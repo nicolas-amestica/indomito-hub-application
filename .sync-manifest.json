@@ -1,0 +1,158 @@
+{
+  "generatedAt": "2026-08-09T05:15:14.008Z",
+  "engineVersion": "1.0.0",
+  "files": [
+    {
+      "sourcePaths": [
+        "ai/source/global-context/agent-charter.md",
+        "ai/source/global-context/output-style.md",
+        "ai/source/global-context/repo-routing.md",
+        "ai/source/global-context/spec-lifecycle.md",
+        "ai/source/repo-overrides/ind-hub-app.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/CLAUDE.md",
+      "targetPath": ".claude/CLAUDE.md",
+      "checksum": "sha256:1c883c4e5c32488f8ee594a4186cf449a794be7eeefdd9b460394b8dba4434a7"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/global-context/agent-charter.md",
+        "ai/source/global-context/output-style.md",
+        "ai/source/global-context/repo-routing.md",
+        "ai/source/global-context/spec-lifecycle.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/.claude/rules/global-rules.md",
+      "targetPath": ".claude/rules/global-rules.md",
+      "checksum": "sha256:0ccce5fab4ee74b64d08472619b4e4b517fd0e2a6224e387ba9a0404cb19df85"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/repo-overrides/ind-hub-app.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/.claude/rules/repo-rules.md",
+      "targetPath": ".claude/rules/repo-rules.md",
+      "checksum": "sha256:28df36932443cdafd0f80adb50b3d73b3ec60179a70b2eacf2645acc74b86da6"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/global-context/agent-charter.md",
+        "ai/source/global-context/output-style.md",
+        "ai/source/global-context/repo-routing.md",
+        "ai/source/global-context/spec-lifecycle.md",
+        "ai/source/repo-overrides/ind-hub-app.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/GEMINI.md",
+      "targetPath": ".gemini/GEMINI.md",
+      "checksum": "sha256:90dbbdf6a93ccd23e3fa31e5d33b0a6f55ec4af55aa95b8b184e85f60dc1b8db"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/global-context/repo-routing.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/.kiro/steering/repo-routing.md",
+      "targetPath": ".kiro/steering/repo-routing.md",
+      "checksum": "sha256:171f01d3e327b9a274f6d30c23748ac8f73fdbb727d18d38844e0f71705942e2"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/global-context/spec-lifecycle.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/.kiro/steering/spec-lifecycle.md",
+      "targetPath": ".kiro/steering/spec-lifecycle.md",
+      "checksum": "sha256:ada46510941f614c9615348562349398a435ee5f10c35c87cb6d3f12c82b8eb4"
+    },
+    {
+      "sourcePaths": [
+        "docs/standards/architecture/auth-flow.md",
+        "docs/standards/architecture/contracts-policy.md",
+        "docs/standards/architecture/environment-definitions.md",
+        "docs/standards/architecture/repo-map.md",
+        "docs/standards/architecture/system-overview.md",
+        "docs/standards/backend/common-backend-rules.md",
+        "docs/standards/backend/go-conventions.md",
+        "docs/standards/backend/typescript-conventions.md",
+        "docs/standards/domains/auth-domain-rules.md",
+        "docs/standards/domains/orders-domain-rules.md",
+        "docs/standards/frontend/angular-architecture.md",
+        "docs/standards/frontend/design-system-usage.md",
+        "docs/standards/frontend/ui-patterns.md",
+        "docs/standards/global/api-design.md",
+        "docs/standards/global/architecture-principles.md",
+        "docs/standards/global/aws-naming.md",
+        "docs/standards/global/commit-conventions.md",
+        "docs/standards/global/error-handling.md",
+        "docs/standards/global/git-pr-guidelines.md",
+        "docs/standards/global/naming-conventions.md",
+        "docs/standards/global/observability.md",
+        "docs/standards/global/security-baseline.md",
+        "docs/standards/global/testing-baseline.md",
+        "docs/standards/product/domain-glossary.md",
+        "docs/standards/product/module-definitions.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/.kiro/steering/standards-ref.md",
+      "targetPath": ".kiro/steering/standards-ref.md",
+      "checksum": "sha256:68181ff53805dc8e609469752a0a851bcf3dc8f51013bcd6bac00c5d160022dd"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/repo-overrides/ind-hub-app.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/.kiro/steering/domain-context.md",
+      "targetPath": ".kiro/steering/domain-context.md",
+      "checksum": "sha256:4290062423db31a813ada36c7cfb6e579016a3713b7350de9efa0ef79163b74d"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/global-context/agent-charter.md",
+        "ai/source/global-context/output-style.md",
+        "ai/source/global-context/repo-routing.md",
+        "ai/source/global-context/spec-lifecycle.md",
+        "ai/source/repo-overrides/ind-hub-app.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/AGENTS.md",
+      "targetPath": "AGENTS.md",
+      "checksum": "sha256:08a3d7a09f89ec628b239bbae870192cf3b3b32b09cf92de985de7689543f7a1"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/skills/api-contract-review.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/skills/kiro/api-contract-review.md",
+      "targetPath": ".kiro/skills/api-contract-review.md",
+      "checksum": "sha256:8b07d712252d29430184c31cbe31329465b4914618acaf67005b5658cff17068"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/skills/api-contract-review.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/skills/claude/api-contract-review.md",
+      "targetPath": ".claude/skills/api-contract-review.md",
+      "checksum": "sha256:8b07d712252d29430184c31cbe31329465b4914618acaf67005b5658cff17068"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/skills/aws-naming-review.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/skills/kiro/aws-naming-review.md",
+      "targetPath": ".kiro/skills/aws-naming-review.md",
+      "checksum": "sha256:d45cc80cc27d362ecb149f21f259743834a8469d6cbe612495c533e05ce9b2d5"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/skills/aws-naming-review.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/skills/claude/aws-naming-review.md",
+      "targetPath": ".claude/skills/aws-naming-review.md",
+      "checksum": "sha256:d45cc80cc27d362ecb149f21f259743834a8469d6cbe612495c533e05ce9b2d5"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/mcp/shared.json",
+        "ai/source/mcp/frontend.json"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/mcp/mcp.json",
+      "targetPath": "mcp/mcp.json",
+      "checksum": "sha256:d8e397af03b5b032f21d0aa967086f0c78b33c87b76f2e9898ae0a144df7de02"
+    }
+  ]
+}
