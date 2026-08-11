@@ -1,23 +1,37 @@
 {
   "name": "ind-hub-app-ngx-pri-gh",
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "build:dev": "ng build -c=dev",
+    "build:prd": "ng build -c=production",
+    "deploy:dev": "bash tools/deploy-spa.sh dev",
+    "deploy:prd": "bash tools/deploy-spa.sh prd",
+    "version:dev": "node tools/versioning.js dev",
+    "version:prd": "node tools/versioning.js prd",
+    "build:deploy:dev": "npm run version:dev && npm run build:dev && npm run deploy:dev",
+    "build:deploy:prd": "npm run version:prd && npm run build:prd && npm run deploy:prd"
   },
   "private": true,
   "packageManager": "npm@11.12.1",
   "dependencies": {
+    "@angular/animations": "^22.1.1",
+    "@angular/cdk": "^22.1.1",
     "@angular/common": "^22.1.0",
     "@angular/compiler": "^22.1.0",
     "@angular/core": "^22.1.0",
     "@angular/forms": "^22.1.0",
     "@angular/platform-browser": "^22.1.0",
     "@angular/router": "^22.1.0",
+    "@primeuix/themes": "^3.0.0",
+    "primeng": "^22.1.0-rc.1",
     "rxjs": "~7.8.0",
+    "tailwindcss": "^4.3.3",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
