@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-10T00:33:57.574Z",
+  "generatedAt": "2026-08-11T02:15:11.880Z",
   "engineVersion": "1.0.0",
   "files": [
     {
@@ -12,7 +12,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/CLAUDE.md",
       "targetPath": ".claude/CLAUDE.md",
-      "checksum": "sha256:6685c9df15755429945761c74e47e32996adb5f83bbe4be1bb10fb3c62faf6a6"
+      "checksum": "sha256:6c0b5c1e06e55b529b7b047a3d9430c0ba8c672af5c1f3c0ada1ac9e92c814f0"
     },
     {
       "sourcePaths": [
@@ -23,7 +23,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.claude/rules/global-rules.md",
       "targetPath": ".claude/rules/global-rules.md",
-      "checksum": "sha256:b6325514041aeb282748bdbf96133a1588bdab3a1e751763ac61bf22319b4113"
+      "checksum": "sha256:f82475515982fa8155a5498517d69d62e0a999d274677a571bd04dc95a7d09fe"
     },
     {
       "sourcePaths": [
@@ -31,7 +31,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.claude/rules/repo-rules.md",
       "targetPath": ".claude/rules/repo-rules.md",
-      "checksum": "sha256:a26919bad8185a78530476fdc014d297b1c697d3b504c4a56140c590d26dc192"
+      "checksum": "sha256:ac0d287463f253d751208626a72eb5f06479fe926b3c4ddbbe68fe55d89cfadd"
     },
     {
       "sourcePaths": [
@@ -43,7 +43,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/GEMINI.md",
       "targetPath": ".gemini/GEMINI.md",
-      "checksum": "sha256:6f9500c9189c6b780c73d9fb9ac7ec771d42df5e8b4bcfc9afd8f3694defaaf5"
+      "checksum": "sha256:647ecd0b6a2edd3ddbb485afa922a734a46fb8f1e347f69807eb9609c7940cae"
     },
     {
       "sourcePaths": [
@@ -51,7 +51,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.kiro/steering/repo-routing.md",
       "targetPath": ".kiro/steering/repo-routing.md",
-      "checksum": "sha256:2229651d7861ee8ed0dd1a50cfacbd1c05f82c0774d62eab9ebacb4b670af2a0"
+      "checksum": "sha256:68bcab8d1cf5998c67157e383baf095281d6cee8a115c1f922465cc1e976df34"
     },
     {
       "sourcePaths": [
@@ -59,7 +59,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.kiro/steering/spec-lifecycle.md",
       "targetPath": ".kiro/steering/spec-lifecycle.md",
-      "checksum": "sha256:e8acb2f6b46b3280398db8cf1fae67bb407b6323a512aa98f909dd67877f1575"
+      "checksum": "sha256:a9976929779c03259b1adc672c96c8def89a7ceb95931c4557d6425c5173d363"
     },
     {
       "sourcePaths": [
@@ -91,7 +91,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.kiro/steering/standards-ref.md",
       "targetPath": ".kiro/steering/standards-ref.md",
-      "checksum": "sha256:472d591e94159c0f7b3c6954e272ba757cdde2fb9ba243cd54928df4266faa3f"
+      "checksum": "sha256:81dbc2bdad90285da25bfbb373ef887d668f6218ff5f7e6e724fb528e9ef5f04"
     },
     {
       "sourcePaths": [
@@ -99,7 +99,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.kiro/steering/domain-context.md",
       "targetPath": ".kiro/steering/domain-context.md",
-      "checksum": "sha256:5de2211c2df44376d5054e082fb8eb89209a7639f5e16aed8d7be4e6f7d85582"
+      "checksum": "sha256:4c82ce191da4499aec946ab8b020ec8722b7cf01385a4799ad401f6a0c5ee248"
     },
     {
       "sourcePaths": [
@@ -111,7 +111,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/AGENTS.md",
       "targetPath": "AGENTS.md",
-      "checksum": "sha256:5018feee01362507e255a8378ee421e56dc48c1b9d4f157f1affa8cd1977292c"
+      "checksum": "sha256:0acb275ffa483fe97b4b8214edd7145ac4ed5ce33013b0e14196f9da10b5acfb"
     },
     {
       "sourcePaths": [
@@ -119,7 +119,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/skills/kiro/api-contract-review.md",
       "targetPath": ".kiro/skills/api-contract-review.md",
-      "checksum": "sha256:067d13589844cc119758c2b0cb40dd12bd5b1faae009b3fc36ea9ff5742276f7"
+      "checksum": "sha256:559e13fb11056d0b2a2335fc2eb646ac1ff330127cb3e7ebe2d41dda0d95ead0"
     },
     {
       "sourcePaths": [
@@ -127,7 +127,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/skills/claude/api-contract-review.md",
       "targetPath": ".claude/skills/api-contract-review.md",
-      "checksum": "sha256:067d13589844cc119758c2b0cb40dd12bd5b1faae009b3fc36ea9ff5742276f7"
+      "checksum": "sha256:559e13fb11056d0b2a2335fc2eb646ac1ff330127cb3e7ebe2d41dda0d95ead0"
     },
     {
       "sourcePaths": [
@@ -135,7 +135,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/skills/kiro/aws-naming-review.md",
       "targetPath": ".kiro/skills/aws-naming-review.md",
-      "checksum": "sha256:b73a46bf6d5022c8dea6672fc99f400d7fa88b814ccb3e9eaac33601b92ac499"
+      "checksum": "sha256:e20836d6cf44ddea52603773235ca1137164c82e558623bd9e4d3d32ccfa8f0e"
     },
     {
       "sourcePaths": [
@@ -143,7 +143,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/skills/claude/aws-naming-review.md",
       "targetPath": ".claude/skills/aws-naming-review.md",
-      "checksum": "sha256:b73a46bf6d5022c8dea6672fc99f400d7fa88b814ccb3e9eaac33601b92ac499"
+      "checksum": "sha256:e20836d6cf44ddea52603773235ca1137164c82e558623bd9e4d3d32ccfa8f0e"
     },
     {
       "sourcePaths": [
