@@ -25,13 +25,13 @@ REGION=${3:-us-east-1}
 case "$STAGE" in
   dev)
     PROFILE="pa-dev"
-    BUCKET="ind-dev-hub-s3-dev-pri-use1"
-    STACK_NAME="ind-hub-inf-cdn-dev"
+    BUCKET="ind-dev-hub-spa-s3-dev-pri-use1"
+    STACK_NAME="indomito-hub-infra-cdn-dev"
     ;;
   prd)
     PROFILE="pa-prd"
-    BUCKET="ind-prd-hub-s3-prd-pri-use1"
-    STACK_NAME="ind-hub-inf-cdn-prd"
+    BUCKET="ind-prd-hub-spa-s3-prd-pri-use1"
+    STACK_NAME="indomito-hub-infra-cdn-prd"
     ;;
 esac
 

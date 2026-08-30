@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-11T02:15:11.880Z",
+  "generatedAt": "2026-08-30T18:33:26.986Z",
   "engineVersion": "1.0.0",
   "files": [
     {
@@ -12,7 +12,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/CLAUDE.md",
       "targetPath": ".claude/CLAUDE.md",
-      "checksum": "sha256:6c0b5c1e06e55b529b7b047a3d9430c0ba8c672af5c1f3c0ada1ac9e92c814f0"
+      "checksum": "sha256:117a5c0104f26170a6dc060ac01f6979dfdfdf296d7fcc8419072f6f69ce8f14"
     },
     {
       "sourcePaths": [
@@ -23,7 +23,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.claude/rules/global-rules.md",
       "targetPath": ".claude/rules/global-rules.md",
-      "checksum": "sha256:f82475515982fa8155a5498517d69d62e0a999d274677a571bd04dc95a7d09fe"
+      "checksum": "sha256:5a41a769261b0968cc6a5b23c716a92a47a209f51d06ab01d371fecc01b96092"
     },
     {
       "sourcePaths": [
@@ -31,7 +31,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.claude/rules/repo-rules.md",
       "targetPath": ".claude/rules/repo-rules.md",
-      "checksum": "sha256:ac0d287463f253d751208626a72eb5f06479fe926b3c4ddbbe68fe55d89cfadd"
+      "checksum": "sha256:4ab590bd756cbc570da8efe1ea96895953f4e549acd90751dec4002ec80385c8"
     },
     {
       "sourcePaths": [
@@ -43,7 +43,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/GEMINI.md",
       "targetPath": ".gemini/GEMINI.md",
-      "checksum": "sha256:647ecd0b6a2edd3ddbb485afa922a734a46fb8f1e347f69807eb9609c7940cae"
+      "checksum": "sha256:0ce83d76c15b20e3a08a2702b67fce20263b4125225da5185962e711c73bd4ea"
     },
     {
       "sourcePaths": [
@@ -51,7 +51,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.kiro/steering/repo-routing.md",
       "targetPath": ".kiro/steering/repo-routing.md",
-      "checksum": "sha256:68bcab8d1cf5998c67157e383baf095281d6cee8a115c1f922465cc1e976df34"
+      "checksum": "sha256:98d2970b077d88f2e90bc7c49a6357256dfc9273ea9866e72fd270bee97ead2f"
     },
     {
       "sourcePaths": [
@@ -59,7 +59,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.kiro/steering/spec-lifecycle.md",
       "targetPath": ".kiro/steering/spec-lifecycle.md",
-      "checksum": "sha256:a9976929779c03259b1adc672c96c8def89a7ceb95931c4557d6425c5173d363"
+      "checksum": "sha256:fb3236f9895f7c4b6ee8335ded7b494ae63124f2ed7d06c7e0aea673bb6f33c7"
     },
     {
       "sourcePaths": [
@@ -91,7 +91,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.kiro/steering/standards-ref.md",
       "targetPath": ".kiro/steering/standards-ref.md",
-      "checksum": "sha256:81dbc2bdad90285da25bfbb373ef887d668f6218ff5f7e6e724fb528e9ef5f04"
+      "checksum": "sha256:5e9e30e5ee1587a0328f7b1ab033aa28e4aab2c5c154a62e2aec18785b272c30"
     },
     {
       "sourcePaths": [
@@ -99,7 +99,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.kiro/steering/domain-context.md",
       "targetPath": ".kiro/steering/domain-context.md",
-      "checksum": "sha256:4c82ce191da4499aec946ab8b020ec8722b7cf01385a4799ad401f6a0c5ee248"
+      "checksum": "sha256:bb51ad51462b671ce909e7d4595d9e3d557a1e4dbecc391f81c746b84fc0a196"
     },
     {
       "sourcePaths": [
@@ -111,7 +111,23 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/AGENTS.md",
       "targetPath": "AGENTS.md",
-      "checksum": "sha256:0acb275ffa483fe97b4b8214edd7145ac4ed5ce33013b0e14196f9da10b5acfb"
+      "checksum": "sha256:74f14d576cf0c5d01d271756f3c7fafeb0939590f6d0284d8866f28d8e5b83d8"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/skills/angular-best-practices.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/skills/kiro/angular-best-practices.md",
+      "targetPath": ".kiro/skills/angular-best-practices.md",
+      "checksum": "sha256:8caf270db2ab92e0c15ae1a66f16ffe10f5b25ea81be3e0611551e34f64ebd3f"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/skills/angular-best-practices.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/skills/claude/angular-best-practices.md",
+      "targetPath": ".claude/skills/angular-best-practices.md",
+      "checksum": "sha256:8caf270db2ab92e0c15ae1a66f16ffe10f5b25ea81be3e0611551e34f64ebd3f"
     },
     {
       "sourcePaths": [
@@ -119,7 +135,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/skills/kiro/api-contract-review.md",
       "targetPath": ".kiro/skills/api-contract-review.md",
-      "checksum": "sha256:559e13fb11056d0b2a2335fc2eb646ac1ff330127cb3e7ebe2d41dda0d95ead0"
+      "checksum": "sha256:08628c8889cd4e1d64382d510006e0b7f6078f1c0dc243a93554abcad578b654"
     },
     {
       "sourcePaths": [
@@ -127,7 +143,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/skills/claude/api-contract-review.md",
       "targetPath": ".claude/skills/api-contract-review.md",
-      "checksum": "sha256:559e13fb11056d0b2a2335fc2eb646ac1ff330127cb3e7ebe2d41dda0d95ead0"
+      "checksum": "sha256:08628c8889cd4e1d64382d510006e0b7f6078f1c0dc243a93554abcad578b654"
     },
     {
       "sourcePaths": [
@@ -135,7 +151,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/skills/kiro/aws-naming-review.md",
       "targetPath": ".kiro/skills/aws-naming-review.md",
-      "checksum": "sha256:e20836d6cf44ddea52603773235ca1137164c82e558623bd9e4d3d32ccfa8f0e"
+      "checksum": "sha256:47511529ebf12182653de09b72e7482f52bd3b120548f0e6159c1f95fcd55a99"
     },
     {
       "sourcePaths": [
@@ -143,7 +159,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/skills/claude/aws-naming-review.md",
       "targetPath": ".claude/skills/aws-naming-review.md",
-      "checksum": "sha256:e20836d6cf44ddea52603773235ca1137164c82e558623bd9e4d3d32ccfa8f0e"
+      "checksum": "sha256:47511529ebf12182653de09b72e7482f52bd3b120548f0e6159c1f95fcd55a99"
     },
     {
       "sourcePaths": [
@@ -152,7 +168,25 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/mcp/mcp.json",
       "targetPath": "mcp/mcp.json",
-      "checksum": "sha256:d8e397af03b5b032f21d0aa967086f0c78b33c87b76f2e9898ae0a144df7de02"
+      "checksum": "sha256:52969a32efea09a8e37d6c66dec99df156ddb59743f8a92e45f4a0edcd9384c9"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/mcp/shared.json",
+        "ai/source/mcp/frontend.json"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/mcp/gemini-mcp.json",
+      "targetPath": "mcp/gemini-mcp.json",
+      "checksum": "sha256:52969a32efea09a8e37d6c66dec99df156ddb59743f8a92e45f4a0edcd9384c9"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/mcp/shared.json",
+        "ai/source/mcp/frontend.json"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/mcp/codex-mcp.toml",
+      "targetPath": "mcp/codex-mcp.toml",
+      "checksum": "sha256:0eaa1f1a5d544d24545d1c87632da928bf538a72ca464412b187ab2c7f19b4e9"
     }
   ]
 }
