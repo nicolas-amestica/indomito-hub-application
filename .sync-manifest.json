@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-30T18:33:26.986Z",
+  "generatedAt": "2026-08-30T19:10:53.332Z",
   "engineVersion": "1.0.0",
   "files": [
     {
@@ -12,7 +12,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/CLAUDE.md",
       "targetPath": ".claude/CLAUDE.md",
-      "checksum": "sha256:117a5c0104f26170a6dc060ac01f6979dfdfdf296d7fcc8419072f6f69ce8f14"
+      "checksum": "sha256:d6230255886768dae7bcef1fdcd72ca8fe08dd01aef82f95417c372eb04fb1a3"
     },
     {
       "sourcePaths": [
@@ -23,7 +23,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.claude/rules/global-rules.md",
       "targetPath": ".claude/rules/global-rules.md",
-      "checksum": "sha256:5a41a769261b0968cc6a5b23c716a92a47a209f51d06ab01d371fecc01b96092"
+      "checksum": "sha256:d0a04b944d86df6cb6cbe5584065baa67a066a566079a3f3cf2203562633c1e5"
     },
     {
       "sourcePaths": [
@@ -31,7 +31,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.claude/rules/repo-rules.md",
       "targetPath": ".claude/rules/repo-rules.md",
-      "checksum": "sha256:4ab590bd756cbc570da8efe1ea96895953f4e549acd90751dec4002ec80385c8"
+      "checksum": "sha256:617efe1a975379ce739040c202049767a5581574b4d4327e21baf9fe461613a9"
     },
     {
       "sourcePaths": [
@@ -43,7 +43,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/GEMINI.md",
       "targetPath": ".gemini/GEMINI.md",
-      "checksum": "sha256:0ce83d76c15b20e3a08a2702b67fce20263b4125225da5185962e711c73bd4ea"
+      "checksum": "sha256:0db7a82a7825ed8df15ee4b5f1f3c08c8859f680d07d348609500068e40ef601"
     },
     {
       "sourcePaths": [
@@ -51,7 +51,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.kiro/steering/repo-routing.md",
       "targetPath": ".kiro/steering/repo-routing.md",
-      "checksum": "sha256:98d2970b077d88f2e90bc7c49a6357256dfc9273ea9866e72fd270bee97ead2f"
+      "checksum": "sha256:cacb1205a261fdd2e4ac9a662ce95f2bf4fcb8511a81a12aaae269455fae4457"
     },
     {
       "sourcePaths": [
@@ -59,7 +59,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.kiro/steering/spec-lifecycle.md",
       "targetPath": ".kiro/steering/spec-lifecycle.md",
-      "checksum": "sha256:fb3236f9895f7c4b6ee8335ded7b494ae63124f2ed7d06c7e0aea673bb6f33c7"
+      "checksum": "sha256:26eadd5ce5d968c57985144d24a3f4bc0d304e77dcd0711196f818669596f346"
     },
     {
       "sourcePaths": [
@@ -91,7 +91,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.kiro/steering/standards-ref.md",
       "targetPath": ".kiro/steering/standards-ref.md",
-      "checksum": "sha256:5e9e30e5ee1587a0328f7b1ab033aa28e4aab2c5c154a62e2aec18785b272c30"
+      "checksum": "sha256:d9b00f549f52ac560cbd659237996e527d8bfbdc4a27b4499bf230a9024ad5b4"
     },
     {
       "sourcePaths": [
@@ -99,7 +99,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.kiro/steering/domain-context.md",
       "targetPath": ".kiro/steering/domain-context.md",
-      "checksum": "sha256:bb51ad51462b671ce909e7d4595d9e3d557a1e4dbecc391f81c746b84fc0a196"
+      "checksum": "sha256:5ddfe66ab936639f31685eb3cd21b66da1773c143d95ef643c543e799eaa6e17"
     },
     {
       "sourcePaths": [
@@ -111,7 +111,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/AGENTS.md",
       "targetPath": "AGENTS.md",
-      "checksum": "sha256:74f14d576cf0c5d01d271756f3c7fafeb0939590f6d0284d8866f28d8e5b83d8"
+      "checksum": "sha256:6bd7fe6b494588fa74eeb4c1deb3982252d1385c9f1c8ac6ee09531ad0d252c7"
     },
     {
       "sourcePaths": [
@@ -119,7 +119,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/skills/kiro/angular-best-practices.md",
       "targetPath": ".kiro/skills/angular-best-practices.md",
-      "checksum": "sha256:8caf270db2ab92e0c15ae1a66f16ffe10f5b25ea81be3e0611551e34f64ebd3f"
+      "checksum": "sha256:9131d392355141766d2673c5bad2478cd3d9b1d20b173996dc422f81f5be2d8f"
     },
     {
       "sourcePaths": [
@@ -127,7 +127,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/skills/claude/angular-best-practices.md",
       "targetPath": ".claude/skills/angular-best-practices.md",
-      "checksum": "sha256:8caf270db2ab92e0c15ae1a66f16ffe10f5b25ea81be3e0611551e34f64ebd3f"
+      "checksum": "sha256:9131d392355141766d2673c5bad2478cd3d9b1d20b173996dc422f81f5be2d8f"
     },
     {
       "sourcePaths": [
@@ -135,7 +135,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/skills/kiro/api-contract-review.md",
       "targetPath": ".kiro/skills/api-contract-review.md",
-      "checksum": "sha256:08628c8889cd4e1d64382d510006e0b7f6078f1c0dc243a93554abcad578b654"
+      "checksum": "sha256:1acf74ef300dd14d9ffc0fb2ccf13ba29df8feef204c57d6e2f514c0dd4d8bab"
     },
     {
       "sourcePaths": [
@@ -143,7 +143,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/skills/claude/api-contract-review.md",
       "targetPath": ".claude/skills/api-contract-review.md",
-      "checksum": "sha256:08628c8889cd4e1d64382d510006e0b7f6078f1c0dc243a93554abcad578b654"
+      "checksum": "sha256:1acf74ef300dd14d9ffc0fb2ccf13ba29df8feef204c57d6e2f514c0dd4d8bab"
     },
     {
       "sourcePaths": [
@@ -151,7 +151,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/skills/kiro/aws-naming-review.md",
       "targetPath": ".kiro/skills/aws-naming-review.md",
-      "checksum": "sha256:47511529ebf12182653de09b72e7482f52bd3b120548f0e6159c1f95fcd55a99"
+      "checksum": "sha256:b7da3a32825ab6f591020fb89181c73efaed03410a3375723b620c3e629c8df9"
     },
     {
       "sourcePaths": [
@@ -159,7 +159,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/skills/claude/aws-naming-review.md",
       "targetPath": ".claude/skills/aws-naming-review.md",
-      "checksum": "sha256:47511529ebf12182653de09b72e7482f52bd3b120548f0e6159c1f95fcd55a99"
+      "checksum": "sha256:b7da3a32825ab6f591020fb89181c73efaed03410a3375723b620c3e629c8df9"
     },
     {
       "sourcePaths": [
@@ -186,7 +186,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/mcp/codex-mcp.toml",
       "targetPath": "mcp/codex-mcp.toml",
-      "checksum": "sha256:0eaa1f1a5d544d24545d1c87632da928bf538a72ca464412b187ab2c7f19b4e9"
+      "checksum": "sha256:b7f667d2f8673d6be3ec1036c0e8332b56d1b5fbe8318752c1b05033b1872af7"
     }
   ]
 }
