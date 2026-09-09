@@ -1,19 +1,6 @@
 {
-  "generatedAt": "2026-09-01T14:18:08.115Z",
   "engineVersion": "1.0.0",
   "files": [
-    {
-      "sourcePaths": [
-        "ai/source/global-context/agent-charter.md",
-        "ai/source/global-context/output-style.md",
-        "ai/source/global-context/repo-routing.md",
-        "ai/source/global-context/spec-lifecycle.md",
-        "ai/source/repo-overrides/ind-hub-app.md"
-      ],
-      "outputPath": "ai/generated/ind-hub-app/CLAUDE.md",
-      "targetPath": ".claude/CLAUDE.md",
-      "checksum": "sha256:21a2eaffe740a5a96bf1f30186205c5257f5ac6e56a44b1a6558aad96c161ee2"
-    },
     {
       "sourcePaths": [
         "ai/source/global-context/agent-charter.md",
@@ -23,7 +10,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.claude/rules/global-rules.md",
       "targetPath": ".claude/rules/global-rules.md",
-      "checksum": "sha256:2ccf19ec5e4d55ca3b333379290268ee62385432c1457f7d00c356a8bdc8ad77"
+      "checksum": "sha256:a6aaabb587e01c973743ca147c623485d162750f99a757f6c29ed55119a8005b"
     },
     {
       "sourcePaths": [
@@ -31,19 +18,15 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.claude/rules/repo-rules.md",
       "targetPath": ".claude/rules/repo-rules.md",
-      "checksum": "sha256:a36622080aa66bd477214621127dd6fc6eb2797801f3c7ff2b5f4c3fd0d50bd8"
+      "checksum": "sha256:91495bbc45187f999cd3647ccb748e0c3b2fe8e24dc864abaac12bfd5a592f4f"
     },
     {
       "sourcePaths": [
-        "ai/source/global-context/agent-charter.md",
-        "ai/source/global-context/output-style.md",
-        "ai/source/global-context/repo-routing.md",
-        "ai/source/global-context/spec-lifecycle.md",
         "ai/source/repo-overrides/ind-hub-app.md"
       ],
-      "outputPath": "ai/generated/ind-hub-app/GEMINI.md",
-      "targetPath": ".gemini/GEMINI.md",
-      "checksum": "sha256:cd1e969f2375b45e36f4c4a73a73f45eda2c652d4e7059c60c17fd0990ebbe69"
+      "outputPath": "ai/generated/ind-hub-app/.kiro/steering/domain-context.md",
+      "targetPath": ".kiro/steering/domain-context.md",
+      "checksum": "sha256:2f9a0ef7114ff17cee8622074588fe8f4af7ba8afc2b4c19c8cc701cd3e4ea1d"
     },
     {
       "sourcePaths": [
@@ -51,7 +34,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.kiro/steering/repo-routing.md",
       "targetPath": ".kiro/steering/repo-routing.md",
-      "checksum": "sha256:c4787925961320b133c51191c1e64ab6200585baa4755e691434c2653c5e23a9"
+      "checksum": "sha256:bf1fd63bd71b097364254a91862f6b52ef848d1108bc6c940be5f5f4f98063cb"
     },
     {
       "sourcePaths": [
@@ -59,13 +42,14 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.kiro/steering/spec-lifecycle.md",
       "targetPath": ".kiro/steering/spec-lifecycle.md",
-      "checksum": "sha256:a1c5bfe2ba7daac74970acb59c0f436fc472b31d315ef2355ced7e7aa0545074"
+      "checksum": "sha256:ad94e79cf3b9fe9ecfb4774d14d88860ec8a8a980facb55dcf65312f12517a6e"
     },
     {
       "sourcePaths": [
         "docs/standards/architecture/auth-flow.md",
         "docs/standards/architecture/contracts-policy.md",
         "docs/standards/architecture/environment-definitions.md",
+        "docs/standards/architecture/legacy-systems.md",
         "docs/standards/architecture/repo-map.md",
         "docs/standards/architecture/system-overview.md",
         "docs/standards/backend/common-backend-rules.md",
@@ -91,15 +75,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.kiro/steering/standards-ref.md",
       "targetPath": ".kiro/steering/standards-ref.md",
-      "checksum": "sha256:50836be75fa0290918d607369dedf9c5b96b2ae021d2d62e33cb1103a6c4fd80"
-    },
-    {
-      "sourcePaths": [
-        "ai/source/repo-overrides/ind-hub-app.md"
-      ],
-      "outputPath": "ai/generated/ind-hub-app/.kiro/steering/domain-context.md",
-      "targetPath": ".kiro/steering/domain-context.md",
-      "checksum": "sha256:52ab9ec62d80ee8d96c27400ba86436deee75d72a862a618c9a6c6e32497037f"
+      "checksum": "sha256:286e97c325d58da2ff3d59a1250479b8e5ab65d6f245742a2a6194dd48b00f8c"
     },
     {
       "sourcePaths": [
@@ -111,64 +87,40 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/AGENTS.md",
       "targetPath": "AGENTS.md",
-      "checksum": "sha256:d131236360a8670748b505ecf4918a2090e02dfe7b6c0568919764607d8bb9a5"
+      "checksum": "sha256:d922cb039951a5c4c173dfc3641e5228c69871a6f9eb5222c25adfb23328b95c"
     },
     {
       "sourcePaths": [
-        "ai/source/skills/angular-best-practices.md"
+        "ai/source/global-context/agent-charter.md",
+        "ai/source/global-context/output-style.md",
+        "ai/source/global-context/repo-routing.md",
+        "ai/source/global-context/spec-lifecycle.md",
+        "ai/source/repo-overrides/ind-hub-app.md"
       ],
-      "outputPath": "ai/generated/ind-hub-app/skills/kiro/angular-best-practices.md",
-      "targetPath": ".kiro/skills/angular-best-practices.md",
-      "checksum": "sha256:c04f16cc2d53c8f289b9d762fccee6bfc23742259cbacb77224fc0564f9e82ce"
+      "outputPath": "ai/generated/ind-hub-app/CLAUDE.md",
+      "targetPath": ".claude/CLAUDE.md",
+      "checksum": "sha256:a581a85a1a8b2ee53f45df33b1d657e7ffe32ecb08decf003a38853e26bcca31"
     },
     {
       "sourcePaths": [
-        "ai/source/skills/angular-best-practices.md"
+        "ai/source/global-context/agent-charter.md",
+        "ai/source/global-context/output-style.md",
+        "ai/source/global-context/repo-routing.md",
+        "ai/source/global-context/spec-lifecycle.md",
+        "ai/source/repo-overrides/ind-hub-app.md"
       ],
-      "outputPath": "ai/generated/ind-hub-app/skills/claude/angular-best-practices.md",
-      "targetPath": ".claude/skills/angular-best-practices.md",
-      "checksum": "sha256:c04f16cc2d53c8f289b9d762fccee6bfc23742259cbacb77224fc0564f9e82ce"
-    },
-    {
-      "sourcePaths": [
-        "ai/source/skills/api-contract-review.md"
-      ],
-      "outputPath": "ai/generated/ind-hub-app/skills/kiro/api-contract-review.md",
-      "targetPath": ".kiro/skills/api-contract-review.md",
-      "checksum": "sha256:53cf4a8d92b255ab280eb6eaaa037da664ee04f4476998116095a9fad72c7e1a"
-    },
-    {
-      "sourcePaths": [
-        "ai/source/skills/api-contract-review.md"
-      ],
-      "outputPath": "ai/generated/ind-hub-app/skills/claude/api-contract-review.md",
-      "targetPath": ".claude/skills/api-contract-review.md",
-      "checksum": "sha256:53cf4a8d92b255ab280eb6eaaa037da664ee04f4476998116095a9fad72c7e1a"
-    },
-    {
-      "sourcePaths": [
-        "ai/source/skills/aws-naming-review.md"
-      ],
-      "outputPath": "ai/generated/ind-hub-app/skills/kiro/aws-naming-review.md",
-      "targetPath": ".kiro/skills/aws-naming-review.md",
-      "checksum": "sha256:b5ca68e34212586fca285ef92a926390e494cd4769a197d878d05f4c4a346f81"
-    },
-    {
-      "sourcePaths": [
-        "ai/source/skills/aws-naming-review.md"
-      ],
-      "outputPath": "ai/generated/ind-hub-app/skills/claude/aws-naming-review.md",
-      "targetPath": ".claude/skills/aws-naming-review.md",
-      "checksum": "sha256:b5ca68e34212586fca285ef92a926390e494cd4769a197d878d05f4c4a346f81"
+      "outputPath": "ai/generated/ind-hub-app/GEMINI.md",
+      "targetPath": ".gemini/GEMINI.md",
+      "checksum": "sha256:a71e663ccc8da4a7bcee5f93198cd0f95667c0cef04cf5970cd523b30a93e35a"
     },
     {
       "sourcePaths": [
         "ai/source/mcp/shared.json",
         "ai/source/mcp/frontend.json"
       ],
-      "outputPath": "ai/generated/ind-hub-app/mcp/mcp.json",
-      "targetPath": "mcp/mcp.json",
-      "checksum": "sha256:52969a32efea09a8e37d6c66dec99df156ddb59743f8a92e45f4a0edcd9384c9"
+      "outputPath": "ai/generated/ind-hub-app/mcp/codex-mcp.toml",
+      "targetPath": "mcp/codex-mcp.toml",
+      "checksum": "sha256:dd000aa64ba63f9b583a31aefa514fedd5006dddbc969eba738313c5a6f21b95"
     },
     {
       "sourcePaths": [
@@ -184,9 +136,61 @@
         "ai/source/mcp/shared.json",
         "ai/source/mcp/frontend.json"
       ],
-      "outputPath": "ai/generated/ind-hub-app/mcp/codex-mcp.toml",
-      "targetPath": "mcp/codex-mcp.toml",
-      "checksum": "sha256:3c63585daefc78623c351f82ce1014a21d1cc3ce883cfb95b1e65d6b354b6f86"
+      "outputPath": "ai/generated/ind-hub-app/mcp/mcp.json",
+      "targetPath": "mcp/mcp.json",
+      "checksum": "sha256:52969a32efea09a8e37d6c66dec99df156ddb59743f8a92e45f4a0edcd9384c9"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/skills/angular-best-practices.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/skills/claude/angular-best-practices.md",
+      "targetPath": ".claude/skills/angular-best-practices.md",
+      "checksum": "sha256:de24644847c99d2e4967d3ea412400fbc08b80f9ce901f37df7c7bcc9a93fc12"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/skills/api-contract-review.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/skills/claude/api-contract-review.md",
+      "targetPath": ".claude/skills/api-contract-review.md",
+      "checksum": "sha256:60713e8f63d530882cb81b37db94f6f488b4e82c0f68326b596c37a7e64b3945"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/skills/aws-naming-review.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/skills/claude/aws-naming-review.md",
+      "targetPath": ".claude/skills/aws-naming-review.md",
+      "checksum": "sha256:71986852fc56bf70ef830b240328846a046c8d212d7df962bfcc51f6a5734e23"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/skills/angular-best-practices.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/skills/kiro/angular-best-practices.md",
+      "targetPath": ".kiro/skills/angular-best-practices.md",
+      "checksum": "sha256:de24644847c99d2e4967d3ea412400fbc08b80f9ce901f37df7c7bcc9a93fc12"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/skills/api-contract-review.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/skills/kiro/api-contract-review.md",
+      "targetPath": ".kiro/skills/api-contract-review.md",
+      "checksum": "sha256:60713e8f63d530882cb81b37db94f6f488b4e82c0f68326b596c37a7e64b3945"
+    },
+    {
+      "sourcePaths": [
+        "ai/source/skills/aws-naming-review.md"
+      ],
+      "outputPath": "ai/generated/ind-hub-app/skills/kiro/aws-naming-review.md",
+      "targetPath": ".kiro/skills/aws-naming-review.md",
+      "checksum": "sha256:71986852fc56bf70ef830b240328846a046c8d212d7df962bfcc51f6a5734e23"
     }
-  ]
+  ],
+  "managedBy": "indomito-context-compiler",
+  "artifactFormatVersion": 1,
+  "sourceCommit": "cbf88576535808bb9beed9241275f3302206bddf",
+  "sourceDirty": true
 }
