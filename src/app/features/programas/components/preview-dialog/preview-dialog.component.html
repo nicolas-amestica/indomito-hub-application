@@ -1,0 +1,382 @@
+<p-dialog
+  header="Previsualización del programa"
+  role="dialog"
+  styleClass="w-[min(72rem,calc(100vw-2rem))]"
+  contentStyleClass="p-0"
+  [visible]="visible()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="false"
+  [focusOnShow]="true"
+  [focusTrap]="true"
+  [closable]="!busy()"
+  [closeOnEscape]="!busy()"
+  [blockScroll]="true"
+  closeAriaLabel="Cerrar previsualización"
+  (visibleChange)="visible.set($event)"
+>
+  <div class="max-h-[72vh] overflow-y-auto bg-canvas" [attr.aria-busy]="busy()">
+    <div class="flex flex-col gap-6 p-5 sm:p-6">
+      <section
+        aria-labelledby="preview-general-heading"
+        class="rounded-xl border border-line bg-surface p-4"
+      >
+        <div class="flex flex-col gap-1 border-b border-line pb-3">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-graphite">Programa</p>
+          <h2 id="preview-general-heading" class="text-xl font-semibold text-ink">
+            {{ program().generals.name }}
+          </h2>
+          @if (program().generals.description; as description) {
+            <p class="text-sm leading-6 text-graphite">{{ description }}</p>
+          }
+        </div>
+
+        <dl class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <dt class="text-xs font-medium uppercase tracking-wide text-muted">Plan</dt>
+            <dd class="mt-1 font-medium text-ink">{{ program().generals.plan.display }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium uppercase tracking-wide text-muted">Temporada</dt>
+            <dd class="mt-1 font-medium text-ink">{{ program().generals.season.display }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium uppercase tracking-wide text-muted">Destino</dt>
+            <dd class="mt-1 font-medium text-ink">
+              {{ program().generals.destination.display }}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium uppercase tracking-wide text-muted">Ciudad de salida</dt>
+            <dd class="mt-1 font-medium text-ink">{{ program().generals.departureCity }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      @if (fallbackDate(); as date) {
+        <app-fallback-rates-notice [date]="date" />
+      }
+
+      <div class="grid gap-4 lg:grid-cols-2">
+        <section
+          aria-labelledby="preview-schedule-heading"
+          class="rounded-xl border border-line bg-surface p-4"
+        >
+          <h2 id="preview-schedule-heading" class="font-semibold text-ink">Fechas y cantidades</h2>
+          <dl class="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:grid-cols-3">
+            <div>
+              <dt class="text-muted">Inicio</dt>
+              <dd class="mt-0.5 font-medium text-ink">
+                {{ program().schedule.startDate | date: 'longDate' : 'UTC' }}
+              </dd>
+            </div>
+            <div>
+              <dt class="text-muted">Término</dt>
+              <dd class="mt-0.5 font-medium text-ink">
+                {{ program().schedule.endDate | date: 'longDate' : 'UTC' }}
+              </dd>
+            </div>
+            <div>
+              <dt class="text-muted">Duración</dt>
+              <dd class="mt-0.5 font-medium text-ink">
+                {{ program().schedule.totalDays }} días /
+                {{ program().schedule.totalNights }} noches
+              </dd>
+            </div>
+            <div>
+              <dt class="text-muted">Pasajeros</dt>
+              <dd class="mt-0.5 font-medium text-ink">
+                {{ program().schedule.totalPassengers }}
+              </dd>
+            </div>
+            <div>
+              <dt class="text-muted">Liberados</dt>
+              <dd class="mt-0.5 font-medium text-ink">
+                {{ program().schedule.freePassengers }}
+              </dd>
+            </div>
+            <div>
+              <dt class="text-muted">Pagantes</dt>
+              <dd class="mt-0.5 font-medium text-ink">
+                {{ program().schedule.payingPassengers }}
+              </dd>
+            </div>
+          </dl>
+        </section>
+
+        <section
+          aria-labelledby="preview-pricing-heading"
+          class="rounded-xl border border-line bg-surface p-4"
+        >
+          <h2 id="preview-pricing-heading" class="font-semibold text-ink">Parámetros de precio</h2>
+          <dl class="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+            <div>
+              <dt class="text-muted">Snapshot</dt>
+              <dd class="mt-0.5 font-medium text-ink">
+                {{ program().pricing.exchange.date | date: 'longDate' : 'UTC' }}
+              </dd>
+            </div>
+            <div>
+              <dt class="text-muted">USD efectivo</dt>
+              <dd class="mt-0.5 font-medium tabular-nums text-ink">
+                {{ effectiveRates().USD | clpAmount }} CLP
+              </dd>
+            </div>
+            <div>
+              <dt class="text-muted">BRL efectivo</dt>
+              <dd class="mt-0.5 font-medium tabular-nums text-ink">
+                {{ effectiveRates().BRL | clpAmount }} CLP
+              </dd>
+            </div>
+            <div>
+              <dt class="text-muted">Incrementos USD / BRL</dt>
+              <dd class="mt-0.5 font-medium tabular-nums text-ink">
+                {{ program().pricing.usdIncreaseCLP | clpAmount }} /
+                {{ program().pricing.brlIncreaseCLP | clpAmount }} CLP
+              </dd>
+            </div>
+            <div>
+              <dt class="text-muted">Utilidad</dt>
+              <dd class="mt-0.5 font-medium text-ink">
+                {{ program().pricing.utilityRate | number: '1.0-2' }} %
+              </dd>
+            </div>
+            <div>
+              <dt class="text-muted">Recargo</dt>
+              <dd class="mt-0.5 font-medium text-ink">
+                {{ program().pricing.rechargeRate | number: '1.0-2' }} %
+              </dd>
+            </div>
+          </dl>
+        </section>
+      </div>
+
+      <section
+        aria-labelledby="preview-crew-heading"
+        class="rounded-xl border border-line bg-surface p-4"
+      >
+        <h2 id="preview-crew-heading" class="font-semibold text-ink">Tripulación</h2>
+        <div class="mt-3 overflow-x-auto">
+          <table class="w-full min-w-[44rem] border-collapse text-sm">
+            <thead>
+              <tr class="border-b border-line text-left text-xs uppercase tracking-wide text-muted">
+                <th scope="col" class="px-3 py-2 font-semibold">Nombre</th>
+                <th scope="col" class="px-3 py-2 font-semibold">Documento</th>
+                <th scope="col" class="px-3 py-2 text-right font-semibold">Precio diario</th>
+                <th scope="col" class="px-3 py-2 text-right font-semibold">Monto base</th>
+                <th scope="col" class="px-3 py-2 text-right font-semibold">Monto CLP</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (crew of program().crews; track $index) {
+                <tr class="border-b border-line last:border-b-0">
+                  <td class="px-3 py-2.5 font-medium text-ink">{{ crew.name }}</td>
+                  <td class="px-3 py-2.5 text-graphite">{{ crew.documentId }}</td>
+                  <td class="px-3 py-2.5 text-right tabular-nums text-graphite">
+                    @if (crew.currency === 'CLP') {
+                      {{ crew.dailyPrice | clpAmount }} CLP
+                    } @else {
+                      {{ crew.dailyPrice | number: '1.0-6' }} {{ crew.currency }}
+                    }
+                  </td>
+                  <td class="px-3 py-2.5 text-right tabular-nums text-graphite">
+                    @if (crew.currency === 'CLP') {
+                      {{ crew.baseAmount | clpAmount }} CLP
+                    } @else {
+                      {{ crew.baseAmount | number: '1.0-6' }} {{ crew.currency }}
+                    }
+                  </td>
+                  <td class="px-3 py-2.5 text-right font-semibold tabular-nums text-ink">
+                    {{ crew.amountCLP | clpAmount }} CLP
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section
+        aria-labelledby="preview-services-heading"
+        class="rounded-xl border border-line bg-surface p-4"
+      >
+        <h2 id="preview-services-heading" class="font-semibold text-ink">Servicios</h2>
+        <div class="mt-3 overflow-x-auto">
+          <table class="w-full min-w-[48rem] border-collapse text-sm">
+            <thead>
+              <tr class="border-b border-line text-left text-xs uppercase tracking-wide text-muted">
+                <th scope="col" class="px-3 py-2 font-semibold">Nombre</th>
+                <th scope="col" class="px-3 py-2 font-semibold">Tipo</th>
+                <th scope="col" class="px-3 py-2 text-right font-semibold">Precio unitario</th>
+                <th scope="col" class="px-3 py-2 text-right font-semibold">Monto base</th>
+                <th scope="col" class="px-3 py-2 text-right font-semibold">Monto CLP</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (service of program().services; track $index) {
+                <tr class="border-b border-line last:border-b-0">
+                  <td class="px-3 py-2.5 font-medium text-ink">{{ service.name }}</td>
+                  <td class="px-3 py-2.5 text-graphite">
+                    {{ chargeTypeLabels[service.chargeType] }}
+                  </td>
+                  <td class="px-3 py-2.5 text-right tabular-nums text-graphite">
+                    @if (service.currency === 'CLP') {
+                      {{ service.unitPrice | clpAmount }} CLP
+                    } @else {
+                      {{ service.unitPrice | number: '1.0-6' }} {{ service.currency }}
+                    }
+                  </td>
+                  <td class="px-3 py-2.5 text-right tabular-nums text-graphite">
+                    @if (service.currency === 'CLP') {
+                      {{ service.baseAmount | clpAmount }} CLP
+                    } @else {
+                      {{ service.baseAmount | number: '1.0-6' }} {{ service.currency }}
+                    }
+                  </td>
+                  <td class="px-3 py-2.5 text-right font-semibold tabular-nums text-ink">
+                    {{ service.amountCLP | clpAmount }} CLP
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section
+        aria-labelledby="preview-totals-heading"
+        class="rounded-xl border border-line bg-canvas p-4"
+      >
+        <h2 id="preview-totals-heading" class="font-semibold text-graphite">Totales</h2>
+        <dl
+          class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <div>
+            <dt class="text-xs text-muted">Subtotal CLP</dt>
+            <dd class="font-semibold tabular-nums text-ink">
+              {{ program().totals.subtotalCLP | clpAmount }} CLP
+            </dd>
+          </div>
+          <div>
+            <dt class="text-xs text-muted">Subtotal USD</dt>
+            <dd class="font-semibold tabular-nums text-ink">
+              {{ program().totals.subtotalUSD | number: '1.0-6' }} USD
+            </dd>
+          </div>
+          <div>
+            <dt class="text-xs text-muted">Subtotal BRL</dt>
+            <dd class="font-semibold tabular-nums text-ink">
+              {{ program().totals.subtotalBRL | number: '1.0-6' }} BRL
+            </dd>
+          </div>
+          <div>
+            <dt class="text-xs text-muted">Neto</dt>
+            <dd class="font-semibold tabular-nums text-ink">
+              {{ program().totals.netCLP | clpAmount }} CLP
+            </dd>
+          </div>
+          <div>
+            <dt class="text-xs text-muted">Utilidad</dt>
+            <dd class="font-semibold tabular-nums text-ink">
+              {{ program().totals.utilityCLP | clpAmount }} CLP
+            </dd>
+          </div>
+          <div>
+            <dt class="text-xs text-muted">Neto con utilidad</dt>
+            <dd class="font-semibold tabular-nums text-ink">
+              {{ program().totals.netWithUtilityCLP | clpAmount }} CLP
+            </dd>
+          </div>
+          <div>
+            <dt class="text-xs text-muted">Por persona antes del recargo</dt>
+            <dd class="font-semibold tabular-nums text-ink">
+              {{ program().totals.netWithUtilityPerPassengerCLP | clpAmount }} CLP
+            </dd>
+          </div>
+          <div>
+            <dt class="text-xs text-muted">Recargo</dt>
+            <dd class="font-semibold tabular-nums text-ink">
+              {{ program().totals.rechargeCLP | clpAmount }} CLP
+            </dd>
+          </div>
+          <div class="rounded-lg bg-canvas px-3 py-2">
+            <dt class="text-xs font-medium text-graphite">Total programa</dt>
+            <dd class="font-bold tabular-nums text-graphite">
+              {{ program().totals.totalCLP | clpAmount }} CLP
+            </dd>
+          </div>
+          <div class="rounded-lg bg-graphite px-3 py-2">
+            <dt class="text-xs font-medium text-canvas">Total por persona</dt>
+            <dd class="font-bold tabular-nums text-white">
+              {{ program().totals.totalPerPassengerCLP | clpAmount }} CLP
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      @if (busy()) {
+        <div
+          role="status"
+          aria-live="polite"
+          class="flex items-center justify-center gap-3 rounded-xl border border-line bg-canvas px-4 py-3 text-sm font-medium text-graphite"
+        >
+          <p-progress-spinner
+            ariaLabel="Procesando acción"
+            strokeWidth="6"
+            [style]="{ width: '1.5rem', height: '1.5rem' }"
+          />
+          Procesando la solicitud…
+        </div>
+      }
+    </div>
+  </div>
+
+  <ng-template #footer>
+    <div class="flex w-full flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <button
+        pButton
+        type="button"
+        severity="secondary"
+        outlined
+        [disabled]="busy()"
+        (click)="visible.set(false)"
+      >
+        Cerrar
+      </button>
+      <div class="flex flex-col gap-2 sm:flex-row">
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          [disabled]="busy()"
+          (click)="excelRequested.emit()"
+        >
+          Exportar a Excel
+        </button>
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          [disabled]="busy()"
+          (click)="pdfRequested.emit()"
+        >
+          Exportar presupuesto
+        </button>
+        <button
+          pButton
+          type="button"
+          [disabled]="busy() || !favoriteAvailable()"
+          [title]="
+            favoriteAvailable() ? 'Guardar favorito' : 'Guardado no disponible en este ambiente'
+          "
+          (click)="favoriteRequested.emit()"
+        >
+          Guardar favorito
+        </button>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>

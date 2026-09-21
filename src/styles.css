@@ -1,1 +1,32 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+/* Fuente única de valores visuales; PrimeNG consume estas mismas variables. */
+@theme static {
+  --font-sans: 'Avenir', 'Avenir Next', 'Segoe UI', sans-serif;
+  --color-brand: #ebff00;
+  --color-brand-hover: #d8eb00;
+  --color-brand-active: #c5d600;
+  --color-brand-soft: #f8fbcf;
+  --color-ink: #1c1c1c;
+  --color-graphite: #3a3a3a;
+  --color-muted: #616161;
+  --color-canvas: #f9fafb;
+  --color-surface: #ffffff;
+  --color-line: #e2e3e5;
+  --color-control-border: #858585;
+  --radius-control: 0.5rem;
+  --radius-panel: 0.75rem;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  body {
+    @apply m-0 bg-canvas font-sans text-ink antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-graphite);
+    outline-offset: 3px;
+  }
+}

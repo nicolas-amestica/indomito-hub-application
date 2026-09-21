@@ -1,0 +1,261 @@
+<section
+  aria-labelledby="schedule-heading"
+  [class]="
+    embedded()
+      ? 'overflow-hidden bg-surface'
+      : 'overflow-hidden rounded-2xl border border-line border-t-4 border-t-graphite bg-surface shadow-sm'
+  "
+>
+  @if (embedded()) {
+    <h2 id="schedule-heading" class="sr-only">Fechas y cantidades</h2>
+  } @else {
+    <div class="border-b border-line bg-canvas/70 px-5 py-4 sm:px-6">
+      <div class="flex items-start gap-3">
+        <span
+          aria-hidden="true"
+          class="flex size-8 shrink-0 items-center justify-center rounded-full bg-graphite text-xs font-bold tracking-wide text-white"
+        >
+          02
+        </span>
+        <div>
+          <h2 id="schedule-heading" class="text-lg font-semibold text-ink">Fechas y cantidades</h2>
+          <p class="mt-0.5 text-sm text-graphite">
+            Define la duración del viaje y la composición del grupo.
+          </p>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div [formGroup]="group()" class="grid gap-x-5 gap-y-5 p-5 sm:grid-cols-2 sm:p-6 lg:grid-cols-3">
+    <div class="flex flex-col gap-2">
+      <label for="program-start-date" class="text-sm font-medium text-ink">
+        Fecha de inicio <span class="text-red-600" aria-hidden="true">*</span>
+      </label>
+      <input
+        id="program-start-date"
+        pInputText
+        fluid
+        type="date"
+        formControlName="startDate"
+        [invalid]="group().controls.startDate.touched && group().controls.startDate.invalid"
+        [attr.aria-invalid]="
+          group().controls.startDate.touched && group().controls.startDate.invalid
+        "
+        [attr.aria-describedby]="
+          group().controls.startDate.touched && group().controls.startDate.invalid
+            ? 'program-start-date-error'
+            : null
+        "
+      />
+      @if (group().controls.startDate.touched && group().controls.startDate.invalid) {
+        <p id="program-start-date-error" class="text-sm text-red-700">
+          Selecciona la fecha de inicio.
+        </p>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label for="program-end-date" class="text-sm font-medium text-ink">
+        Fecha de término <span class="text-red-600" aria-hidden="true">*</span>
+      </label>
+      <input
+        id="program-end-date"
+        pInputText
+        fluid
+        type="date"
+        formControlName="endDate"
+        [invalid]="
+          (group().controls.endDate.touched && group().controls.endDate.invalid) ||
+          rangeHasError('dateRangeOrder') ||
+          rangeHasError('dateRangeMaxDays')
+        "
+        [attr.aria-invalid]="
+          (group().controls.endDate.touched && group().controls.endDate.invalid) ||
+          rangeHasError('dateRangeOrder') ||
+          rangeHasError('dateRangeMaxDays')
+        "
+        [attr.aria-describedby]="
+          group().controls.endDate.touched && group().controls.endDate.invalid
+            ? 'program-end-date-error'
+            : rangeHasError('dateRangeOrder')
+              ? 'program-date-range-order-error'
+              : rangeHasError('dateRangeMaxDays')
+                ? 'program-date-range-max-error'
+                : null
+        "
+      />
+      @if (group().controls.endDate.touched && group().controls.endDate.invalid) {
+        <p id="program-end-date-error" class="text-sm text-red-700">
+          Selecciona la fecha de término.
+        </p>
+      } @else if (rangeHasError('dateRangeOrder')) {
+        <p id="program-date-range-order-error" class="text-sm text-red-700">
+          La fecha de término no puede ser anterior a la fecha de inicio.
+        </p>
+      } @else if (rangeHasError('dateRangeMaxDays')) {
+        <p id="program-date-range-max-error" class="text-sm text-red-700">
+          La duración máxima permitida es de {{ limits.totalDays.max }} días.
+        </p>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label for="program-total-days" class="text-sm font-medium text-ink">Días totales</label>
+      <div class="relative">
+        <input
+          id="program-total-days"
+          pInputText
+          fluid
+          readonly
+          [value]="totalDays()"
+          aria-live="polite"
+          class="bg-canvas pr-14 font-semibold text-ink"
+        />
+        <span
+          aria-hidden="true"
+          class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs font-medium text-muted"
+        >
+          días
+        </span>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label
+        id="program-total-nights-label"
+        for="program-total-nights"
+        class="text-sm font-medium text-ink"
+      >
+        Noches de estadía <span class="text-red-600" aria-hidden="true">*</span>
+      </label>
+      <p-inputnumber
+        inputId="program-total-nights"
+        fluid
+        formControlName="totalNights"
+        [min]="limits.totalNights.min"
+        [max]="limits.totalNights.max"
+        [step]="limits.totalNights.step"
+        [useGrouping]="false"
+        [maxFractionDigits]="0"
+        [invalid]="group().controls.totalNights.touched && group().controls.totalNights.invalid"
+        [ariaDescribedBy]="nightsDescription()"
+        ariaLabelledBy="program-total-nights-label"
+      />
+      @if (group().controls.totalNights.touched && group().controls.totalNights.invalid) {
+        <p id="program-total-nights-error" class="text-sm text-red-700">
+          @if (group().controls.totalNights.hasError('numericRange')) {
+            Ingresa entre {{ limits.totalNights.min }} y {{ limits.totalNights.max }} noches.
+          } @else {
+            Ingresa las noches de estadía.
+          }
+        </p>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label
+        id="program-total-passengers-label"
+        for="program-total-passengers"
+        class="text-sm font-medium text-ink"
+      >
+        Pasajeros <span class="text-red-600" aria-hidden="true">*</span>
+      </label>
+      <p-inputnumber
+        inputId="program-total-passengers"
+        fluid
+        formControlName="totalPassengers"
+        [min]="limits.totalPassengers.min"
+        [max]="limits.totalPassengers.max"
+        [step]="limits.totalPassengers.step"
+        [useGrouping]="false"
+        [maxFractionDigits]="0"
+        [invalid]="
+          (group().controls.totalPassengers.touched && group().controls.totalPassengers.invalid) ||
+          payingPassengersHasError()
+        "
+        [ariaDescribedBy]="
+          group().controls.totalPassengers.touched && group().controls.totalPassengers.invalid
+            ? 'program-total-passengers-error'
+            : payingPassengersHasError()
+              ? 'program-paying-passengers-error'
+              : undefined
+        "
+        ariaLabelledBy="program-total-passengers-label"
+      />
+      @if (group().controls.totalPassengers.touched && group().controls.totalPassengers.invalid) {
+        <p id="program-total-passengers-error" class="text-sm text-red-700">
+          @if (group().controls.totalPassengers.hasError('numericRange')) {
+            Ingresa entre {{ limits.totalPassengers.min }} y
+            {{ limits.totalPassengers.max }} pasajeros.
+          } @else {
+            Ingresa la cantidad de pasajeros.
+          }
+        </p>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label
+        id="program-free-passengers-label"
+        for="program-free-passengers"
+        class="text-sm font-medium text-ink"
+      >
+        Pasajeros liberados <span class="text-red-600" aria-hidden="true">*</span>
+      </label>
+      <p-inputnumber
+        inputId="program-free-passengers"
+        fluid
+        formControlName="freePassengers"
+        [min]="limits.freePassengers.min"
+        [max]="limits.freePassengers.max"
+        [step]="limits.freePassengers.step"
+        [useGrouping]="false"
+        [maxFractionDigits]="0"
+        [invalid]="
+          (group().controls.freePassengers.touched && group().controls.freePassengers.invalid) ||
+          payingPassengersHasError()
+        "
+        [ariaDescribedBy]="
+          group().controls.freePassengers.touched && group().controls.freePassengers.invalid
+            ? 'program-free-passengers-error'
+            : payingPassengersHasError()
+              ? 'program-paying-passengers-error'
+              : undefined
+        "
+        ariaLabelledBy="program-free-passengers-label"
+      />
+      @if (group().controls.freePassengers.touched && group().controls.freePassengers.invalid) {
+        <p id="program-free-passengers-error" class="text-sm text-red-700">
+          @if (group().controls.freePassengers.hasError('numericRange')) {
+            Ingresa entre {{ limits.freePassengers.min }} y
+            {{ limits.freePassengers.max }} liberados.
+          } @else {
+            Ingresa la cantidad de pasajeros liberados.
+          }
+        </p>
+      } @else if (payingPassengersHasError()) {
+        <p id="program-paying-passengers-error" class="text-sm text-red-700">
+          Debe existir al menos un pasajero pagante.
+        </p>
+      } @else if (payingPassengers() !== null) {
+        <p class="text-sm text-graphite">
+          {{ payingPassengers() }}
+          {{ payingPassengers() === 1 ? 'pasajero pagante' : 'pasajeros pagantes' }}
+        </p>
+      }
+    </div>
+
+    <div aria-live="polite" aria-atomic="true" class="sm:col-span-2 lg:col-span-3">
+      @if (nightsExceedDays()) {
+        <p
+          id="program-nights-warning"
+          role="status"
+          class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+        >
+          Las noches de estadía superan los días totales. Revisa si corresponde a una noche en ruta.
+        </p>
+      }
+    </div>
+  </div>
+</section>

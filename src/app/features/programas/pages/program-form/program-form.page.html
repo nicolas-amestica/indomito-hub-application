@@ -1,0 +1,283 @@
+<p-toast position="top-right" />
+
+<div class="border-b-4 border-brand bg-ink">
+  <div class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-5 sm:px-6 lg:px-8">
+    <img
+      src="brand/logo-web-large.png"
+      alt="Giras Indómito"
+      width="768"
+      height="391"
+      class="h-14 w-auto object-contain"
+    />
+    <div class="border-l border-graphite pl-6 text-right">
+      <p class="text-sm font-semibold tracking-wide text-canvas">Indómito Hub</p>
+      <p class="mt-1 text-xs text-canvas/70">Gestión de programas</p>
+    </div>
+  </div>
+</div>
+
+<div class="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
+  <app-page-header
+    title="Programa"
+    description="Completa el formulario para crear un nuevo programa de viajes."
+  >
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      outlined
+      [disabled]="!favoritesAvailable"
+      [attr.aria-expanded]="favoritesOpen()"
+      aria-controls="favorites-panel"
+      (click)="toggleFavorites()"
+    >
+      {{ favoritesOpen() ? 'Cerrar favoritos' : 'Favoritos' }}
+    </button>
+  </app-page-header>
+
+  @if (!favoritesAvailable) {
+    <aside
+      role="status"
+      class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950"
+    >
+      El guardado de favoritos no está disponible en este ambiente. Puedes calcular, previsualizar y
+      exportar el programa.
+    </aside>
+  }
+
+  <main class="flex flex-col gap-6">
+    @if (catalogStore.hasError()) {
+      <aside
+        role="alert"
+        class="flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-950 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <p class="text-sm font-medium">No se pudieron obtener los catálogos del programa.</p>
+        <button
+          pButton
+          type="button"
+          severity="danger"
+          outlined
+          [disabled]="catalogStore.loading()"
+          (click)="catalogStore.retry()"
+        >
+          Reintentar catálogos
+        </button>
+      </aside>
+    }
+
+    <p-panel header="Datos generales" [toggleable]="true" [pt]="panelPt">
+      <app-general-data-panel
+        [group]="programFormStore.form.controls.generals"
+        [plans]="catalogStore.plans()"
+        [seasons]="catalogStore.seasons()"
+        [destinations]="catalogStore.destinations()"
+        [loading]="catalogStore.loading()"
+        [embedded]="true"
+      />
+    </p-panel>
+
+    <p-panel header="Fechas y cantidades" [toggleable]="true" [pt]="panelPt">
+      <app-schedule-panel
+        [group]="programFormStore.form.controls.schedule"
+        [totalDays]="programFormStore.totalDays()"
+        [payingPassengers]="programFormStore.payingPassengers()"
+        [nightsExceedDays]="programFormStore.nightsExceedDays()"
+        [embedded]="true"
+      />
+    </p-panel>
+
+    <section
+      aria-labelledby="exchange-status-heading"
+      class="rounded-panel border border-line bg-surface p-5 sm:p-6"
+      [attr.aria-busy]="exchangeRateStore.loading()"
+    >
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-muted">Conversión</p>
+          <h2 id="exchange-status-heading" class="mt-1 text-lg font-semibold text-ink">
+            Tipos de cambio
+          </h2>
+        </div>
+
+        @if (exchangeRateStore.loading()) {
+          <div role="status" class="flex items-center gap-3 text-sm font-medium text-graphite">
+            <p-progress-spinner
+              ariaLabel="Cargando tipos de cambio"
+              strokeWidth="6"
+              [style]="{ width: '1.5rem', height: '1.5rem' }"
+            />
+            Obteniendo tasas vigentes…
+          </div>
+        } @else if (exchangeRateStore.hasError()) {
+          <div class="flex flex-col items-start gap-2 sm:items-end">
+            <p class="text-sm font-medium text-red-800">
+              No se pudieron obtener los tipos de cambio.
+            </p>
+            <button
+              pButton
+              type="button"
+              severity="danger"
+              outlined
+              (click)="exchangeRateStore.retry()"
+            >
+              Reintentar tasas
+            </button>
+          </div>
+        } @else if (exchangeRateStore.snapshot(); as snapshot) {
+          <dl class="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+            <div>
+              <dt class="text-muted">Fecha</dt>
+              <dd class="font-semibold text-ink">
+                {{ snapshot.date | date: 'longDate' : 'UTC' }}
+              </dd>
+            </div>
+            <div>
+              <dt class="text-muted">USD</dt>
+              <dd class="font-semibold tabular-nums text-ink">
+                {{ snapshot.usdToClp | clpAmount }} CLP
+              </dd>
+            </div>
+            <div>
+              <dt class="text-muted">BRL</dt>
+              <dd class="font-semibold tabular-nums text-ink">
+                {{ snapshot.brlToClp | clpAmount }} CLP
+              </dd>
+            </div>
+          </dl>
+        }
+      </div>
+
+      @if (exchangeRateStore.fallbackDate(); as fallbackDate) {
+        <div class="mt-4 flex flex-col gap-3">
+          <app-fallback-rates-notice [date]="fallbackDate" />
+          <button
+            pButton
+            type="button"
+            severity="warn"
+            outlined
+            class="self-start"
+            [disabled]="exchangeRateStore.loading()"
+            (click)="exchangeRateStore.retry()"
+          >
+            Reintentar tasas del día
+          </button>
+        </div>
+      }
+    </section>
+
+    <p-panel header="Parámetros de precio" [toggleable]="true" [pt]="panelPt">
+      <app-pricing-panel
+        [group]="programFormStore.form.controls.pricing"
+        [snapshot]="exchangeRateStore.snapshot()"
+        [belowUtilityFloor]="programFormStore.belowUtilityFloor()"
+        [minimumUtilityRate]="catalogStore.settings()?.margin?.minUtilityRate ?? null"
+        [embedded]="true"
+      />
+    </p-panel>
+
+    <p-panel header="Tripulación" [toggleable]="true" [pt]="panelPt">
+      <app-crew-panel [crews]="programFormStore.form.controls.crews" [embedded]="true" />
+    </p-panel>
+
+    <p-panel header="Servicios" [toggleable]="true" [pt]="panelPt">
+      <app-services-panel [services]="programFormStore.form.controls.services" [embedded]="true" />
+    </p-panel>
+
+    @defer (when programFormStore.rows().length > 0) {
+      @if (programFormStore.totals(); as totals) {
+        @if (programFormStore.effectiveRates(); as effectiveRates) {
+          @if (exchangeRateStore.snapshot(); as snapshot) {
+            <p-panel header="Resumen" [toggleable]="true" [pt]="panelPt">
+              <app-summary-table
+                [rows]="programFormStore.visibleRows()"
+                [totalRowCount]="programFormStore.rows().length"
+                [totals]="totals"
+                [effectiveRates]="effectiveRates"
+                [snapshotDate]="snapshot.date"
+                [fallbackDate]="exchangeRateStore.fallbackDate()"
+                [embedded]="true"
+                (searchChanged)="programFormStore.searchTerm.set($event)"
+              />
+            </p-panel>
+          }
+        }
+      }
+    }
+
+    <footer
+      class="flex flex-col-reverse justify-end gap-2 rounded-panel border border-line bg-surface p-4 sm:p-6 sm:flex-row"
+    >
+      @if (programFormStore.rows().length > 0) {
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          outlined
+          [disabled]="actionBusy()"
+          (click)="exportPdf()"
+        >
+          Exportar presupuesto
+        </button>
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          outlined
+          [disabled]="!programFormStore.canPreview() || actionBusy()"
+          (click)="exportExcel()"
+        >
+          Exportar a Excel
+        </button>
+      }
+      <button
+        #previewTrigger
+        pButton
+        type="button"
+        [disabled]="!programFormStore.canPreview() || actionBusy()"
+        (click)="openPreview()"
+      >
+        Previsualizar
+      </button>
+    </footer>
+  </main>
+</div>
+
+@defer (when previewOpen()) {
+  @if (programFormStore.program(); as program) {
+    @if (programFormStore.effectiveRates(); as effectiveRates) {
+      <app-preview-dialog
+        [visible]="previewOpen()"
+        [program]="program"
+        [effectiveRates]="effectiveRates"
+        [fallbackDate]="exchangeRateStore.fallbackDate()"
+        [busy]="actionBusy()"
+        [favoriteAvailable]="favoritesAvailable"
+        (visibleChange)="setPreviewVisible($event)"
+        (excelRequested)="exportExcel()"
+        (pdfRequested)="exportPdf()"
+        (favoriteRequested)="requestFavoriteSave()"
+      />
+    }
+  }
+}
+
+<app-favorites-panel
+  id="favorites-panel"
+  scope="programa"
+  [visible]="favoritesOpen()"
+  [saveDialogVisible]="favoriteSaveOpen()"
+  [favorites]="favoritesStore.visibleFavorites()"
+  [totalFavoriteCount]="favoritesStore.favorites().length"
+  [selectedFavorite]="favoritesStore.selected()"
+  [loading]="favoritesStore.loading()"
+  [busy]="favoritesStore.mutating()"
+  [hasError]="favoritesStore.hasError()"
+  [searchTerm]="favoritesStore.searchTerm()"
+  (visibleChange)="favoritesOpen.set($event)"
+  (saveDialogVisibleChange)="favoriteSaveOpen.set($event)"
+  (retryRequested)="favoritesStore.load('programa')"
+  (searchChanged)="favoritesStore.searchTerm.set($event)"
+  (favoriteSelected)="selectFavorite($event)"
+  (favoriteDeleted)="deleteFavorite($event)"
+  (saveSubmitted)="saveFavorite($event)"
+/>

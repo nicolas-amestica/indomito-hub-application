@@ -1,0 +1,314 @@
+@if (totalRowCount() > 0) {
+  <section
+    aria-labelledby="summary-heading"
+    [class]="
+      embedded()
+        ? 'overflow-hidden bg-surface'
+        : 'overflow-hidden rounded-2xl border border-line border-t-4 border-t-graphite bg-surface shadow-sm'
+    "
+  >
+    <div class="border-b border-line bg-canvas/70 px-5 py-4 sm:px-6">
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        @if (embedded()) {
+          <h2 id="summary-heading" class="sr-only">Resumen del programa</h2>
+        } @else {
+          <div class="flex items-start gap-3">
+            <span
+              aria-hidden="true"
+              class="flex size-8 shrink-0 items-center justify-center rounded-full bg-graphite text-xs font-bold tracking-wide text-white"
+            >
+              06
+            </span>
+            <div>
+              <h2 id="summary-heading" class="text-lg font-semibold text-ink">
+                Resumen del programa
+              </h2>
+              <p class="mt-0.5 text-sm text-graphite">
+                Revisa el detalle convertido y los totales de la cotización.
+              </p>
+            </div>
+          </div>
+        }
+
+        <div class="w-full lg:max-w-sm">
+          <label for="program-summary-search" class="mb-2 block text-sm font-medium text-ink">
+            Buscar por nombre
+          </label>
+          <div class="relative">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              class="pointer-events-none absolute left-3 top-1/2 z-10 size-4 -translate-y-1/2 text-muted"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-4-4" />
+            </svg>
+            <input
+              id="program-summary-search"
+              pInputText
+              fluid
+              type="search"
+              autocomplete="off"
+              placeholder="Ej. hotel o coordinador"
+              class="pl-9"
+              [formControl]="searchControl"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-4 p-5 sm:p-6">
+      <div class="grid gap-3 sm:grid-cols-3" aria-label="Tipos de cambio usados">
+        <div class="rounded-xl border border-line bg-canvas px-4 py-3">
+          <p class="text-xs font-semibold uppercase tracking-wide text-muted">Snapshot</p>
+          <p class="mt-1 font-medium text-ink">
+            {{ snapshotDate() | date: 'longDate' : 'UTC' }}
+          </p>
+        </div>
+        <div class="rounded-xl border border-line bg-canvas px-4 py-3">
+          <p class="text-xs font-semibold uppercase tracking-wide text-graphite">USD efectivo</p>
+          <p class="mt-1 font-semibold tabular-nums text-graphite">
+            1 USD = {{ effectiveRates().USD | clpAmount }} CLP
+          </p>
+        </div>
+        <div class="rounded-xl border border-line bg-canvas px-4 py-3">
+          <p class="text-xs font-semibold uppercase tracking-wide text-graphite">BRL efectivo</p>
+          <p class="mt-1 font-semibold tabular-nums text-graphite">
+            1 BRL = {{ effectiveRates().BRL | clpAmount }} CLP
+          </p>
+        </div>
+      </div>
+
+      @if (fallbackDate(); as date) {
+        <app-fallback-rates-notice [date]="date" />
+      }
+
+      <p class="text-sm text-graphite" aria-live="polite" aria-atomic="true">
+        Mostrando <strong class="font-semibold text-ink">{{ rows().length }}</strong> de
+        <strong class="font-semibold text-ink">{{ totalRowCount() }}</strong> filas.
+      </p>
+
+      <div class="overflow-x-auto rounded-xl border border-line">
+        @if (totalRowCount() >= virtualScrollThreshold) {
+          <p-table
+            dataKey="key"
+            scrollHeight="32rem"
+            [value]="rows()"
+            [scrollable]="true"
+            [virtualScroll]="true"
+            [virtualScrollItemSize]="61"
+            [rowTrackBy]="trackRow"
+            tableStyleClass="min-w-[70rem]"
+          >
+            <ng-template #header>
+              <ng-container [ngTemplateOutlet]="tableHeader" />
+            </ng-template>
+            <ng-template #body let-row>
+              <tr
+                data-summary-row
+                class="h-[61px] border-t border-line bg-surface hover:bg-canvas/70"
+              >
+                <ng-container
+                  [ngTemplateOutlet]="rowCells"
+                  [ngTemplateOutletContext]="{ $implicit: row }"
+                />
+              </tr>
+            </ng-template>
+            <ng-template #emptymessage>
+              <ng-container [ngTemplateOutlet]="emptyRow" />
+            </ng-template>
+            <ng-template #footer>
+              <ng-container [ngTemplateOutlet]="totalsRow" />
+            </ng-template>
+          </p-table>
+        } @else {
+          <table class="min-w-[70rem] w-full border-collapse text-sm">
+            <caption class="sr-only">
+              Detalle de tripulación y servicios del programa
+            </caption>
+            <thead>
+              <ng-container [ngTemplateOutlet]="tableHeader" />
+            </thead>
+            <tbody>
+              @for (row of rows(); track row.key) {
+                <tr
+                  data-summary-row
+                  class="h-[61px] border-t border-line bg-surface hover:bg-canvas/70"
+                >
+                  <ng-container
+                    [ngTemplateOutlet]="rowCells"
+                    [ngTemplateOutletContext]="{ $implicit: row }"
+                  />
+                </tr>
+              } @empty {
+                <ng-container [ngTemplateOutlet]="emptyRow" />
+              }
+            </tbody>
+            <tfoot>
+              <ng-container [ngTemplateOutlet]="totalsRow" />
+            </tfoot>
+          </table>
+        }
+      </div>
+    </div>
+  </section>
+}
+
+<ng-template #tableHeader>
+  <tr class="bg-canvas text-left text-xs uppercase tracking-wide text-graphite">
+    <th scope="col" class="px-4 py-3 font-semibold">Nombre</th>
+    <th scope="col" class="px-4 py-3 font-semibold">Tipo</th>
+    <th scope="col" class="px-4 py-3 text-center font-semibold">Moneda</th>
+    <th scope="col" class="px-4 py-3 text-right font-semibold">Tasa efectiva</th>
+    <th scope="col" class="px-4 py-3 text-right font-semibold">Precio unitario</th>
+    <th scope="col" class="px-4 py-3 text-right font-semibold">Monto base</th>
+    <th scope="col" class="px-4 py-3 text-right font-semibold">Monto en CLP</th>
+  </tr>
+</ng-template>
+
+<ng-template #rowCells let-row>
+  <td class="max-w-64 px-4 py-3 font-medium text-ink">
+    <span class="block truncate" [title]="row.name">{{ row.name }}</span>
+  </td>
+  <td class="px-4 py-3">
+    @switch (row.chargeType) {
+      @case (null) {
+        <span
+          class="inline-flex whitespace-nowrap rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800"
+        >
+          {{ row.typeLabel }}
+        </span>
+      }
+      @case ('fixed') {
+        <span
+          class="inline-flex whitespace-nowrap rounded-full bg-canvas px-2.5 py-1 text-xs font-semibold text-graphite"
+        >
+          {{ row.typeLabel }}
+        </span>
+      }
+      @case ('per_day') {
+        <span
+          class="inline-flex whitespace-nowrap rounded-full bg-canvas px-2.5 py-1 text-xs font-semibold text-graphite"
+        >
+          {{ row.typeLabel }}
+        </span>
+      }
+      @case ('per_passenger') {
+        <span
+          class="inline-flex whitespace-nowrap rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-900"
+        >
+          {{ row.typeLabel }}
+        </span>
+      }
+      @case ('per_passenger_day') {
+        <span
+          class="inline-flex whitespace-nowrap rounded-full bg-rose-100 px-2.5 py-1 text-xs font-semibold text-rose-800"
+        >
+          {{ row.typeLabel }}
+        </span>
+      }
+      @case ('per_passenger_night') {
+        <span
+          class="inline-flex whitespace-nowrap rounded-full bg-fuchsia-100 px-2.5 py-1 text-xs font-semibold text-fuchsia-800"
+        >
+          {{ row.typeLabel }}
+        </span>
+      }
+    }
+  </td>
+  <td class="px-4 py-3 text-center font-medium text-graphite">{{ row.currency }}</td>
+  <td class="px-4 py-3 text-right tabular-nums text-graphite">
+    {{ row.effectiveRate | clpAmount }} CLP
+  </td>
+  <td class="px-4 py-3 text-right tabular-nums text-graphite">
+    @if (row.currency === 'CLP') {
+      {{ row.unitPrice | clpAmount }} CLP
+    } @else {
+      {{ row.unitPrice | number: '1.0-6' }} {{ row.currency }}
+    }
+  </td>
+  <td class="px-4 py-3 text-right tabular-nums text-graphite">
+    @if (row.currency === 'CLP') {
+      {{ row.baseAmount | clpAmount }} CLP
+    } @else {
+      {{ row.baseAmount | number: '1.0-6' }} {{ row.currency }}
+    }
+  </td>
+  <td class="px-4 py-3 text-right font-semibold tabular-nums text-ink">
+    {{ row.amountCLP | clpAmount }} CLP
+  </td>
+</ng-template>
+
+<ng-template #emptyRow>
+  <tr>
+    <td colspan="7" class="px-4 py-10 text-center text-sm text-graphite">
+      No hay filas que coincidan con la búsqueda.
+    </td>
+  </tr>
+</ng-template>
+
+<ng-template #totalsRow>
+  <tr class="border-t-2 border-line bg-canvas/70">
+    <td colspan="7" class="px-4 py-4">
+      <div
+        class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+        aria-label="Totales del programa"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        <div class="rounded-lg bg-surface px-3 py-2 shadow-sm">
+          <span class="block text-xs text-muted">Subtotal CLP</span>
+          <strong class="tabular-nums text-ink">{{ totals().subtotalCLP | clpAmount }} CLP</strong>
+        </div>
+        <div class="rounded-lg bg-surface px-3 py-2 shadow-sm">
+          <span class="block text-xs text-muted">Subtotal USD</span>
+          <strong class="tabular-nums text-ink"
+            >{{ totals().subtotalUSD | number: '1.0-6' }} USD</strong
+          >
+        </div>
+        <div class="rounded-lg bg-surface px-3 py-2 shadow-sm">
+          <span class="block text-xs text-muted">Subtotal BRL</span>
+          <strong class="tabular-nums text-ink"
+            >{{ totals().subtotalBRL | number: '1.0-6' }} BRL</strong
+          >
+        </div>
+        <div class="rounded-lg bg-surface px-3 py-2 shadow-sm">
+          <span class="block text-xs text-muted">Neto</span>
+          <strong class="tabular-nums text-ink">{{ totals().netCLP | clpAmount }} CLP</strong>
+        </div>
+        <div class="rounded-lg bg-surface px-3 py-2 shadow-sm">
+          <span class="block text-xs text-muted">Utilidad</span>
+          <strong class="tabular-nums text-ink">{{ totals().utilityCLP | clpAmount }} CLP</strong>
+        </div>
+        <div class="rounded-lg bg-surface px-3 py-2 shadow-sm">
+          <span class="block text-xs text-muted">Neto con utilidad</span>
+          <strong class="tabular-nums text-ink"
+            >{{ totals().netWithUtilityCLP | clpAmount }} CLP</strong
+          >
+        </div>
+        <div class="rounded-lg bg-surface px-3 py-2 shadow-sm">
+          <span class="block text-xs text-muted">Neto con utilidad por persona</span>
+          <strong class="tabular-nums text-ink"
+            >{{ totals().netWithUtilityPerPassengerCLP | clpAmount }} CLP</strong
+          >
+        </div>
+        <div class="rounded-lg bg-canvas px-3 py-2 shadow-sm">
+          <span class="block text-xs font-medium text-graphite">Total del programa</span>
+          <strong class="tabular-nums text-graphite"
+            >{{ totals().totalCLP | clpAmount }} CLP</strong
+          >
+        </div>
+        <div class="rounded-lg bg-graphite px-3 py-2 shadow-sm">
+          <span class="block text-xs font-medium text-canvas">Total por persona</span>
+          <strong class="tabular-nums text-white"
+            >{{ totals().totalPerPassengerCLP | clpAmount }} CLP</strong
+          >
+        </div>
+      </div>
+    </td>
+  </tr>
+</ng-template>

@@ -1,0 +1,215 @@
+<section
+  aria-labelledby="crew-heading"
+  [class]="
+    embedded()
+      ? 'overflow-hidden bg-surface'
+      : 'overflow-hidden rounded-2xl border border-line border-t-4 border-t-graphite bg-surface shadow-sm'
+  "
+>
+  <div
+    [class]="
+      embedded()
+        ? 'flex justify-end border-b border-line px-5 py-3 sm:px-6'
+        : 'border-b border-line bg-canvas/70 px-5 py-4 sm:px-6'
+    "
+  >
+    <div class="flex w-full flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      @if (embedded()) {
+        <h2 id="crew-heading" class="sr-only">Tripulación</h2>
+      } @else {
+        <div class="flex items-start gap-3">
+          <span
+            aria-hidden="true"
+            class="flex size-8 shrink-0 items-center justify-center rounded-full bg-graphite text-xs font-bold tracking-wide text-white"
+          >
+            04
+          </span>
+          <div>
+            <h2 id="crew-heading" class="text-lg font-semibold text-ink">Tripulación</h2>
+            <p class="mt-0.5 text-sm text-graphite">
+              Registra a quienes acompañan al grupo y su costo diario.
+            </p>
+          </div>
+        </div>
+      }
+
+      <button
+        pButton
+        type="button"
+        class="add-crew-button"
+        [disabled]="crews().length >= limits.maxCrews"
+        (click)="add()"
+      >
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          class="size-4"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        Agregar tripulante
+      </button>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4 p-5 sm:p-6">
+    @for (row of crews().controls; track row.controls.id.value; let index = $index) {
+      <article [formGroup]="row" class="rounded-xl border border-line bg-canvas/50 p-4">
+        <div class="mb-4 flex items-center justify-between gap-3">
+          <h3 class="text-sm font-semibold text-ink">Tripulante {{ index + 1 }}</h3>
+          <button
+            pButton
+            type="button"
+            severity="danger"
+            text
+            rounded
+            iconOnly
+            [disabled]="crews().length === 1"
+            [attr.aria-label]="'Eliminar tripulante ' + (index + 1)"
+            (click)="remove(index)"
+          >
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              class="size-4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5M14 11v5" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="grid gap-x-4 gap-y-4 sm:grid-cols-2 lg:grid-cols-12">
+          <div class="flex flex-col gap-2 lg:col-span-4">
+            <label [for]="'crew-' + index + '-name'" class="text-sm font-medium text-ink">
+              Nombre <span class="text-red-600" aria-hidden="true">*</span>
+            </label>
+            <input
+              [id]="'crew-' + index + '-name'"
+              pInputText
+              fluid
+              formControlName="name"
+              autocomplete="off"
+              placeholder="Nombre completo"
+              [invalid]="row.controls.name.touched && row.controls.name.invalid"
+              [attr.aria-invalid]="row.controls.name.touched && row.controls.name.invalid"
+              [attr.aria-describedby]="
+                row.controls.name.touched && row.controls.name.invalid
+                  ? 'crew-' + index + '-name-error'
+                  : null
+              "
+            />
+            @if (row.controls.name.touched && row.controls.name.invalid) {
+              <p [id]="'crew-' + index + '-name-error'" class="text-sm text-red-700">
+                Ingresa el nombre del tripulante.
+              </p>
+            }
+          </div>
+
+          <div class="flex flex-col gap-2 lg:col-span-3">
+            <label [for]="'crew-' + index + '-document'" class="text-sm font-medium text-ink">
+              Documento de identidad <span class="text-red-600" aria-hidden="true">*</span>
+            </label>
+            <input
+              [id]="'crew-' + index + '-document'"
+              pInputText
+              fluid
+              formControlName="documentId"
+              autocomplete="off"
+              placeholder="RUT, DNI o CPF"
+              [invalid]="row.controls.documentId.touched && row.controls.documentId.invalid"
+              [attr.aria-invalid]="
+                row.controls.documentId.touched && row.controls.documentId.invalid
+              "
+              [attr.aria-describedby]="
+                row.controls.documentId.touched && row.controls.documentId.invalid
+                  ? 'crew-' + index + '-document-error'
+                  : null
+              "
+            />
+            @if (row.controls.documentId.touched && row.controls.documentId.invalid) {
+              <p [id]="'crew-' + index + '-document-error'" class="text-sm text-red-700">
+                @if (row.controls.documentId.hasError('documentId')) {
+                  Ingresa un RUT, DNI o CPF válido.
+                } @else {
+                  Ingresa el documento de identidad.
+                }
+              </p>
+            }
+          </div>
+
+          <div class="flex flex-col gap-2 lg:col-span-3">
+            <label
+              [id]="'crew-' + index + '-daily-price-label'"
+              [for]="'crew-' + index + '-daily-price'"
+              class="text-sm font-medium text-ink"
+            >
+              Precio diario <span class="text-red-600" aria-hidden="true">*</span>
+            </label>
+            <p-inputnumber
+              [inputId]="'crew-' + index + '-daily-price'"
+              fluid
+              formControlName="dailyPrice"
+              mode="decimal"
+              locale="es-CL"
+              [min]="limits.itemPrice.min"
+              [max]="limits.itemPrice.max"
+              [minFractionDigits]="0"
+              [maxFractionDigits]="6"
+              [invalid]="priceInvalid(row)"
+              [ariaDescribedBy]="priceDescription(row, index)"
+              [ariaLabelledBy]="'crew-' + index + '-daily-price-label'"
+            />
+            @if (priceInvalid(row)) {
+              <p [id]="'crew-' + index + '-daily-price-error'" class="text-sm text-red-700">
+                @if (row.hasError('clpIntegerPrice')) {
+                  El precio en CLP debe ser un número entero.
+                } @else if (row.controls.dailyPrice.hasError('numericRange')) {
+                  Ingresa un precio entre 0,01 y 99.999.999.
+                } @else {
+                  Ingresa el precio diario.
+                }
+              </p>
+            }
+          </div>
+
+          <div class="flex flex-col gap-2 lg:col-span-2">
+            <label
+              [id]="'crew-' + index + '-currency-label'"
+              [for]="'crew-' + index + '-currency'"
+              class="text-sm font-medium text-ink"
+            >
+              Moneda <span class="text-red-600" aria-hidden="true">*</span>
+            </label>
+            <p-select
+              [inputId]="'crew-' + index + '-currency'"
+              fluid
+              formControlName="currency"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Moneda"
+              [options]="currencies"
+              [invalid]="row.controls.currency.touched && row.controls.currency.invalid"
+              [pt]="selectAccessibility(row.controls.currency, 'crew-' + index + '-currency-error')"
+              [ariaLabelledBy]="'crew-' + index + '-currency-label'"
+            />
+            @if (row.controls.currency.touched && row.controls.currency.invalid) {
+              <p [id]="'crew-' + index + '-currency-error'" class="text-sm text-red-700">
+                Selecciona una moneda.
+              </p>
+            }
+          </div>
+        </div>
+      </article>
+    }
+
+    <p class="text-right text-xs text-muted" aria-live="polite">
+      {{ crews().length }} de {{ limits.maxCrews }} tripulantes
+    </p>
+  </div>
+</section>

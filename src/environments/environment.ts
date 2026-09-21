@@ -6,4 +6,5 @@ export const environment = {
   version: 'v0.1.0',
   apiUrl: 'http://localhost:3000',
   stage: 'local',
+  favoritesEnabled: true,
 };

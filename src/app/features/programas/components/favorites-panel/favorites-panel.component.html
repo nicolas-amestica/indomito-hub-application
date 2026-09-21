@@ -1,0 +1,339 @@
+@if (visible()) {
+  <button
+    type="button"
+    aria-label="Cerrar panel de favoritos"
+    class="fixed inset-0 z-30 bg-slate-950/35 md:hidden"
+    (click)="visible.set(false)"
+  ></button>
+
+  <aside
+    role="dialog"
+    aria-label="Favoritos"
+    [attr.aria-busy]="loading() || busy()"
+    [class]="panelClasses()"
+  >
+    <header class="flex min-h-16 items-center gap-2 border-b border-line px-3 py-3">
+      <button
+        pButton
+        type="button"
+        severity="secondary"
+        text
+        class="hidden md:inline-flex"
+        [attr.aria-label]="
+          collapsed() ? 'Expandir panel de favoritos' : 'Contraer panel de favoritos'
+        "
+        [title]="collapsed() ? 'Expandir panel' : 'Contraer panel'"
+        (click)="collapsed.set(!collapsed())"
+      >
+        {{ collapsed() ? '›' : '‹' }}
+      </button>
+
+      @if (!collapsed()) {
+        <div class="min-w-0 flex-1">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-graphite">
+            {{ scope() }}
+          </p>
+          <h2 class="truncate text-lg font-semibold text-ink">Favoritos</h2>
+        </div>
+      }
+
+      <button
+        pButton
+        type="button"
+        severity="secondary"
+        text
+        aria-label="Cerrar panel de favoritos"
+        title="Cerrar panel"
+        (click)="visible.set(false)"
+      >
+        ×
+      </button>
+    </header>
+
+    @if (collapsed()) {
+      <nav
+        aria-label="Acciones de favoritos"
+        class="hidden flex-1 flex-col items-center gap-3 p-3 md:flex"
+      >
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          outlined
+          aria-label="Actualizar favoritos"
+          title="Actualizar favoritos"
+          [disabled]="loading()"
+          (click)="retryRequested.emit()"
+        >
+          ↻
+        </button>
+        <span class="text-xs font-semibold text-graphite" aria-label="Cantidad de favoritos">
+          {{ favorites().length }}
+        </span>
+      </nav>
+    } @else {
+      <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4">
+        <div>
+          <label for="favorite-search" class="mb-1.5 block text-sm font-medium text-ink">
+            Buscar favorito
+          </label>
+          <input
+            id="favorite-search"
+            pInputText
+            type="search"
+            class="w-full"
+            placeholder="Nombre del favorito"
+            [value]="searchTerm()"
+            (input)="updateSearch($event)"
+          />
+        </div>
+
+        @if (loading()) {
+          <div
+            role="status"
+            class="flex flex-1 items-center justify-center gap-3 text-sm text-graphite"
+          >
+            <p-progress-spinner
+              ariaLabel="Cargando favoritos"
+              strokeWidth="6"
+              [style]="{ width: '1.75rem', height: '1.75rem' }"
+            />
+            Cargando favoritos…
+          </div>
+        } @else if (hasError()) {
+          <div role="alert" class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-950">
+            <p class="text-sm font-medium">No se pudieron cargar los favoritos.</p>
+            <button
+              pButton
+              type="button"
+              severity="danger"
+              outlined
+              class="mt-3"
+              (click)="retryRequested.emit()"
+            >
+              Reintentar
+            </button>
+          </div>
+        } @else {
+          <ul class="flex flex-col gap-3" aria-live="polite">
+            @for (favorite of favorites(); track favorite.id) {
+              <li
+                class="rounded-xl border bg-surface p-3"
+                [class.border-line]="selectedFavorite()?.id === favorite.id"
+                [class.border-line]="selectedFavorite()?.id !== favorite.id"
+              >
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <h3 class="truncate font-semibold text-ink">{{ favorite.name }}</h3>
+                    <p class="mt-1 text-xs text-muted">
+                      Actualizado {{ favorite.updatedAt | date: 'mediumDate' : 'UTC' }}
+                    </p>
+                  </div>
+                  @if (selectedFavorite()?.id === favorite.id) {
+                    <span
+                      class="rounded-full bg-canvas px-2 py-1 text-xs font-medium text-graphite"
+                    >
+                      Cargado
+                    </span>
+                  }
+                </div>
+                <div class="mt-3 grid grid-cols-3 gap-2">
+                  <button
+                    pButton
+                    type="button"
+                    severity="secondary"
+                    outlined
+                    [disabled]="busy()"
+                    (click)="favoriteSelected.emit(favorite)"
+                  >
+                    Seleccionar
+                  </button>
+                  <button
+                    pButton
+                    type="button"
+                    severity="secondary"
+                    outlined
+                    [disabled]="busy()"
+                    (click)="previewFavorite.set(favorite)"
+                  >
+                    Visualizar
+                  </button>
+                  <button
+                    pButton
+                    type="button"
+                    severity="danger"
+                    outlined
+                    [disabled]="busy()"
+                    (click)="deleteCandidate.set(favorite)"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </li>
+            } @empty {
+              <li
+                class="rounded-xl border border-dashed border-slate-300 bg-canvas p-5 text-center"
+              >
+                @if (totalFavoriteCount() === 0) {
+                  <p class="font-medium text-ink">No hay favoritos para mostrar.</p>
+                  <p class="mt-1 text-sm leading-6 text-graphite">
+                    Completa el programa, previsualízalo y usa “Guardar favorito” para crear el
+                    primero.
+                  </p>
+                } @else {
+                  <p class="font-medium text-ink">No hay coincidencias.</p>
+                  <p class="mt-1 text-sm leading-6 text-graphite">
+                    Prueba con otro nombre o limpia la búsqueda.
+                  </p>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    }
+  </aside>
+}
+
+<p-dialog
+  header="Guardar favorito"
+  styleClass="w-[min(28rem,calc(100vw-2rem))]"
+  [visible]="saveDialogVisible()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!busy()"
+  [closeOnEscape]="!busy()"
+  [focusOnShow]="true"
+  [focusTrap]="true"
+  closeAriaLabel="Cerrar diálogo de favorito"
+  (onShow)="prepareSaveName()"
+  (visibleChange)="saveDialogVisible.set($event)"
+>
+  <form class="flex flex-col gap-2" (submit)="$event.preventDefault(); submitFavoriteName()">
+    <label for="favorite-name" class="text-sm font-medium text-ink">Nombre del favorito</label>
+    <input
+      id="favorite-name"
+      pInputText
+      type="text"
+      autocomplete="off"
+      class="w-full"
+      [formControl]="favoriteName"
+      [attr.aria-invalid]="favoriteName.invalid && favoriteName.touched"
+      [attr.aria-describedby]="
+        favoriteName.invalid && favoriteName.touched ? 'favorite-name-error' : null
+      "
+    />
+    @if (favoriteName.invalid && favoriteName.touched) {
+      <small id="favorite-name-error" class="text-sm text-red-700">
+        Ingresa un nombre para el favorito.
+      </small>
+    }
+  </form>
+
+  <ng-template #footer>
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      outlined
+      [disabled]="busy()"
+      (click)="saveDialogVisible.set(false)"
+    >
+      Cancelar
+    </button>
+    <button
+      pButton
+      type="button"
+      [disabled]="busy() || favoriteName.invalid"
+      (click)="submitFavoriteName()"
+    >
+      Guardar
+    </button>
+  </ng-template>
+</p-dialog>
+
+@if (previewFavorite(); as favorite) {
+  <p-dialog
+    header="{{ favorite.name }}"
+    styleClass="w-[min(40rem,calc(100vw-2rem))]"
+    [visible]="true"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [focusOnShow]="true"
+    [focusTrap]="true"
+    closeAriaLabel="Cerrar visualización del favorito"
+    (visibleChange)="$event || previewFavorite.set(null)"
+  >
+    <dl class="grid gap-4 text-sm sm:grid-cols-2">
+      <div>
+        <dt class="text-muted">Programa</dt>
+        <dd class="font-medium text-ink">{{ favorite.content.generals.name }}</dd>
+      </div>
+      <div>
+        <dt class="text-muted">Destino</dt>
+        <dd class="font-medium text-ink">
+          {{ favorite.content.generals.destination.display }}
+        </dd>
+      </div>
+      <div>
+        <dt class="text-muted">Fechas</dt>
+        <dd class="font-medium text-ink">
+          {{ favorite.content.schedule.startDate | date: 'mediumDate' : 'UTC' }} –
+          {{ favorite.content.schedule.endDate | date: 'mediumDate' : 'UTC' }}
+        </dd>
+      </div>
+      <div>
+        <dt class="text-muted">Pasajeros</dt>
+        <dd class="font-medium text-ink">
+          {{ favorite.content.schedule.totalPassengers }} totales,
+          {{ favorite.content.schedule.freePassengers }} liberados
+        </dd>
+      </div>
+      <div class="sm:col-span-2">
+        <dt class="text-muted">Servicios</dt>
+        <dd class="font-medium text-ink">
+          {{ favorite.content.services.length > 0 ? favorite.content.services.length : 'Sin' }}
+          servicios
+        </dd>
+      </div>
+    </dl>
+  </p-dialog>
+}
+
+@if (deleteCandidate(); as favorite) {
+  <p-dialog
+    header="Eliminar favorito"
+    styleClass="w-[min(28rem,calc(100vw-2rem))]"
+    [visible]="true"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="!busy()"
+    [closeOnEscape]="!busy()"
+    [focusOnShow]="true"
+    [focusTrap]="true"
+    closeAriaLabel="Cerrar confirmación de eliminación"
+    (visibleChange)="$event || deleteCandidate.set(null)"
+  >
+    <p class="leading-6 text-graphite">
+      ¿Quieres eliminar “{{ favorite.name }}”? Esta acción no se puede deshacer.
+    </p>
+    <ng-template #footer>
+      <button
+        pButton
+        type="button"
+        severity="secondary"
+        outlined
+        [disabled]="busy()"
+        (click)="deleteCandidate.set(null)"
+      >
+        Cancelar
+      </button>
+      <button pButton type="button" severity="danger" [disabled]="busy()" (click)="confirmDelete()">
+        Eliminar
+      </button>
+    </ng-template>
+  </p-dialog>
+}

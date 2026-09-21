@@ -1,0 +1,1110 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Agregar dependencias nuevas con versión fija y configurar Vitest": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103009682
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103028990
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789105487038
+      }
+    ],
+    "1.2 Configurar `provideHttpClient`, locale `es-CL` y animaciones en `app.config.ts`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103009843
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789105519988
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789111512426
+      }
+    ],
+    "1.3 Crear los interceptores HTTP y el contrato de respuesta": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103009901
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789105511355
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789111513451
+      }
+    ],
+    "1.4 Crear el enrutamiento con carga diferida y el layout base": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103009957
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789111524494
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789133999512
+      }
+    ],
+    "2.1 Escribir las interfaces del contrato consolidado": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103010009
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103030101
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789105485831
+      }
+    ],
+    "2.2 Escribir las constantes de la feature": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103010091
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789105512340
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789111514634
+      }
+    ],
+    "3.1 Escribir los generadores en `calculation/__arbitraries__/`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103010144
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789111525528
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789134689885
+      }
+    ],
+    "4.1 Implementar `rounding.ts` y `charge-type.ts`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103010208
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789134704137
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789135585432
+      }
+    ],
+    "4.3 Implementar `buildEffectiveRates` y los derivados del calendario": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103010263
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789134705447
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789135586773
+      }
+    ],
+    "4.5 Implementar `calculateProgram`: filas, subtotales, neto, utilidad, recargo y total": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103010325
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789228388141
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789229389847
+      }
+    ],
+    "5. Checkpoint — motor de cálculo verificado": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103010376
+      }
+    ],
+    "6.1 Fijar en código el conjunto de ítems pasajero-independientes": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103010426
+      }
+    ],
+    "6.2 Implementar `per-passenger-split.ts`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103010481
+      }
+    ],
+    "6.6 Integrar el precio por persona en los totales": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103010526
+      }
+    ],
+    "7.1 Implementar `deriveScenarios` y `calculateScenario`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103010585
+      }
+    ],
+    "8.1 Implementar el validador de documento de identidad": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103010730
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789134706179
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789135588193
+      }
+    ],
+    "8.3 Implementar el formateador de montos en CLP": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103010784
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789134707824
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789135589110
+      }
+    ],
+    "8.5 Implementar los validadores numéricos y de rango de fechas derivados de `FIELD_LIMITS`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103010907
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789228389095
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789229391310
+      }
+    ],
+    "8.7 Implementar `program-form.builder.ts`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103010958
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789230215262
+      }
+    ],
+    "8.9 Implementar `margin-preload.ts`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103011014
+      }
+    ],
+    "8.11 Implementar `nights-preload.ts` y la máquina de dos estados de `nightsSource`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103011068
+      }
+    ],
+    "9.1 Implementar `exchange-rate.service.ts` y `exchange-rate.store.ts`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103011143
+      }
+    ],
+    "9.2 Implementar `catalog.service.ts` y `catalog.store.ts`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103011198
+      }
+    ],
+    "9.3 Implementar `program-form.store.ts` como puente entre el formulario y las señales": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103011269
+      }
+    ],
+    "10. Checkpoint — cálculo, formulario y estado cableados": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103011316
+      }
+    ],
+    "11.1 Crear las tablas `catalogos` y `favoritos` y exportar sus ARN": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103011403
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103031186
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789105484815
+      }
+    ],
+    "12.1 Crear el módulo `libs/` y registrar los tres servicios": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103011460
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103032145
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789105487904
+      }
+    ],
+    "12.2 Implementar `libs/logger`, `libs/shared/apperr` y `libs/shared/resp`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103011517
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789105513438
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789111517251
+      }
+    ],
+    "12.3 Implementar `libs/lambdautil`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103011566
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789111526590
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789134000451
+      }
+    ],
+    "12.4 Implementar `libs/awsddb`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103011619
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789111527646
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789134691327
+      }
+    ],
+    "12.5 Implementar `libs/domain/program`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103011682
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789105514511
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789111517386
+      }
+    ],
+    "12.6 Extender `buildGoServiceServerless` con permisos IAM por función": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103011740
+      },
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789111528555
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789134001866
+      }
+    ],
+    "12.7 Crear los `configs/.env.local` por servicio": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103011825
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789134692104
+      }
+    ],
+    "13.1 Crear el scaffold del servicio": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103011944
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789134710162
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789135590430
+      }
+    ],
+    "13.2 Implementar el dominio de persistencia del servicio": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103012000
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136707157
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789228369666
+      }
+    ],
+    "13.3 Implementar `fn-query-catalog.go` y el endpoint de catálogos": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103012299
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789229398428
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789230209334
+      }
+    ],
+    "13.5 Implementar `fn-fetch-rates.go`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103012368
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789230216395
+      }
+    ],
+    "13.7 Implementar `fn-rate-snapshot.go` y el endpoint de tasas": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103012442
+      }
+    ],
+    "13.9 Cablear los entrypoints Lambda y el servidor local": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103012548
+      }
+    ],
+    "14.1 Escribir el script de siembra de la tabla `catalogos`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103012599
+      }
+    ],
+    "15.1 Crear el scaffold del servicio con la guarda de authorizer": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103012671
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789135600516
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136228619
+      }
+    ],
+    "15.2 Implementar el dominio del favorito": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103012733
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789228390439
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789229392648
+      }
+    ],
+    "15.3 Implementar `fn-listar-favoritos-v1`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103012799
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789229399760
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789230210334
+      }
+    ],
+    "15.4 Implementar `fn-crear-favorito-v1`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103012851
+      }
+    ],
+    "15.5 Implementar `fn-actualizar-favorito-v1` y `fn-eliminar-favorito-v1`, y cablear los entrypoints": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103012915
+      }
+    ],
+    "17. Checkpoint — backend implementado y probado": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103012965
+      }
+    ],
+    "18.1 Implementar `general-data-panel`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103013024
+      }
+    ],
+    "18.2 Implementar `schedule-panel`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103013082
+      }
+    ],
+    "18.3 Implementar `pricing-panel`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103013134
+      }
+    ],
+    "18.4 Implementar `crew-panel`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103013200
+      }
+    ],
+    "18.5 Implementar `services-panel`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103013272
+      }
+    ],
+    "18.6 Implementar `fallback-rates-notice`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103013532
+      }
+    ],
+    "19.1 Implementar `summary-table`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103013617
+      }
+    ],
+    "20.1 Implementar `program-form.page` como container": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103013830
+      }
+    ],
+    "20.2 Implementar `preview-dialog`": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103013890
+      }
+    ],
+    "24.1 Escribir un fragmento OpenAPI por servicio": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103013949
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136708318
+      }
+    ],
+    "25.1 Verificar la superficie de endpoints públicos (repo: **api**)": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103014009
+      }
+    ],
+    "25.2 Verificar la independencia de los servicios (repo: **api**)": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103014072
+      }
+    ],
+    "25.3 Verificar la superficie IAM (repo: **api**)": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103014124
+      }
+    ],
+    "25.4 Verificar el peso del bundle inicial (repo: **app**)": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103014173
+      }
+    ],
+    "26. Checkpoint final": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789103014263
+      }
+    ],
+    "11. Infraestructura DynamoDB (repo: **inf**, scope `ddb`)": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789105484857
+      }
+    ],
+    "2. Contrato de datos y constantes del programa (repo: **app**)": [
+      {
+        "executionId": "f4b584e3-73de-4796-a790-b2441ac3bb57",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789111514680
+      }
+    ],
+    "1. Plataforma frontend — configuración base de `ind-hub-app` (repo: **app**)": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789133999655
+      }
+    ],
+    "3. Generadores de `fast-check` (repo: **app**)": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789134690052
+      }
+    ],
+    "12. Plataforma backend Go — módulo `libs/` (repo: **api**, scope `config`/`deps`)": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789134692193
+      }
+    ],
+    "4.2 Escribir el test de propiedad del monto base": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136594941
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136693960
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789228364894
+      }
+    ],
+    "4.4 Escribir los tests de propiedad del calendario y de las tasas": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136596227
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136694165
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789228367868
+      }
+    ],
+    "4.6 Escribir los tests de propiedad de la conversión y del neto": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136597571
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789229401118
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789230207987
+      }
+    ],
+    "4.7 Escribir los tests de propiedad de utilidad, recargo y total": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136599011
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789229402452
+      }
+    ],
+    "4.8 Escribir los tests unitarios de casos límite del motor": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136600422
+      }
+    ],
+    "6.3 Escribir el test de propiedad de la partición del monto": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136601822
+      }
+    ],
+    "6.4 Escribir el test de propiedad de la recaudación del reparto": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136603205
+      }
+    ],
+    "6.5 Escribir el test de propiedad de la coincidencia de las dos ramas": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136605340
+      }
+    ],
+    "7.2 Escribir el test de propiedad de los escenarios derivados": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136606058
+      }
+    ],
+    "7.3 Escribir el test de propiedad de monotonía del precio por escenario": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136607019
+      }
+    ],
+    "8.2 Escribir el test de propiedad del validador de documento": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136608422
+      }
+    ],
+    "8.4 Escribir el test de propiedad del formateador": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136609969
+      }
+    ],
+    "8.6 Escribir el test de propiedad de los rangos numéricos": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136611213
+      }
+    ],
+    "8.8 Escribir el test de propiedad del largo del nombre": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136612656
+      }
+    ],
+    "8.10 Escribir el test de propiedad de la precarga de margen y del piso de utilidad": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136614063
+      }
+    ],
+    "8.12 Escribir el test de propiedad de la precarga de noches": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136615457
+      }
+    ],
+    "13.4 Escribir el test de propiedad de los catálogos": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136616906
+      }
+    ],
+    "13.6 Escribir los tests de propiedad del redondeo y de la fecha": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136618265
+      }
+    ],
+    "13.8 Escribir los tests de propiedad del snapshot de respaldo": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136619306
+      }
+    ],
+    "15.6 Escribir el test de propiedad de la identidad del usuario": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136620732
+      }
+    ],
+    "16.1 Crear el scaffold del servicio sin acceso a DynamoDB": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136622148
+      },
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136691599
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789228371463
+      }
+    ],
+    "16.2 Implementar `domain/budget_request.go`": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136623529
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789228391379
+      },
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789229393681
+      }
+    ],
+    "16.3 Implementar `fn-validate-request.go`": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136626016
+      }
+    ],
+    "16.4 Escribir el test de propiedad de la validación del presupuesto": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136626699
+      }
+    ],
+    "16.5 Implementar el compositor de PDF, el registro de plantillas y el endpoint": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136627804
+      }
+    ],
+    "18.7 Escribir el test de propiedad de duplicar servicio": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136635081
+      }
+    ],
+    "18.8 Escribir el test de propiedad de accesibilidad de los controles": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136635249
+      }
+    ],
+    "19.2 Escribir el test de propiedad de la visibilidad de la tabla": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136636738
+      }
+    ],
+    "19.3 Escribir el test de propiedad de independencia del pie": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136638029
+      }
+    ],
+    "20.3 Escribir el test de propiedad de la dependencia de las tasas": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136639488
+      }
+    ],
+    "20.4 Escribir el test de propiedad de la habilitación de las acciones": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136640865
+      }
+    ],
+    "20.5 Escribir el test de propiedad de la conservación del formulario": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136642278
+      }
+    ],
+    "21.1 Implementar `excel-layout.ts`": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136643244
+      }
+    ],
+    "21.2 Escribir los tests de propiedad del layout de Excel": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136645012
+      }
+    ],
+    "21.3 Implementar `excel-exporter.ts` con carga diferida y cablearlo en la previsualización": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136646672
+      }
+    ],
+    "22.1 Implementar `budget-pdf.service.ts`": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136647930
+      }
+    ],
+    "22.2 Cablear la exportación a PDF en la previsualización": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136649482
+      }
+    ],
+    "23.1 Implementar `favorites.service.ts` y `favorites.store.ts`": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136650770
+      }
+    ],
+    "23.2 Implementar el componente `favorites-panel`": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136651715
+      }
+    ],
+    "23.3 Implementar guardar, actualizar y cargar un favorito": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136653196
+      }
+    ],
+    "23.4 Escribir los tests de propiedad del ciclo de vida del favorito": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136654552
+      }
+    ],
+    "23.5 Implementar el aviso de guardado no disponible": [
+      {
+        "executionId": "42b29660-7d3a-4b5e-bd4d-f717fc933788",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789136655798
+      }
+    ],
+    "16. `services/api-program` — PDF de presupuesto, **despliegue bloqueado** (repo: **api**, scope `program`)": [
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789228375047
+      }
+    ],
+    "4. Motor de cálculo — núcleo determinista (repo: **app**)": [
+      {
+        "executionId": "6341c639-8829-4c15-97de-887ecb3c9437",
+        "chatSessionId": "sess_8c5e8082-d049-4ae8-9f3b-e79c6427d9cd",
+        "timestamp": 1789229390340
+      }
+    ]
+  }
+}

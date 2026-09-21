@@ -123,13 +123,13 @@ Título: `tipo(scope): descripcion breve sin tildes` (max 70 chars). Descripció
 
 ## Repos
 
-| Alias          | Stack                               | Responsabilidad                                   |
-| -------------- | ----------------------------------- | ------------------------------------------------- |
+| Alias          | Stack                               | Responsabilidad                                           |
+| ----------------| -------------------------------------| -----------------------------------------------------------|
 | infrastructure | TypeScript, Serverless Framework v4 | Infraestructura AWS (DynamoDB, S3, SSM, CDN, API Gateway) |
-| application    | Angular 22, Signals, TailwindCSS    | SPA: viajes, cotizaciones, pasajeros, dashboards  |
-| services       | Go 1.25, Echo v4, DynamoDB          | Backend: viajes, cotizaciones, contratos, destinos|
-| authorizer     | TypeScript, Serverless Framework v4 | Lambda Authorizer compartido (JWT propio HMAC-SHA256) |
-| orchestrator   | —                                   | Documentación centralizada, steering, estándares  |
+| application    | Angular 22, Signals, TailwindCSS    | SPA: viajes, cotizaciones, pasajeros, dashboards          |
+| services       | Go 1.25, Echo v4, DynamoDB          | Backend: viajes, cotizaciones, contratos, destinos        |
+| authorizer     | TypeScript, Serverless Framework v4 | Lambda Authorizer compartido (JWT propio HMAC-SHA256)     |
+| orchestrator   | —                                   | Documentación centralizada, steering, estándares          |
 
 ## Repos Legacy
 

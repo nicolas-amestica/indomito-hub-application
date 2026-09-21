@@ -1,0 +1,174 @@
+<section
+  aria-labelledby="general-data-heading"
+  [class]="
+    embedded()
+      ? 'overflow-hidden bg-surface'
+      : 'overflow-hidden rounded-2xl border border-line border-t-4 border-t-graphite bg-surface shadow-sm'
+  "
+>
+  @if (embedded()) {
+    <h2 id="general-data-heading" class="sr-only">Datos generales</h2>
+  } @else {
+    <div class="border-b border-line bg-canvas/70 px-5 py-4 sm:px-6">
+      <div class="flex items-start gap-3">
+        <span
+          aria-hidden="true"
+          class="flex size-8 shrink-0 items-center justify-center rounded-full bg-graphite text-xs font-bold tracking-wide text-white"
+        >
+          01
+        </span>
+        <div>
+          <h2 id="general-data-heading" class="text-lg font-semibold text-ink">Datos generales</h2>
+          <p class="mt-0.5 text-sm text-graphite">
+            Identifica el programa y define su contexto comercial.
+          </p>
+        </div>
+      </div>
+    </div>
+  }
+
+  <form [formGroup]="group()" class="grid gap-x-5 gap-y-5 p-5 sm:grid-cols-2 sm:p-6 lg:grid-cols-3">
+    <div class="flex flex-col gap-2 sm:col-span-2">
+      <label for="program-name" class="text-sm font-medium text-ink">
+        Nombre del programa <span class="text-red-600" aria-hidden="true">*</span>
+      </label>
+      <input
+        id="program-name"
+        pInputText
+        fluid
+        formControlName="name"
+        autocomplete="off"
+        placeholder="Ej. Gira de estudios Brasil 2027"
+        [invalid]="group().controls.name.touched && group().controls.name.invalid"
+        [attr.aria-invalid]="group().controls.name.touched && group().controls.name.invalid"
+        [attr.aria-describedby]="
+          group().controls.name.touched && group().controls.name.invalid
+            ? 'program-name-error'
+            : null
+        "
+      />
+      @if (group().controls.name.touched && group().controls.name.invalid) {
+        <p id="program-name-error" class="text-sm text-red-700">
+          @if (group().controls.name.hasError('minlength')) {
+            El nombre debe tener al menos 3 caracteres.
+          } @else {
+            Ingresa el nombre del programa.
+          }
+        </p>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label id="program-plan-label" for="program-plan" class="text-sm font-medium text-ink">
+        Plan <span class="text-red-600" aria-hidden="true">*</span>
+      </label>
+      <p-select
+        inputId="program-plan"
+        fluid
+        formControlName="plan"
+        optionLabel="display"
+        dataKey="id"
+        placeholder="Selecciona un plan"
+        [options]="plans()"
+        [loading]="loading()"
+        [invalid]="group().controls.plan.touched && group().controls.plan.invalid"
+        [pt]="selectAccessibility(group().controls.plan, 'program-plan-error')"
+        ariaLabelledBy="program-plan-label"
+      />
+      @if (group().controls.plan.touched && group().controls.plan.invalid) {
+        <p id="program-plan-error" class="text-sm text-red-700">Selecciona un plan.</p>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2 sm:col-span-2">
+      <div class="flex items-center justify-between gap-3">
+        <label for="program-description" class="text-sm font-medium text-ink">Descripción</label>
+        <span class="text-xs text-muted">Opcional</span>
+      </div>
+      <textarea
+        id="program-description"
+        pTextarea
+        fluid
+        formControlName="description"
+        rows="3"
+        placeholder="Agrega notas que ayuden a identificar este programa"
+      ></textarea>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label id="program-season-label" for="program-season" class="text-sm font-medium text-ink">
+        Temporada <span class="text-red-600" aria-hidden="true">*</span>
+      </label>
+      <p-select
+        inputId="program-season"
+        fluid
+        formControlName="season"
+        optionLabel="display"
+        dataKey="id"
+        placeholder="Selecciona una temporada"
+        [options]="seasons()"
+        [loading]="loading()"
+        [invalid]="group().controls.season.touched && group().controls.season.invalid"
+        [pt]="selectAccessibility(group().controls.season, 'program-season-error')"
+        ariaLabelledBy="program-season-label"
+      />
+      @if (group().controls.season.touched && group().controls.season.invalid) {
+        <p id="program-season-error" class="text-sm text-red-700">Selecciona una temporada.</p>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label
+        id="program-destination-label"
+        for="program-destination"
+        class="text-sm font-medium text-ink"
+      >
+        Destino <span class="text-red-600" aria-hidden="true">*</span>
+      </label>
+      <p-select
+        inputId="program-destination"
+        fluid
+        formControlName="destination"
+        optionLabel="display"
+        dataKey="id"
+        placeholder="Selecciona un destino"
+        [options]="destinations()"
+        [loading]="loading()"
+        [invalid]="group().controls.destination.touched && group().controls.destination.invalid"
+        [pt]="selectAccessibility(group().controls.destination, 'program-destination-error')"
+        ariaLabelledBy="program-destination-label"
+      />
+      @if (group().controls.destination.touched && group().controls.destination.invalid) {
+        <p id="program-destination-error" class="text-sm text-red-700">Selecciona un destino.</p>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2 sm:col-span-2">
+      <label for="program-departure-city" class="text-sm font-medium text-ink">
+        Ciudad de salida <span class="text-red-600" aria-hidden="true">*</span>
+      </label>
+      <input
+        id="program-departure-city"
+        pInputText
+        fluid
+        formControlName="departureCity"
+        autocomplete="address-level2"
+        placeholder="Ej. Santiago"
+        [invalid]="group().controls.departureCity.touched && group().controls.departureCity.invalid"
+        [attr.aria-invalid]="
+          group().controls.departureCity.touched && group().controls.departureCity.invalid
+        "
+        [attr.aria-describedby]="
+          group().controls.departureCity.touched && group().controls.departureCity.invalid
+            ? 'program-departure-city-error'
+            : null
+        "
+      />
+      @if (group().controls.departureCity.touched && group().controls.departureCity.invalid) {
+        <p id="program-departure-city-error" class="text-sm text-red-700">
+          Ingresa la ciudad de salida.
+        </p>
+      }
+    </div>
+  </form>
+</section>

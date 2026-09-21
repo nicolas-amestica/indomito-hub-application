@@ -1,0 +1,242 @@
+<section
+  aria-labelledby="services-heading"
+  [class]="
+    embedded()
+      ? 'overflow-hidden bg-surface'
+      : 'overflow-hidden rounded-2xl border border-line border-t-4 border-t-graphite bg-surface shadow-sm'
+  "
+>
+  <div
+    [class]="
+      embedded()
+        ? 'flex justify-end border-b border-line px-5 py-3 sm:px-6'
+        : 'border-b border-line bg-canvas/70 px-5 py-4 sm:px-6'
+    "
+  >
+    <div class="flex w-full flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      @if (embedded()) {
+        <h2 id="services-heading" class="sr-only">Servicios</h2>
+      } @else {
+        <div class="flex items-start gap-3">
+          <span
+            aria-hidden="true"
+            class="flex size-8 shrink-0 items-center justify-center rounded-full bg-graphite text-xs font-bold tracking-wide text-white"
+          >
+            05
+          </span>
+          <div>
+            <h2 id="services-heading" class="text-lg font-semibold text-ink">Servicios</h2>
+            <p class="mt-0.5 text-sm text-graphite">
+              Detalla cada costo contratado y la forma en que se multiplica.
+            </p>
+          </div>
+        </div>
+      }
+
+      <button
+        pButton
+        type="button"
+        class="add-service-button"
+        [disabled]="services().length >= limits.maxServices"
+        (click)="add()"
+      >
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          class="size-4"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        Agregar servicio
+      </button>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4 p-5 sm:p-6">
+    @for (row of services().controls; track row.controls.id.value; let index = $index) {
+      <article [formGroup]="row" class="rounded-xl border border-line bg-canvas/50 p-4">
+        <div class="mb-4 flex items-center justify-between gap-3">
+          <h3 class="text-sm font-semibold text-ink">Servicio {{ index + 1 }}</h3>
+          <div class="flex items-center gap-1">
+            <button
+              pButton
+              type="button"
+              severity="secondary"
+              text
+              rounded
+              iconOnly
+              [disabled]="services().length >= limits.maxServices"
+              [attr.aria-label]="'Duplicar servicio ' + (index + 1)"
+              (click)="duplicate(index)"
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                class="size-4"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect x="8" y="8" width="11" height="11" rx="2" />
+                <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
+              </svg>
+            </button>
+            <button
+              pButton
+              type="button"
+              severity="danger"
+              text
+              rounded
+              iconOnly
+              [disabled]="services().length === 1"
+              [attr.aria-label]="'Eliminar servicio ' + (index + 1)"
+              (click)="remove(index)"
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                class="size-4"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5M14 11v5" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid gap-x-4 gap-y-4 sm:grid-cols-2 lg:grid-cols-12">
+          <div class="flex flex-col gap-2 lg:col-span-4">
+            <label [for]="'service-' + index + '-name'" class="text-sm font-medium text-ink">
+              Nombre <span class="text-red-600" aria-hidden="true">*</span>
+            </label>
+            <input
+              [id]="'service-' + index + '-name'"
+              pInputText
+              fluid
+              formControlName="name"
+              autocomplete="off"
+              placeholder="Ej. Hotel"
+              [invalid]="row.controls.name.touched && row.controls.name.invalid"
+              [attr.aria-invalid]="row.controls.name.touched && row.controls.name.invalid"
+              [attr.aria-describedby]="
+                row.controls.name.touched && row.controls.name.invalid
+                  ? 'service-' + index + '-name-error'
+                  : null
+              "
+            />
+            @if (row.controls.name.touched && row.controls.name.invalid) {
+              <p [id]="'service-' + index + '-name-error'" class="text-sm text-red-700">
+                Ingresa el nombre del servicio.
+              </p>
+            }
+          </div>
+
+          <div class="flex flex-col gap-2 lg:col-span-4">
+            <label
+              [id]="'service-' + index + '-charge-type-label'"
+              [for]="'service-' + index + '-charge-type'"
+              class="text-sm font-medium text-ink"
+            >
+              Tipo de cobro <span class="text-red-600" aria-hidden="true">*</span>
+            </label>
+            <p-select
+              [inputId]="'service-' + index + '-charge-type'"
+              fluid
+              formControlName="chargeType"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Selecciona un tipo"
+              [options]="chargeTypes"
+              [invalid]="row.controls.chargeType.touched && row.controls.chargeType.invalid"
+              [pt]="
+                selectAccessibility(
+                  row.controls.chargeType,
+                  'service-' + index + '-charge-type-error'
+                )
+              "
+              [ariaLabelledBy]="'service-' + index + '-charge-type-label'"
+            />
+            @if (row.controls.chargeType.touched && row.controls.chargeType.invalid) {
+              <p [id]="'service-' + index + '-charge-type-error'" class="text-sm text-red-700">
+                Selecciona el tipo de cobro.
+              </p>
+            }
+          </div>
+
+          <div class="flex flex-col gap-2 lg:col-span-2">
+            <label
+              [id]="'service-' + index + '-unit-price-label'"
+              [for]="'service-' + index + '-unit-price'"
+              class="text-sm font-medium text-ink"
+            >
+              Precio unitario <span class="text-red-600" aria-hidden="true">*</span>
+            </label>
+            <p-inputnumber
+              [inputId]="'service-' + index + '-unit-price'"
+              fluid
+              formControlName="unitPrice"
+              mode="decimal"
+              locale="es-CL"
+              [min]="limits.itemPrice.min"
+              [max]="limits.itemPrice.max"
+              [minFractionDigits]="0"
+              [maxFractionDigits]="6"
+              [invalid]="priceInvalid(row)"
+              [ariaDescribedBy]="priceDescription(row, index)"
+              [ariaLabelledBy]="'service-' + index + '-unit-price-label'"
+            />
+            @if (priceInvalid(row)) {
+              <p [id]="'service-' + index + '-unit-price-error'" class="text-sm text-red-700">
+                @if (row.hasError('clpIntegerPrice')) {
+                  El precio en CLP debe ser un número entero.
+                } @else if (row.controls.unitPrice.hasError('numericRange')) {
+                  Ingresa un precio entre 0,01 y 99.999.999.
+                } @else {
+                  Ingresa el precio unitario.
+                }
+              </p>
+            }
+          </div>
+
+          <div class="flex flex-col gap-2 lg:col-span-2">
+            <label
+              [id]="'service-' + index + '-currency-label'"
+              [for]="'service-' + index + '-currency'"
+              class="text-sm font-medium text-ink"
+            >
+              Moneda <span class="text-red-600" aria-hidden="true">*</span>
+            </label>
+            <p-select
+              [inputId]="'service-' + index + '-currency'"
+              fluid
+              formControlName="currency"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Moneda"
+              [options]="currencies"
+              [invalid]="row.controls.currency.touched && row.controls.currency.invalid"
+              [pt]="
+                selectAccessibility(row.controls.currency, 'service-' + index + '-currency-error')
+              "
+              [ariaLabelledBy]="'service-' + index + '-currency-label'"
+            />
+            @if (row.controls.currency.touched && row.controls.currency.invalid) {
+              <p [id]="'service-' + index + '-currency-error'" class="text-sm text-red-700">
+                Selecciona una moneda.
+              </p>
+            }
+          </div>
+        </div>
+      </article>
+    }
+
+    <p class="text-right text-xs text-muted" aria-live="polite">
+      {{ services().length }} de {{ limits.maxServices }} servicios
+    </p>
+  </div>
+</section>
