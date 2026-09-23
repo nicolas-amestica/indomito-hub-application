@@ -62,16 +62,40 @@ export const IndomitoPreset = definePreset(Aura, {
   },
   components: {
     panel: {
-      root: { borderRadius: 'var(--radius-panel)' },
-      header: { padding: '1.25rem 1.5rem', borderWidth: '0 0 1px 0' },
+      root: {
+        background: 'var(--color-surface)',
+        borderColor: 'var(--color-line)',
+        borderRadius: '1rem',
+      },
+      header: {
+        background: 'linear-gradient(180deg, #ffffff 0%, #fbfbfb 100%)',
+        color: 'var(--color-ink)',
+        padding: '1.25rem 1.5rem',
+        borderColor: 'var(--color-line)',
+        borderWidth: '0 0 1px 0',
+        borderRadius: '1rem 1rem 0 0',
+      },
       toggleableHeader: { padding: '1rem 1.5rem' },
       title: { fontSize: '1rem', fontWeight: '600' },
     },
     button: {
       root: {
+        borderRadius: '0.625rem',
         paddingX: '1.25rem',
+        paddingY: '0.6875rem',
         label: { fontWeight: '600' },
-        primary: { focusRing: { color: 'var(--color-graphite)' } },
+        primary: {
+          background: 'var(--color-brand)',
+          hoverBackground: 'var(--color-brand-hover)',
+          activeBackground: 'var(--color-brand-active)',
+          borderColor: 'var(--color-brand)',
+          hoverBorderColor: 'var(--color-brand-hover)',
+          activeBorderColor: 'var(--color-brand-active)',
+          color: 'var(--color-ink)',
+          hoverColor: 'var(--color-ink)',
+          activeColor: 'var(--color-ink)',
+          focusRing: { color: 'var(--color-graphite)' },
+        },
       },
     },
   },

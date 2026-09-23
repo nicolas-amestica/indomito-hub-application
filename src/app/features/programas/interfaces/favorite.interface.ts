@@ -47,7 +47,7 @@ export interface FavoriteContent {
   generals: ProgramGeneral;
   schedule: Pick<
     ProgramSchedule,
-    'startDate' | 'endDate' | 'totalNights' | 'totalPassengers' | 'freePassengers'
+    'totalDays' | 'totalNights' | 'totalPassengers' | 'freePassengers'
   >;
   pricing: Omit<ProgramPricing, 'exchange'>;
   crews: Pick<CrewMember, 'name' | 'documentId' | 'dailyPrice' | 'currency'>[];

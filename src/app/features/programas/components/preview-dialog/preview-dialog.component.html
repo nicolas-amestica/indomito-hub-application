@@ -63,20 +63,10 @@
           aria-labelledby="preview-schedule-heading"
           class="rounded-xl border border-line bg-surface p-4"
         >
-          <h2 id="preview-schedule-heading" class="font-semibold text-ink">Fechas y cantidades</h2>
+          <h2 id="preview-schedule-heading" class="font-semibold text-ink">
+            Duración y cantidades
+          </h2>
           <dl class="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:grid-cols-3">
-            <div>
-              <dt class="text-muted">Inicio</dt>
-              <dd class="mt-0.5 font-medium text-ink">
-                {{ program().schedule.startDate | date: 'longDate' : 'UTC' }}
-              </dd>
-            </div>
-            <div>
-              <dt class="text-muted">Término</dt>
-              <dd class="mt-0.5 font-medium text-ink">
-                {{ program().schedule.endDate | date: 'longDate' : 'UTC' }}
-              </dd>
-            </div>
             <div>
               <dt class="text-muted">Duración</dt>
               <dd class="mt-0.5 font-medium text-ink">

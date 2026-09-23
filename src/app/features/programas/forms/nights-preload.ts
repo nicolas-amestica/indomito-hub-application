@@ -8,5 +8,5 @@ export type NightsSource = 'preloaded' | 'user';
 
 /** Calcula la precarga de noches para una duración derivada. */
 export function preloadedNights(totalDays: number): number {
-  return Math.max(1, totalDays - 1);
+  return Math.max(0, totalDays - 1);
 }

@@ -76,7 +76,7 @@ describe('paneles del formulario · accesibilidad', () => {
           );
           const buttons = host.querySelectorAll<HTMLButtonElement>('button');
 
-          expect(fields).toHaveLength(16 + crewCount * 4 + serviceCount * 4);
+          expect(fields).toHaveLength(14 + crewCount * 4 + serviceCount * 4);
           for (const field of fields) {
             expect(hasVisibleLabel(field, host)).toBe(true);
             expect(hasAccessibleName(field, host)).toBe(true);

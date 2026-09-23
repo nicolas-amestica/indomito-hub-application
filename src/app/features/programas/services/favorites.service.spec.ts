@@ -87,8 +87,7 @@ function sampleFavorite(): Favorite {
         departureCity: 'Santiago',
       },
       schedule: {
-        startDate: '2027-10-04',
-        endDate: '2027-10-10',
+        totalDays: 7,
         totalNights: 6,
         totalPassengers: 30,
         freePassengers: 2,

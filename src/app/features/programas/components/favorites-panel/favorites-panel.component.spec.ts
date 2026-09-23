@@ -1,9 +1,14 @@
 import { TestBed } from '@angular/core/testing';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import type { Favorite } from '../../interfaces/favorite.interface';
 import { FavoritesPanelComponent } from './favorites-panel.component';
 
 describe('FavoritesPanelComponent', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({ providers: [provideNoopAnimations()] });
+  });
+
   it('muestra el estado vacío y permite cerrar desde la capa móvil', async () => {
     const fixture = createFixture([]);
     await fixture.whenStable();
@@ -85,8 +90,7 @@ function favorite(): Favorite {
         departureCity: 'Santiago',
       },
       schedule: {
-        startDate: '2027-10-04',
-        endDate: '2027-10-10',
+        totalDays: 7,
         totalNights: 6,
         totalPassengers: 30,
         freePassengers: 2,

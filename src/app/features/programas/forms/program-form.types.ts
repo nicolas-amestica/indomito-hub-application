@@ -54,15 +54,11 @@ export interface GeneralsControls {
 }
 
 /**
- * Controles de fechas y cantidades (Requirements 3.1 y 3.5). Las fechas son
- * cadenas ISO 8601 `YYYY-MM-DD`, que es lo que consume `deriveTotalDays` y lo
- * que espera `dateRangeValidator`.
- *
- * `totalDays` y `payingPassengers` no están: los deriva el motor.
+ * Controles de duración y cantidades. El programa expresa una duración, pero
+ * no fechas de calendario; esas pertenecen al contrato posterior.
  */
 export interface ScheduleControls {
-  startDate: FormControl<string | null>;
-  endDate: FormControl<string | null>;
+  totalDays: FormControl<number | null>;
   totalNights: FormControl<number | null>;
   totalPassengers: FormControl<number | null>;
   freePassengers: FormControl<number | null>;

@@ -103,6 +103,7 @@ describe('baseAmount · propiedades', () => {
         const countsFreePassengers =
           !isCrewItem(item) &&
           schedule.freePassengers > 0 &&
+          (item.chargeType !== 'per_passenger_night' || schedule.totalNights > 0) &&
           PASSENGER_DEPENDENT_CHARGE_TYPES.includes(item.chargeType);
         if (countsFreePassengers) {
           expect(amount).toBeGreaterThan(baseAmount(item, onlyPaying));

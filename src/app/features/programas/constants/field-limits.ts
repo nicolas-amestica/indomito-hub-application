@@ -11,7 +11,7 @@ export const FIELD_LIMITS = {
   /** Derivado del rango de fechas. Requirement 3.6. */
   totalDays: { min: 1, max: 100, step: 1 },
   /** Requirement 3.6. */
-  totalNights: { min: 1, max: 100, step: 1 },
+  totalNights: { min: 0, max: 100, step: 1 },
   /** Requirement 3.6. */
   totalPassengers: { min: 1, max: 100, step: 1 },
   /** Siempre menor que `totalPassengers`. Requirement 3.7. */

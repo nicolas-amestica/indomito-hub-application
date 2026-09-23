@@ -6,8 +6,7 @@ export function favoriteContentFromProgram(program: Program): FavoriteContent {
   return {
     generals: program.generals,
     schedule: {
-      startDate: program.schedule.startDate,
-      endDate: program.schedule.endDate,
+      totalDays: program.schedule.totalDays,
       totalNights: program.schedule.totalNights,
       totalPassengers: program.schedule.totalPassengers,
       freePassengers: program.schedule.freePassengers,

@@ -120,8 +120,6 @@ function programFrom(
       departureCity: 'Santiago',
     },
     schedule: {
-      startDate: '2027-10-04',
-      endDate: '2027-10-10',
       ...input.schedule,
       payingPassengers: Math.max(1, input.schedule.totalPassengers - input.schedule.freePassengers),
     },

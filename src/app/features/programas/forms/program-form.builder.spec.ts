@@ -26,13 +26,12 @@ describe('buildProgramForm', () => {
       'services',
     ]);
     expect(Object.keys(form.controls.schedule.controls)).toEqual([
-      'startDate',
-      'endDate',
+      'totalDays',
       'totalNights',
       'totalPassengers',
       'freePassengers',
     ]);
-    expect(form.get('schedule.totalDays')).toBeNull();
+    expect(form.get('schedule.totalDays')).not.toBeNull();
     expect(form.get('schedule.payingPassengers')).toBeNull();
     expect(form.get('totals')).toBeNull();
     expect(form.get('pricing.exchange')).toBeNull();

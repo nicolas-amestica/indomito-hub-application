@@ -7,7 +7,7 @@
   "
 >
   @if (embedded()) {
-    <h2 id="schedule-heading" class="sr-only">Fechas y cantidades</h2>
+    <h2 id="schedule-heading" class="sr-only">Duración y cantidades</h2>
   } @else {
     <div class="border-b border-line bg-canvas/70 px-5 py-4 sm:px-6">
       <div class="flex items-start gap-3">
@@ -18,7 +18,9 @@
           02
         </span>
         <div>
-          <h2 id="schedule-heading" class="text-lg font-semibold text-ink">Fechas y cantidades</h2>
+          <h2 id="schedule-heading" class="text-lg font-semibold text-ink">
+            Duración y cantidades
+          </h2>
           <p class="mt-0.5 text-sm text-graphite">
             Define la duración del viaje y la composición del grupo.
           </p>
@@ -29,96 +31,35 @@
 
   <div [formGroup]="group()" class="grid gap-x-5 gap-y-5 p-5 sm:grid-cols-2 sm:p-6 lg:grid-cols-3">
     <div class="flex flex-col gap-2">
-      <label for="program-start-date" class="text-sm font-medium text-ink">
-        Fecha de inicio <span class="text-red-600" aria-hidden="true">*</span>
+      <label
+        id="program-total-days-label"
+        for="program-total-days"
+        class="text-sm font-medium text-ink"
+      >
+        Días totales <span class="text-red-600" aria-hidden="true">*</span>
       </label>
-      <input
-        id="program-start-date"
-        pInputText
+      <p-inputnumber
+        inputId="program-total-days"
         fluid
-        type="date"
-        formControlName="startDate"
-        [invalid]="group().controls.startDate.touched && group().controls.startDate.invalid"
-        [attr.aria-invalid]="
-          group().controls.startDate.touched && group().controls.startDate.invalid
+        formControlName="totalDays"
+        [min]="limits.totalDays.min"
+        [max]="limits.totalDays.max"
+        [step]="limits.totalDays.step"
+        [useGrouping]="false"
+        [maxFractionDigits]="0"
+        [invalid]="group().controls.totalDays.touched && group().controls.totalDays.invalid"
+        [ariaDescribedBy]="
+          group().controls.totalDays.touched && group().controls.totalDays.invalid
+            ? 'program-total-days-error'
+            : undefined
         "
-        [attr.aria-describedby]="
-          group().controls.startDate.touched && group().controls.startDate.invalid
-            ? 'program-start-date-error'
-            : null
-        "
+        ariaLabelledBy="program-total-days-label"
       />
-      @if (group().controls.startDate.touched && group().controls.startDate.invalid) {
-        <p id="program-start-date-error" class="text-sm text-red-700">
-          Selecciona la fecha de inicio.
+      @if (group().controls.totalDays.touched && group().controls.totalDays.invalid) {
+        <p id="program-total-days-error" class="text-sm text-red-700">
+          Ingresa entre {{ limits.totalDays.min }} y {{ limits.totalDays.max }} días.
         </p>
       }
-    </div>
-
-    <div class="flex flex-col gap-2">
-      <label for="program-end-date" class="text-sm font-medium text-ink">
-        Fecha de término <span class="text-red-600" aria-hidden="true">*</span>
-      </label>
-      <input
-        id="program-end-date"
-        pInputText
-        fluid
-        type="date"
-        formControlName="endDate"
-        [invalid]="
-          (group().controls.endDate.touched && group().controls.endDate.invalid) ||
-          rangeHasError('dateRangeOrder') ||
-          rangeHasError('dateRangeMaxDays')
-        "
-        [attr.aria-invalid]="
-          (group().controls.endDate.touched && group().controls.endDate.invalid) ||
-          rangeHasError('dateRangeOrder') ||
-          rangeHasError('dateRangeMaxDays')
-        "
-        [attr.aria-describedby]="
-          group().controls.endDate.touched && group().controls.endDate.invalid
-            ? 'program-end-date-error'
-            : rangeHasError('dateRangeOrder')
-              ? 'program-date-range-order-error'
-              : rangeHasError('dateRangeMaxDays')
-                ? 'program-date-range-max-error'
-                : null
-        "
-      />
-      @if (group().controls.endDate.touched && group().controls.endDate.invalid) {
-        <p id="program-end-date-error" class="text-sm text-red-700">
-          Selecciona la fecha de término.
-        </p>
-      } @else if (rangeHasError('dateRangeOrder')) {
-        <p id="program-date-range-order-error" class="text-sm text-red-700">
-          La fecha de término no puede ser anterior a la fecha de inicio.
-        </p>
-      } @else if (rangeHasError('dateRangeMaxDays')) {
-        <p id="program-date-range-max-error" class="text-sm text-red-700">
-          La duración máxima permitida es de {{ limits.totalDays.max }} días.
-        </p>
-      }
-    </div>
-
-    <div class="flex flex-col gap-2">
-      <label for="program-total-days" class="text-sm font-medium text-ink">Días totales</label>
-      <div class="relative">
-        <input
-          id="program-total-days"
-          pInputText
-          fluid
-          readonly
-          [value]="totalDays()"
-          aria-live="polite"
-          class="bg-canvas pr-14 font-semibold text-ink"
-        />
-        <span
-          aria-hidden="true"
-          class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs font-medium text-muted"
-        >
-          días
-        </span>
-      </div>
     </div>
 
     <div class="flex flex-col gap-2">

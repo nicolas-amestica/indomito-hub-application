@@ -16,17 +16,35 @@
   --color-control-border: #858585;
   --radius-control: 0.5rem;
   --radius-panel: 0.75rem;
+  --shadow-panel: 0 18px 45px -36px rgba(28, 28, 28, 0.75);
 }
 
 @layer base {
   html {
     color-scheme: light;
+    scroll-behavior: smooth;
   }
   body {
     @apply m-0 bg-canvas font-sans text-ink antialiased;
+    min-width: 20rem;
+  }
+  ::selection {
+    background: var(--color-brand);
+    color: var(--color-ink);
   }
   :focus-visible {
     outline: 2px solid var(--color-graphite);
     outline-offset: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

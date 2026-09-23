@@ -15,7 +15,6 @@ import {
   clpIntegerPriceValidator,
   numericRangeValidator,
 } from '../../../shared/validators/numeric-range.validator';
-import { dateRangeValidator } from '../../../shared/validators/date-range.validator';
 import { documentIdValidator } from '../../../shared/validators/document-id.validator';
 import type {
   CrewArray,
@@ -41,8 +40,8 @@ const defaultRowIdFactory: RowIdFactory = () => globalThis.crypto.randomUUID();
 /**
  * Construye el formulario completo del programa.
  *
- * El grupo contiene exclusivamente valores ingresados por el usuario. Días
- * totales, pasajeros pagantes, tasas efectivas y montos se derivan fuera del
+ * El grupo contiene exclusivamente valores ingresados por el usuario. Pasajeros
+ * pagantes, tasas efectivas y montos se derivan fuera del
  * formulario para que nunca queden residuos de un cálculo anterior.
  */
 export function buildProgramForm(
@@ -69,8 +68,10 @@ export function buildProgramForm(
     }),
     schedule: new FormGroup(
       {
-        startDate: new FormControl<string | null>(null, Validators.required),
-        endDate: new FormControl<string | null>(null, Validators.required),
+        totalDays: new FormControl<number | null>(null, [
+          Validators.required,
+          numericRangeValidator(FIELD_LIMITS.totalDays),
+        ]),
         totalNights: new FormControl<number | null>(null, [
           Validators.required,
           numericRangeValidator(FIELD_LIMITS.totalNights),
@@ -84,7 +85,7 @@ export function buildProgramForm(
           numericRangeValidator(FIELD_LIMITS.freePassengers),
         ]),
       },
-      { validators: [dateRangeValidator, payingPassengerValidator] },
+      { validators: [payingPassengerValidator] },
     ),
     pricing: new FormGroup({
       usdIncreaseCLP: new FormControl<number | null>(null, [

@@ -11,6 +11,7 @@ import {
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { ButtonDirective } from 'primeng/button';
 import { Panel } from 'primeng/panel';
 import { ProgressSpinner } from 'primeng/progressspinner';
@@ -18,6 +19,7 @@ import { Toast } from 'primeng/toast';
 import { finalize } from 'rxjs';
 
 import { PageHeaderComponent } from '../../../../shared/ui/page-header.component';
+import { MotionPressDirective } from '../../../../shared/ui/motion-press.directive';
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { ClpAmountPipe } from '../../../../shared/formatting/clp-amount.pipe';
 import { calculateScenario, deriveScenarios } from '../../calculation/scenarios';
@@ -61,8 +63,10 @@ import { ProgramFormStore } from '../../state/program-form.store';
   selector: 'app-program-form-page',
   imports: [
     PageHeaderComponent,
+    MotionPressDirective,
     Toast,
     DatePipe,
+    RouterLink,
     ClpAmountPipe,
     ButtonDirective,
     Panel,

@@ -1,6 +1,8 @@
 import { By } from '@angular/platform-browser';
 import { TestBed } from '@angular/core/testing';
 import type { WritableSignal } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import fc from 'fast-check';
 import { MessageService } from 'primeng/api';
 import { NEVER, of, Subject, throwError, type Observable } from 'rxjs';
@@ -56,6 +58,8 @@ describe('ProgramFormPage', () => {
     await TestBed.configureTestingModule({
       imports: [ProgramFormPage],
       providers: [
+        provideRouter([]),
+        provideNoopAnimations(),
         MessageService,
         { provide: CatalogService, useValue: { getCatalogs } },
         { provide: ExchangeRateService, useValue: { getSnapshot } },
@@ -117,13 +121,13 @@ describe('ProgramFormPage', () => {
     expect(host.querySelector('#program-name')).not.toBeNull();
   });
 
-  it('monta el panel de fechas sobre los valores derivados de la feature', async () => {
+  it('monta el panel de duración con los días editables inicialmente vacíos', async () => {
     const fixture = TestBed.createComponent(ProgramFormPage);
     await fixture.whenStable();
     const host = fixture.nativeElement as HTMLElement;
 
     expect(host.querySelector('app-schedule-panel')).not.toBeNull();
-    expect(host.querySelector<HTMLInputElement>('#program-total-days')?.value).toBe('0');
+    expect(host.querySelector<HTMLInputElement>('#program-total-days')?.value).toBe('');
   });
 
   it('monta los paneles de precio, tripulacion y servicios sobre el formulario', async () => {
@@ -253,8 +257,7 @@ describe('ProgramFormPage', () => {
     const store = fixture.debugElement.injector.get(ProgramFormStore);
 
     store.form.controls.schedule.setValue({
-      startDate: '2027-10-04',
-      endDate: '2027-10-10',
+      totalDays: 7,
       totalNights: 6,
       totalPassengers: 30,
       freePassengers: 2,
@@ -628,8 +631,7 @@ function sampleFavorite(): Favorite {
         departureCity: 'Santiago',
       },
       schedule: {
-        startDate: '2027-10-04',
-        endDate: '2027-10-10',
+        totalDays: 7,
         totalNights: 6,
         totalPassengers: 30,
         freePassengers: 2,
@@ -677,8 +679,7 @@ function completeValidForm(store: ProgramFormStore, name = 'Brasil 2027'): void 
     departureCity: 'Santiago',
   });
   store.form.controls.schedule.setValue({
-    startDate: '2027-10-04',
-    endDate: '2027-10-10',
+    totalDays: 7,
     totalNights: 6,
     totalPassengers: 30,
     freePassengers: 2,
@@ -713,8 +714,7 @@ const requiredFieldInvalidators: ReadonlyArray<(store: ProgramFormStore) => void
   (store) => store.form.controls.generals.controls.season.setValue(null),
   (store) => store.form.controls.generals.controls.destination.setValue(null),
   (store) => store.form.controls.generals.controls.departureCity.setValue(''),
-  (store) => store.form.controls.schedule.controls.startDate.setValue(null),
-  (store) => store.form.controls.schedule.controls.endDate.setValue(null),
+  (store) => store.form.controls.schedule.controls.totalDays.setValue(null),
   (store) => store.form.controls.schedule.controls.totalNights.setValue(null),
   (store) => store.form.controls.schedule.controls.totalPassengers.setValue(null),
   (store) => store.form.controls.schedule.controls.freePassengers.setValue(null),

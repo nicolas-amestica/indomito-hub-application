@@ -34,13 +34,9 @@ export interface ProgramGeneral {
   departureCity: string;
 }
 
-/** Fechas y cantidades del programa. Los campos derivados no son controles del formulario. */
+/** Duración y cantidades del programa. */
 export interface ProgramSchedule {
-  /** ISO 8601, fecha de inicio del rango. */
-  startDate: string;
-  /** ISO 8601, fecha de término del rango. */
-  endDate: string;
-  /** Derivado del rango de fechas. */
+  /** Duración editable del programa; no representa fechas contractuales. */
   totalDays: number;
   /** Precargado como `totalDays − 1`, sobrescribible por el usuario. */
   totalNights: number;

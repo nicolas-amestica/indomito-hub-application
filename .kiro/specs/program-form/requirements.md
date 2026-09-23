@@ -2,7 +2,7 @@
 
 ## Introduction
 
-El **formulario de programa** es la vista de armado de programas de viaje de Indómito Hub. Un programa reúne los datos generales de la gira, el rango de fechas, la cantidad de pasajeros, la tripulación que acompaña al grupo y todos los servicios contratados con sus costos. A partir de esos datos el formulario calcula de forma reactiva el costo total del programa en pesos chilenos, incluyendo la conversión de servicios cotizados en dólares y reales, un resguardo de tipo de cambio, la utilidad esperada y un recargo adicional.
+El **formulario de programa** es la vista de armado de programas de viaje de Indómito Hub. Un programa reúne los datos generales de la gira, su duración, la cantidad de pasajeros, la tripulación que acompaña al grupo y todos los servicios contratados con sus costos. Las fechas corresponden al contrato y no forman parte del programa. A partir de esos datos el formulario calcula de forma reactiva el costo total del programa en pesos chilenos, incluyendo la conversión de servicios cotizados en dólares y reales, un resguardo de tipo de cambio, la utilidad esperada y un recargo adicional.
 
 Esta feature reemplaza el formulario equivalente del portal legacy (`portal_admin_ng_dev_pri_usw2`, módulo `app-admin-portal/program`), con un alcance deliberadamente más reducido: se eliminan los campos que hoy no aportan valor (colegio, curso, representante, declaración al S.I.I.), se elimina el cálculo de IVA y retención de honorarios (los precios ingresados ya los incluyen) y se rediseña el flujo de salida para que pase por una previsualización explícita antes de exportar o de guardar.
 
@@ -135,11 +135,9 @@ interface ProgramGeneral {
   departureCity: string;
 }
 
-/** Fechas y cantidades del programa. */
+/** Duración y cantidades del programa. */
 interface ProgramSchedule {
-  startDate: string;        // ISO 8601, fecha de inicio del rango
-  endDate: string;          // ISO 8601, fecha de término del rango
-  totalDays: number;        // derivado del rango de fechas
+  totalDays: number;        // editable; el programa no tiene fechas
   totalNights: number;      // precargado como totalDays − 1, sobrescribible por el usuario
   totalPassengers: number;
   freePassengers: number;
@@ -247,8 +245,8 @@ les corresponden. Una divergencia entre capas es un defecto.
 
 | Campo | Mínimo | Máximo | Paso | Nota |
 | --- | --- | --- | --- | --- |
-| `totalDays` | 1 | 100 | 1 | Derivado del rango de fechas |
-| `totalNights` | 1 | 100 | 1 | |
+| `totalDays` | 1 | 100 | 1 | Editable por el usuario |
+| `totalNights` | 0 | 100 | 1 | Precargado como `totalDays − 1` |
 | `totalPassengers` | 1 | 100 | 1 | |
 | `freePassengers` | 0 | 99 | 1 | Siempre menor que `totalPassengers` |
 | `usdIncreaseCLP` | 0 | 200 | 5 | |
@@ -264,7 +262,7 @@ les corresponden. Una divergencia entre capas es un defecto.
 3. **`dollarIncrease` y `realIncrease` pasan a `usdIncreaseCLP` y `brlIncreaseCLP`.** El sufijo `CLP` hace explícito que es un monto absoluto en pesos y no un porcentaje, que es justo la ambigüedad que detectamos en el ejemplo numérico.
 4. **`expectedUtility` pasa a `utilityRate`, `recharge` a `rechargeRate`.** El sufijo `Rate` marca que son porcentajes, y así se distinguen de `utilityCLP` y `rechargeCLP`, que son los montos resultantes.
 5. **`Exchange` pasa a `ExchangeSnapshot` con campos `usdToClp` y `brlToClp`.** El nombre anterior no decía la dirección de la conversión.
-6. **`dates: string[]` pasa a `startDate` y `endDate`.** Un arreglo de dos posiciones no expresa que el orden importa ni que la longitud es fija.
+6. **El programa no contiene fechas.** `totalDays` expresa su duración y queda editable; las fechas de inicio y término pertenecen al contrato.
 7. **`Crew.dni` pasa a `documentId`.** El campo acepta RUT chileno, DNI argentino y CPF brasileño, así que `dni` nombraba solo uno de los tres casos.
 8. **`Service.type` pasa a `chargeType`.** `type` no decía nada; `chargeType` nombra exactamente lo que hace.
 9. **Se agregan campos derivados explícitos** (`totalDays`, `payingPassengers`, `baseAmount`, `amountCLP`) porque son los montos que el usuario revisa en la previsualización y los que se exportan a Excel, así que un lector posterior puede auditar el cálculo sin reconstruirlo.
@@ -317,24 +315,24 @@ les corresponden. Una divergencia entre capas es un defecto.
 9. WHEN el Catalog_Endpoint entrega un plan por defecto que corresponde a una opción vigente, THE Program_Form SHALL preseleccionar ese plan sin marcar el control como modificado.
 10. IF el Catalog_Endpoint no entrega un plan por defecto vigente, THEN THE Program_Form SHALL dejar el selector de plan sin selección y SHALL mantenerlo obligatorio.
 
-### Requirement 3: Fechas y cantidades del programa
+### Requirement 3: Duración y cantidades del programa
 
-**User Story:** Como cotizador, quiero definir el rango de fechas, las noches de estadía y la cantidad de pasajeros, para que el sistema derive los días del viaje y calcule los costos que dependen de esas cantidades.
+**User Story:** Como cotizador, quiero definir los días, las noches de estadía y la cantidad de pasajeros del programa, para calcular los costos que dependen de esas cantidades sin confundir el programa con un contrato fechado.
 
 #### Acceptance Criteria
 
-1. THE Program_Form SHALL exponer un selector de rango de fechas con fecha de inicio y fecha de término.
-2. WHEN el usuario selecciona un rango de fechas completo, THE Calculation_Engine SHALL calcular los días totales como la diferencia en días entre fecha de término y fecha de inicio, más uno.
-3. THE Program_Form SHALL mostrar los días totales como campo de solo lectura.
-4. IF la fecha de término es anterior a la fecha de inicio, THEN THE Program_Form SHALL mostrar un mensaje de validación y SHALL fijar los días totales en 0.
-5. THE Program_Form SHALL exponer los campos noches de estadía, cantidad de pasajeros y pasajeros liberados como enteros.
-6. THE Program_Form SHALL aceptar valores entre 1 y 100 para noches de estadía y para cantidad de pasajeros.
+1. THE Program_Form SHALL omitir las fechas de inicio y término porque pertenecen al contrato y no al programa.
+2. THE Program_Form SHALL exponer los días totales como un campo entero editable.
+3. THE Program_Form SHALL aceptar entre 1 y 100 días totales.
+4. THE Program_Form SHALL exponer los campos noches de estadía, cantidad de pasajeros y pasajeros liberados como enteros.
+5. THE Program_Form SHALL aceptar valores entre 0 y 100 para noches de estadía.
+6. THE Program_Form SHALL aceptar valores entre 1 y 100 para cantidad de pasajeros.
 7. THE Program_Form SHALL aceptar valores entre 0 y 99 para pasajeros liberados.
 8. IF la cantidad de pasajeros liberados es mayor o igual que la cantidad de pasajeros, THEN THE Program_Form SHALL mostrar un mensaje de validación que indica que debe existir al menos un pasajero pagante.
 9. WHEN cambia la cantidad de pasajeros o la cantidad de pasajeros liberados, THE Calculation_Engine SHALL calcular los pasajeros pagantes como el mayor entre 1 y la diferencia entre pasajeros y liberados.
-10. IF el rango de fechas seleccionado produce más de 100 días totales, THEN THE Program_Form SHALL mostrar un mensaje de validación que indica la duración máxima permitida.
-11. WHILE el usuario no ha modificado las noches de estadía, WHEN cambian los días totales, THE Program_Form SHALL precargar las noches de estadía como el mayor entre 1 y los días totales menos uno.
-12. WHEN el usuario modifica las noches de estadía, THE Program_Form SHALL dejar de precargarlas ante cambios posteriores del rango de fechas.
+10. IF los días totales quedan fuera del rango permitido, THEN THE Program_Form SHALL mostrar un mensaje de validación.
+11. WHILE el usuario no ha modificado las noches de estadía, WHEN cambian los días totales, THE Program_Form SHALL precargar las noches de estadía como los días totales menos uno.
+12. WHEN el usuario modifica las noches de estadía, THE Program_Form SHALL dejar de precargarlas ante cambios posteriores de los días totales.
 13. WHILE las noches de estadía son mayores que los días totales, THE Program_Form SHALL mostrar una advertencia no bloqueante que indica la incoherencia entre ambas cantidades.
 14. WHILE las noches de estadía son mayores que los días totales, THE Program_Form SHALL mantener habilitadas las acciones de previsualizar, exportar y guardar favorito.
 

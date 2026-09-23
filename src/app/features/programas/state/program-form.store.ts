@@ -1,12 +1,10 @@
 import { computed, DestroyRef, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { merge } from 'rxjs';
 
 import {
   buildEffectiveRates,
   calculateProgram,
   derivePayingPassengers,
-  deriveTotalDays,
   type CalculationResult,
 } from '../calculation/calculation-engine';
 import type {
@@ -50,10 +48,7 @@ export class ProgramFormStore {
   private applyingPreload = false;
 
   readonly nightsSource = this.nightsSourceState.asReadonly();
-  readonly totalDays = computed(() => {
-    const schedule = this.scheduleState();
-    return deriveTotalDays(schedule.startDate, schedule.endDate);
-  });
+  readonly totalDays = computed(() => this.scheduleState().totalDays ?? 0);
   readonly payingPassengers = computed(() => {
     const schedule = this.scheduleState();
     if (schedule.totalPassengers === null || schedule.freePassengers === null) return null;
@@ -220,7 +215,7 @@ export class ProgramFormStore {
       if (!this.applyingPreload) this.nightsSourceState.set('user');
     });
 
-    merge(schedule.startDate.valueChanges, schedule.endDate.valueChanges)
+    schedule.totalDays.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.applyNightsPreload());
   }
@@ -230,12 +225,7 @@ export class ProgramFormStore {
 
     this.applyingPreload = true;
     this.form.controls.schedule.controls.totalNights.setValue(
-      preloadedNights(
-        deriveTotalDays(
-          this.form.controls.schedule.controls.startDate.value,
-          this.form.controls.schedule.controls.endDate.value,
-        ),
-      ),
+      preloadedNights(this.form.controls.schedule.controls.totalDays.value ?? 0),
     );
     this.applyingPreload = false;
   }
@@ -264,8 +254,7 @@ export class ProgramFormStore {
       generals.plan === null ||
       generals.season === null ||
       generals.destination === null ||
-      schedule.startDate === null ||
-      schedule.endDate === null ||
+      schedule.totalDays === null ||
       schedule.totalNights === null ||
       schedule.totalPassengers === null ||
       schedule.freePassengers === null ||
@@ -294,9 +283,7 @@ export class ProgramFormStore {
         departureCity: generals.departureCity.trim(),
       },
       schedule: {
-        startDate: schedule.startDate,
-        endDate: schedule.endDate,
-        totalDays: this.totalDays(),
+        totalDays: schedule.totalDays,
         totalNights: schedule.totalNights,
         totalPassengers: schedule.totalPassengers,
         freePassengers: schedule.freePassengers,

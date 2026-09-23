@@ -2,7 +2,6 @@ import { computed, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import fc from 'fast-check';
 
-import { addDaysIso } from '../calculation/__arbitraries__';
 import { favoriteContentFromProgram } from '../forms/favorite-content';
 import type { CatalogResponse } from '../interfaces/catalog.interface';
 import type { ExchangeSnapshot } from '../interfaces/program.interface';
@@ -62,8 +61,7 @@ function createStore(catalog: CatalogResponse | null = null): {
 function completeCalculationFields(store: ProgramFormStore): void {
   const form = store.form;
   form.controls.schedule.setValue({
-    startDate: '2027-10-04',
-    endDate: '2027-10-10',
+    totalDays: 7,
     totalNights: 5,
     totalPassengers: 30,
     freePassengers: 2,
@@ -242,31 +240,27 @@ describe('ProgramFormStore', () => {
     const { store } = createStore();
     const schedule = store.form.controls.schedule.controls;
 
-    schedule.startDate.setValue('2027-10-04');
-    schedule.endDate.setValue('2027-10-10');
+    schedule.totalDays.setValue(7);
     expect(schedule.totalNights.value).toBe(6);
     expect(store.nightsSource()).toBe('preloaded');
 
     schedule.totalNights.setValue(4);
     expect(store.nightsSource()).toBe('user');
 
-    schedule.endDate.setValue('2027-10-12');
+    schedule.totalDays.setValue(9);
     expect(schedule.totalNights.value).toBe(4);
   });
 
   it('Feature: program-form, Property 24: Las noches se precargan hasta que el usuario decide, y después no', () => {
     const { store } = createStore();
     const schedule = store.form.controls.schedule.controls;
-    const startDate = '2027-01-01';
-
     fc.assert(
       fc.property(arbNightsSequence(), ({ totalDays, interventionIndex, userNights }) => {
         store.resetForm();
-        schedule.startDate.setValue(startDate);
         let decidedNights: number | null = null;
 
         totalDays.forEach((days, index) => {
-          schedule.endDate.setValue(addDaysIso(startDate, days - 1));
+          schedule.totalDays.setValue(days);
 
           if (index === interventionIndex) {
             schedule.totalNights.setValue(userNights);
@@ -274,7 +268,7 @@ describe('ProgramFormStore', () => {
           }
 
           if (decidedNights === null) {
-            expect(schedule.totalNights.value).toBe(Math.max(1, days - 1));
+            expect(schedule.totalNights.value).toBe(Math.max(0, days - 1));
             expect(store.nightsSource()).toBe('preloaded');
           } else {
             expect(schedule.totalNights.value).toBe(decidedNights);
@@ -289,11 +283,10 @@ describe('ProgramFormStore', () => {
   it('considera decididas las noches cargadas desde un favorito', () => {
     const { store } = createStore();
     const schedule = store.form.controls.schedule.controls;
-    schedule.startDate.setValue('2027-10-04');
-    schedule.endDate.setValue('2027-10-10');
+    schedule.totalDays.setValue(7);
 
     store.setNightsFromFavorite(8);
-    schedule.endDate.setValue('2027-10-20');
+    schedule.totalDays.setValue(17);
 
     expect(store.nightsSource()).toBe('user');
     expect(schedule.totalNights.value).toBe(8);
@@ -306,8 +299,7 @@ describe('ProgramFormStore', () => {
     expect(store.nightsSource()).toBe('user');
 
     store.resetForm();
-    schedule.startDate.setValue('2027-10-04');
-    schedule.endDate.setValue('2027-10-08');
+    schedule.totalDays.setValue(5);
 
     expect(store.nightsSource()).toBe('preloaded');
     expect(schedule.totalNights.value).toBe(4);
@@ -331,8 +323,7 @@ describe('ProgramFormStore', () => {
     const { store } = createStore(catalogs);
     const schedule = store.form.controls.schedule;
     schedule.setValue({
-      startDate: '2027-10-04',
-      endDate: '2027-10-06',
+      totalDays: 3,
       totalNights: 4,
       totalPassengers: 30,
       freePassengers: 2,
@@ -361,8 +352,9 @@ function arbNightsSequence(): fc.Arbitrary<{
   interventionIndex: number | null;
   userNights: number;
 }> {
-  return fc.array(fc.integer({ min: 1, max: 100 }), { minLength: 1, maxLength: 20 }).chain(
-    (totalDays) =>
+  return fc
+    .array(fc.integer({ min: 1, max: 100 }), { minLength: 1, maxLength: 20 })
+    .chain((totalDays) =>
       fc.record({
         totalDays: fc.constant(totalDays),
         interventionIndex: fc.option(fc.integer({ min: 0, max: totalDays.length - 1 }), {
@@ -371,5 +363,5 @@ function arbNightsSequence(): fc.Arbitrary<{
         }),
         userNights: fc.integer({ min: 1, max: 100 }),
       }),
-  );
+    );
 }
