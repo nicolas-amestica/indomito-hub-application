@@ -48,3 +48,29 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+@layer components {
+  .iam-input {
+    width: 100%;
+    border: 1px solid rgb(28 28 28 / 0.14);
+    border-radius: 0.75rem;
+    background: #f9fafb;
+    padding: 0.75rem 1rem;
+    outline: none;
+    transition: 0.18s ease;
+  }
+  .iam-input:focus {
+    border-color: #9daa00;
+    box-shadow: 0 0 0 3px rgb(235 255 0 / 0.22);
+  }
+}
+@keyframes drawer-in {
+  from {
+    transform: translateX(-100%);
+    opacity: 0.4;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

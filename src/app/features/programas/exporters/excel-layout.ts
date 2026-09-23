@@ -153,18 +153,21 @@ function buildHeaderRows(
   const { generals, schedule, pricing } = program;
 
   return [
-    [
+    mergedRow([
       {
-        value: generals.name,
-        type: String,
-        columnSpan: COLUMN_COUNT,
-        fontSize: 18,
-        fontWeight: 'bold',
-        textColor: COLORS.white,
-        backgroundColor: COLORS.navy,
-        alignVertical: 'center',
+        cell: {
+          value: generals.name,
+          type: String,
+          columnSpan: COLUMN_COUNT,
+          fontSize: 18,
+          fontWeight: 'bold',
+          textColor: COLORS.white,
+          backgroundColor: COLORS.navy,
+          alignVertical: 'center',
+        },
+        span: COLUMN_COUNT,
       },
-    ],
+    ]),
     metadataRow('Fecha de exportación', dateCell(exportedAt)),
     metadataRow('Plan', textCell(generals.plan.display)),
     metadataRow('Temporada', textCell(generals.season.display)),
@@ -182,31 +185,37 @@ function buildHeaderRows(
 }
 
 function metadataRow(label: string, value: ExcelCell): ExcelRow {
-  return [
+  return mergedRow([
     {
-      value: label,
-      type: String,
-      columnSpan: 2,
-      fontWeight: 'bold',
-      textColor: COLORS.slate,
-      backgroundColor: COLORS.lightSlate,
+      cell: {
+        value: label,
+        type: String,
+        columnSpan: 2,
+        fontWeight: 'bold',
+        textColor: COLORS.slate,
+        backgroundColor: COLORS.lightSlate,
+      },
+      span: 2,
     },
-    { ...value, columnSpan: COLUMN_COUNT - 2 },
-  ];
+    { cell: { ...value, columnSpan: COLUMN_COUNT - 2 }, span: COLUMN_COUNT - 2 },
+  ]);
 }
 
 function sectionTitle(title: string, color: string): ExcelRow {
-  return [
+  return mergedRow([
     {
-      value: title,
-      type: String,
-      columnSpan: COLUMN_COUNT,
-      fontSize: 13,
-      fontWeight: 'bold',
-      textColor: COLORS.white,
-      backgroundColor: color,
+      cell: {
+        value: title,
+        type: String,
+        columnSpan: COLUMN_COUNT,
+        fontSize: 13,
+        fontWeight: 'bold',
+        textColor: COLORS.white,
+        backgroundColor: color,
+      },
+      span: COLUMN_COUNT,
     },
-  ];
+  ]);
 }
 
 function detailHeaderRow(): ExcelRow {
@@ -254,27 +263,42 @@ function summaryRows(program: Program): ExcelRow[] {
 
   return entries.map(([label, value, format], index) => {
     const isTotal = index >= entries.length - 2;
-    return [
+    return mergedRow([
       {
-        value: label,
-        type: String,
-        columnSpan: 5,
-        fontWeight: 'bold',
-        backgroundColor: isTotal ? COLORS.lightViolet : undefined,
-        bottomBorderColor: isTotal ? COLORS.violet : COLORS.lightSlate,
-        bottomBorderStyle: isTotal ? 'medium' : 'thin',
+        cell: {
+          value: label,
+          type: String,
+          columnSpan: 5,
+          fontWeight: 'bold',
+          backgroundColor: isTotal ? COLORS.lightViolet : undefined,
+          bottomBorderColor: isTotal ? COLORS.violet : COLORS.lightSlate,
+          bottomBorderStyle: isTotal ? 'medium' : 'thin',
+        },
+        span: 5,
       },
       {
-        ...numberCell(value, format),
-        columnSpan: 2,
-        align: 'right',
-        fontWeight: 'bold',
-        backgroundColor: isTotal ? COLORS.lightViolet : undefined,
-        bottomBorderColor: isTotal ? COLORS.violet : COLORS.lightSlate,
-        bottomBorderStyle: isTotal ? 'medium' : 'thin',
+        cell: {
+          ...numberCell(value, format),
+          columnSpan: 2,
+          align: 'right',
+          fontWeight: 'bold',
+          backgroundColor: isTotal ? COLORS.lightViolet : undefined,
+          bottomBorderColor: isTotal ? COLORS.violet : COLORS.lightSlate,
+          bottomBorderStyle: isTotal ? 'medium' : 'thin',
+        },
+        span: 2,
       },
-    ];
+    ]);
   });
+}
+
+/**
+ * Expande las celdas combinadas con los `null` que exige `write-excel-file`.
+ * Sin estos espacios la librería interpreta la siguiente celda como un solapamiento
+ * y cancela la generación completa del archivo.
+ */
+function mergedRow(entries: ReadonlyArray<{ cell: ExcelCell; span: number }>): ExcelRow {
+  return entries.flatMap(({ cell, span }) => [cell, ...Array<null>(span - 1).fill(null)]);
 }
 
 function textCell(value: string): ExcelCell {

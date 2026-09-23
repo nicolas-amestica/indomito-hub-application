@@ -6,5 +6,5 @@ export const environment = {
   version: 'v0.3.0',
   apiUrl: 'https://api.dev.girasindomito.cl',
   stage: 'dev',
-  favoritesEnabled: false,
+  favoritesEnabled: true,
 };

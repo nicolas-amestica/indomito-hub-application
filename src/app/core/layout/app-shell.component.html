@@ -1,0 +1,63 @@
+<div class="min-h-screen bg-surface-50 text-ink">
+  <header class="sticky top-0 z-40 border-b border-black/10 bg-ink/95 text-white backdrop-blur-xl">
+    <div class="mx-auto flex max-w-[1500px] items-center gap-4 px-4 py-3 sm:px-8">
+      <button
+        type="button"
+        class="grid size-11 place-items-center rounded-xl border border-white/15 text-brand transition hover:bg-white/10"
+        (click)="toggle()"
+        aria-label="Abrir módulos"
+      >
+        <i class="pi pi-bars"></i></button
+      ><a routerLink="/programas" class="flex items-center gap-3"
+        ><img src="brand/logo-web-large.png" alt="Giras Indómito" class="h-9 w-auto" /><span
+          class="hidden text-sm font-semibold sm:block"
+          >Indómito Hub</span
+        ></a
+      >
+      <div class="ml-auto text-right">
+        <p class="text-sm font-semibold">{{ auth.user()?.name }}</p>
+        <p class="text-xs text-white/55">{{ auth.user()?.profileCode }}</p>
+      </div>
+      <button
+        type="button"
+        class="rounded-xl px-3 py-2 text-sm text-white/70 hover:bg-white/10 hover:text-white"
+        (click)="auth.logout()"
+      >
+        Salir
+      </button>
+    </div>
+  </header>
+  @if (open()) {
+    <button
+      type="button"
+      class="fixed inset-0 z-40 bg-black/45 backdrop-blur-sm"
+      aria-label="Cerrar menú"
+      (click)="open.set(false)"
+    ></button>
+    <aside
+      class="fixed inset-y-0 left-0 z-50 w-[min(88vw,22rem)] bg-ink p-6 text-white shadow-2xl animate-[drawer-in_180ms_ease-out]"
+    >
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold uppercase tracking-[.22em] text-brand">
+          Módulos disponibles
+        </p>
+        <button class="size-10 rounded-xl hover:bg-white/10" (click)="open.set(false)">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+      <nav class="mt-8 grid gap-2">
+        @for (module of auth.modules(); track module.code) {
+          <a
+            [routerLink]="module.path"
+            routerLinkActive="bg-brand text-ink"
+            class="flex items-center gap-4 rounded-2xl border border-white/10 px-4 py-4 transition hover:border-brand/50 hover:bg-white/5"
+            (click)="open.set(false)"
+            ><i [class]="module.icon || 'pi pi-circle'"></i
+            ><span class="font-semibold">{{ module.title }}</span></a
+          >
+        }
+      </nav>
+    </aside>
+  }
+  <main><router-outlet /></main>
+</div>

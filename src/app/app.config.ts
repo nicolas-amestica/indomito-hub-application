@@ -10,6 +10,7 @@ import { MessageService } from 'primeng/api';
 import { providePrimeNG } from 'primeng/config';
 
 import { routes } from './app.routes';
+import { authInterceptor } from './core/auth/auth.interceptor';
 import { correlationIdInterceptor } from './core/http/correlation-id.interceptor';
 import { errorInterceptor } from './core/http/error.interceptor';
 import { IndomitoPreset } from './core/theme/indomito.preset';
@@ -33,7 +34,9 @@ export const appConfig: ApplicationConfig = {
       }),
     ),
 
-    provideHttpClient(withInterceptors([correlationIdInterceptor, errorInterceptor])),
+    provideHttpClient(
+      withInterceptors([authInterceptor, correlationIdInterceptor, errorInterceptor]),
+    ),
 
     provideAnimationsAsync(),
 

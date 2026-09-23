@@ -1,0 +1,218 @@
+<main class="mx-auto max-w-[1500px] px-4 py-8 sm:px-8">
+  <div class="rounded-3xl bg-ink p-7 text-white">
+    <p class="text-xs font-bold uppercase tracking-[.2em] text-brand">Control de acceso</p>
+    <h1 class="mt-3 text-3xl font-semibold">Administración IAM</h1>
+    <p class="mt-2 text-white/55">Usuarios, perfiles y módulos en una sola vista.</p>
+  </div>
+  <div class="mt-6 flex gap-2 rounded-2xl border border-black/10 bg-white p-2">
+    @for (
+      x of [
+        { id: 'users', label: 'Usuarios' },
+        { id: 'profiles', label: 'Perfiles' },
+        { id: 'modules', label: 'Módulos' },
+      ];
+      track x.id
+    ) {
+      <button
+        class="rounded-xl px-5 py-3 text-sm font-bold transition"
+        [class.bg-ink]="tab() === x.id"
+        [class.text-white]="tab() === x.id"
+        (click)="tab.set($any(x.id))"
+      >
+        {{ x.label }}
+      </button>
+    }
+  </div>
+  @if (!busy()) {
+    <section class="mt-6 grid gap-6 lg:grid-cols-[22rem_1fr]">
+      <form
+        class="grid content-start gap-4 rounded-3xl border border-black/10 bg-white p-6 shadow-sm"
+        (ngSubmit)="
+          tab() === 'users' ? addUser() : tab() === 'profiles' ? addProfile() : addModule()
+        "
+      >
+        <h2 class="text-lg font-bold">
+          Crear {{ tab() === 'users' ? 'usuario' : tab() === 'profiles' ? 'perfil' : 'módulo' }}
+        </h2>
+        @if (tab() === 'users') {
+          <input
+            class="iam-input"
+            name="name"
+            [(ngModel)]="user.name"
+            placeholder="Nombre"
+            required
+          /><input
+            class="iam-input"
+            name="email"
+            [(ngModel)]="user.email"
+            placeholder="Correo"
+            required
+          /><input
+            class="iam-input"
+            name="rut"
+            [(ngModel)]="user.rut"
+            placeholder="RUT"
+            required
+          /><input
+            class="iam-input"
+            name="password"
+            [(ngModel)]="user.password"
+            type="password"
+            placeholder="Clave"
+            required
+          /><select class="iam-input" name="profile" [(ngModel)]="user.profileCode">
+            @for (p of profiles(); track p.code) {
+              <option [value]="p.code">{{ p.title }}</option>
+            }
+          </select>
+        } @else if (tab() === 'profiles') {
+          <input
+            class="iam-input"
+            name="code"
+            [(ngModel)]="profile.code"
+            placeholder="Código"
+            required
+          /><input
+            class="iam-input"
+            name="title"
+            [(ngModel)]="profile.title"
+            placeholder="Nombre"
+            required
+          /><textarea
+            class="iam-input min-h-24"
+            name="description"
+            [(ngModel)]="profile.description"
+            placeholder="Descripción"
+          ></textarea>
+        } @else {
+          <input
+            class="iam-input"
+            name="code"
+            [(ngModel)]="module.code"
+            placeholder="Código"
+            required
+          /><input
+            class="iam-input"
+            name="title"
+            [(ngModel)]="module.title"
+            placeholder="Nombre"
+            required
+          /><input
+            class="iam-input"
+            name="path"
+            [(ngModel)]="module.path"
+            placeholder="Ruta"
+            required
+          /><input
+            class="iam-input"
+            name="endpoints"
+            [(ngModel)]="module.endpoints"
+            placeholder="Endpoints separados por coma"
+          /><input
+            class="iam-input"
+            name="order"
+            [(ngModel)]="module.order"
+            type="number"
+            placeholder="Orden"
+          />
+        }
+        <label class="flex items-center gap-3 text-sm font-semibold"
+          ><input
+            type="checkbox"
+            name="active"
+            [ngModel]="
+              tab() === 'users'
+                ? user.active
+                : tab() === 'profiles'
+                  ? profile.active
+                  : module.active
+            "
+            (ngModelChange)="
+              tab() === 'users'
+                ? (user.active = $event)
+                : tab() === 'profiles'
+                  ? (profile.active = $event)
+                  : (module.active = $event)
+            "
+          />Activo</label
+        ><button class="mt-2 rounded-xl bg-brand px-4 py-3 font-bold text-ink">Guardar</button>
+      </form>
+      <div class="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-ink text-white">
+              <tr>
+                <th class="p-4">Código / usuario</th>
+                <th class="p-4">Nombre</th>
+                <th class="p-4">Detalle</th>
+                <th class="p-4">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (
+                item of tab() === 'users' ? users() : tab() === 'profiles' ? profiles() : modules();
+                track $index
+              ) {
+                <tr
+                  class="cursor-pointer border-b border-black/5 transition hover:bg-brand/10 last:border-0"
+                  (click)="selectItem($any(item))"
+                >
+                  <td class="p-4 font-mono text-xs">{{ $any(item).email || $any(item).code }}</td>
+                  <td class="p-4 font-semibold">{{ $any(item).name || $any(item).title }}</td>
+                  <td class="p-4 text-black/55">
+                    {{ $any(item).rut || $any(item).description || $any(item).path }}
+                  </td>
+                  <td class="p-4">
+                    <span class="rounded-full bg-brand/40 px-3 py-1 text-xs font-bold">{{
+                      $any(item).active ? 'Activo' : 'Inactivo'
+                    }}</span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+    @if (tab() === 'profiles' && selectedProfile()) {
+      <section class="mt-6 rounded-3xl border border-black/10 bg-white p-6 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-[.18em] text-black/45">
+              Módulos del perfil
+            </p>
+            <h2 class="mt-1 text-xl font-bold">{{ selectedProfile()?.title }}</h2>
+          </div>
+          <button
+            type="button"
+            class="rounded-xl bg-brand px-5 py-3 font-bold text-ink"
+            (click)="saveMatrix()"
+          >
+            Guardar accesos
+          </button>
+        </div>
+        <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          @for (moduleItem of modules(); track moduleItem.code) {
+            <button
+              type="button"
+              class="flex items-center gap-4 rounded-2xl border p-4 text-left transition"
+              [class.border-brand]="grants()[moduleItem.code]?.length"
+              [class.bg-brand/10]="grants()[moduleItem.code]?.length"
+              (click)="toggleModule(moduleItem.code)"
+            >
+              <span class="grid size-10 place-items-center rounded-xl bg-ink text-brand"
+                ><i [class]="moduleItem.icon"></i
+              ></span>
+              <span
+                ><strong class="block">{{ moduleItem.title }}</strong
+                ><small class="text-black/50">{{
+                  grants()[moduleItem.code]?.length ? 'Acceso CRUD' : 'Sin acceso'
+                }}</small></span
+              >
+            </button>
+          }
+        </div>
+      </section>
+    }
+  }
+</main>

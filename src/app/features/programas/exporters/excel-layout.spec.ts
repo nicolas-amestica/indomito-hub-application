@@ -16,12 +16,31 @@ const NUM_RUNS = 100;
 const EXPORTED_AT = new Date('2027-04-12T15:30:00.000Z');
 
 describe('buildExcelLayout', () => {
+  it('genera un libro XLSX válido con el escritor real', async () => {
+    const input = fc.sample(arbCalculationInput(), 1)[0];
+    const calculation = calculateProgram(input);
+    const program = programFrom(input, calculation.rows, calculation.totals);
+    const layout = buildExcelLayout(program, calculation.rows, EXPORTED_AT);
+    const { default: writeXlsxFile } = await import('write-excel-file/node');
+    const workbook = writeXlsxFile(layout.rows, {
+      columns: layout.columns,
+      sheet: layout.sheetName,
+      showGridLines: false,
+      stickyRowsCount: layout.stickyRowsCount,
+    });
+
+    const buffer = await workbook.toBuffer();
+
+    expect(buffer.subarray(0, 2).toString()).toBe('PK');
+  });
+
   it('Feature: program-form, Property 31: El Excel exporta el programa completo', () => {
     fc.assert(
       fc.property(arbCalculationInput(), (input) => {
         const calculation = calculateProgram(input);
         const program = programFrom(input, calculation.rows, calculation.totals);
         const layout = buildExcelLayout(program, calculation.rows, EXPORTED_AT);
+        expectValidMergedCells(layout.rows);
         const detailHeaderIndex = layout.rows.findIndex(
           (row) => JSON.stringify(cellValues(row)) === JSON.stringify(EXCEL_DETAIL_HEADERS),
         );
@@ -152,5 +171,17 @@ function cellValues(row: ExcelRow): Array<ExcelCell['value'] | null> {
 
 function metadataValue(rows: readonly ExcelRow[], label: string): ExcelCell['value'] {
   const row = rows.find((candidate) => candidate[0]?.value === label);
-  return row?.[1]?.value;
+  return row?.slice(1).find((cell) => cell != null)?.value;
+}
+
+function expectValidMergedCells(rows: readonly ExcelRow[]): void {
+  for (const row of rows) {
+    row.forEach((cell, index) => {
+      const span = cell?.columnSpan ?? 1;
+
+      for (let offset = 1; offset < span; offset += 1) {
+        expect(row[index + offset]).toBeNull();
+      }
+    });
+  }
 }
