@@ -3,7 +3,10 @@ import { authGuard, moduleGuard } from './core/auth/auth.guard';
 export const routes: Routes = [
   {
     path: 'login',
-    loadComponent: () => import('./features/auth/login.page').then((m) => m.LoginPage),
+    loadChildren: () =>
+      import('./indomito-hub/authentication/authentication.routes').then(
+        (m) => m.AUTHENTICATION_ROUTES,
+      ),
   },
   {
     path: '',
@@ -16,20 +19,14 @@ export const routes: Routes = [
         data: { module: 'PROGRAMS' },
         canActivate: [moduleGuard],
         loadChildren: () =>
-          import('./features/programas/programas.routes').then((m) => m.PROGRAMAS_ROUTES),
+          import('./indomito-hub/programs/programs.routes').then((m) => m.PROGRAMS_ROUTES),
       },
       {
-        path: 'iam',
-        data: { module: 'IAM' },
-        canActivate: [moduleGuard],
-        loadComponent: () => import('./features/iam/iam.page').then((m) => m.IamPage),
-      },
-      {
-        path: 'configuracion',
-        data: { module: 'CONFIGURATION' },
-        canActivate: [moduleGuard],
-        loadComponent: () =>
-          import('./features/configuration/configuration.page').then((m) => m.ConfigurationPage),
+        path: '',
+        loadChildren: () =>
+          import('./indomito-hub/administration/administration.routes').then(
+            (m) => m.ADMINISTRATION_ROUTES,
+          ),
       },
       { path: '', pathMatch: 'full', redirectTo: 'programas' },
     ],

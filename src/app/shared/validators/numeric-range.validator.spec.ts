@@ -15,7 +15,7 @@
 
 import { FormControl, FormGroup } from '@angular/forms';
 import { describe, expect, it } from 'vitest';
-import { FIELD_LIMITS } from '../../features/programas/constants/field-limits';
+import { FIELD_LIMITS } from '../../indomito-hub/programs/constants/field-limits';
 import {
   CLP_INTEGER_ERROR_KEY,
   clpIntegerPriceValidator,

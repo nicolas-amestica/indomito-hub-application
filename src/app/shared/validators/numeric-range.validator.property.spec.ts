@@ -3,7 +3,7 @@
 import { FormControl } from '@angular/forms';
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
-import { FIELD_LIMITS } from '../../features/programas/constants/field-limits';
+import { FIELD_LIMITS } from '../../indomito-hub/programs/constants/field-limits';
 import { type NumericLimit, numericRangeValidator } from './numeric-range.validator';
 
 /** Campos del formulario que declaran un intervalo numérico cerrado. */
@@ -21,15 +21,17 @@ const RANGE_FIELDS: readonly { readonly field: string; readonly limit: NumericLi
 
 /** Valor general, interior o de frontera para el rango elegido. */
 function arbFieldAndValue(): fc.Arbitrary<{ limit: NumericLimit; value: number }> {
-  return fc.constantFrom(...RANGE_FIELDS).chain(({ limit }) =>
-    fc
-      .oneof(
-        fc.double(),
-        fc.double({ min: limit.min, max: limit.max, noNaN: true, noDefaultInfinity: true }),
-        fc.constantFrom(limit.min, limit.max, limit.min - 1, limit.max + 1),
-      )
-      .map((value) => ({ limit, value })),
-  );
+  return fc
+    .constantFrom(...RANGE_FIELDS)
+    .chain(({ limit }) =>
+      fc
+        .oneof(
+          fc.double(),
+          fc.double({ min: limit.min, max: limit.max, noNaN: true, noDefaultInfinity: true }),
+          fc.constantFrom(limit.min, limit.max, limit.min - 1, limit.max + 1),
+        )
+        .map((value) => ({ limit, value })),
+    );
 }
 
 describe('numericRangeValidator · propiedad', () => {

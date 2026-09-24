@@ -6,7 +6,7 @@
  * ## Los rangos no se escriben acá
  *
  * `numericRangeValidator` recibe el rango en vez de conocerlo. La única fuente de
- * los rangos es `FIELD_LIMITS` en `features/programas/constants/field-limits.ts`,
+ * los rangos es `FIELD_LIMITS` en `indomito-hub/programs/constants/field-limits.ts`,
  * y el llamador pasa la entrada que corresponde:
  *
  * ```ts

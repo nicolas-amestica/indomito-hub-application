@@ -1,0 +1,474 @@
+<main class="mx-auto max-w-[1500px] px-4 py-7 sm:px-8">
+  <header class="overflow-hidden rounded-[2rem] bg-[#1c1c1c] text-white">
+    <div class="grid gap-6 p-7 md:grid-cols-[1fr_auto] md:items-end md:p-9">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-[.22em] text-brand">Seguridad y accesos</p>
+        <h1 class="mt-3 text-3xl font-semibold tracking-tight">Administración IAM</h1>
+        <p class="mt-2 max-w-2xl text-sm leading-6 text-white/60">
+          Administra usuarios, perfiles y el acceso CRUD de cada módulo desde un solo lugar.
+        </p>
+      </div>
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <div class="rounded-2xl bg-white/7 px-4 py-3">
+          <strong class="block text-xl">{{ users().length }}</strong
+          ><span class="text-[10px] uppercase tracking-wider text-white/45">Usuarios</span>
+        </div>
+        <div class="rounded-2xl bg-white/7 px-4 py-3">
+          <strong class="block text-xl">{{ profiles().length }}</strong
+          ><span class="text-[10px] uppercase tracking-wider text-white/45">Perfiles</span>
+        </div>
+        <div class="rounded-2xl bg-white/7 px-4 py-3">
+          <strong class="block text-xl">{{ modules().length }}</strong
+          ><span class="text-[10px] uppercase tracking-wider text-white/45">Módulos</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  @if (message()) {
+    <div
+      class="mt-4 rounded-xl border border-brand/40 bg-brand/10 px-4 py-3 text-sm font-semibold text-ink"
+    >
+      {{ message() }}
+    </div>
+  }
+
+  <section
+    class="mt-6 overflow-hidden rounded-3xl border border-black/8 bg-white shadow-[0_16px_40px_rgba(28,28,28,.06)]"
+  >
+    <div
+      class="flex flex-col gap-4 border-b border-black/8 p-4 md:flex-row md:items-center md:justify-between md:p-5"
+    >
+      <nav class="flex gap-1 rounded-2xl bg-[#f1f2f3] p-1" aria-label="Secciones IAM">
+        @for (
+          item of [
+            { id: 'users', label: 'Usuarios', icon: 'icon-[tabler--users]' },
+            { id: 'profiles', label: 'Perfiles', icon: 'icon-[tabler--id-badge-2]' },
+            { id: 'modules', label: 'Módulos', icon: 'icon-[tabler--layout-grid]' },
+          ];
+          track item.id
+        ) {
+          <button
+            type="button"
+            class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition"
+            [class.bg-white]="tab() === item.id"
+            [class.shadow-sm]="tab() === item.id"
+            [class.text-black/45]="tab() !== item.id"
+            (click)="changeTab($any(item.id))"
+          >
+            <i [class]="item.icon"></i>{{ item.label }}
+          </button>
+        }
+      </nav>
+      <div class="flex gap-2">
+        <label class="relative flex-1"
+          ><i
+            class="icon-[tabler--search] absolute left-3 top-1/2 -translate-y-1/2 text-black/35"
+          ></i
+          ><input
+            class="iam-input min-w-64 pl-10"
+            [ngModel]="search()"
+            (ngModelChange)="search.set($event)"
+            placeholder="Buscar" /></label
+        ><button
+          type="button"
+          class="rounded-xl bg-brand px-4 py-2.5 text-sm font-bold text-ink transition hover:brightness-95"
+          (click)="openCreate()"
+        >
+          <i class="icon-[tabler--plus] mr-1"></i>Crear
+        </button>
+      </div>
+    </div>
+
+    @if (busy()) {
+      <div class="grid place-items-center py-24 text-sm text-black/45">
+        <i class="icon-[tabler--loader-2] mb-3 animate-spin text-3xl"></i>Cargando accesos…
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[760px] text-left text-sm">
+          <thead>
+            <tr
+              class="border-b border-black/8 bg-[#fafafa] text-[10px] font-bold uppercase tracking-[.13em] text-black/45"
+            >
+              @if (tab() === 'users') {
+                <th class="px-5 py-3">Usuario</th>
+                <th class="px-5 py-3">RUT</th>
+                <th class="px-5 py-3">Perfil</th>
+              } @else if (tab() === 'profiles') {
+                <th class="px-5 py-3">Perfil</th>
+                <th class="px-5 py-3 text-center">Permisos</th>
+                <th class="px-5 py-3 text-center">Usuarios</th>
+              } @else {
+                <th class="px-5 py-3">Módulo</th>
+                <th class="px-5 py-3">Jerarquía</th>
+                <th class="px-5 py-3">Ruta</th>
+              }
+              <th class="px-5 py-3">Estado</th>
+              <th class="px-5 py-3 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (tab() === 'users') {
+              @for (item of visibleUsers(); track item.id) {
+                <tr class="border-b border-black/6 last:border-0 hover:bg-black/[.018]">
+                  <td class="px-5 py-4">
+                    <strong class="block">{{ item.name }}</strong
+                    ><span class="text-xs text-black/45">{{ item.email }}</span>
+                  </td>
+                  <td class="px-5 py-4 font-mono text-xs">{{ item.rut }}</td>
+                  <td class="px-5 py-4">
+                    <span class="rounded-full bg-black/5 px-3 py-1 text-xs font-semibold">{{
+                      profileTitle(item.profileCode)
+                    }}</span>
+                  </td>
+                  <td class="px-5 py-4">
+                    <button
+                      class="rounded-full px-3 py-1 text-xs font-bold"
+                      [class.bg-emerald-100]="item.active"
+                      [class.text-emerald-800]="item.active"
+                      [class.bg-black/5]="!item.active"
+                      (click)="toggleUser(item)"
+                    >
+                      {{ item.active ? 'Activo' : 'Inactivo' }}
+                    </button>
+                  </td>
+                  <td class="px-5 py-4 text-right">
+                    <button class="iam-action" title="Editar" (click)="editUser(item)">
+                      <i class="icon-[tabler--pencil]"></i></button
+                    ><button
+                      class="iam-action text-red-600"
+                      title="Eliminar"
+                      (click)="removeUser(item)"
+                    >
+                      <i class="icon-[tabler--trash]"></i>
+                    </button>
+                  </td>
+                </tr>
+              }
+            } @else if (tab() === 'profiles') {
+              @for (item of visibleProfiles(); track item.code) {
+                <tr class="border-b border-black/6 last:border-0 hover:bg-black/[.018]">
+                  <td class="px-5 py-4">
+                    <strong class="block">{{ item.title }}</strong
+                    ><span class="font-mono text-xs text-black/45"
+                      >{{ item.code }} · {{ item.description }}</span
+                    >
+                  </td>
+                  <td class="px-5 py-4 text-center">{{ item.permissionCount }}</td>
+                  <td class="px-5 py-4 text-center">{{ item.userCount }}</td>
+                  <td class="px-5 py-4">
+                    <span
+                      class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800"
+                      >{{ item.active ? 'Activo' : 'Inactivo' }}</span
+                    >
+                  </td>
+                  <td class="px-5 py-4 text-right">
+                    <button
+                      class="iam-action text-blue-700"
+                      title="Gestionar permisos"
+                      (click)="managePermissions(item)"
+                    >
+                      <i class="icon-[tabler--key]"></i></button
+                    ><button class="iam-action" title="Editar" (click)="editProfile(item)">
+                      <i class="icon-[tabler--pencil]"></i></button
+                    ><button
+                      class="iam-action text-red-600"
+                      title="Eliminar"
+                      (click)="removeProfile(item)"
+                    >
+                      <i class="icon-[tabler--trash]"></i>
+                    </button>
+                  </td>
+                </tr>
+              }
+            } @else {
+              @for (item of visibleModules(); track item.code) {
+                <tr class="border-b border-black/6 last:border-0 hover:bg-black/[.018]">
+                  <td class="px-5 py-4">
+                    <div class="flex items-center gap-3">
+                      <span class="grid size-9 place-items-center rounded-xl bg-ink text-brand"
+                        ><i [class]="item.icon"></i
+                      ></span>
+                      <div>
+                        <strong class="block">{{ item.title }}</strong
+                        ><span class="font-mono text-xs text-black/45">{{ item.code }}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-5 py-4">
+                    <span
+                      class="rounded-full px-3 py-1 text-xs font-bold"
+                      [class.bg-brand/25]="item.level === 'LV1'"
+                      [class.bg-black/5]="item.level === 'LV2'"
+                      >{{ item.level }}{{ item.parentCode ? ' · ' + item.parentCode : '' }}</span
+                    >
+                  </td>
+                  <td class="px-5 py-4 font-mono text-xs text-black/55">{{ item.path }}</td>
+                  <td class="px-5 py-4">{{ item.active ? 'Activo' : 'Inactivo' }}</td>
+                  <td class="px-5 py-4 text-right">
+                    <button class="iam-action" title="Editar" (click)="editModule(item)">
+                      <i class="icon-[tabler--pencil]"></i></button
+                    ><button
+                      class="iam-action text-red-600"
+                      title="Eliminar"
+                      (click)="removeModule(item)"
+                    >
+                      <i class="icon-[tabler--trash]"></i>
+                    </button>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+  @if (dialog()) {
+    <div
+      class="fixed inset-0 z-[1200] grid place-items-center bg-black/55 p-4 backdrop-blur-sm"
+      (click)="closeDialog()"
+    >
+      <section
+        class="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-[1.75rem] bg-white shadow-2xl"
+        [class.max-w-5xl]="dialog() === 'permissions'"
+        (click)="$event.stopPropagation()"
+      >
+        <header
+          class="sticky top-0 z-10 flex items-center justify-between border-b border-black/8 bg-white/95 px-6 py-5 backdrop-blur"
+        >
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-[.18em] text-black/40">
+              Administración IAM
+            </p>
+            <h2 class="mt-1 text-xl font-bold">
+              {{
+                dialog() === 'permissions'
+                  ? 'Permisos de ' + selectedProfile()?.title
+                  : (user.id || profile.code || module.code ? 'Editar' : 'Crear') +
+                    ' ' +
+                    (dialog() === 'user' ? 'usuario' : dialog() === 'profile' ? 'perfil' : 'módulo')
+              }}
+            </h2>
+          </div>
+          <button class="iam-action" (click)="closeDialog()">
+            <i class="icon-[tabler--x]"></i>
+          </button>
+        </header>
+        @if (dialog() === 'permissions') {
+          <div class="p-6">
+            <div
+              class="mb-4 grid grid-cols-[1fr_repeat(4,4.5rem)] items-center gap-2 px-3 text-center text-[10px] font-bold uppercase tracking-wider text-black/40"
+            >
+              <span class="text-left">Módulo / componente</span>
+              @for (a of allowances; track a.code) {
+                <span>{{ a.label }}</span>
+              }
+            </div>
+            @for (root of rootModules(); track root.code) {
+              <div class="mb-3 overflow-hidden rounded-2xl border border-black/8">
+                <div
+                  class="grid grid-cols-[1fr_repeat(4,4.5rem)] items-center gap-2 bg-[#f5f5f4] px-4 py-3"
+                >
+                  <strong
+                    >{{ root.title }}
+                    <small class="ml-2 font-mono text-black/40">{{ root.code }}</small></strong
+                  >
+                  @for (a of allowances; track a.code) {
+                    <label class="grid place-items-center"
+                      ><input
+                        class="size-4 accent-[#1c1c1c]"
+                        type="checkbox"
+                        [checked]="hasGrant(root.code, a.code)"
+                        (change)="toggleGrant(root.code, a.code)"
+                    /></label>
+                  }
+                </div>
+                @for (child of children(root.code); track child.code) {
+                  <div
+                    class="grid grid-cols-[1fr_repeat(4,4.5rem)] items-center gap-2 border-t border-black/6 px-4 py-3"
+                  >
+                    <span class="pl-5 text-sm"
+                      ><i class="icon-[tabler--corner-down-right] mr-2 text-black/30"></i
+                      >{{ child.title }}
+                      <small class="ml-2 font-mono text-black/40">{{ child.code }}</small></span
+                    >
+                    @for (a of allowances; track a.code) {
+                      <label class="grid place-items-center"
+                        ><input
+                          class="size-4 accent-[#1c1c1c]"
+                          type="checkbox"
+                          [checked]="hasGrant(child.code, a.code)"
+                          (change)="toggleGrant(child.code, a.code)"
+                      /></label>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          <form
+            class="grid gap-4 p-6 sm:grid-cols-2"
+            (ngSubmit)="
+              dialog() === 'user'
+                ? saveUser()
+                : dialog() === 'profile'
+                  ? saveProfile()
+                  : saveModule()
+            "
+          >
+            @if (dialog() === 'user') {
+              <label class="iam-field sm:col-span-2"
+                >Nombre completo<input
+                  class="iam-input"
+                  name="name"
+                  [(ngModel)]="user.name"
+                  required /></label
+              ><label class="iam-field"
+                >Correo<input
+                  class="iam-input"
+                  name="email"
+                  type="email"
+                  [(ngModel)]="user.email"
+                  required /></label
+              ><label class="iam-field"
+                >RUT<input class="iam-input" name="rut" [(ngModel)]="user.rut" required /></label
+              ><label class="iam-field"
+                >Perfil<select class="iam-input" name="profile" [(ngModel)]="user.profileCode">
+                  @for (p of profiles(); track p.code) {
+                    <option [value]="p.code">{{ p.title }}</option>
+                  }
+                </select></label
+              ><label class="iam-field"
+                >{{ user.id ? 'Nueva clave (opcional)' : 'Clave'
+                }}<input
+                  class="iam-input"
+                  name="password"
+                  type="password"
+                  [(ngModel)]="user.password"
+                  [required]="!user.id"
+              /></label>
+            } @else if (dialog() === 'profile') {
+              <label class="iam-field"
+                >Código<input
+                  class="iam-input uppercase"
+                  name="code"
+                  [(ngModel)]="profile.code"
+                  [readonly]="!!editingProfileCode()"
+                  required /></label
+              ><label class="iam-field"
+                >Nombre<input
+                  class="iam-input"
+                  name="title"
+                  [(ngModel)]="profile.title"
+                  required /></label
+              ><label class="iam-field sm:col-span-2"
+                >Descripción<textarea
+                  class="iam-input min-h-24"
+                  name="description"
+                  [(ngModel)]="profile.description"
+                ></textarea>
+              </label>
+            } @else {
+              <label class="iam-field"
+                >Código<input
+                  class="iam-input uppercase"
+                  name="code"
+                  [(ngModel)]="module.code"
+                  required /></label
+              ><label class="iam-field"
+                >Nombre<input
+                  class="iam-input"
+                  name="title"
+                  [(ngModel)]="module.title"
+                  required /></label
+              ><label class="iam-field"
+                >Módulo padre<select
+                  class="iam-input"
+                  name="parent"
+                  [(ngModel)]="module.parentCode"
+                >
+                  <option value="">Ninguno (nivel principal)</option>
+                  @for (m of rootModules(); track m.code) {
+                    <option [value]="m.code">{{ m.title }}</option>
+                  }
+                </select></label
+              ><label class="iam-field"
+                >Ruta<input
+                  class="iam-input"
+                  name="path"
+                  [(ngModel)]="module.path"
+                  required /></label
+              ><label class="iam-field sm:col-span-2"
+                >Endpoints autorizados<input
+                  class="iam-input"
+                  name="endpoints"
+                  [(ngModel)]="module.endpoints"
+                  placeholder="/programas, /favoritos" /></label
+              ><label class="iam-field"
+                >Ícono Tabler<input
+                  class="iam-input"
+                  name="icon"
+                  [(ngModel)]="module.icon" /></label
+              ><label class="iam-field"
+                >Orden<input
+                  class="iam-input"
+                  name="order"
+                  type="number"
+                  [(ngModel)]="module.order"
+              /></label>
+            }
+            <label class="flex items-center gap-3 text-sm font-semibold sm:col-span-2"
+              ><input
+                type="checkbox"
+                class="size-4 accent-[#1c1c1c]"
+                name="active"
+                [ngModel]="
+                  dialog() === 'user'
+                    ? user.active
+                    : dialog() === 'profile'
+                      ? profile.active
+                      : module.active
+                "
+                (ngModelChange)="
+                  dialog() === 'user'
+                    ? (user.active = $event)
+                    : dialog() === 'profile'
+                      ? (profile.active = $event)
+                      : (module.active = $event)
+                "
+              />Activo</label
+            >
+          </form>
+        }
+        <footer
+          class="sticky bottom-0 flex justify-end gap-2 border-t border-black/8 bg-white/95 px-6 py-4 backdrop-blur"
+        >
+          <button
+            class="rounded-xl px-4 py-2.5 text-sm font-semibold text-black/55"
+            (click)="closeDialog()"
+          >
+            Cancelar</button
+          ><button
+            class="rounded-xl bg-brand px-5 py-2.5 text-sm font-bold text-ink disabled:opacity-50"
+            [disabled]="saving()"
+            (click)="
+              dialog() === 'permissions'
+                ? saveMatrix()
+                : dialog() === 'user'
+                  ? saveUser()
+                  : dialog() === 'profile'
+                    ? saveProfile()
+                    : saveModule()
+            "
+          >
+            {{ saving() ? 'Guardando…' : 'Guardar cambios' }}
+          </button>
+        </footer>
+      </section>
+    </div>
+  }
+</main>

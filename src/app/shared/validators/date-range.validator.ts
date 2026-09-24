@@ -27,8 +27,8 @@
  */
 
 import type { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { deriveTotalDays } from '../../features/programas/calculation/calculation-engine';
-import { FIELD_LIMITS } from '../../features/programas/constants/field-limits';
+import { deriveTotalDays } from '../../indomito-hub/programs/calculation/calculation-engine';
+import { FIELD_LIMITS } from '../../indomito-hub/programs/constants/field-limits';
 
 /** Clave del error de rango invertido: la fecha de término precede a la de inicio. */
 export const DATE_RANGE_ORDER_ERROR_KEY = 'dateRangeOrder';

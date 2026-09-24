@@ -32,7 +32,7 @@
  *
  * ## Fuente de verdad frente a los generadores
  *
- * `features/programas/calculation/__arbitraries__/document-id.arbitrary.ts` expone
+ * `indomito-hub/programs/calculation/__arbitraries__/document-id.arbitrary.ts` expone
  * su propio `isValidRut` e `isValidCpf`. **Esa duplicación es deliberada y no se
  * unifica**: un generador que importara el código bajo prueba no podría detectar
  * que ese código está mal, y la Propiedad 18 existe precisamente para contrastar

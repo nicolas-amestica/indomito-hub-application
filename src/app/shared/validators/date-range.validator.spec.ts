@@ -14,7 +14,7 @@
 
 import { FormControl, FormGroup } from '@angular/forms';
 import { describe, expect, it } from 'vitest';
-import { FIELD_LIMITS } from '../../features/programas/constants/field-limits';
+import { FIELD_LIMITS } from '../../indomito-hub/programs/constants/field-limits';
 import {
   DATE_RANGE_MAX_DAYS_ERROR_KEY,
   DATE_RANGE_ORDER_ERROR_KEY,

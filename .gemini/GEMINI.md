@@ -50,11 +50,20 @@
 - **Free Tier**: al diseñar o agregar cualquier recurso AWS, siempre priorizar las opciones dentro del Free Tier (tipos de instancia, tiers de servicio, límites de uso incluidos). Evaluar el costo antes de proponer un recurso nuevo.
 - **DynamoDB**: **estrictamente prohibido usar el operador `Scan`** bajo cualquier circunstancia, en cualquier ambiente. Usar siempre `Query` apoyado en la partition key/sort key o en un GSI/LSI diseñado para el patrón de acceso. Si no existe un índice que soporte la consulta necesaria, diseñar el índice antes de escribir la consulta — nunca recurrir a `Scan` como solución temporal.
 
+## Arquitectura Frontend — Features Angular
+
+- Cada feature nueva debe ser autocontenida dentro de `src/app/indomito-hub/<feature-name>` y usar nombres de carpetas, archivos e identificadores en inglés.
+- La estructura debe seguir el patrón modular de Axity: cada feature mantiene sus propios `constants`, `components`, `interfaces`, `pages`, `services`, `stores`, `types`, `fn` y archivo `<feature-name>.routes.ts` cuando correspondan.
+- Las páginas, componentes, servicios y stores deben contener solo la responsabilidad de su clase o función principal. Las interfaces, tipos, constantes, factories, validadores y helpers reutilizables deben declararse en las carpetas hermanas correspondientes de la misma feature, no dentro del archivo de una página o componente.
+- Los subdominios administrativos deben vivir bajo `src/app/indomito-hub/administration/`; por ejemplo, `administration/iam` y `administration/configuration`.
+- Solo las capacidades transversales y reutilizadas por varias features deben vivir en `core` o `shared`. No trasladar lógica específica de una feature a esas carpetas.
+- El módulo `indomito-hub/programs` es la referencia local de organización. Para decisiones no cubiertas por este proyecto, usar como referencia el módulo `surgeries` del frontend Axity.
+
 ## Patrones de Referencia
 
 | Repo           | Módulo referencia        | Paradigma             |
 | -------------- | ------------------------ | --------------------- |
-| application    | `src/app/` (por definir) | Stores, servicios     |
+| application    | `src/app/indomito-hub/programs` | Feature autocontenida con rutas, stores, servicios y tipos |
 | services       | `services/api-catalog`, `services/api-favorite`, `services/api-program` | Endpoint-per-function |
 | authorizer     | `src/functions/authorize.ts` | Handler unico + politicas IAM |
 

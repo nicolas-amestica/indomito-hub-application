@@ -2,7 +2,10 @@
 
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
-import { arbDocumentIdSample, arbMutatedDocumentId } from '../../features/programas/calculation/__arbitraries__';
+import {
+  arbDocumentIdSample,
+  arbMutatedDocumentId,
+} from '../../indomito-hub/programs/calculation/__arbitraries__';
 import { isValidDocumentId } from './document-id.validator';
 
 describe('isValidDocumentId · propiedad', () => {
