@@ -26,12 +26,10 @@ import { type ChargeableItem, baseAmount, isCrewItem } from './charge-type';
 import { isPassengerIndependent } from './passenger-independent';
 import { independentAmountCLP, perPassengerPrice } from './per-passenger-split';
 import { ceil, round } from './rounding';
-
-/** Tasa general de IVA vigente en Chile. */
-export const VAT_RATE = 0.19;
-
-/** Retención de boletas de honorarios vigente durante 2026. */
-export const CREW_WITHHOLDING_RATE = 0.1525;
+import {
+  DEFAULT_TAX_SETTINGS,
+  type TaxSettings,
+} from '../../../core/configuration/app-configuration.service';
 
 /** Milisegundos de un día. Exacto en UTC, donde no hay horario de verano. */
 const MS_PER_DAY = 86_400_000;
@@ -176,7 +174,10 @@ export interface CalculationResult {
  * @param input Calendario, parámetros de precio, tasas efectivas y las dos listas.
  * @returns Las filas de la tabla, los totales del programa y el neto sin redondear.
  */
-export function calculateProgram(input: CalculationInput): CalculationResult {
+export function calculateProgram(
+  input: CalculationInput,
+  taxes: TaxSettings = DEFAULT_TAX_SETTINGS,
+): CalculationResult {
   const { schedule, pricing, rates, crews, services } = input;
 
   const rows: SummaryRow[] = [];
@@ -209,8 +210,11 @@ export function calculateProgram(input: CalculationInput): CalculationResult {
 
   const netRaw = subtotalCLP * rates.CLP + subtotalUSD * rates.USD + subtotalBRL * rates.BRL;
   const netCLP = round(netRaw);
-  const vatCLP = round((sumAscending(serviceAmountsCLP) * VAT_RATE) / (1 + VAT_RATE));
-  const crewWithholdingCLP = round(sumAscending(crewAmountsCLP) * CREW_WITHHOLDING_RATE);
+  const vatFactor = taxes.vatRate / 100;
+  const vatCLP = round((sumAscending(serviceAmountsCLP) * vatFactor) / (1 + vatFactor));
+  const crewWithholdingCLP = round(
+    sumAscending(crewAmountsCLP) * (taxes.crewWithholdingRate / 100),
+  );
 
   const utilityCLP = ceil((netRaw * pricing.utilityRate) / 100);
   const netWithUtilityCLP = netCLP + utilityCLP;
@@ -234,6 +238,8 @@ export function calculateProgram(input: CalculationInput): CalculationResult {
       netCLP,
       vatCLP,
       crewWithholdingCLP,
+      vatRate: taxes.vatRate,
+      crewWithholdingRate: taxes.crewWithholdingRate,
       utilityCLP,
       netWithUtilityCLP,
       netWithUtilityPerPassengerCLP: perPassengerPrice(netWithUtilityCLP, splitContext),

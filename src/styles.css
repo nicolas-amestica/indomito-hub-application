@@ -1,4 +1,7 @@
 @import 'tailwindcss';
+@plugin '@iconify/tailwind4';
+/* Los módulos llegan desde DynamoDB; estas clases no pueden descubrirse en templates. */
+@source inline("icon-[tabler--settings] icon-[tabler--adjustments] icon-[tabler--shield-lock] icon-[tabler--route] icon-[tabler--map-route] icon-[tabler--point]");
 
 /* Fuente única de valores visuales; PrimeNG consume estas mismas variables. */
 @theme static {
@@ -62,6 +65,25 @@
   .iam-input:focus {
     border-color: #9daa00;
     box-shadow: 0 0 0 3px rgb(235 255 0 / 0.22);
+  }
+  .iam-field {
+    display: grid;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: rgb(28 28 28 / 0.62);
+  }
+  .iam-action {
+    display: inline-grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    place-items: center;
+    border-radius: 0.75rem;
+    transition: background-color 160ms ease, transform 160ms ease;
+  }
+  .iam-action:hover {
+    background: rgb(28 28 28 / 0.07);
+    transform: translateY(-1px);
   }
 }
 @keyframes drawer-in {

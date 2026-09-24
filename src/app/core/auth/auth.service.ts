@@ -17,12 +17,26 @@ export class AuthService {
   readonly authenticated = computed(() => !!this.state()?.token);
   readonly user = computed(() => this.state()?.user ?? null);
   readonly permissions = computed(() => this.state()?.permissions ?? []);
-  readonly modules = computed(() =>
-    this.permissions()
-      .filter((p) => p.module.active)
+  readonly modules = computed(() => {
+    const permissions = this.permissions();
+    const readableParents = new Set(
+      permissions
+        .filter((permission) => permission.module.level === 'LV1' && permission.allowances.includes('r'))
+        .map((permission) => permission.module.code),
+    );
+    return permissions
+      .filter(
+        (permission) =>
+          permission.module.active &&
+          permission.allowances.includes('r') &&
+          (permission.module.level !== 'LV2' || readableParents.has(permission.module.parentCode ?? '')),
+      )
       .sort((a, b) => a.module.order - b.module.order)
-      .map((p) => p.module),
-  );
+      .map((permission) => permission.module);
+  });
+  constructor() {
+    if (this.state()?.token) queueMicrotask(() => void this.refreshPermissions());
+  }
   async login(login: string, password: string): Promise<void> {
     const session = await firstValueFrom(
       this.http
@@ -36,7 +50,21 @@ export class AuthService {
     return this.state()?.token ?? null;
   }
   canAccess(code: string): boolean {
-    return this.permissions().some((p) => p.module.code === code && p.allowances.includes('r'));
+    return this.modules().some((module) => module.code === code);
+  }
+  async refreshPermissions(): Promise<void> {
+    const current = this.state();
+    if (!current?.token) return;
+    try {
+      const refreshed = await firstValueFrom(
+        this.http
+          .get<ApiEnvelope<AuthSession>>(`${environment.apiUrl}/auth/permisos`)
+          .pipe(map((response) => response.data)),
+      );
+      this.setSession(refreshed);
+    } catch {
+      // Un fallo transitorio no destruye una sesión todavía válida.
+    }
   }
   logout(): void {
     this.state.set(null);

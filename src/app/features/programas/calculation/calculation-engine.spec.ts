@@ -189,6 +189,8 @@ describe('calculateProgram — casos límite', () => {
       netCLP: 0,
       vatCLP: 0,
       crewWithholdingCLP: 0,
+      vatRate: 19,
+      crewWithholdingRate: 15.25,
       utilityCLP: 0,
       netWithUtilityCLP: 0,
       netWithUtilityPerPassengerCLP: 0,

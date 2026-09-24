@@ -12,6 +12,7 @@ import type {
   ProgramPricing,
   ProgramSchedule,
   ProgramService,
+  ProgramTotals,
 } from './program.interface';
 
 /** Colección reutilizable que identifica favoritos de programa. */
@@ -53,6 +54,8 @@ export interface FavoriteContent {
   pricing: Omit<ProgramPricing, 'exchange'>;
   /** Auditoría de la tasa usada al guardar; no se reutiliza al recalcular. */
   rateOrigin?: ExchangeRateOrigin;
+  /** Totales y porcentajes efectivos usados al guardar el programa. */
+  totals?: ProgramTotals;
   crews: Pick<CrewMember, 'name' | 'documentId' | 'dailyPrice' | 'currency'>[];
   services: Pick<ProgramService, 'name' | 'chargeType' | 'unitPrice' | 'currency'>[];
 }

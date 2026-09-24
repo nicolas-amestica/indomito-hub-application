@@ -301,11 +301,15 @@
           <strong class="tabular-nums text-ink">{{ totals().netCLP | clpAmount }} CLP</strong>
         </div>
         <div class="rounded-lg border border-brand-active/30 bg-brand-soft px-3 py-2">
-          <span class="block text-xs text-graphite">IVA incluido (19%)</span>
+          <span class="block text-xs text-graphite"
+            >IVA incluido ({{ totals().vatRate | number: '1.0-2' }}%)</span
+          >
           <strong class="tabular-nums text-ink">{{ totals().vatCLP | clpAmount }} CLP</strong>
         </div>
         <div class="rounded-lg border border-brand-active/30 bg-brand-soft px-3 py-2">
-          <span class="block text-xs text-graphite">Retención tripulación (15,25%)</span>
+          <span class="block text-xs text-graphite"
+            >Retención tripulación ({{ totals().crewWithholdingRate | number: '1.0-2' }}%)</span
+          >
           <strong class="tabular-nums text-ink"
             >{{ totals().crewWithholdingCLP | clpAmount }} CLP</strong
           >

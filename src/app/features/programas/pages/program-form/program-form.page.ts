@@ -18,7 +18,6 @@ import { ProgressSpinner } from 'primeng/progressspinner';
 import { Toast } from 'primeng/toast';
 import { finalize } from 'rxjs';
 
-import { PageHeaderComponent } from '../../../../shared/ui/page-header.component';
 import { MotionPressDirective } from '../../../../shared/ui/motion-press.directive';
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { ClpAmountPipe } from '../../../../shared/formatting/clp-amount.pipe';
@@ -62,7 +61,6 @@ import { ProgramFormStore } from '../../state/program-form.store';
 @Component({
   selector: 'app-program-form-page',
   imports: [
-    PageHeaderComponent,
     MotionPressDirective,
     Toast,
     DatePipe,

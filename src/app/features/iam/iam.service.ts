@@ -20,11 +20,32 @@ export class IamService {
   saveUser(v: unknown) {
     return this.h.post(`${this.u}/iam/usuarios`, v);
   }
+  updateUser(id: string, v: unknown) {
+    return this.h.put(`${this.u}/iam/usuarios/${encodeURIComponent(id)}`, v);
+  }
+  toggleUser(id: string, active: boolean) {
+    return this.h.patch(`${this.u}/iam/usuarios/${encodeURIComponent(id)}`, { active });
+  }
+  deleteUser(id: string) {
+    return this.h.delete(`${this.u}/iam/usuarios/${encodeURIComponent(id)}`);
+  }
   saveProfile(v: unknown) {
     return this.h.post(`${this.u}/iam/perfiles`, v);
   }
+  updateProfile(code: string, v: unknown) {
+    return this.h.put(`${this.u}/iam/perfiles/${encodeURIComponent(code)}`, v);
+  }
+  deleteProfile(code: string) {
+    return this.h.delete(`${this.u}/iam/perfiles/${encodeURIComponent(code)}`);
+  }
   saveModule(v: unknown) {
     return this.h.post(`${this.u}/iam/modulos`, v);
+  }
+  updateModule(code: string, v: unknown) {
+    return this.h.put(`${this.u}/iam/modulos/${encodeURIComponent(code)}`, v);
+  }
+  deleteModule(code: string) {
+    return this.h.delete(`${this.u}/iam/modulos/${encodeURIComponent(code)}`);
   }
   profilePermissions(code: string) {
     return this.h

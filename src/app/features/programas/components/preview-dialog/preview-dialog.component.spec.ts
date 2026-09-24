@@ -68,6 +68,8 @@ const PROGRAM: Program = {
     netCLP: 10_710_000,
     vatCLP: 1_660_546,
     crewWithholdingCLP: 48_038,
+    vatRate: 19,
+    crewWithholdingRate: 15.25,
     utilityCLP: 2_142_000,
     netWithUtilityCLP: 12_852_000,
     netWithUtilityPerPassengerCLP: 459_000,

@@ -125,6 +125,8 @@ export interface ProgramTotals {
   vatCLP: number;
   /** Retención de honorarios incluida en el total bruto de tripulación. */
   crewWithholdingCLP: number;
+  vatRate: number;
+  crewWithholdingRate: number;
   utilityCLP: number;
   netWithUtilityCLP: number;
   netWithUtilityPerPassengerCLP: number;

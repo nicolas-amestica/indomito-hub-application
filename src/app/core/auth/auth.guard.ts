@@ -7,5 +7,7 @@ export const authGuard: CanActivateFn = () => {
 };
 export const moduleGuard: CanActivateFn = (route) => {
   const a = inject(AuthService);
-  return a.canAccess(String(route.data['module'])) || inject(Router).createUrlTree(['/programas']);
+  if (a.canAccess(String(route.data['module']))) return true;
+  const fallback = a.modules().find((module) => module.level === 'LV2') ?? a.modules()[0];
+  return inject(Router).createUrlTree([fallback?.path || '/login']);
 };

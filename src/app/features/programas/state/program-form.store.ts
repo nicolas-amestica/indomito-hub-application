@@ -28,6 +28,7 @@ import type {
 } from '../interfaces/program.interface';
 import { CatalogStore } from './catalog.store';
 import { ExchangeRateStore } from './exchange-rate.store';
+import { AppConfigurationService } from '../../../core/configuration/app-configuration.service';
 
 /** Puente feature-scoped entre el formulario tipado y el motor puro de cálculo. */
 @Injectable()
@@ -35,6 +36,7 @@ export class ProgramFormStore {
   private readonly rates = inject(ExchangeRateStore);
   private readonly catalogs = inject(CatalogStore);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly configuration = inject(AppConfigurationService);
 
   readonly form = buildProgramForm();
 
@@ -83,7 +85,7 @@ export class ProgramFormStore {
 
   readonly derived = computed<CalculationResult | null>(() => {
     const input = this.calculationInput();
-    return input === null ? null : calculateProgram(input);
+    return input === null ? null : calculateProgram(input, this.configuration.taxes());
   });
 
   readonly rows = computed<SummaryRow[]>(() => this.derived()?.rows ?? []);

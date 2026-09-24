@@ -275,13 +275,17 @@
             </dd>
           </div>
           <div class="rounded-lg border border-brand-active/30 bg-brand-soft px-3 py-2">
-            <dt class="text-xs text-graphite">IVA incluido (19%)</dt>
+            <dt class="text-xs text-graphite">
+              IVA incluido ({{ program().totals.vatRate | number: '1.0-2' }}%)
+            </dt>
             <dd class="font-semibold tabular-nums text-ink">
               {{ program().totals.vatCLP | clpAmount }} CLP
             </dd>
           </div>
           <div class="rounded-lg border border-brand-active/30 bg-brand-soft px-3 py-2">
-            <dt class="text-xs text-graphite">Retención tripulación (15,25%)</dt>
+            <dt class="text-xs text-graphite">
+              Retención tripulación ({{ program().totals.crewWithholdingRate | number: '1.0-2' }}%)
+            </dt>
             <dd class="font-semibold tabular-nums text-ink">
               {{ program().totals.crewWithholdingCLP | clpAmount }} CLP
             </dd>

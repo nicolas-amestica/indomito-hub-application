@@ -1,63 +1,107 @@
 <div class="min-h-screen bg-surface-50 text-ink">
   <header class="sticky top-0 z-40 border-b border-black/10 bg-ink/95 text-white backdrop-blur-xl">
     <div class="mx-auto flex max-w-[1500px] items-center gap-4 px-4 py-3 sm:px-8">
-      <button
-        type="button"
-        class="grid size-11 place-items-center rounded-xl border border-white/15 text-brand transition hover:bg-white/10"
-        (click)="toggle()"
-        aria-label="Abrir módulos"
-      >
-        <i class="pi pi-bars"></i></button
-      ><a routerLink="/programas" class="flex items-center gap-3"
-        ><img src="brand/logo-web-large.png" alt="Giras Indómito" class="h-9 w-auto" /><span
-          class="hidden text-sm font-semibold sm:block"
-          >Indómito Hub</span
-        ></a
-      >
-      <div class="ml-auto text-right">
-        <p class="text-sm font-semibold">{{ auth.user()?.name }}</p>
-        <p class="text-xs text-white/55">{{ auth.user()?.profileCode }}</p>
-      </div>
-      <button
-        type="button"
-        class="rounded-xl px-3 py-2 text-sm text-white/70 hover:bg-white/10 hover:text-white"
-        (click)="auth.logout()"
-      >
-        Salir
-      </button>
-    </div>
-  </header>
-  @if (open()) {
-    <button
-      type="button"
-      class="fixed inset-0 z-40 bg-black/45 backdrop-blur-sm"
-      aria-label="Cerrar menú"
-      (click)="open.set(false)"
-    ></button>
-    <aside
-      class="fixed inset-y-0 left-0 z-50 w-[min(88vw,22rem)] bg-ink p-6 text-white shadow-2xl animate-[drawer-in_180ms_ease-out]"
-    >
-      <div class="flex items-center justify-between">
-        <p class="text-xs font-semibold uppercase tracking-[.22em] text-brand">
-          Módulos disponibles
-        </p>
-        <button class="size-10 rounded-xl hover:bg-white/10" (click)="open.set(false)">
-          <i class="pi pi-times"></i>
+      <a routerLink="/programas" class="flex items-center gap-3">
+        <img src="brand/logo-web-large.png" alt="Giras Indómito" class="h-9 w-auto" />
+        <span class="hidden text-sm font-semibold sm:block">Indómito Hub</span>
+      </a>
+      <div class="ml-auto flex items-center gap-3">
+        <button
+          type="button"
+          class="flex h-10 items-center gap-2 rounded-xl border border-white/15 px-3 text-sm font-semibold transition hover:border-brand/60 hover:bg-white/10"
+          (click)="toggle()"
+          aria-label="Abrir menú de módulos"
+        >
+          <svg
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="text-brand"
+          >
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <span class="hidden sm:inline">Menú</span>
+        </button>
+        <div class="border-l border-white/15 pl-3 text-right">
+          <p class="text-sm font-semibold">{{ auth.user()?.name }}</p>
+          <p class="text-xs text-white/55">{{ auth.user()?.profileCode }}</p>
+        </div>
+        <button
+          type="button"
+          class="rounded-xl px-3 py-2 text-sm text-white/70 hover:bg-white/10 hover:text-white"
+          (click)="auth.logout()"
+        >
+          Salir
         </button>
       </div>
-      <nav class="mt-8 grid gap-2">
-        @for (module of auth.modules(); track module.code) {
-          <a
-            [routerLink]="module.path"
-            routerLinkActive="bg-brand text-ink"
-            class="flex items-center gap-4 rounded-2xl border border-white/10 px-4 py-4 transition hover:border-brand/50 hover:bg-white/5"
-            (click)="open.set(false)"
-            ><i [class]="module.icon || 'pi pi-circle'"></i
-            ><span class="font-semibold">{{ module.title }}</span></a
+    </div>
+  </header>
+
+  <p-dialog
+    [visible]="open()"
+    (visibleChange)="open.set($event)"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [dismissableMask]="true"
+    [style]="{ width: 'min(92vw, 62rem)' }"
+    styleClass="overflow-hidden rounded-3xl border-0"
+  >
+    <ng-template #header>
+      <div>
+        <p class="text-xs font-bold uppercase tracking-[.2em] text-brand-active">Navegación</p>
+        <h2 class="mt-1 text-2xl font-semibold text-ink">Módulos disponibles</h2>
+      </div>
+    </ng-template>
+    <div class="border-y border-black/10 bg-canvas px-1 py-4">
+      <div class="flex flex-wrap gap-2" aria-label="Filtrar módulos por categoría">
+        @for (item of categories(); track item) {
+          <button
+            type="button"
+            class="rounded-full border px-4 py-2 text-sm font-semibold transition"
+            [class.border-ink]="category() === item"
+            [class.bg-ink]="category() === item"
+            [class.text-white]="category() === item"
+            [class.border-black/10]="category() !== item"
+            [class.bg-white]="category() !== item"
+            (click)="category.set(item)"
           >
+            {{ item }}
+          </button>
         }
-      </nav>
-    </aside>
-  }
+      </div>
+    </div>
+    <nav class="grid gap-3 py-5 sm:grid-cols-2 lg:grid-cols-3">
+      @for (module of visibleModules(); track module.code) {
+        <a
+          [routerLink]="module.path"
+          routerLinkActive="border-brand-active bg-brand-soft"
+          class="group flex min-h-28 flex-col justify-between rounded-2xl border border-black/10 bg-white p-5 transition hover:-translate-y-0.5 hover:border-brand-active hover:shadow-lg"
+          (click)="open.set(false)"
+        >
+          <span class="grid size-10 place-items-center rounded-xl bg-ink text-brand"
+            ><i [class]="module.icon || 'icon-[tabler--point]'"></i
+          ></span>
+          <span class="mt-4"
+            ><strong class="block text-base text-ink">{{ module.title }}</strong
+            ><small class="mt-1 block text-black/45">{{
+              module.category || 'General'
+            }}</small></span
+          >
+        </a>
+      } @empty {
+        <p class="col-span-full rounded-2xl bg-canvas px-5 py-10 text-center text-sm text-black/50">
+          No hay módulos disponibles en esta categoría.
+        </p>
+      }
+    </nav>
+  </p-dialog>
   <main><router-outlet /></main>
 </div>

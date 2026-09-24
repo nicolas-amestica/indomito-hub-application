@@ -24,6 +24,13 @@ export const routes: Routes = [
         canActivate: [moduleGuard],
         loadComponent: () => import('./features/iam/iam.page').then((m) => m.IamPage),
       },
+      {
+        path: 'configuracion',
+        data: { module: 'CONFIGURATION' },
+        canActivate: [moduleGuard],
+        loadComponent: () =>
+          import('./features/configuration/configuration.page').then((m) => m.ConfigurationPage),
+      },
       { path: '', pathMatch: 'full', redirectTo: 'programas' },
     ],
   },

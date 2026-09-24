@@ -11,26 +11,40 @@
 <div
   class="min-h-screen bg-[radial-gradient(circle_at_top_right,rgba(235,255,0,0.07),transparent_32rem)]"
 >
-  <div class="mx-auto flex w-full max-w-[90rem] flex-col gap-7 px-4 py-5 sm:px-6 sm:py-7 lg:px-8">
-    <app-page-header
-      title="Programa"
-      description="Completa el formulario para crear un nuevo programa de viajes."
+  <div class="mx-auto flex w-full max-w-360 flex-col gap-7 px-4 py-5 sm:px-6 sm:py-7 lg:px-8">
+
+   <header class="flex items-center justify-between rounded-3xl bg-ink p-7 text-white">
+  <div>
+    <p class="text-xs font-bold uppercase tracking-[.2em] text-brand">
+      Programa
+    </p>
+
+    <h1 class="mt-3 text-3xl font-semibold">
+      Crear Programa
+    </h1>
+
+    <p class="mt-2 max-w-2xl text-white/60">
+      Completa el formulario para crear un nuevo programa de viajes.
+    </p>
+  </div>
+
+  <div class="shrink-0">
+    <button
+      pButton
+      appMotionPress
+      type="button"
+      severity="secondary"
+      outlined
+      class="border-white/20! text-white! hover:border-white/35! hover:bg-white/10!"
+      [disabled]="!favoritesAvailable"
+      [attr.aria-expanded]="favoritesOpen()"
+      aria-controls="favorites-panel"
+      (click)="toggleFavorites()"
     >
-      <button
-        pButton
-        appMotionPress
-        type="button"
-        severity="secondary"
-        outlined
-        class="border-white/20! text-white! hover:border-white/35! hover:bg-white/10!"
-        [disabled]="!favoritesAvailable"
-        [attr.aria-expanded]="favoritesOpen()"
-        aria-controls="favorites-panel"
-        (click)="toggleFavorites()"
-      >
-        {{ favoritesOpen() ? 'Cerrar favoritos' : 'Favoritos' }}
-      </button>
-    </app-page-header>
+      {{ favoritesOpen() ? 'Cerrar favoritos' : 'Favoritos' }}
+    </button>
+  </div>
+</header>
 
     @if (!favoritesAvailable) {
       <aside
@@ -46,7 +60,7 @@
       <aside class="hidden lg:sticky lg:top-6 lg:block">
         <nav
           aria-label="Secciones del formulario"
-          class="overflow-hidden rounded-2xl border border-line/80 bg-surface/95 p-3 shadow-[0_18px_45px_-36px_rgba(28,28,28,0.75)] backdrop-blur"
+          class="overflow-hidden rounded-2xl border border-line/80 bg-surface/95 p-3 shadow-panel backdrop-blur"
         >
           <p
             class="px-3 pb-3 pt-2 text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-muted"

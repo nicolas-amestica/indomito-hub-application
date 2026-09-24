@@ -18,6 +18,8 @@ const TOTALS: ProgramTotals = {
   netCLP: 2_010_600,
   vatCLP: 263_445,
   crewWithholdingCLP: 48_038,
+  vatRate: 19,
+  crewWithholdingRate: 15.25,
   utilityCLP: 402_120,
   netWithUtilityCLP: 2_412_720,
   netWithUtilityPerPassengerCLP: 86_169,

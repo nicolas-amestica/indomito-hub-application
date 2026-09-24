@@ -22,6 +22,7 @@ export function favoriteContentFromProgram(program: Program): FavoriteContent {
       source: program.pricing.exchange.source,
       isFallback: program.pricing.exchange.isFallback,
     },
+    totals: program.totals,
     crews: program.crews.map(({ name, documentId, dailyPrice, currency }) => ({
       name,
       documentId,

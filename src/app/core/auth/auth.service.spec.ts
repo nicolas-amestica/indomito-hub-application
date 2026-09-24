@@ -56,6 +56,25 @@ describe('AuthService', () => {
     expect(sessionStorage.getItem(STORAGE_KEY)).toBeNull();
   });
 
+  it('oculta un LV2 aunque tenga lectura cuando su LV1 no tiene lectura', () => {
+    const session = authSession(jwtExpiringIn(3_600));
+    session.permissions.unshift({
+      module: {
+        code: 'PRG', title: 'Programas', category: 'Programas', path: '/programas',
+        icon: 'icon-[tabler--route]', order: 1, active: true, endpoints: [], level: 'LV1',
+      },
+      allowances: [],
+    });
+    session.permissions[1].module.level = 'LV2';
+    session.permissions[1].module.parentCode = 'PRG';
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+
+    const service = TestBed.inject(AuthService);
+
+    expect(service.canAccess('PROGRAMS')).toBe(false);
+    expect(service.modules().map((module) => module.code)).not.toContain('PROGRAMS');
+  });
+
   it('elimina la sesión almacenada al cerrar sesión', () => {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(authSession(jwtExpiringIn(3_600))));
     const service = TestBed.inject(AuthService);
@@ -85,8 +104,9 @@ function authSession(token: string): AuthSession {
         module: {
           code: 'PROGRAMS',
           title: 'Programas',
+          category: 'Programas',
           path: '/programas',
-          icon: 'pi pi-file',
+          icon: 'icon-[tabler--file]',
           order: 1,
           active: true,
           endpoints: ['/programas'],

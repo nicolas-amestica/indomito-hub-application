@@ -502,7 +502,7 @@ describe('ProgramFormPage', () => {
     ).toBe(true);
   });
 
-  it('guarda desde la previsualización sin enviar totales ni snapshot de tasas', async () => {
+  it('guarda desde la previsualización los totales auditables sin enviar el snapshot de tasas', async () => {
     exchangeResponse$ = of(freshSnapshot());
     const saved = sampleFavorite();
     createFavorite.mockReturnValueOnce(of(saved));
@@ -526,7 +526,12 @@ describe('ProgramFormPage', () => {
     const content = createFavorite.mock.calls[0][0].content as Record<string, unknown> & {
       pricing: Record<string, unknown>;
     };
-    expect(content).not.toHaveProperty('totals');
+    expect(content['totals']).toMatchObject({
+      vatRate: 19,
+      crewWithholdingRate: 15.25,
+      vatCLP: expect.any(Number),
+      crewWithholdingCLP: expect.any(Number),
+    });
     expect(content.pricing).not.toHaveProperty('exchange');
     expect(content['rateOrigin']).toEqual({
       date: '2027-03-01',
