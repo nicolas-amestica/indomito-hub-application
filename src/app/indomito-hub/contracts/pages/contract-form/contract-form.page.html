@@ -1,0 +1,80 @@
+<div class="mx-auto max-w-[1500px] px-4 py-8 sm:px-8">
+  <header class="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+      <p class="text-xs font-bold uppercase tracking-[.2em] text-brand-active">Contratos</p>
+      <h1 class="mt-2 text-3xl font-semibold text-ink">Contrato de prestación de servicios</h1>
+      <p class="mt-2 max-w-3xl text-sm text-black/55">Importa la plantilla oficial o completa el formulario. Todos los campos pueden ajustarse hasta que el contrato sea aprobado.</p>
+    </div>
+    <div class="flex flex-wrap gap-3">
+      <button type="button" class="rounded-xl border border-black/15 bg-white px-4 py-2.5 text-sm font-semibold" (click)="template.download()">Descargar plantilla Excel</button>
+      <label class="cursor-pointer rounded-xl border border-black/15 bg-white px-4 py-2.5 text-sm font-semibold" [class.opacity-50]="locked() || importing()">
+        {{ importing() ? 'Importando…' : 'Cargar Excel' }}
+        <input type="file" class="sr-only" accept=".xlsx" [disabled]="locked() || importing()" (change)="importExcel($event)" />
+      </label>
+      <button type="button" class="rounded-xl border border-black/15 bg-white px-4 py-2.5 text-sm font-semibold" [disabled]="busy()" (click)="preview()">Vista previa PDF</button>
+      <button type="button" class="rounded-xl bg-ink px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50" [disabled]="locked() || busy()" (click)="save()">{{ busy() ? 'Guardando…' : 'Guardar contrato' }}</button>
+    </div>
+  </header>
+
+  @if (locked()) { <div class="mb-6 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900">Este contrato está aprobado y quedó bloqueado para edición.</div> }
+
+  <form [formGroup]="form" class="space-y-6">
+    <section class="rounded-2xl border border-black/10 bg-white p-6">
+      <h2 class="mb-5 text-lg font-semibold">Control del contrato</h2>
+      <div class="grid gap-4 md:grid-cols-3">
+        <label class="field">Período<input type="month" formControlName="period" /></label>
+        <label class="field">ID del programa (opcional)<input formControlName="programId" /></label>
+        <label class="field">Estado<select formControlName="status"><option value="DRAFT">Borrador</option><option value="PENDING_APPROVAL">Pendiente de aprobación</option><option value="APPROVED">Aprobado</option><option value="REJECTED">Rechazado</option><option value="CANCELLED">Cancelado</option></select></label>
+      </div>
+    </section>
+
+    <section class="rounded-2xl border border-black/10 bg-white p-6">
+      <h2 class="mb-5 text-lg font-semibold">Institución y viaje</h2>
+      <div formGroupName="institution" class="grid gap-4 md:grid-cols-2">
+        <label class="field">Establecimiento<input formControlName="name" /></label><label class="field">Dirección<textarea rows="2" formControlName="address"></textarea></label>
+      </div>
+      <div formGroupName="trip" class="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <label class="field">Ciudad de firma<input formControlName="city" /></label><label class="field">Fecha del contrato<input type="date" formControlName="contractDate" /></label>
+        <label class="field">Destino<input formControlName="destination" /></label><label class="field">Punto de salida<input formControlName="departurePoint" /></label>
+        <label class="field">Fecha de salida<input type="date" formControlName="departureDate" /></label><label class="field">Fecha de retorno<input type="date" formControlName="returnDate" /></label>
+        <label class="field">Días<input type="number" min="0" formControlName="days" /></label><label class="field">Noches<input type="number" min="0" formControlName="nights" /></label>
+      </div>
+    </section>
+
+    <section class="rounded-2xl border border-black/10 bg-white p-6">
+      <div class="mb-5 flex items-center justify-between"><h2 class="text-lg font-semibold">Representantes de Giras Indómito</h2><button type="button" class="text-sm font-semibold text-brand-active" (click)="addRepresentative()">Agregar representante</button></div>
+      <div formArrayName="representatives" class="space-y-3">@for (group of representatives.controls; track group; let i = $index) { <div [formGroupName]="i" class="grid gap-3 md:grid-cols-[1fr_14rem_1fr_auto]"><label class="field">Nombre<input formControlName="name" /></label><label class="field">RUT<input formControlName="dni" /></label><label class="field">Cargo<input formControlName="course" /></label><button type="button" class="self-end rounded-lg px-3 py-2 text-sm text-red-700" (click)="remove(representatives, i)">Quitar</button></div> }</div>
+    </section>
+
+    <section class="rounded-2xl border border-black/10 bg-white p-6">
+      <div class="mb-5 flex items-center justify-between"><h2 class="text-lg font-semibold">Representantes del cliente</h2><button type="button" class="text-sm font-semibold text-brand-active" (click)="addRepresentative(true)">Agregar representante</button></div>
+      <div formArrayName="clientRepresentatives" class="space-y-3">@for (group of clientRepresentatives.controls; track group; let i = $index) { <div [formGroupName]="i" class="grid gap-3 md:grid-cols-[1fr_14rem_1fr_auto]"><label class="field">Nombre<input formControlName="name" /></label><label class="field">RUT<input formControlName="dni" /></label><label class="field">Curso<input formControlName="course" /></label><button type="button" class="self-end rounded-lg px-3 py-2 text-sm text-red-700" (click)="remove(clientRepresentatives, i)">Quitar</button></div> }</div>
+    </section>
+
+    <section class="rounded-2xl border border-black/10 bg-white p-6" formGroupName="plan">
+      <label class="field mb-5">Nombre del programa<input formControlName="name" /></label>
+      <div class="mb-4 flex items-center justify-between"><h2 class="text-lg font-semibold">Servicios incluidos</h2><button type="button" class="text-sm font-semibold text-brand-active" (click)="addService()">Agregar servicio</button></div>
+      <div formArrayName="servicesIncluded" class="space-y-3">@for (group of services.controls; track group; let i = $index) { <div [formGroupName]="i" class="flex gap-3"><textarea rows="2" formControlName="description" class="w-full"></textarea><button type="button" class="rounded-lg px-3 text-sm text-red-700" (click)="remove(services, i)">Quitar</button></div> }</div>
+    </section>
+
+    <section class="rounded-2xl border border-black/10 bg-white p-6" formGroupName="payments">
+      <h2 class="mb-5 text-lg font-semibold">Pagos</h2>
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <label class="field">Pasajeros pagantes<input type="number" min="0" formControlName="totalPassengers" /></label><label class="field">Pasajeros liberados<input type="number" min="0" formControlName="freePassengers" /></label>
+        <label class="field">Precio por persona CLP<input type="number" min="0" formControlName="pricePerPerson" /></label><label class="field">Precio por persona USD<input type="number" min="0" formControlName="priceInUSD" /></label>
+        <label class="field">Total grupo CLP<input type="number" min="0" formControlName="totalGroup" /></label><label class="field">Abono inicial<input type="number" min="0" formControlName="downPayment" /></label>
+        <label class="field">Saldo grupal<input type="number" min="0" formControlName="groupBalance" /></label><label class="field">Días antes del pago<input type="number" min="0" formControlName="daysBeforePayment" /></label>
+        <label class="field">Tipo de cambio tope USD<input type="number" min="0" formControlName="maxExchangeRate" /></label>
+      </div>
+      <h3 class="mb-4 mt-7 font-semibold">Cuotas</h3><div formGroupName="installments" class="grid gap-4 md:grid-cols-2 lg:grid-cols-4"><label class="field">Cantidad<input type="number" min="0" formControlName="quantity" /></label><label class="field">Valor grupal<input type="number" min="0" formControlName="groupInstallmentValue" /></label><label class="field">Valor individual<input type="number" min="0" formControlName="individualInstallmentValue" /></label><label class="field">Inicio<input formControlName="startMonth" /></label></div>
+      <h3 class="mb-4 mt-7 font-semibold">Condiciones contractuales</h3><div formGroupName="conditions" class="grid gap-4 md:grid-cols-2 lg:grid-cols-4"><label class="field">% abono con pasajes<input type="number" min="0" max="100" formControlName="depositPercentageWithFlight" /></label><label class="field">% abono sin pasajes<input type="number" min="0" max="100" formControlName="depositPercentageWithoutFlight" /></label><label class="field">Abono programa especial<input type="number" min="0" formControlName="specialProgramDeposit" /></label><label class="field">Días saldo aéreo<input type="number" min="0" formControlName="daysBeforeFlightBalance" /></label><label class="field">Días saldo terrestre<input type="number" min="0" formControlName="daysBeforeTerrestrialBalance" /></label><label class="field">% penalidad cancelación<input type="number" min="0" max="100" formControlName="cancellationPenaltyPercentage" /></label><label class="field">Días aviso cancelación<input type="number" min="0" formControlName="cancellationNoticeDays" /></label><label class="field">Días plazo reclamos<input type="number" min="0" formControlName="complaintDeadlineDays" /></label></div>
+      <h3 class="mb-4 mt-7 font-semibold">Cuenta bancaria</h3><div formGroupName="bankAccount" class="grid gap-4 md:grid-cols-2 lg:grid-cols-5"><label class="field">Número de cuenta<input formControlName="accountNumber" /></label><label class="field">Titular<input formControlName="accountHolder" /></label><label class="field">RUT titular<input formControlName="holderDNI" /></label><label class="field">Banco<input formControlName="bank" /></label><label class="field">Email<input type="email" formControlName="email" /></label></div>
+    </section>
+
+    <section class="rounded-2xl border border-black/10 bg-white p-6">
+      <div class="mb-2 flex items-center justify-between"><h2 class="text-lg font-semibold">Nómina de pasajeros</h2><button type="button" class="text-sm font-semibold text-brand-active" (click)="addPassenger()">Agregar pasajero</button></div>
+      <p class="mb-5 text-sm text-black/55">Obligatoria. Esta tabla se insertará después de la cláusula VIGÉSIMO SEGUNDO.</p>
+      <div formArrayName="passengers" class="space-y-3">@for (group of passengers.controls; track group; let i = $index) { <div [formGroupName]="i" class="grid gap-3 md:grid-cols-2 xl:grid-cols-[1fr_1fr_12rem_12rem_12rem_auto]"><label class="field">Nombres<input formControlName="names" /></label><label class="field">Apellidos<input formControlName="lastNames" /></label><label class="field">RUT<input formControlName="dni" /></label><label class="field">Fecha de nacimiento<input type="date" formControlName="birthDate" /></label><label class="field">Nacionalidad<input formControlName="nationality" /></label><button type="button" class="self-end rounded-lg px-3 py-2 text-sm text-red-700" (click)="remove(passengers, i)">Quitar</button></div> }</div>
+    </section>
+  </form>
+</div>

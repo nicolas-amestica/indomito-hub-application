@@ -22,6 +22,11 @@ export const routes: Routes = [
           import('./indomito-hub/programs/programs.routes').then((m) => m.PROGRAMS_ROUTES),
       },
       {
+        path: 'contratos',
+        loadChildren: () =>
+          import('./indomito-hub/contracts/contracts.routes').then((m) => m.CONTRACTS_ROUTES),
+      },
+      {
         path: '',
         loadChildren: () =>
           import('./indomito-hub/administration/administration.routes').then(

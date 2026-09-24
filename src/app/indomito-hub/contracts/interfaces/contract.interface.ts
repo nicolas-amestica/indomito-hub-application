@@ -1,0 +1,20 @@
+export type ContractStatus = 'DRAFT' | 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
+export interface ContractPerson { name: string; dni: string; course: string }
+export interface ContractPassenger { names: string; lastNames: string; dni: string; birthDate: string; nationality: string }
+export interface ContractContent {
+  representatives: ContractPerson[];
+  institution: { name: string; address: string };
+  clientRepresentatives: ContractPerson[];
+  trip: { city: string; contractDate: string; destination: string; departureDate: string; returnDate: string; days: number; nights: number; departurePoint: string };
+  plan: { name: string; servicesIncluded: { description: string }[] };
+  payments: {
+    totalPassengers: number; freePassengers: number; pricePerPerson: number; priceInUSD: number; totalGroup: number; downPayment: number; groupBalance: number; daysBeforePayment: number; maxExchangeRate: number;
+    installments: { quantity: number; groupInstallmentValue: number; individualInstallmentValue: number; startMonth: string };
+    conditions: { depositPercentageWithFlight: number; depositPercentageWithoutFlight: number; specialProgramDeposit: number; daysBeforeFlightBalance: number; daysBeforeTerrestrialBalance: number; cancellationPenaltyPercentage: number; cancellationNoticeDays: number; complaintDeadlineDays: number };
+    bankAccount: { accountNumber: string; accountHolder: string; holderDNI: string; bank: string; email: string };
+  };
+  passengers: ContractPassenger[];
+}
+export interface Contract { id: string; programId?: string; period: string; status: ContractStatus; content: ContractContent; createdAt: string; updatedAt: string; version: number }
+export interface ContractCreateRequest { programId?: string; period?: string; content: ContractContent }
+export interface ContractUpdateRequest { period: string; status: ContractStatus; content: ContractContent; version: number }
