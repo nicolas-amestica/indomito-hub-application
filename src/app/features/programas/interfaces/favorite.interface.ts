@@ -7,6 +7,7 @@
 
 import type {
   CrewMember,
+  ExchangeRateOrigin,
   ProgramGeneral,
   ProgramPricing,
   ProgramSchedule,
@@ -50,6 +51,8 @@ export interface FavoriteContent {
     'totalDays' | 'totalNights' | 'totalPassengers' | 'freePassengers'
   >;
   pricing: Omit<ProgramPricing, 'exchange'>;
+  /** Auditoría de la tasa usada al guardar; no se reutiliza al recalcular. */
+  rateOrigin?: ExchangeRateOrigin;
   crews: Pick<CrewMember, 'name' | 'documentId' | 'dailyPrice' | 'currency'>[];
   services: Pick<ProgramService, 'name' | 'chargeType' | 'unitPrice' | 'currency'>[];
 }

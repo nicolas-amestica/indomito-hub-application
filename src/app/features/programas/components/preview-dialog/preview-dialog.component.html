@@ -108,6 +108,12 @@
               </dd>
             </div>
             <div>
+              <dt class="text-muted">Origen</dt>
+              <dd class="mt-0.5 font-medium text-ink">
+                {{ exchangeRateSourceLabel(program().pricing.exchange) }}
+              </dd>
+            </div>
+            <div>
               <dt class="text-muted">USD efectivo</dt>
               <dd class="mt-0.5 font-medium tabular-nums text-ink">
                 {{ effectiveRates().USD | clpAmount }} CLP
@@ -266,6 +272,18 @@
             <dt class="text-xs text-muted">Neto</dt>
             <dd class="font-semibold tabular-nums text-ink">
               {{ program().totals.netCLP | clpAmount }} CLP
+            </dd>
+          </div>
+          <div class="rounded-lg border border-brand-active/30 bg-brand-soft px-3 py-2">
+            <dt class="text-xs text-graphite">IVA incluido (19%)</dt>
+            <dd class="font-semibold tabular-nums text-ink">
+              {{ program().totals.vatCLP | clpAmount }} CLP
+            </dd>
+          </div>
+          <div class="rounded-lg border border-brand-active/30 bg-brand-soft px-3 py-2">
+            <dt class="text-xs text-graphite">Retención tripulación (15,25%)</dt>
+            <dd class="font-semibold tabular-nums text-ink">
+              {{ program().totals.crewWithholdingCLP | clpAmount }} CLP
             </dd>
           </div>
           <div>

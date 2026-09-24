@@ -38,6 +38,7 @@ const PROGRAM: Program = {
       usdToClp: 1_000,
       brlToClp: 200,
       isFallback: false,
+      source: 'banco-central',
     },
   },
   crews: [
@@ -65,6 +66,8 @@ const PROGRAM: Program = {
     subtotalUSD: 9_900,
     subtotalBRL: 0,
     netCLP: 10_710_000,
+    vatCLP: 1_660_546,
+    crewWithholdingCLP: 48_038,
     utilityCLP: 2_142_000,
     netWithUtilityCLP: 12_852_000,
     netWithUtilityPerPassengerCLP: 459_000,

@@ -14,6 +14,7 @@ const SNAPSHOT: ExchangeSnapshot = {
   usdToClp: 950,
   brlToClp: 178,
   isFallback: false,
+  source: 'banco-central',
 };
 
 const CATALOGS: CatalogResponse = {
@@ -188,6 +189,7 @@ describe('ProgramFormStore', () => {
             usdToClp,
             brlToClp,
             isFallback: false,
+            source: 'banco-central',
           };
           rateState.set(currentSnapshot);
 

@@ -27,6 +27,12 @@ import { isPassengerIndependent } from './passenger-independent';
 import { independentAmountCLP, perPassengerPrice } from './per-passenger-split';
 import { ceil, round } from './rounding';
 
+/** Tasa general de IVA vigente en Chile. */
+export const VAT_RATE = 0.19;
+
+/** Retención de boletas de honorarios vigente durante 2026. */
+export const CREW_WITHHOLDING_RATE = 0.1525;
+
 /** Milisegundos de un día. Exacto en UTC, donde no hay horario de verano. */
 const MS_PER_DAY = 86_400_000;
 
@@ -180,17 +186,21 @@ export function calculateProgram(input: CalculationInput): CalculationResult {
   // que ya no coincide, hasta el último bit, con los subtotales que la tabla
   // muestra en el pie (Requirement 7.2 a 7.4).
   const baseByCurrency: Record<CurrencyCode, number[]> = { CLP: [], USD: [], BRL: [] };
+  const crewAmountsCLP: number[] = [];
+  const serviceAmountsCLP: number[] = [];
 
   for (const [index, crew] of crews.entries()) {
     const row = buildRow(crew, index, schedule, rates);
     rows.push(row);
     baseByCurrency[row.currency].push(row.baseAmount);
+    crewAmountsCLP.push(row.amountCLP);
   }
 
   for (const [index, service] of services.entries()) {
     const row = buildRow(service, index, schedule, rates);
     rows.push(row);
     baseByCurrency[row.currency].push(row.baseAmount);
+    serviceAmountsCLP.push(row.amountCLP);
   }
 
   const subtotalCLP = sumAscending(baseByCurrency.CLP);
@@ -199,6 +209,8 @@ export function calculateProgram(input: CalculationInput): CalculationResult {
 
   const netRaw = subtotalCLP * rates.CLP + subtotalUSD * rates.USD + subtotalBRL * rates.BRL;
   const netCLP = round(netRaw);
+  const vatCLP = round((sumAscending(serviceAmountsCLP) * VAT_RATE) / (1 + VAT_RATE));
+  const crewWithholdingCLP = round(sumAscending(crewAmountsCLP) * CREW_WITHHOLDING_RATE);
 
   const utilityCLP = ceil((netRaw * pricing.utilityRate) / 100);
   const netWithUtilityCLP = netCLP + utilityCLP;
@@ -220,6 +232,8 @@ export function calculateProgram(input: CalculationInput): CalculationResult {
       subtotalUSD,
       subtotalBRL,
       netCLP,
+      vatCLP,
+      crewWithholdingCLP,
       utilityCLP,
       netWithUtilityCLP,
       netWithUtilityPerPassengerCLP: perPassengerPrice(netWithUtilityCLP, splitContext),

@@ -17,7 +17,9 @@ const destinations: DestinationOption[] = [
 
 describe('GeneralDataPanelComponent', () => {
   beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [GeneralDataPanelComponent] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [GeneralDataPanelComponent],
+    }).compileComponents();
   });
 
   function createPanel(loading = false) {
@@ -49,7 +51,9 @@ describe('GeneralDataPanelComponent', () => {
   it('enlaza las opciones y bloquea los selectores mientras cargan los catalogos', async () => {
     const { fixture } = createPanel(true);
     await fixture.whenStable();
-    const selects = fixture.debugElement.queryAll(By.directive(Select)).map((item) => item.componentInstance as Select);
+    const selects = fixture.debugElement
+      .queryAll(By.directive(Select))
+      .map((item) => item.componentInstance as Select);
 
     expect(selects).toHaveLength(3);
     expect(selects[0].options()).toBe(plans);
@@ -100,7 +104,9 @@ describe('GeneralDataPanelComponent', () => {
   it('escribe los valores de texto en el grupo recibido', async () => {
     const { fixture, group } = createPanel();
     await fixture.whenStable();
-    const input = (fixture.nativeElement as HTMLElement).querySelector<HTMLInputElement>('#program-name')!;
+    const input = (fixture.nativeElement as HTMLElement).querySelector<HTMLInputElement>(
+      '#program-name',
+    )!;
 
     input.value = 'Brasil 2027';
     input.dispatchEvent(new Event('input'));

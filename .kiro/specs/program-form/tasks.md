@@ -548,7 +548,7 @@ persona baja del orden de 1% respecto del comportamiento actual.
   - [x] 19.1 Implementar `summary-table`
     - Oculta mientras no haya ningún ítem con datos válidos; una fila por tripulante y por servicio
     - Columnas: nombre, tipo, moneda, tasa efectiva, precio unitario, monto base y monto en CLP
-    - Pie con los nueve montos; etiqueta visual por tipo de cobro y una propia para tripulación, **con texto y no solo color**
+    - Pie con los totales, incluido el desglose informativo de IVA y retención de tripulación; etiqueta visual por tipo de cobro y una propia para tripulación, **con texto y no solo color**
     - Buscador con `debounceTime(150)` que filtra filas e indica cuántas se muestran del total; el pie ignora el filtro
     - `<table>` semántica con `<th scope="col">`, `OnPush`, `@for` con `track` sobre `SummaryRow.key`, y virtual scrolling a partir de 50 filas
     - Aviso de tasas de respaldo junto a los valores de USD y BRL

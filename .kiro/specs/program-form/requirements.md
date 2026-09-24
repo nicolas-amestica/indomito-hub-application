@@ -35,10 +35,10 @@ el Lambda Authorizer compartido está desactivado hoy (`authorizerEnabled: false
 en infraestructura, `SHARED_AUTHORIZER_ENABLED = false` en el backend), lo que
 obliga a declarar `public: true` todo endpoint que se despliegue.
 
-| Fase | Endpoints | Condición |
-| --- | --- | --- |
-| 1 | `GET /tasas-cambio`, `GET /catalogos` | Se despliegan ya. Son de lectura, sin datos de negocio ni datos personales. |
-| 2 | `POST /programas:presupuesto`, CRUD de favoritos | Implementados y con tests, **despliegue bloqueado** hasta que el authorizer esté activo. |
+| Fase | Endpoints                                        | Condición                                                                                |
+| ---- | ------------------------------------------------ | ---------------------------------------------------------------------------------------- |
+| 1    | `GET /tasas-cambio`, `GET /catalogos`            | Se despliegan ya. Son de lectura, sin datos de negocio ni datos personales.              |
+| 2    | `POST /programas:presupuesto`, CRUD de favoritos | Implementados y con tests, **despliegue bloqueado** hasta que el authorizer esté activo. |
 
 Mientras la fase 2 esté bloqueada, el formulario se ejercita de punta a punta
 contra el servidor local (`make dev`). El motivo está en el Requirement 19.
@@ -58,13 +58,13 @@ contra el servidor local (`make dev`). El motivo está en el Requirement 19.
 
 ## Repos Involucrados
 
-| Repo | Alias | Qué hace en esta feature |
-| --- | --- | --- |
-| `ind-hub-app-ngx-pri-gh` | application | **Repo principal.** Página del formulario, paneles, motor de cálculo reactivo, tabla resumen, diálogo de previsualización, panel de favoritos, exportación a Excel, store del programa y servicios HTTP. Es el único lugar donde vive el cálculo. |
-| `ind-hub-api-gox-sls-pri-gh` | services | Tres microservicios Go independientes: `api-program` (maquetación del PDF de presupuesto, scope `program`), `api-catalog` (catálogos y tipos de cambio, scope `configuration`) y `api-favorite` (CRUD de favoritos, scope `favorites`). Sin motor de cálculo en Go. |
-| `ind-hub-inf-aws-sls-pri-gh` | infrastructure | Dos tablas DynamoDB nuevas: `catalogos` (catálogos, parámetros de margen y último snapshot de tasas) y `favoritos`. Política IAM mínima por servicio sobre su propia tabla. La tabla `programas` existente no se usa en esta spec. Scope de commit: `ddb`. |
-| `ind-hub-iam-tsx-sls-pri-gh` | authorizer | Sin cambios en esta spec. Su ausencia condiciona el despliegue de los endpoints que requieren identidad, según el Requirement 19. |
-| `ind-hub-orc-aws-sls-pri-gh` | orchestrator | Fragmento OpenAPI de los endpoints nuevos. Scope de commit: `docs`. |
+| Repo                         | Alias          | Qué hace en esta feature                                                                                                                                                                                                                                            |
+| ---------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ind-hub-app-ngx-pri-gh`     | application    | **Repo principal.** Página del formulario, paneles, motor de cálculo reactivo, tabla resumen, diálogo de previsualización, panel de favoritos, exportación a Excel, store del programa y servicios HTTP. Es el único lugar donde vive el cálculo.                   |
+| `ind-hub-api-gox-sls-pri-gh` | services       | Tres microservicios Go independientes: `api-program` (maquetación del PDF de presupuesto, scope `program`), `api-catalog` (catálogos y tipos de cambio, scope `configuration`) y `api-favorite` (CRUD de favoritos, scope `favorites`). Sin motor de cálculo en Go. |
+| `ind-hub-inf-aws-sls-pri-gh` | infrastructure | Dos tablas DynamoDB nuevas: `catalogos` (catálogos, parámetros de margen y último snapshot de tasas) y `favoritos`. Política IAM mínima por servicio sobre su propia tabla. La tabla `programas` existente no se usa en esta spec. Scope de commit: `ddb`.          |
+| `ind-hub-iam-tsx-sls-pri-gh` | authorizer     | Sin cambios en esta spec. Su ausencia condiciona el despliegue de los endpoints que requieren identidad, según el Requirement 19.                                                                                                                                   |
+| `ind-hub-orc-aws-sls-pri-gh` | orchestrator   | Fragmento OpenAPI de los endpoints nuevos. Scope de commit: `docs`.                                                                                                                                                                                                 |
 
 ## Glossary
 
@@ -110,11 +110,11 @@ Esta es la evolución del contrato que planteaste. Los cambios respecto de tu pr
 ```typescript
 /** Tipo de cobro de un servicio. Define el multiplicador del precio unitario. */
 type ChargeType =
-  | 'fixed'               // Valor único: precio fijo, independiente de pasajeros y días
-  | 'per_passenger'       // Valor una vez por pasajero
+  | 'fixed' // Valor único: precio fijo, independiente de pasajeros y días
+  | 'per_passenger' // Valor una vez por pasajero
   | 'per_passenger_night' // Valor por pasajero por noche
-  | 'per_day'             // Valor por día, independiente de la cantidad de pasajeros
-  | 'per_passenger_day';  // Valor por pasajero por día
+  | 'per_day' // Valor por día, independiente de la cantidad de pasajeros
+  | 'per_passenger_day'; // Valor por pasajero por día
 
 /** Monedas soportadas por el cálculo del programa. */
 type CurrencyCode = 'CLP' | 'USD' | 'BRL';
@@ -137,8 +137,8 @@ interface ProgramGeneral {
 
 /** Duración y cantidades del programa. */
 interface ProgramSchedule {
-  totalDays: number;        // editable; el programa no tiene fechas
-  totalNights: number;      // precargado como totalDays − 1, sobrescribible por el usuario
+  totalDays: number; // editable; el programa no tiene fechas
+  totalNights: number; // precargado como totalDays − 1, sobrescribible por el usuario
   totalPassengers: number;
   freePassengers: number;
   payingPassengers: number; // derivado: max(1, totalPassengers - freePassengers)
@@ -146,16 +146,16 @@ interface ProgramSchedule {
 
 /** Parámetros de precio y resguardo de tipo de cambio. */
 interface ProgramPricing {
-  usdIncreaseCLP: number;   // monto absoluto en CLP sumado a la tasa del USD
-  brlIncreaseCLP: number;   // monto absoluto en CLP sumado a la tasa del BRL
-  utilityRate: number;      // porcentaje, 0 a 100
-  rechargeRate: number;     // porcentaje, 0 a 100
+  usdIncreaseCLP: number; // monto absoluto en CLP sumado a la tasa del USD
+  brlIncreaseCLP: number; // monto absoluto en CLP sumado a la tasa del BRL
+  utilityRate: number; // porcentaje, 0 a 100
+  rechargeRate: number; // porcentaje, 0 a 100
   exchange: ExchangeSnapshot;
 }
 
 /** Tipos de cambio con los que se calcula el programa. */
 interface ExchangeSnapshot {
-  date: string;             // ISO 8601, fecha informada por la fuente de tasas
+  date: string; // ISO 8601, fecha informada por la fuente de tasas
   usdToClp: number;
   brlToClp: number;
   /** Verdadero cuando los valores provienen del último snapshot conocido y no de la fuente externa. */
@@ -165,11 +165,11 @@ interface ExchangeSnapshot {
 /** Tripulante del programa. Su costo siempre es dailyPrice × totalDays. */
 interface CrewMember {
   name: string;
-  documentId: string;       // RUT chileno, DNI argentino o CPF brasileño
+  documentId: string; // RUT chileno, DNI argentino o CPF brasileño
   dailyPrice: number;
   currency: CurrencyCode;
-  baseAmount: number;       // derivado: dailyPrice × totalDays, en su moneda
-  amountCLP: number;        // derivado: baseAmount × tasa efectiva
+  baseAmount: number; // derivado: dailyPrice × totalDays, en su moneda
+  amountCLP: number; // derivado: baseAmount × tasa efectiva
 }
 
 /** Servicio contratado del programa. */
@@ -178,16 +178,16 @@ interface ProgramService {
   chargeType: ChargeType;
   unitPrice: number;
   currency: CurrencyCode;
-  baseAmount: number;       // derivado según chargeType, en su moneda
-  amountCLP: number;        // derivado: baseAmount × tasa efectiva
+  baseAmount: number; // derivado según chargeType, en su moneda
+  amountCLP: number; // derivado: baseAmount × tasa efectiva
 }
 
 /** Totales calculados del programa, todos en CLP. */
 interface ProgramTotals {
-  subtotalCLP: number;                    // suma de ítems en CLP
-  subtotalUSD: number;                    // suma de ítems en USD, expresada en USD
-  subtotalBRL: number;                    // suma de ítems en BRL, expresada en BRL
-  netCLP: number;                         // neto: todo convertido a CLP
+  subtotalCLP: number; // suma de ítems en CLP
+  subtotalUSD: number; // suma de ítems en USD, expresada en USD
+  subtotalBRL: number; // suma de ítems en BRL, expresada en BRL
+  netCLP: number; // neto: todo convertido a CLP
   utilityCLP: number;
   netWithUtilityCLP: number;
   netWithUtilityPerPassengerCLP: number;
@@ -212,9 +212,9 @@ interface Program {
 
 /** Escenario del presupuesto. Se deriva de los pasajeros del propio programa. */
 interface BudgetScenario {
-  totalPassengers: number;      // pasajeros del programa + desplazamiento, acotado a mínimo 1
-  freePassengers: number;       // derivado de la proporción de liberados del programa
-  payingPassengers: number;     // derivado: totalPassengers − freePassengers, mínimo 1
+  totalPassengers: number; // pasajeros del programa + desplazamiento, acotado a mínimo 1
+  freePassengers: number; // derivado de la proporción de liberados del programa
+  payingPassengers: number; // derivado: totalPassengers − freePassengers, mínimo 1
   pricePerPassengerCLP: number; // calculado por el Calculation_Engine
 }
 
@@ -243,17 +243,17 @@ Estos rangos son únicos para toda la feature: el formulario los aplica como
 validadores y los endpoints que reciben contenido de programa revalidan los que
 les corresponden. Una divergencia entre capas es un defecto.
 
-| Campo | Mínimo | Máximo | Paso | Nota |
-| --- | --- | --- | --- | --- |
-| `totalDays` | 1 | 100 | 1 | Editable por el usuario |
-| `totalNights` | 0 | 100 | 1 | Precargado como `totalDays − 1` |
-| `totalPassengers` | 1 | 100 | 1 | |
-| `freePassengers` | 0 | 99 | 1 | Siempre menor que `totalPassengers` |
-| `usdIncreaseCLP` | 0 | 200 | 5 | |
-| `brlIncreaseCLP` | 0 | 40 | 5 | Ver justificación en el Requirement 4 |
-| `utilityRate` | 0 | 100 | 1 | Porcentaje |
-| `rechargeRate` | 0 | 100 | 1 | Porcentaje |
-| `dailyPrice` / `unitPrice` | 0,01 | 99.999.999 | — | Entero si la moneda es CLP |
+| Campo                      | Mínimo | Máximo     | Paso | Nota                                  |
+| -------------------------- | ------ | ---------- | ---- | ------------------------------------- |
+| `totalDays`                | 1      | 100        | 1    | Editable por el usuario               |
+| `totalNights`              | 0      | 100        | 1    | Precargado como `totalDays − 1`       |
+| `totalPassengers`          | 1      | 100        | 1    |                                       |
+| `freePassengers`           | 0      | 99         | 1    | Siempre menor que `totalPassengers`   |
+| `usdIncreaseCLP`           | 0      | 200        | 5    |                                       |
+| `brlIncreaseCLP`           | 0      | 40         | 5    | Ver justificación en el Requirement 4 |
+| `utilityRate`              | 0      | 100        | 1    | Porcentaje                            |
+| `rechargeRate`             | 0      | 100        | 1    | Porcentaje                            |
+| `dailyPrice` / `unitPrice` | 0,01   | 99.999.999 | —    | Entero si la moneda es CLP            |
 
 ### Notas sobre los cambios al contrato
 
@@ -710,11 +710,11 @@ les corresponden. Una divergencia entre capas es un defecto.
 11. THE Favorites_Service SHALL recibir permisos de DynamoDB únicamente sobre la tabla `favoritos`.
 12. THE Program_Service, THE Catalog_Service y THE Favorites_Service SHALL operar sin usar la tabla `programas`.
 
-| Servicio Go | Endpoints | Scope de commit |
-| --- | --- | --- |
-| `api-program` | `POST /programas:presupuesto` | `program` |
-| `api-catalog` | `GET /catalogos`, `GET /tasas-cambio` | `configuration` |
-| `api-favorite` | `GET·POST·PUT·DELETE /favoritos` | `favorites` |
+| Servicio Go    | Endpoints                             | Scope de commit |
+| -------------- | ------------------------------------- | --------------- |
+| `api-program`  | `POST /programas:presupuesto`         | `program`       |
+| `api-catalog`  | `GET /catalogos`, `GET /tasas-cambio` | `configuration` |
+| `api-favorite` | `GET·POST·PUT·DELETE /favoritos`      | `favorites`     |
 
 > **Por qué las tasas de cambio viven en `api-catalog`.** Tanto los catálogos como
 > las tasas son datos de referencia que el formulario carga al abrirse: llegan
@@ -797,30 +797,30 @@ les corresponden. Una divergencia entre capas es un defecto.
 
 ## Decisiones tomadas durante el levantamiento
 
-| # | Duda | Resolución |
-| --- | --- | --- |
-| 1 | Semántica del incremento de divisa | Monto absoluto en CLP que se suma a la tasa del día. El ejemplo numérico original tenía un error aritmético; el criterio correcto quedó en el Requirement 4. |
-| 2 | Tratamiento de pasajeros liberados | El costo de los servicios por pasajero usa el total de pasajeros; el precio por persona se divide entre los pagantes, salvo la porción pasajero-independiente que se divide entre todos. |
-| 3 | Base de utilidad y recargo | La utilidad se calcula sobre el neto; el recargo se calcula sobre neto más utilidad (compuesto). |
-| 4 | IVA y retención de honorarios | No se calculan. Los precios ingresados ya los incluyen porque son los montos que el proveedor cobra a la empresa. Se eliminan el flag de exención por fila y el indicador de pérdida por diferencia de IVA del legacy. |
-| 5 | Origen de los tipos de cambio | Endpoint Go propio que replica el comportamiento del handler legacy: consulta la fuente externa, redondea y expone fecha y valores. |
-| 6 | Snapshot de tipo de cambio | Se obtiene al abrir el formulario y se usa para todo el cálculo. Al cargar un favorito se usa el snapshot vigente, no uno guardado. |
-| 7 | Flujo de salida | Botón "Previsualizar" que abre un diálogo con el detalle renderizado en el frontend, y desde ahí las acciones de exportar y guardar como favorito. Sin borradores parciales. |
-| 8 | Alcance recortado del legacy | Se mantienen destino, plan, temporada, ciudad de salida, favoritos, export Excel y export PDF de escenarios. Se descartan colegio, curso, representante, toggle S.I.I., precarga de servicios administrativos y autocomplete de ítems de costo. |
-| 9 | Catálogo de tipos de cobro | Cinco tipos: `fixed`, `per_passenger`, `per_passenger_night`, `per_day` y `per_passenger_day`. La tripulación mantiene su regla fija de precio por día y no participa del catálogo. |
-| 10 | Rango del incremento por divisa | USD de 0 a 200 CLP, BRL de 0 a 40 CLP. El incremento es un monto absoluto pero resguarda un porcentaje, y las dos tasas difieren en un orden de magnitud. Ver Requirement 4. |
-| 11 | Rangos numéricos únicos | Una sola tabla de límites en el contrato de datos, aplicada por el formulario y revalidada por los endpoints que reciben contenido de programa. Pasajeros de 1 a 100, precios desde 0,01 y enteros cuando la moneda es CLP. |
-| 12 | Filtro de búsqueda de la tabla | Filtra solo las filas visibles. El pie y la exportación a Excel siempre reflejan el programa completo. Ver Requirement 9. |
-| 13 | Validación de totales en el backend | **Revertida por la decisión 21.** El backend recalculaba los totales y rechazaba con `TOTALS_MISMATCH` una diferencia mayor a 1 CLP. Sin persistencia del programa no hay autoridad que establecer, así que el cálculo queda una sola vez, en TypeScript. |
-| 14 | Idempotencia de la creación | **Revertida por la decisión 19.** La clave ULID por apertura del `Preview_Dialog` protegía la creación del programa. Sin `POST /programas` no hay creación que hacer idempotente. |
-| 15 | Origen de los catálogos | Endpoint propio servido desde DynamoDB, según el principio 9 del charter. Ver Requirement 16. |
-| 16 | Despliegue de endpoints con identidad | Bloqueado hasta que el authorizer compartido esté activo. Solo se despliegan los endpoints de lectura. Ver Requirement 19. |
-| 17 | Manejo de estado del formulario | Typed Reactive Forms para la entrada y la validación, signals para el estado derivado y el estado asíncrono. Sin dependencias nuevas de manejo de estado. |
-| 18 | Separación del backend en microservicios | Tres servicios Go independientes: `api-program` (presupuesto, scope `program`), `api-catalog` (catálogos y tasas, scope `configuration`) y `api-favorite` (favoritos, scope `favorites`). Una tabla DynamoDB por servicio, política IAM mínima sobre la propia, tipos de dominio compartidos por librería. Ver Requirement 17. |
-| 19 | Persistencia del programa | Fuera del alcance. Se eliminan `POST /programas`, la clave de idempotencia, `TOTALS_MISMATCH` y el diálogo de confirmación. Los favoritos pasan a ser la única forma de guardar un programa, y lo desplegable hoy es una calculadora sin guardar. Ver Requirements 10, 11 y 19, y el punto abierto 5. |
-| 20 | Mejoras aprobadas al formulario | Cuatro: parámetros de margen precargados desde el catálogo con piso de utilidad advertido (Requirement 4), respaldo de tasas por indisponibilidad de la fuente (Requirements 1, 9 y 14), noches de estadía precargadas y sobrescribibles (Requirement 3), y escenarios del presupuesto derivados de los pasajeros del programa (Requirement 13). |
-| 21 | Un solo motor de cálculo | El motor en Go se elimina, junto con los vectores de cálculo compartidos, su script de sincronía y el anclaje de versión entre motores. El `Budget_Pdf_Endpoint` maqueta los precios que recibe y valida su forma. El riesgo asumido y su control humano están en el Requirement 18. |
-| 22 | Porción pasajero-independiente | Validada por el solicitante el 14 de septiembre de 2026: incluye tripulación y servicios `fixed` y `per_day`, aceptando la rebaja respecto del legacy. |
+| #   | Duda                                     | Resolución                                                                                                                                                                                                                                                                                                                                       |
+| --- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Semántica del incremento de divisa       | Monto absoluto en CLP que se suma a la tasa del día. El ejemplo numérico original tenía un error aritmético; el criterio correcto quedó en el Requirement 4.                                                                                                                                                                                     |
+| 2   | Tratamiento de pasajeros liberados       | El costo de los servicios por pasajero usa el total de pasajeros; el precio por persona se divide entre los pagantes, salvo la porción pasajero-independiente que se divide entre todos.                                                                                                                                                         |
+| 3   | Base de utilidad y recargo               | La utilidad se calcula sobre el neto; el recargo se calcula sobre neto más utilidad (compuesto).                                                                                                                                                                                                                                                 |
+| 4   | IVA y retención de honorarios            | Los precios ingresados ya incluyen ambos conceptos. El resumen desglosa informativamente el IVA contenido en servicios (`19/119`) y la retención 2026 contenida en el total bruto de tripulación (`15,25%`), sin volver a sumarlos al total. No se reincorpora un flag de exención por fila.                                                     |
+| 5   | Origen de los tipos de cambio            | Endpoint Go propio que replica el comportamiento del handler legacy: consulta la fuente externa, redondea y expone fecha y valores.                                                                                                                                                                                                              |
+| 6   | Snapshot de tipo de cambio               | Se obtiene al abrir el formulario y se usa para todo el cálculo. Al cargar un favorito se usa el snapshot vigente, no uno guardado.                                                                                                                                                                                                              |
+| 7   | Flujo de salida                          | Botón "Previsualizar" que abre un diálogo con el detalle renderizado en el frontend, y desde ahí las acciones de exportar y guardar como favorito. Sin borradores parciales.                                                                                                                                                                     |
+| 8   | Alcance recortado del legacy             | Se mantienen destino, plan, temporada, ciudad de salida, favoritos, export Excel y export PDF de escenarios. Se descartan colegio, curso, representante, toggle S.I.I., precarga de servicios administrativos y autocomplete de ítems de costo.                                                                                                  |
+| 9   | Catálogo de tipos de cobro               | Cinco tipos: `fixed`, `per_passenger`, `per_passenger_night`, `per_day` y `per_passenger_day`. La tripulación mantiene su regla fija de precio por día y no participa del catálogo.                                                                                                                                                              |
+| 10  | Rango del incremento por divisa          | USD de 0 a 200 CLP, BRL de 0 a 40 CLP. El incremento es un monto absoluto pero resguarda un porcentaje, y las dos tasas difieren en un orden de magnitud. Ver Requirement 4.                                                                                                                                                                     |
+| 11  | Rangos numéricos únicos                  | Una sola tabla de límites en el contrato de datos, aplicada por el formulario y revalidada por los endpoints que reciben contenido de programa. Pasajeros de 1 a 100, precios desde 0,01 y enteros cuando la moneda es CLP.                                                                                                                      |
+| 12  | Filtro de búsqueda de la tabla           | Filtra solo las filas visibles. El pie y la exportación a Excel siempre reflejan el programa completo. Ver Requirement 9.                                                                                                                                                                                                                        |
+| 13  | Validación de totales en el backend      | **Revertida por la decisión 21.** El backend recalculaba los totales y rechazaba con `TOTALS_MISMATCH` una diferencia mayor a 1 CLP. Sin persistencia del programa no hay autoridad que establecer, así que el cálculo queda una sola vez, en TypeScript.                                                                                        |
+| 14  | Idempotencia de la creación              | **Revertida por la decisión 19.** La clave ULID por apertura del `Preview_Dialog` protegía la creación del programa. Sin `POST /programas` no hay creación que hacer idempotente.                                                                                                                                                                |
+| 15  | Origen de los catálogos                  | Endpoint propio servido desde DynamoDB, según el principio 9 del charter. Ver Requirement 16.                                                                                                                                                                                                                                                    |
+| 16  | Despliegue de endpoints con identidad    | Bloqueado hasta que el authorizer compartido esté activo. Solo se despliegan los endpoints de lectura. Ver Requirement 19.                                                                                                                                                                                                                       |
+| 17  | Manejo de estado del formulario          | Typed Reactive Forms para la entrada y la validación, signals para el estado derivado y el estado asíncrono. Sin dependencias nuevas de manejo de estado.                                                                                                                                                                                        |
+| 18  | Separación del backend en microservicios | Tres servicios Go independientes: `api-program` (presupuesto, scope `program`), `api-catalog` (catálogos y tasas, scope `configuration`) y `api-favorite` (favoritos, scope `favorites`). Una tabla DynamoDB por servicio, política IAM mínima sobre la propia, tipos de dominio compartidos por librería. Ver Requirement 17.                   |
+| 19  | Persistencia del programa                | Fuera del alcance. Se eliminan `POST /programas`, la clave de idempotencia, `TOTALS_MISMATCH` y el diálogo de confirmación. Los favoritos pasan a ser la única forma de guardar un programa, y lo desplegable hoy es una calculadora sin guardar. Ver Requirements 10, 11 y 19, y el punto abierto 5.                                            |
+| 20  | Mejoras aprobadas al formulario          | Cuatro: parámetros de margen precargados desde el catálogo con piso de utilidad advertido (Requirement 4), respaldo de tasas por indisponibilidad de la fuente (Requirements 1, 9 y 14), noches de estadía precargadas y sobrescribibles (Requirement 3), y escenarios del presupuesto derivados de los pasajeros del programa (Requirement 13). |
+| 21  | Un solo motor de cálculo                 | El motor en Go se elimina, junto con los vectores de cálculo compartidos, su script de sincronía y el anclaje de versión entre motores. El `Budget_Pdf_Endpoint` maqueta los precios que recibe y valida su forma. El riesgo asumido y su control humano están en el Requirement 18.                                                             |
+| 22  | Porción pasajero-independiente           | Validada por el solicitante el 14 de septiembre de 2026: incluye tripulación y servicios `fixed` y `per_day`, aceptando la rebaja respecto del legacy.                                                                                                                                                                                           |
 
 ## Puntos abiertos
 

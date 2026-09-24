@@ -6,6 +6,7 @@ import { InputText } from 'primeng/inputtext';
 import { ProgressSpinner } from 'primeng/progressspinner';
 
 import type { Favorite, FavoriteScope } from '../../interfaces/favorite.interface';
+import { exchangeRateOriginLabel } from '../../formatting/exchange-rate-source';
 import { MotionPressDirective } from '../../../../shared/ui/motion-press.directive';
 import { SideDrawerComponent } from '../../../../shared/ui/side-drawer.component';
 
@@ -46,6 +47,7 @@ export class FavoritesPanelComponent {
 
   protected readonly previewFavorite = signal<Favorite | null>(null);
   protected readonly deleteCandidate = signal<Favorite | null>(null);
+  protected readonly exchangeRateOriginLabel = exchangeRateOriginLabel;
   protected readonly favoriteName = new FormControl('', {
     nonNullable: true,
     validators: [Validators.required, trimmedRequired],

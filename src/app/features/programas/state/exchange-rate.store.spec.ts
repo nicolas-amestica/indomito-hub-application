@@ -17,7 +17,13 @@ describe('ExchangeRateStore', () => {
     expect(service.getSnapshot).toHaveBeenCalledTimes(1);
     expect(store.loading()).toBe(true);
 
-    response.next({ date: '2026-09-14', usdToClp: 950, brlToClp: 178, isFallback: false });
+    response.next({
+      date: '2026-09-14',
+      usdToClp: 950,
+      brlToClp: 178,
+      isFallback: false,
+      source: 'banco-central',
+    });
     response.complete();
 
     expect(store.snapshot()).toEqual({
@@ -25,6 +31,7 @@ describe('ExchangeRateStore', () => {
       usdToClp: 950,
       brlToClp: 178,
       isFallback: false,
+      source: 'banco-central',
     });
     expect(store.loading()).toBe(false);
     expect(store.hasError()).toBe(false);
@@ -41,7 +48,13 @@ describe('ExchangeRateStore', () => {
     });
 
     const store = TestBed.inject(ExchangeRateStore);
-    response.next({ date: '2026-09-12', usdToClp: 940, brlToClp: 175, isFallback: true });
+    response.next({
+      date: '2026-09-12',
+      usdToClp: 940,
+      brlToClp: 175,
+      isFallback: true,
+      source: 'banco-central',
+    });
 
     expect(store.usingFallback()).toBe(true);
     expect(store.fallbackDate()).toBe('2026-09-12');
@@ -72,7 +85,13 @@ describe('ExchangeRateStore', () => {
     expect(store.loading()).toBe(true);
     expect(store.error()).toBeNull();
 
-    second.next({ date: '2026-09-14', usdToClp: 950, brlToClp: 178, isFallback: false });
+    second.next({
+      date: '2026-09-14',
+      usdToClp: 950,
+      brlToClp: 178,
+      isFallback: false,
+      source: 'banco-central',
+    });
     second.complete();
     expect(store.hasError()).toBe(false);
   });

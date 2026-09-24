@@ -325,6 +325,8 @@
                     [totals]="totals"
                     [effectiveRates]="effectiveRates"
                     [snapshotDate]="snapshot.date"
+                    [snapshotSource]="snapshot.source"
+                    [snapshotIsFallback]="snapshot.isFallback"
                     [fallbackDate]="exchangeRateStore.fallbackDate()"
                     [embedded]="true"
                     (searchChanged)="programFormStore.searchTerm.set($event)"

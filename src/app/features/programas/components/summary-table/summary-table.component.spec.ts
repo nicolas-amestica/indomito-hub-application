@@ -16,6 +16,8 @@ const TOTALS: ProgramTotals = {
   subtotalUSD: 1_650,
   subtotalBRL: 200,
   netCLP: 2_010_600,
+  vatCLP: 263_445,
+  crewWithholdingCLP: 48_038,
   utilityCLP: 402_120,
   netWithUtilityCLP: 2_412_720,
   netWithUtilityPerPassengerCLP: 86_169,
@@ -57,11 +59,13 @@ describe('SummaryTableComponent', () => {
     fixture.componentRef.setInput('totals', TOTALS);
     fixture.componentRef.setInput('effectiveRates', RATES);
     fixture.componentRef.setInput('snapshotDate', '2027-03-01');
+    fixture.componentRef.setInput('snapshotSource', 'banco-central');
+    fixture.componentRef.setInput('snapshotIsFallback', false);
     fixture.componentRef.setInput('fallbackDate', null);
     return fixture;
   }
 
-  it('muestra las siete columnas, las etiquetas con texto y los nueve montos del pie', async () => {
+  it('muestra las siete columnas, las etiquetas con texto y los once montos del pie', async () => {
     const fixture = createTable([summaryRow(0, 'crew'), summaryRow(1)]);
     await fixture.whenStable();
     const host = fixture.nativeElement as HTMLElement;
@@ -80,8 +84,17 @@ describe('SummaryTableComponent', () => {
     expect(host.querySelectorAll('[data-summary-row]')).toHaveLength(2);
     expect(host.textContent).toContain('Tripulación');
     expect(host.textContent).toContain('Por pasajero por noche');
-    expect(host.querySelectorAll('[aria-label="Totales del programa"] > div')).toHaveLength(9);
+    expect(host.querySelectorAll('[aria-label="Totales del programa"] > div')).toHaveLength(11);
     expect(host.textContent).toContain('2.533.356 CLP');
+    expect(host.textContent).toContain('Banco Central de Chile');
+    expect(host.textContent).toContain('IVA incluido');
+    expect(host.textContent).toContain(
+      'Los montos de IVA y retención informados abajo ya están incluidos en los precios.',
+    );
+    expect(host.textContent).toContain('IVA incluido (19%)');
+    expect(host.textContent).toContain('263.445 CLP');
+    expect(host.textContent).toContain('Retención tripulación (15,25%)');
+    expect(host.textContent).toContain('48.038 CLP');
   });
 
   it('emite el texto de búsqueda solo después de 150 ms', async () => {

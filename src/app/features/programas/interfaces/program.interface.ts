@@ -18,6 +18,9 @@ export type ChargeType =
 /** Monedas soportadas por el cálculo del programa. */
 export type CurrencyCode = 'CLP' | 'USD' | 'BRL';
 
+/** Proveedor que originó las tasas antes de cualquier lectura desde caché. */
+export type ExchangeRateSource = 'banco-central' | 'currency-api' | 'unknown';
+
 /** Referencia a una entidad de catálogo. */
 export interface CatalogRef {
   id: string;
@@ -68,9 +71,13 @@ export interface ExchangeSnapshot {
   date: string;
   usdToClp: number;
   brlToClp: number;
+  source: ExchangeRateSource;
   /** Verdadero cuando los valores provienen del último snapshot conocido y no de la fuente externa. */
   isFallback: boolean;
 }
+
+/** Procedencia persistible de las tasas, sin conservar valores reutilizables. */
+export type ExchangeRateOrigin = Pick<ExchangeSnapshot, 'date' | 'source' | 'isFallback'>;
 
 /** Tasas efectivas por moneda. Derivadas del snapshot y los incrementos (tasa del día + incremento). */
 export interface EffectiveRates {
@@ -114,6 +121,10 @@ export interface ProgramTotals {
   subtotalBRL: number;
   /** Neto: todo convertido a CLP. */
   netCLP: number;
+  /** IVA incluido en el total de servicios, extraído con tasa 19%. */
+  vatCLP: number;
+  /** Retención de honorarios incluida en el total bruto de tripulación. */
+  crewWithholdingCLP: number;
   utilityCLP: number;
   netWithUtilityCLP: number;
   netWithUtilityPerPassengerCLP: number;

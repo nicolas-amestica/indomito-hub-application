@@ -15,7 +15,13 @@ import { Table } from 'primeng/table';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { ClpAmountPipe } from '../../../../shared/formatting/clp-amount.pipe';
-import type { EffectiveRates, ProgramTotals, SummaryRow } from '../../interfaces/program.interface';
+import { exchangeRateOriginLabel } from '../../formatting/exchange-rate-source';
+import type {
+  EffectiveRates,
+  ExchangeRateSource,
+  ProgramTotals,
+  SummaryRow,
+} from '../../interfaces/program.interface';
 import { FallbackRatesNoticeComponent } from '../fallback-rates-notice/fallback-rates-notice.component';
 
 /** Umbral fijado por el diseño para limitar la cantidad de filas en el DOM. */
@@ -45,6 +51,8 @@ export class SummaryTableComponent {
   readonly totals = input.required<ProgramTotals>();
   readonly effectiveRates = input.required<EffectiveRates>();
   readonly snapshotDate = input.required<string>();
+  readonly snapshotSource = input.required<ExchangeRateSource>();
+  readonly snapshotIsFallback = input.required<boolean>();
   readonly fallbackDate = input<string | null>(null);
   readonly embedded = input(false);
 
@@ -52,6 +60,7 @@ export class SummaryTableComponent {
 
   protected readonly searchControl = new FormControl('', { nonNullable: true });
   protected readonly virtualScrollThreshold = SUMMARY_VIRTUAL_SCROLL_THRESHOLD;
+  protected readonly exchangeRateOriginLabel = exchangeRateOriginLabel;
   protected readonly trackRow: TrackByFunction<SummaryRow> = (_index, row) => row.key;
 
   constructor() {

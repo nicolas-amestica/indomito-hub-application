@@ -249,6 +249,14 @@
           servicios
         </dd>
       </div>
+      @if (favorite.content.rateOrigin; as origin) {
+        <div class="sm:col-span-2">
+          <dt class="text-muted">Origen de las tasas guardadas</dt>
+          <dd class="font-medium text-ink">
+            {{ exchangeRateOriginLabel(origin.source, origin.isFallback) }} · {{ origin.date }}
+          </dd>
+        </div>
+      }
     </dl>
   </p-dialog>
 }

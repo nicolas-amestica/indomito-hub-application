@@ -22,6 +22,7 @@ const SNAPSHOT: ExchangeSnapshot = {
   usdToClp: 1000,
   brlToClp: 180,
   isFallback: false,
+  source: 'banco-central',
 };
 
 /** Parámetros de precio con los dos incrementos en su valor por defecto de prueba. */
@@ -91,6 +92,7 @@ describe('buildEffectiveRates', () => {
       usdToClp: 1000,
       brlToClp: 180,
       isFallback: false,
+      source: 'banco-central',
     });
     expect(PRICING.usdIncreaseCLP).toBe(60);
   });
@@ -185,6 +187,8 @@ describe('calculateProgram — casos límite', () => {
       subtotalUSD: 0,
       subtotalBRL: 0,
       netCLP: 0,
+      vatCLP: 0,
+      crewWithholdingCLP: 0,
       utilityCLP: 0,
       netWithUtilityCLP: 0,
       netWithUtilityPerPassengerCLP: 0,
@@ -192,6 +196,32 @@ describe('calculateProgram — casos límite', () => {
       totalCLP: 0,
       totalPerPassengerCLP: 0,
     });
+  });
+
+  it('desglosa el IVA de servicios y la retención bruta de tripulación sin alterar el total', () => {
+    const result = calculateProgram({
+      ...MINIMAL_PROGRAM,
+      crews: [
+        {
+          name: 'Guía',
+          documentId: '17137440-5',
+          dailyPrice: 100_000,
+          currency: 'CLP',
+        },
+      ],
+      services: [
+        {
+          name: 'Traslado',
+          chargeType: 'fixed',
+          unitPrice: 119_000,
+          currency: 'CLP',
+        },
+      ],
+    });
+
+    expect(result.totals.vatCLP).toBe(19_000);
+    expect(result.totals.crewWithholdingCLP).toBe(15_250);
+    expect(result.totals.totalCLP).toBe(219_000);
   });
 
   it('reparte un programa de un pasajero sin cambiar su total', () => {

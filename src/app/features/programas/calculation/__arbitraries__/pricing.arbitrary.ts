@@ -52,6 +52,7 @@ export function arbExchangeSnapshot(): fc.Arbitrary<ExchangeSnapshot> {
     date: arbStartDate(),
     usdToClp: arbBoundedInt(USD_RATE_RANGE.min, USD_RATE_RANGE.max),
     brlToClp: arbBoundedInt(BRL_RATE_RANGE.min, BRL_RATE_RANGE.max),
+    source: fc.constantFrom('banco-central' as const, 'currency-api' as const),
     isFallback: fc.boolean(),
   });
 }

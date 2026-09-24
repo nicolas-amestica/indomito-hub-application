@@ -44,6 +44,7 @@ class AccessiblePanelsHost {
     usdToClp: 1_000,
     brlToClp: 200,
     isFallback: false,
+    source: 'banco-central',
   };
 }
 

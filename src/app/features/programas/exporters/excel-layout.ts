@@ -1,4 +1,5 @@
 import type { Program, SummaryRow } from '../interfaces/program.interface';
+import { exchangeRateSourceLabel } from '../formatting/exchange-rate-source';
 
 /** Valor que puede escribirse directamente en una celda del detalle exportado. */
 export type ExcelCellValue = string | number | boolean | Date;
@@ -176,6 +177,7 @@ function buildHeaderRows(
     metadataRow('Pasajeros', numberCell(schedule.totalPassengers, CLP_FORMAT)),
     metadataRow('Pasajeros liberados', numberCell(schedule.freePassengers, CLP_FORMAT)),
     metadataRow('Fecha de las tasas', isoDateCell(pricing.exchange.date)),
+    metadataRow('Origen de las tasas', textCell(exchangeRateSourceLabel(pricing.exchange))),
     metadataRow('Tasa del día USD', numberCell(pricing.exchange.usdToClp, CURRENCY_FORMAT)),
     metadataRow('Tasa efectiva USD', numberCell(effectiveUsd, CURRENCY_FORMAT)),
     metadataRow('Tasa del día BRL', numberCell(pricing.exchange.brlToClp, CURRENCY_FORMAT)),
@@ -253,6 +255,8 @@ function summaryRows(program: Program): ExcelRow[] {
     ['Subtotal USD', totals.subtotalUSD, CURRENCY_FORMAT],
     ['Subtotal BRL', totals.subtotalBRL, CURRENCY_FORMAT],
     ['Neto', totals.netCLP, CLP_FORMAT],
+    ['IVA incluido (19%)', totals.vatCLP, CLP_FORMAT],
+    ['Retención tripulación (15,25%)', totals.crewWithholdingCLP, CLP_FORMAT],
     ['Utilidad', totals.utilityCLP, CLP_FORMAT],
     ['Neto con utilidad', totals.netWithUtilityCLP, CLP_FORMAT],
     ['Neto con utilidad por persona', totals.netWithUtilityPerPassengerCLP, CLP_FORMAT],

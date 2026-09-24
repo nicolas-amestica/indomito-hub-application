@@ -75,11 +75,16 @@ describe('buildExcelLayout', () => {
           program.pricing.exchange.brlToClp,
         );
         expect(metadataValue(layout.rows, 'Tasa efectiva BRL')).toBe(input.rates.BRL);
+        expect(metadataValue(layout.rows, 'Origen de las tasas')).toBe('Banco Central de Chile');
 
         expect(metadataValue(layout.rows, 'Subtotal CLP')).toBe(calculation.totals.subtotalCLP);
         expect(metadataValue(layout.rows, 'Subtotal USD')).toBe(calculation.totals.subtotalUSD);
         expect(metadataValue(layout.rows, 'Subtotal BRL')).toBe(calculation.totals.subtotalBRL);
         expect(metadataValue(layout.rows, 'Neto')).toBe(calculation.totals.netCLP);
+        expect(metadataValue(layout.rows, 'IVA incluido (19%)')).toBe(calculation.totals.vatCLP);
+        expect(metadataValue(layout.rows, 'Retención tripulación (15,25%)')).toBe(
+          calculation.totals.crewWithholdingCLP,
+        );
         expect(metadataValue(layout.rows, 'Utilidad')).toBe(calculation.totals.utilityCLP);
         expect(metadataValue(layout.rows, 'Recargo')).toBe(calculation.totals.rechargeCLP);
         expect(metadataValue(layout.rows, 'Total programa')).toBe(calculation.totals.totalCLP);
@@ -149,6 +154,7 @@ function programFrom(
         usdToClp: input.rates.USD - input.pricing.usdIncreaseCLP,
         brlToClp: input.rates.BRL - input.pricing.brlIncreaseCLP,
         isFallback: false,
+        source: 'banco-central',
       },
     },
     crews: input.crews.map((crew, index) => ({

@@ -25,6 +25,7 @@ describe('ExchangeRateService', () => {
       usdToClp: 950,
       brlToClp: 178,
       isFallback: false,
+      source: 'banco-central',
     };
     let received: unknown;
 

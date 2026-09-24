@@ -6,6 +6,7 @@ import { ProgressSpinner } from 'primeng/progressspinner';
 
 import { ClpAmountPipe } from '../../../../shared/formatting/clp-amount.pipe';
 import { CHARGE_TYPE_LABELS } from '../../constants/charge-types';
+import { exchangeRateSourceLabel } from '../../formatting/exchange-rate-source';
 import type { EffectiveRates, Program } from '../../interfaces/program.interface';
 import { FallbackRatesNoticeComponent } from '../fallback-rates-notice/fallback-rates-notice.component';
 
@@ -37,4 +38,5 @@ export class PreviewDialogComponent {
   readonly favoriteRequested = output<void>();
 
   protected readonly chargeTypeLabels = CHARGE_TYPE_LABELS;
+  protected readonly exchangeRateSourceLabel = exchangeRateSourceLabel;
 }

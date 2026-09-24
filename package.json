@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "npm run clean && ng serve --no-hmr --port 4300",
+    "clean": "rm -rf .angular/cache",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",

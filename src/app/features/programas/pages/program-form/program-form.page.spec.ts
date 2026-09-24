@@ -186,7 +186,7 @@ describe('ProgramFormPage', () => {
   });
 
   it('muestra el aviso reutilizable cuando las tasas provienen del respaldo', async () => {
-    exchangeResponse$ = of({ ...freshSnapshot(), isFallback: true });
+    exchangeResponse$ = of({ ...freshSnapshot(), isFallback: true, source: 'banco-central' });
     const fixture = TestBed.createComponent(ProgramFormPage);
     await fixture.whenStable();
     const host = fixture.nativeElement as HTMLElement;
@@ -528,6 +528,11 @@ describe('ProgramFormPage', () => {
     };
     expect(content).not.toHaveProperty('totals');
     expect(content.pricing).not.toHaveProperty('exchange');
+    expect(content['rateOrigin']).toEqual({
+      date: '2027-03-01',
+      source: 'banco-central',
+      isFallback: false,
+    });
     expect(notifySuccess).toHaveBeenCalledWith('El favorito se guardó correctamente.');
   });
 
@@ -593,6 +598,7 @@ function freshSnapshot(): ExchangeSnapshot {
     usdToClp: 1_000,
     brlToClp: 200,
     isFallback: false,
+    source: 'banco-central',
   };
 }
 

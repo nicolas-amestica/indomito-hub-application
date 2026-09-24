@@ -62,11 +62,17 @@
     </div>
 
     <div class="flex flex-col gap-4 p-5 sm:p-6">
-      <div class="grid gap-3 sm:grid-cols-3" aria-label="Tipos de cambio usados">
+      <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Tipos de cambio usados">
         <div class="rounded-xl border border-line bg-canvas px-4 py-3">
           <p class="text-xs font-semibold uppercase tracking-wide text-muted">Snapshot</p>
           <p class="mt-1 font-medium text-ink">
             {{ snapshotDate() | date: 'longDate' : 'UTC' }}
+          </p>
+        </div>
+        <div class="rounded-xl border border-line bg-canvas px-4 py-3">
+          <p class="text-xs font-semibold uppercase tracking-wide text-muted">Origen</p>
+          <p class="mt-1 font-semibold text-ink">
+            {{ exchangeRateOriginLabel(snapshotSource(), snapshotIsFallback()) }}
           </p>
         </div>
         <div class="rounded-xl border border-line bg-canvas px-4 py-3">
@@ -81,6 +87,20 @@
             1 BRL = {{ effectiveRates().BRL | clpAmount }} CLP
           </p>
         </div>
+      </div>
+
+      <div
+        class="flex items-center gap-2 rounded-xl border border-brand-active/40 bg-brand-soft px-4 py-3 text-sm text-ink"
+        role="status"
+      >
+        <span
+          class="inline-flex shrink-0 rounded-full bg-ink px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-brand"
+        >
+          IVA incluido
+        </span>
+        <span
+          >Los montos de IVA y retención informados abajo ya están incluidos en los precios.</span
+        >
       </div>
 
       @if (fallbackDate(); as date) {
@@ -279,6 +299,16 @@
         <div class="rounded-lg bg-surface px-3 py-2 shadow-sm">
           <span class="block text-xs text-muted">Neto</span>
           <strong class="tabular-nums text-ink">{{ totals().netCLP | clpAmount }} CLP</strong>
+        </div>
+        <div class="rounded-lg border border-brand-active/30 bg-brand-soft px-3 py-2">
+          <span class="block text-xs text-graphite">IVA incluido (19%)</span>
+          <strong class="tabular-nums text-ink">{{ totals().vatCLP | clpAmount }} CLP</strong>
+        </div>
+        <div class="rounded-lg border border-brand-active/30 bg-brand-soft px-3 py-2">
+          <span class="block text-xs text-graphite">Retención tripulación (15,25%)</span>
+          <strong class="tabular-nums text-ink"
+            >{{ totals().crewWithholdingCLP | clpAmount }} CLP</strong
+          >
         </div>
         <div class="rounded-lg bg-surface px-3 py-2 shadow-sm">
           <span class="block text-xs text-muted">Utilidad</span>

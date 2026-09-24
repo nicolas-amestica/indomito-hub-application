@@ -16,6 +16,7 @@ const snapshot: ExchangeSnapshot = {
   usdToClp: 1_000,
   brlToClp: 200,
   isFallback: false,
+  source: 'banco-central',
 };
 
 describe('PricingPanelComponent', () => {
