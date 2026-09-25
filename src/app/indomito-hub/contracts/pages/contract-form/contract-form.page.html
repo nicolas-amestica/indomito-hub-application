@@ -1,10 +1,10 @@
-<div class="mx-auto max-w-[1500px] px-4 py-8 sm:px-8">
+<div class="mx-auto max-w-375 px-4 py-8 sm:px-8">
   <header class="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
     <div>
       <p class="text-xs font-bold uppercase tracking-[.2em] text-brand-active">Contratos</p>
       <h1 class="mt-2 text-3xl font-semibold text-ink">Contrato de prestación de servicios</h1>
       <p class="mt-2 max-w-3xl text-sm text-black/55">
-        Importa la ficha del cliente y selecciona opcionalmente un programa. Los totales se
+        Importa la ficha del cliente y selecciona un programa. Los totales se
         recalculan automáticamente hasta que el contrato sea aprobado.
       </p>
     </div>
@@ -266,9 +266,9 @@
               class="w-full"
               placeholder="Descripción del servicio incluido"
             />
-            ><button pButton type="button" severity="danger" text (click)="remove(services, i)">
+            <p-button pButton type="button" severity="danger" text (click)="remove(services, i)">
               Quitar
-            </button>
+            </p-button>
           </div>
         }
       </div>
