@@ -22,6 +22,11 @@ export const rutValidator: ValidatorFn = (control: AbstractControl): ValidationE
 export const birthDateValidator: ValidatorFn = (
   control: AbstractControl,
 ): ValidationErrors | null => {
+  if (control.value instanceof Date) {
+    return control.value.getFullYear() >= 1920 && control.value <= new Date()
+      ? null
+      : { birthDate: true };
+  }
   const raw = String(control.value ?? '').trim();
   if (raw === '') return null;
   const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw);

@@ -5,7 +5,12 @@ import { ContractExcelImporter } from './contract-excel.importer';
 describe('ContractExcelImporter', () => {
   it('importa la plantilla aunque existan filas vacías entre sus secciones', async () => {
     const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(await new ContractTemplateService().build());
+    await workbook.xlsx.load(
+      await new ContractTemplateService().build([
+        { code: 'CL', name: 'Chile' },
+        { code: 'AR', name: 'Argentina' },
+      ]),
+    );
     const sheet = workbook.getWorksheet('Contrato');
     expect(sheet).toBeDefined();
     sheet!.getCell('B5').value = 'Colegio San Francisco';
@@ -41,7 +46,7 @@ describe('ContractExcelImporter', () => {
         lastNames: 'Améstica Vidal',
         dni: '16663901-8',
         birthDate: '1988-02-11',
-        nationality: 'Chilena',
+        nationality: 'Chile',
         sex: 'FEMALE',
       },
     ]);

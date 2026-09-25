@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import type ExcelJS from 'exceljs';
+import type { ContractCountryOption } from '../interfaces/contract.interface';
 
 const PASSENGER_CAPACITY = 200;
 const PERSON_CAPACITY = 8;
@@ -7,8 +8,8 @@ const SHEET_PASSWORD = 'indomito-template';
 
 @Injectable({ providedIn: 'root' })
 export class ContractTemplateService {
-  async download(): Promise<void> {
-    const buffer = await this.build();
+  async download(countries: ContractCountryOption[]): Promise<void> {
+    const buffer = await this.build(countries);
     const blob = new Blob([buffer as BlobPart], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
@@ -20,12 +21,18 @@ export class ContractTemplateService {
     URL.revokeObjectURL(url);
   }
 
-  async build(): Promise<ExcelJS.Buffer> {
+  async build(countries: ContractCountryOption[]): Promise<ExcelJS.Buffer> {
     const { default: ExcelJSRuntime } = await import('exceljs');
     const workbook = new ExcelJSRuntime.Workbook();
     workbook.creator = 'Giras Indómito';
     workbook.title = 'Plantilla de creación de contrato';
     workbook.created = new Date();
+    const lists = workbook.addWorksheet('_listas', { state: 'veryHidden' });
+    lists.getCell('A1').value = 'Países';
+    countries.forEach((country, index) => {
+      lists.getCell(index + 2, 1).value = country.name;
+    });
+    await lists.protect(SHEET_PASSWORD, {});
     const sheet = workbook.addWorksheet('Contrato', {
       views: [{ state: 'frozen', ySplit: 4, showGridLines: false }],
     });
@@ -109,7 +116,7 @@ export class ContractTemplateService {
       sheet.getCell(row, 5).dataValidation = {
         type: 'list',
         allowBlank: true,
-        formulae: ['"Chilena,Argentina,Brasileña,Otra"'],
+        formulae: [`'_listas'!$A$2:$A$${countries.length + 1}`],
         showErrorMessage: true,
         errorStyle: 'stop',
         errorTitle: 'Nacionalidad inválida',

@@ -80,11 +80,15 @@ export const MiStore = signalStore(
 
 ## PrimeNG y Estilos
 
-- Preferir PrimeNG ^21.1.1 sobre HTML puro
-- Excepcion: HTML + TailwindCSS si PrimeNG no aplica
-- PROHIBIDO CSS/SCSS propios o `<style>` en componentes
-- Solo utilidades TailwindCSS + clases/props PrimeNG
-- Temas: `@primeng/themes` + `tailwindcss-primeui`
+- Usar el componente o la directiva PrimeNG disponible para cada control interactivo; por ejemplo, `pInputText`, `p-select`, `p-datepicker`, `p-inputnumber`, `pButton` y `p-fileupload`.
+- Usar HTML semántico nativo únicamente para estructura o cuando PrimeNG no tenga un equivalente aplicable.
+- Usar TailwindCSS para layout, espaciado, responsividad y composición externa. No recrear con utilidades la apariencia interna de un componente PrimeNG.
+- PROHIBIDO CSS/SCSS propio o `<style>` en componentes.
+- PROHIBIDO agregar selectores globales para `input`, `select`, `textarea`, `button` o elementos internos `.p-*` con el fin de corregir una pantalla.
+- No colocar clases tipográficas heredables como `uppercase`, `font-*`, `text-*` o `tracking-*` en un `label` o contenedor que envuelva un componente PrimeNG. Separar el texto de la etiqueta en un elemento hermano.
+- Los cambios en `providePrimeNG`, el preset de `@primeng/themes`, `cssLayer` o tokens de componentes son cambios globales del sistema de diseño: deben justificarse, probarse con las pantallas existentes y acompañarse de `ng build`.
+- Mantener el orden oficial de capas CSS compatible con Tailwind y PrimeNG definido por el proyecto. No modificarlo desde una feature.
+- Temas: `@primeng/themes` + `tailwindcss-primeui`.
 
 ## Servicios HTTP
 
@@ -122,7 +126,10 @@ export const MiStore = signalStore(
 | `*ngIf/*ngFor/*ngSwitch` en codigo nuevo       | `@if`, `@for`, `@switch`                      |
 | Efectos sin `finalize` o sin `catchError`      | Siempre incluir ambos                         |
 | Funciones > 75 lineas                          | Extraer helpers                               |
-| CSS/SCSS personalizados                        | TailwindCSS + PrimeNG                         |
+| CSS/SCSS personalizados                        | TailwindCSS para layout + PrimeNG para controles |
+| Control HTML artesanal con equivalente PrimeNG | Componente o directiva PrimeNG correspondiente   |
+| Tipografía heredable en wrapper PrimeNG        | Etiqueta separada sin herencia sobre el control  |
+| Override global para corregir una sola página  | Props PrimeNG y utilidades locales de layout      |
 | `subscribe()` sin `takeUntilDestroyed()`       | Agregar `takeUntilDestroyed()` en constructor |
 | Acceso directo a `sessionStorage/localStorage` | Usar `BrowserStorageService`                  |
 | `any` en superficies publicas                  | Definir interfaces tipadas                    |

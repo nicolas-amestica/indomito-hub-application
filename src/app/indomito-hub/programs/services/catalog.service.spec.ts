@@ -31,7 +31,6 @@ describe('CatalogService', () => {
           budgetTemplateId: 'brochure-default',
         },
       ],
-      settings: {},
     };
     let received: unknown;
 

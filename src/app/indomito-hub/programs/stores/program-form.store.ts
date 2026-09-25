@@ -98,7 +98,7 @@ export class ProgramFormStore {
   readonly visibleRows = computed(() => filterRows(this.rows(), this.searchTerm()));
 
   readonly belowUtilityFloor = computed(() => {
-    const floor = this.catalogs.settings()?.margin?.minUtilityRate;
+    const floor = this.catalogs.minUtilityRate();
     const selected = this.pricingState().utilityRate;
     return floor !== undefined && selected !== null && selected < floor;
   });
@@ -116,7 +116,7 @@ export class ProgramFormStore {
     // El catálogo es un origen asíncrono y FormGroup una API imperativa: este
     // effect es el borde que sincroniza ambos una sola vez por respuesta.
     effect(() => {
-      if (this.catalogs.catalogs() === null) return;
+      if (this.catalogs.catalogs() === null || this.catalogs.configuration() === null) return;
       this.catalogs.applyDefaults(this.form);
       this.generalsState.set(this.form.controls.generals.getRawValue());
       this.pricingState.set(this.form.controls.pricing.getRawValue());

@@ -17,7 +17,7 @@ export interface DestinationOption extends CatalogOption {
   budgetTemplateId: string;
 }
 
-/** Valores por defecto de margen y piso de política, servidos por el catálogo. */
+/** Valores de margen reutilizados por la configuración del formulario. */
 export interface MarginDefaults {
   usdIncreaseCLP: number;
   brlIncreaseCLP: number;
@@ -26,15 +26,10 @@ export interface MarginDefaults {
   minUtilityRate: number;
 }
 
-/**
- * Parámetros de política de empresa que acompañan a los catálogos. Su ausencia
- * activa los respaldos definidos para cada precarga.
- */
+/** Combinación opcional usada por generadores y pruebas de precarga. */
 export interface CatalogSettings {
-  /** Plan que se preselecciona cuando el catálogo termina de cargar. */
   defaultPlanId?: string;
   margin?: MarginDefaults;
-  /** Desplazamientos de pasajeros del presupuesto. Por defecto [-10, -5, 0, 5]. */
   scenarioOffsets?: number[];
 }
 
@@ -43,5 +38,4 @@ export interface CatalogResponse {
   plans: CatalogOption[];
   seasons: CatalogOption[];
   destinations: DestinationOption[];
-  settings: CatalogSettings;
 }

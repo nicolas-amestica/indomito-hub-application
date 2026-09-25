@@ -19,6 +19,26 @@ export interface ContractProgramReference {
   updatedAt: string;
   content: Record<string, unknown>;
 }
+export interface ContractCountryOption {
+  code: string;
+  name: string;
+}
+export interface ContractBankAccountOption {
+  id: string;
+  label: string;
+  accountNumber: string;
+  accountHolder: string;
+  holderDNI: string;
+  bank: string;
+  accountType: string;
+  email: string;
+}
+export interface ContractFormConfiguration {
+  companyRepresentatives: ContractPerson[];
+  bankAccounts: ContractBankAccountOption[];
+  defaults: { daysBeforePayment: number; specialProgramDeposit: number };
+  countries: ContractCountryOption[];
+}
 export interface ContractContent {
   representatives: ContractPerson[];
   institution: { name: string; address: string; course: string };

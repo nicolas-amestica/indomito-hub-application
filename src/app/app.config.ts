@@ -45,6 +45,10 @@ export const appConfig: ApplicationConfig = {
         preset: IndomitoPreset,
         options: {
           darkModeSelector: false,
+          cssLayer: {
+            name: 'primeng',
+            order: 'theme, base, primeng',
+          },
         },
       },
     }),

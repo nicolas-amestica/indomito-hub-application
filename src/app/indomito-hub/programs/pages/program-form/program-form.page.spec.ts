@@ -14,11 +14,13 @@ import { NotificationService } from '../../../../core/notifications/notification
 import { ExcelExporter } from '../../exporters/excel-exporter';
 import { EXCEL_DETAIL_HEADERS, type ExcelLayout } from '../../exporters/excel-layout';
 import type { CatalogResponse } from '../../interfaces/catalog.interface';
+import type { ProgramFormConfiguration } from '../../interfaces/program-form-configuration.interface';
 import type { Favorite } from '../../interfaces/favorite.interface';
 import type { ExchangeSnapshot } from '../../interfaces/program.interface';
 import type { BudgetRequest } from '../../interfaces/program.interface';
 import { BudgetPdfService } from '../../services/budget-pdf.service';
 import { CatalogService } from '../../services/catalog.service';
+import { ProgramFormConfigurationService } from '../../services/program-form-configuration.service';
 import { ExchangeRateService } from '../../services/exchange-rate.service';
 import { FavoritesService } from '../../services/favorites.service';
 import { ProgramFormStore } from '../../stores/program-form.store';
@@ -29,6 +31,8 @@ describe('ProgramFormPage', () => {
   let catalogResponse$: Observable<CatalogResponse>;
   let getSnapshot: ReturnType<typeof vi.fn>;
   let getCatalogs: ReturnType<typeof vi.fn>;
+  let getFormConfiguration: ReturnType<typeof vi.fn>;
+  let formConfiguration: ProgramFormConfiguration;
   let exportExcelFile: ReturnType<typeof vi.fn>;
   let generateBudgetPdf: ReturnType<typeof vi.fn>;
   let downloadBudgetPdf: ReturnType<typeof vi.fn>;
@@ -45,6 +49,8 @@ describe('ProgramFormPage', () => {
     catalogResponse$ = NEVER;
     getSnapshot = vi.fn(() => exchangeResponse$);
     getCatalogs = vi.fn(() => catalogResponse$);
+    formConfiguration = defaultFormConfiguration();
+    getFormConfiguration = vi.fn(() => of(formConfiguration));
     exportExcelFile = vi.fn().mockResolvedValue(undefined);
     generateBudgetPdf = vi.fn(() => of(new Blob([], { type: 'application/pdf' })));
     downloadBudgetPdf = vi.fn();
@@ -62,6 +68,7 @@ describe('ProgramFormPage', () => {
         provideNoopAnimations(),
         MessageService,
         { provide: CatalogService, useValue: { getCatalogs } },
+        { provide: ProgramFormConfigurationService, useValue: { get: getFormConfiguration } },
         { provide: ExchangeRateService, useValue: { getSnapshot } },
         { provide: ExcelExporter, useValue: { export: exportExcelFile } },
         {
@@ -98,8 +105,8 @@ describe('ProgramFormPage', () => {
     await fixture.whenStable();
     const host = fixture.nativeElement as HTMLElement;
 
-    expect(host.querySelector('h1')?.textContent?.trim()).toBe('Programa');
-    expect(host.querySelector('header p')?.textContent?.trim()).toBe(
+    expect(host.querySelector('h1')?.textContent?.trim()).toBe('Crear Programa');
+    expect(host.querySelectorAll('header p')[1]?.textContent?.trim()).toBe(
       'Completa el formulario para crear un nuevo programa de viajes.',
     );
   });
@@ -400,8 +407,8 @@ describe('ProgramFormPage', () => {
     exchangeResponse$ = of(freshSnapshot());
     catalogResponse$ = of({
       ...emptyCatalog(),
-      settings: { scenarioOffsets: [-10, 0, 5] },
     });
+    formConfiguration = { ...defaultFormConfiguration(), scenarioOffsets: [-10, 0, 5] };
     const pdf = new Blob(['presupuesto'], { type: 'application/pdf' });
     generateBudgetPdf.mockReturnValueOnce(of(pdf));
     const fixture = TestBed.createComponent(ProgramFormPage);
@@ -608,7 +615,7 @@ function freshSnapshot(): ExchangeSnapshot {
 }
 
 function emptyCatalog(): CatalogResponse {
-  return { plans: [], seasons: [], destinations: [], settings: {} };
+  return { plans: [], seasons: [], destinations: [] };
 }
 
 function catalogWithOptions(): CatalogResponse {
@@ -623,7 +630,22 @@ function catalogWithOptions(): CatalogResponse {
         budgetTemplateId: 'brochure-default',
       },
     ],
-    settings: {},
+  };
+}
+
+function defaultFormConfiguration(): ProgramFormConfiguration {
+  return {
+    defaults: {
+      generals: { defaultPlanId: 'plan-1' },
+      pricing: {
+        usdIncreaseCLP: 60,
+        brlIncreaseCLP: 40,
+        utilityRate: 20,
+        rechargeRate: 5,
+      },
+    },
+    policy: { minUtilityRate: 10 },
+    scenarioOffsets: [-10, -5, 0, 5],
   };
 }
 

@@ -54,7 +54,7 @@ export class ContractExcelImporter {
         lastNames: this.pick(row, ['apellidos']),
         dni: this.pick(row, ['rut']),
         birthDate: this.date(this.pick(row, ['fechanacimiento'])),
-        nationality: this.pick(row, ['nacionalidad']),
+        nationality: this.country(this.pick(row, ['nacionalidad'])),
         sex: this.sex(this.pick(row, ['sexo'])),
       }))
       .filter((row) => Object.values(row).some(Boolean));
@@ -149,6 +149,17 @@ export class ContractExcelImporter {
     if (normalized === 'otro') return 'OTHER';
     if (normalized === 'prefierenoindicar') return 'NOT_SPECIFIED';
     return '' as ContractPassengerSex;
+  }
+  private country(value: string): string {
+    const aliases: Record<string, string> = {
+      chilena: 'Chile',
+      chileno: 'Chile',
+      argentina: 'Argentina',
+      argentino: 'Argentina',
+      brasilena: 'Brasil',
+      brasileno: 'Brasil',
+    };
+    return aliases[normalize(value)] ?? value;
   }
   private date(value: string): string {
     if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;

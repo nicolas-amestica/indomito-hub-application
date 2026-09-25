@@ -2,7 +2,12 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '
 import { ReactiveFormsModule, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { finalize, merge } from 'rxjs';
+import { distinctUntilChanged, finalize, forkJoin, merge, skip } from 'rxjs';
+import { ButtonDirective } from 'primeng/button';
+import { DatePicker } from 'primeng/datepicker';
+import { FileUpload } from 'primeng/fileupload';
+import { InputNumber } from 'primeng/inputnumber';
+import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { ContractExcelImporter } from '../../importers/contract-excel.importer';
@@ -16,9 +21,11 @@ import { ExchangeRateService } from '../../../programs/services/exchange-rate.se
 import { FavoritesService } from '../../../programs/services/favorites.service';
 import { calculateContractPayments } from '../../fn/calculate-contract-payments';
 import { birthDateValidator, rutValidator } from '../../fn/contract-validators';
+import { CONTRACT_MONTHS, CONTRACT_SEX_OPTIONS } from '../../constants/contract-options';
 import type {
   Contract,
   ContractContent,
+  ContractFormConfiguration,
   ContractProgramReference,
   ContractStatus,
 } from '../../interfaces/contract.interface';
@@ -27,47 +34,16 @@ import { ContractTemplateService } from '../../services/contract-template.servic
 
 @Component({
   selector: 'app-contract-form-page',
-  imports: [ReactiveFormsModule, Select],
-  templateUrl: './contract-form.page.html',
-  styles: [
-    `
-      .field {
-        display: flex;
-        flex-direction: column;
-        gap: 0.45rem;
-        color: rgb(23 32 51 / 0.72);
-        font-size: 0.78rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-      }
-      input,
-      select,
-      textarea {
-        border: 1px solid rgb(0 0 0 / 0.14);
-        border-radius: 0.7rem;
-        background: white;
-        padding: 0.7rem 0.8rem;
-        color: #172033;
-        font-size: 0.9rem;
-        font-weight: 400;
-        text-transform: none;
-        letter-spacing: normal;
-      }
-      input:focus,
-      select:focus,
-      textarea:focus {
-        outline: 2px solid rgb(20 184 166 / 0.25);
-        border-color: #0f766e;
-      }
-      input:disabled,
-      select:disabled,
-      textarea:disabled {
-        background: #f3f4f6;
-        color: #6b7280;
-      }
-    `,
+  imports: [
+    ButtonDirective,
+    DatePicker,
+    FileUpload,
+    InputNumber,
+    InputText,
+    ReactiveFormsModule,
+    Select,
   ],
+  templateUrl: './contract-form.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContractFormPage {
@@ -88,70 +64,89 @@ export class ContractFormPage {
   protected readonly locked = signal(false);
   protected readonly programs = signal<Favorite[]>([]);
   protected readonly programsLoading = signal(false);
+  protected readonly configuration = signal<ContractFormConfiguration | null>(null);
+  protected readonly months = CONTRACT_MONTHS;
+  protected readonly sexOptions = CONTRACT_SEX_OPTIONS;
+  protected readonly statusOptions: Array<{ label: string; value: ContractStatus }> = [
+    { label: 'Borrador', value: 'DRAFT' },
+    { label: 'Pendiente de aprobación', value: 'PENDING_APPROVAL' },
+    { label: 'Aprobado', value: 'APPROVED' },
+    { label: 'Rechazado', value: 'REJECTED' },
+    { label: 'Cancelado', value: 'CANCELLED' },
+  ];
+  protected readonly maxBirthDate = new Date();
   private readonly exchangeSnapshot = signal<ExchangeSnapshot | null>(null);
   private readonly programReference = signal<ContractProgramReference | null>(null);
 
   protected readonly form = this.fb.group({
-    programId: [''],
-    period: [new Date().toISOString().slice(0, 7)],
-    status: ['DRAFT' as ContractStatus],
+    programId: ['', Validators.required],
+    period: this.fb.control(new Date(new Date().getFullYear(), new Date().getMonth(), 1), {
+      nonNullable: true,
+      validators: Validators.required,
+    }),
+    status: ['DRAFT' as ContractStatus, Validators.required],
     representatives: this.fb.array([this.personGroup()]),
-    institution: this.fb.group({ name: [''], address: [''], course: [''] }),
+    institution: this.fb.group({
+      name: ['', Validators.required],
+      address: ['', Validators.required],
+      course: ['', Validators.required],
+    }),
     clientRepresentatives: this.fb.array([this.personGroup()]),
     trip: this.fb.group({
-      city: [''],
-      contractDate: [''],
-      destination: [''],
-      departureDate: [''],
-      returnDate: [''],
-      days: [0],
-      nights: [0],
-      departurePoint: [''],
+      city: ['', Validators.required],
+      contractDate: [null as Date | null, Validators.required],
+      destination: ['', Validators.required],
+      travelRange: this.fb.control<Date[] | null>(null, Validators.required),
+      days: [0, [Validators.required, Validators.min(1)]],
+      nights: [0, [Validators.required, Validators.min(0)]],
+      departurePoint: ['', Validators.required],
     }),
     plan: this.fb.group({
-      name: [''],
-      servicesIncluded: this.fb.array([this.fb.group({ description: [''] })]),
+      name: ['', Validators.required],
+      servicesIncluded: this.fb.array([this.serviceGroup()]),
     }),
     payments: this.fb.group({
-      totalPassengers: [{ value: 0, disabled: true }],
-      freePassengers: [0],
-      pricePerPerson: [0],
-      totalGroup: [{ value: 0, disabled: true }],
-      downPayment: [0],
-      groupBalance: [{ value: 0, disabled: true }],
-      daysBeforePayment: [0],
-      maxExchangeRate: [0],
+      totalPassengers: [{ value: 0, disabled: true }, Validators.required],
+      freePassengers: [0, [Validators.required, Validators.min(0)]],
+      pricePerPerson: [0, [Validators.required, Validators.min(1)]],
+      totalGroup: [{ value: 0, disabled: true }, Validators.required],
+      downPayment: [0, [Validators.required, Validators.min(0)]],
+      groupBalance: [{ value: 0, disabled: true }, Validators.required],
+      daysBeforePayment: [10, [Validators.required, Validators.min(0)]],
+      maxExchangeRate: [0, [Validators.required, Validators.min(1)]],
+      bankAccountId: ['', Validators.required],
       installments: this.fb.group({
-        quantity: [0],
-        groupInstallmentValue: [{ value: 0, disabled: true }],
-        individualInstallmentValue: [{ value: 0, disabled: true }],
-        startMonth: [''],
+        quantity: [0, [Validators.required, Validators.min(1)]],
+        groupInstallmentValue: [{ value: 0, disabled: true }, Validators.required],
+        individualInstallmentValue: [{ value: 0, disabled: true }, Validators.required],
+        startMonth: ['', Validators.required],
       }),
       conditions: this.fb.group({
-        depositPercentageWithFlight: [65],
-        depositPercentageWithoutFlight: [20],
-        specialProgramDeposit: [0],
-        daysBeforeFlightBalance: [30],
-        daysBeforeTerrestrialBalance: [10],
-        cancellationPenaltyPercentage: [25],
-        cancellationNoticeDays: [35],
-        complaintDeadlineDays: [30],
+        depositPercentageWithFlight: [65, Validators.required],
+        depositPercentageWithoutFlight: [20, Validators.required],
+        specialProgramDeposit: [100000, Validators.required],
+        daysBeforeFlightBalance: [30, Validators.required],
+        daysBeforeTerrestrialBalance: [10, Validators.required],
+        cancellationPenaltyPercentage: [25, Validators.required],
+        cancellationNoticeDays: [35, Validators.required],
+        complaintDeadlineDays: [30, Validators.required],
       }),
       bankAccount: this.fb.group({
-        accountNumber: [''],
-        accountHolder: [''],
-        holderDNI: [''],
-        bank: [''],
-        email: [''],
+        accountNumber: ['', Validators.required],
+        accountHolder: ['', Validators.required],
+        holderDNI: ['', [Validators.required, rutValidator]],
+        bank: ['', Validators.required],
+        email: ['', [Validators.required, Validators.email]],
       }),
     }),
     passengers: this.fb.array([this.passengerGroup()]),
   });
 
   constructor() {
-    this.loadPrograms();
     this.setupPaymentCalculation();
+    this.setupDependentFields();
     const id = this.route.snapshot.paramMap.get('id');
+    this.loadInitialData(id !== null);
     if (id) this.load(id);
   }
 
@@ -168,16 +163,45 @@ export class ContractFormPage {
     return this.form.controls.plan.controls.servicesIncluded;
   }
   protected addRepresentative(client = false): void {
-    (client ? this.clientRepresentatives : this.representatives).push(this.personGroup());
+    (client ? this.clientRepresentatives : this.representatives).push(
+      this.personGroup({
+        course: client ? (this.form.controls.institution.controls.course.value ?? '') : '',
+      }),
+    );
   }
   protected addPassenger(): void {
     this.passengers.push(this.passengerGroup());
   }
   protected addService(): void {
-    this.services.push(this.fb.group({ description: [''] }));
+    this.services.push(this.serviceGroup());
   }
   protected remove(array: FormArray, index: number): void {
     if (array.length > 1) array.removeAt(index);
+  }
+
+  protected selectBank(bankId: string | null): void {
+    const bank = this.configuration()?.bankAccounts.find(({ id }) => id === bankId);
+    if (!bank) {
+      this.form.controls.payments.controls.bankAccount.reset();
+      return;
+    }
+    this.form.controls.payments.controls.bankAccount.setValue({
+      accountNumber: bank.accountNumber,
+      accountHolder: bank.accountHolder,
+      holderDNI: bank.holderDNI,
+      bank: `${bank.bank} · Cuenta ${bank.accountType}`,
+      email: bank.email,
+    });
+  }
+
+  protected selectTravelStart(): void {
+    const control = this.form.controls.trip.controls.travelRange;
+    const start = control.value?.[0];
+    const days = this.form.controls.trip.controls.days.value ?? 0;
+    if (!(start instanceof Date) || days < 1) return;
+    const end = new Date(start);
+    end.setDate(end.getDate() + days - 1);
+    control.setValue([start, end], { emitEvent: false });
   }
 
   protected selectProgram(programId: string | null): void {
@@ -221,14 +245,12 @@ export class ContractFormPage {
       },
     });
     this.replaceArray(this.services, content.services, (service) =>
-      this.fb.group({ description: [service.name] }),
+      this.serviceGroup(service.name),
     );
     this.recalculatePayments();
   }
 
-  protected async importExcel(event: Event): Promise<void> {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
+  protected async importExcel(file: File | undefined, uploader: FileUpload): Promise<void> {
     if (!file || this.locked()) return;
     this.importing.set(true);
     try {
@@ -239,6 +261,7 @@ export class ContractFormPage {
         this.replaceArray(this.clientRepresentatives, patch.clientRepresentatives, (value) =>
           this.personGroup(value),
         );
+      this.syncClientCourse();
       this.replaceArray(this.passengers, patch.passengers, (value) => this.passengerGroup(value));
       this.recalculatePayments();
       this.notifications.success(
@@ -250,7 +273,7 @@ export class ContractFormPage {
       );
     } finally {
       this.importing.set(false);
-      input.value = '';
+      uploader.clear();
     }
   }
 
@@ -268,7 +291,7 @@ export class ContractFormPage {
       ? this.api.update(id, {
           programId: this.form.controls.programId.value || undefined,
           programReference: this.programReference() ?? undefined,
-          period: this.form.controls.period.value ?? '',
+          period: this.periodValue(this.form.controls.period.value),
           status: this.form.controls.status.value ?? 'DRAFT',
           content,
           version: this.version(),
@@ -276,7 +299,7 @@ export class ContractFormPage {
       : this.api.create({
           programId: this.form.controls.programId.value || undefined,
           programReference: this.programReference() ?? undefined,
-          period: this.form.controls.period.value || undefined,
+          period: this.periodValue(this.form.controls.period.value),
           content,
         });
     request$
@@ -331,14 +354,20 @@ export class ContractFormPage {
     this.programReference.set(contract.programReference ?? null);
     this.form.patchValue({
       programId: contract.programId ?? '',
-      period: contract.period,
+      period: this.periodObject(contract.period),
       status: contract.status,
       institution: contract.content.institution,
       trip: {
-        ...contract.content.trip,
-        contractDate: this.dateInput(contract.content.trip.contractDate),
-        departureDate: this.dateInput(contract.content.trip.departureDate),
-        returnDate: this.dateInput(contract.content.trip.returnDate),
+        city: contract.content.trip.city,
+        contractDate: this.dateObject(contract.content.trip.contractDate),
+        destination: contract.content.trip.destination,
+        travelRange: [
+          this.dateObject(contract.content.trip.departureDate)!,
+          this.dateObject(contract.content.trip.returnDate)!,
+        ],
+        days: contract.content.trip.days,
+        nights: contract.content.trip.nights,
+        departurePoint: contract.content.trip.departurePoint,
       },
       plan: { name: contract.content.plan.name },
       payments: contract.content.payments,
@@ -350,33 +379,45 @@ export class ContractFormPage {
       this.personGroup(value),
     );
     this.replaceArray(this.services, contract.content.plan.servicesIncluded, (value) =>
-      this.fb.group({ description: [value.description] }),
+      this.serviceGroup(value.description),
     );
     this.replaceArray(this.passengers, contract.content.passengers, (value) =>
       this.passengerGroup(value),
     );
     this.recalculatePayments();
+    this.syncBankSelection(contract.content.payments.bankAccount);
     if (this.locked()) this.form.disable();
   }
   private content(): ContractContent {
     const raw = this.form.getRawValue();
+    const [departureDate, returnDate] = raw.trip.travelRange ?? [];
+    const { travelRange: _, ...trip } = raw.trip;
+    const { bankAccountId: __, ...payments } = raw.payments;
     return {
       representatives: raw.representatives,
       institution: raw.institution,
       clientRepresentatives: raw.clientRepresentatives,
-      trip: raw.trip,
+      trip: {
+        ...trip,
+        contractDate: this.dateValue(raw.trip.contractDate),
+        departureDate: this.dateValue(departureDate),
+        returnDate: this.dateValue(returnDate),
+      },
       plan: raw.plan,
-      payments: raw.payments,
-      passengers: raw.passengers,
+      payments,
+      passengers: raw.passengers.map((passenger) => ({
+        ...passenger,
+        birthDate: this.dateValue(passenger['birthDate']),
+      })),
     } as ContractContent;
   }
   private personGroup(
     value: Partial<{ name: string; dni: string; course: string }> = {},
   ): FormGroup {
     return this.fb.group({
-      name: [value.name ?? ''],
-      dni: [value.dni ?? '', rutValidator],
-      course: [value.course ?? ''],
+      name: [value.name ?? '', Validators.required],
+      dni: [value.dni ?? '', [Validators.required, rutValidator]],
+      course: [value.course ?? '', Validators.required],
     });
   }
   private passengerGroup(
@@ -386,7 +427,7 @@ export class ContractFormPage {
       names: [value.names, Validators.required],
       lastNames: [value.lastNames, Validators.required],
       dni: [value.dni, [Validators.required, rutValidator]],
-      birthDate: [this.dateInput(value.birthDate), [Validators.required, birthDateValidator]],
+      birthDate: [this.dateObject(value.birthDate), [Validators.required, birthDateValidator]],
       nationality: [value.nationality, Validators.required],
       sex: [value.sex, Validators.required],
     });
@@ -397,27 +438,102 @@ export class ContractFormPage {
     if (array.length === 0) array.push(build({} as T));
   }
 
-  private dateInput(value: string): string {
-    const match = /^(\d{4}-\d{2}-\d{2})/.exec(value ?? '');
-    return match?.[1] ?? '';
+  private serviceGroup(description = ''): FormGroup {
+    return this.fb.group({ description: [description, Validators.required] });
   }
 
-  private loadPrograms(): void {
+  private dateObject(value: string | Date | null | undefined): Date | null {
+    if (value instanceof Date) return value;
+    const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value ?? '');
+    return match ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3])) : null;
+  }
+
+  private dateValue(value: unknown): string {
+    if (!(value instanceof Date)) return '';
+    const year = value.getFullYear();
+    const month = String(value.getMonth() + 1).padStart(2, '0');
+    const day = String(value.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private periodObject(value: string): Date {
+    const match = /^(\d{4})-(\d{2})/.exec(value);
+    return match
+      ? new Date(Number(match[1]), Number(match[2]) - 1, 1)
+      : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  }
+
+  private periodValue(value: Date): string {
+    return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  private loadInitialData(editing: boolean): void {
     this.programsLoading.set(true);
-    this.favoritesApi
-      .list('programa')
+    forkJoin({
+      programs: this.favoritesApi.list('programa'),
+      exchange: this.exchangeRateApi.getSnapshot(),
+      configuration: this.api.getConfiguration('CTX'),
+    })
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.programsLoading.set(false)),
       )
       .subscribe({
-        next: (programs) => this.programs.set(programs),
-        error: () => this.programs.set([]),
+        next: ({ programs, exchange, configuration }) => {
+          this.programs.set(programs);
+          this.exchangeSnapshot.set(exchange);
+          this.configuration.set(configuration);
+          if (!editing) this.applyInitialConfiguration(configuration);
+          else
+            this.syncBankSelection(this.form.controls.payments.controls.bankAccount.getRawValue());
+        },
+        error: () => {
+          this.programs.set([]);
+          this.notifications.error('No se pudo cargar la configuración inicial del contrato.');
+        },
       });
-    this.exchangeRateApi
-      .getSnapshot()
+  }
+
+  private applyInitialConfiguration(configuration: ContractFormConfiguration): void {
+    this.replaceArray(this.representatives, configuration.companyRepresentatives, (value) =>
+      this.personGroup({ ...value, course: value.course || 'Representante legal' }),
+    );
+    const firstBank = configuration.bankAccounts[0];
+    this.form.controls.payments.patchValue({
+      daysBeforePayment: configuration.defaults.daysBeforePayment,
+      conditions: { specialProgramDeposit: configuration.defaults.specialProgramDeposit },
+      bankAccountId: firstBank?.id ?? '',
+    });
+    this.selectBank(firstBank?.id ?? null);
+  }
+
+  private setupDependentFields(): void {
+    this.form.controls.institution.controls.course.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ next: (snapshot) => this.exchangeSnapshot.set(snapshot) });
+      .subscribe(() => this.syncClientCourse());
+    this.form.controls.trip.controls.days.valueChanges
+      .pipe(skip(1), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.form.controls.trip.controls.travelRange.reset());
+  }
+
+  private syncClientCourse(): void {
+    const course = this.form.controls.institution.controls.course.value ?? '';
+    for (const representative of this.clientRepresentatives.controls) {
+      representative.get('course')?.setValue(course);
+    }
+  }
+
+  private syncBankSelection(account: {
+    accountNumber?: string | null;
+    accountHolder?: string | null;
+    holderDNI?: string | null;
+    bank?: string | null;
+    email?: string | null;
+  }): void {
+    const bank = this.configuration()?.bankAccounts.find(
+      ({ accountNumber }) => accountNumber === account.accountNumber,
+    );
+    if (bank) this.form.controls.payments.controls.bankAccountId.setValue(bank.id);
   }
 
   private setupPaymentCalculation(): void {

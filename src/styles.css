@@ -35,10 +35,6 @@
     background: var(--color-brand);
     color: var(--color-ink);
   }
-  :focus-visible {
-    outline: 2px solid var(--color-graphite);
-    outline-offset: 3px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -79,7 +75,9 @@
     height: 2.25rem;
     place-items: center;
     border-radius: 0.75rem;
-    transition: background-color 160ms ease, transform 160ms ease;
+    transition:
+      background-color 160ms ease,
+      transform 160ms ease;
   }
   .iam-action:hover {
     background: rgb(28 28 28 / 0.07);

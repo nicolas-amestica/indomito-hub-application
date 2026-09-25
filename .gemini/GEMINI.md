@@ -52,6 +52,10 @@
 
 ## Arquitectura Frontend — Features Angular
 
+- Todo código de interfaz debe usar componentes PrimeNG y utilidades Tailwind CSS conforme a sus documentaciones oficiales. No incorporar otras librerías de componentes, CSS/SCSS personalizado ni implementaciones artesanales cuando PrimeNG provea el componente; reservar el HTML semántico nativo para estructura y casos sin equivalente en PrimeNG.
+- En formularios, usar siempre el componente o directiva PrimeNG correspondiente (`pInputText`, `p-select`, `p-datepicker`, `p-inputnumber`, `pButton`, `p-fileupload`, etc.). Tailwind se limita a layout, espaciado y composición externa; no debe reconstruir la apariencia interna de controles PrimeNG.
+- No aplicar en contenedores de componentes PrimeNG clases tipográficas heredables que alteren su contenido (`uppercase`, `font-*`, `text-*`, `tracking-*`, entre otras). El texto de la etiqueta debe estilizarse en un elemento hermano independiente cuando sea necesario.
+- No agregar selectores CSS globales sobre elementos de formulario ni sobrescribir tokens globales de componentes PrimeNG para resolver una pantalla puntual. Un cambio al preset o al orden de capas CSS es una modificación transversal del sistema de diseño y requiere validar visualmente y compilar todas las pantallas afectadas.
 - Cada feature nueva debe ser autocontenida dentro de `src/app/indomito-hub/<feature-name>` y usar nombres de carpetas, archivos e identificadores en inglés.
 - La estructura debe seguir el patrón modular de Axity: cada feature mantiene sus propios `constants`, `components`, `interfaces`, `pages`, `services`, `stores`, `types`, `fn` y archivo `<feature-name>.routes.ts` cuando correspondan.
 - Las páginas, componentes, servicios y stores deben contener solo la responsabilidad de su clase o función principal. Las interfaces, tipos, constantes, factories, validadores y helpers reutilizables deben declararse en las carpetas hermanas correspondientes de la misma feature, no dentro del archivo de una página o componente.

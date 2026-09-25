@@ -301,7 +301,7 @@
             [group]="programFormStore.form.controls.pricing"
             [snapshot]="exchangeRateStore.snapshot()"
             [belowUtilityFloor]="programFormStore.belowUtilityFloor()"
-            [minimumUtilityRate]="catalogStore.settings()?.margin?.minUtilityRate ?? null"
+            [minimumUtilityRate]="catalogStore.minUtilityRate() ?? null"
             [embedded]="true"
           />
         </p-panel>

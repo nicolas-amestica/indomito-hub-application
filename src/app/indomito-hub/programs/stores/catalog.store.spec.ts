@@ -4,7 +4,9 @@ import { Subject } from 'rxjs';
 import { DEFAULT_SCENARIO_OFFSETS } from '../constants/scenario-defaults';
 import { buildProgramForm } from '../forms/program-form.builder';
 import type { CatalogResponse } from '../interfaces/catalog.interface';
+import type { ProgramFormConfiguration } from '../interfaces/program-form-configuration.interface';
 import { CatalogService } from '../services/catalog.service';
+import { ProgramFormConfigurationService } from '../services/program-form-configuration.service';
 import { CatalogStore } from './catalog.store';
 
 const CATALOGS: CatalogResponse = {
@@ -21,16 +23,20 @@ const CATALOGS: CatalogResponse = {
       budgetTemplateId: 'brochure-default',
     },
   ],
-  settings: {
-    defaultPlanId: 'study',
-    margin: {
+};
+
+const CONFIGURATION: ProgramFormConfiguration = {
+  defaults: {
+    generals: { defaultPlanId: 'study' },
+    pricing: {
       usdIncreaseCLP: 50,
       brlIncreaseCLP: 10,
       utilityRate: 20,
       rechargeRate: 5,
-      minUtilityRate: 10,
     },
   },
+  policy: { minUtilityRate: 10 },
+  scenarioOffsets: [-10, -5, 0, 5],
 };
 
 function setup(responses: Subject<CatalogResponse>[]): {
@@ -38,17 +44,30 @@ function setup(responses: Subject<CatalogResponse>[]): {
   service: { getCatalogs: ReturnType<typeof vi.fn> };
 } {
   const getCatalogs = vi.fn();
+  const getConfiguration = vi.fn();
   for (const response of responses) getCatalogs.mockReturnValueOnce(response.asObservable());
+  for (let index = 0; index < responses.length; index += 1) {
+    const configuration = new Subject<ProgramFormConfiguration>();
+    getConfiguration.mockReturnValueOnce(configuration.asObservable());
+    queueMicrotask(() => {
+      configuration.next(CONFIGURATION);
+      configuration.complete();
+    });
+  }
   const service = { getCatalogs };
   TestBed.configureTestingModule({
-    providers: [CatalogStore, { provide: CatalogService, useValue: service }],
+    providers: [
+      CatalogStore,
+      { provide: CatalogService, useValue: service },
+      { provide: ProgramFormConfigurationService, useValue: { get: getConfiguration } },
+    ],
   });
 
   return { store: TestBed.inject(CatalogStore), service };
 }
 
 describe('CatalogStore', () => {
-  it('hace una sola solicitud inicial y publica las tres listas', () => {
+  it('hace una sola solicitud inicial y publica las tres listas', async () => {
     const response = new Subject<CatalogResponse>();
     const { store, service } = setup([response]);
 
@@ -57,6 +76,7 @@ describe('CatalogStore', () => {
 
     response.next(CATALOGS);
     response.complete();
+    await Promise.resolve();
 
     expect(store.plans()).toEqual(CATALOGS.plans);
     expect(store.seasons()).toEqual(CATALOGS.seasons);
@@ -64,11 +84,13 @@ describe('CatalogStore', () => {
     expect(store.loading()).toBe(false);
   });
 
-  it('preselecciona el plan vigente configurado y conserva pristine', () => {
+  it('preselecciona el plan vigente configurado y conserva pristine', async () => {
     const response = new Subject<CatalogResponse>();
     const { store } = setup([response]);
     const form = buildProgramForm();
     response.next(CATALOGS);
+    response.complete();
+    await Promise.resolve();
 
     store.applyDefaults(form);
 
@@ -82,14 +104,13 @@ describe('CatalogStore', () => {
     });
   });
 
-  it('no elige un plan inexistente ni el primer elemento como respaldo', () => {
+  it('no elige un plan inexistente ni el primer elemento como respaldo', async () => {
     const response = new Subject<CatalogResponse>();
     const { store } = setup([response]);
     const form = buildProgramForm();
-    response.next({
-      ...CATALOGS,
-      settings: { ...CATALOGS.settings, defaultPlanId: 'inexistente' },
-    });
+    response.next({ ...CATALOGS, plans: [CATALOGS.plans[1]] });
+    response.complete();
+    await Promise.resolve();
 
     store.applyDefaults(form);
 
@@ -97,7 +118,7 @@ describe('CatalogStore', () => {
     expect(form.controls.generals.controls.plan.hasError('required')).toBe(true);
   });
 
-  it('no sobrescribe el plan que el usuario ya eligió', () => {
+  it('no sobrescribe el plan que el usuario ya eligió', async () => {
     const response = new Subject<CatalogResponse>();
     const { store } = setup([response]);
     const form = buildProgramForm();
@@ -105,21 +126,25 @@ describe('CatalogStore', () => {
     plan.setValue(CATALOGS.plans[1]);
     plan.markAsDirty();
     response.next(CATALOGS);
+    response.complete();
+    await Promise.resolve();
 
     store.applyDefaults(form);
 
     expect(plan.value).toEqual(CATALOGS.plans[1]);
   });
 
-  it('usa los desplazamientos por defecto cuando settings los omite', () => {
+  it('usa los desplazamientos de la configuración del formulario', async () => {
     const response = new Subject<CatalogResponse>();
     const { store } = setup([response]);
     response.next(CATALOGS);
+    response.complete();
+    await Promise.resolve();
 
     expect(store.scenarioOffsets()).toEqual(DEFAULT_SCENARIO_OFFSETS);
   });
 
-  it('expone el error y permite reintentar', () => {
+  it('expone el error y permite reintentar', async () => {
     const first = new Subject<CatalogResponse>();
     const second = new Subject<CatalogResponse>();
     const { store, service } = setup([first, second]);
@@ -135,6 +160,7 @@ describe('CatalogStore', () => {
 
     second.next(CATALOGS);
     second.complete();
+    await Promise.resolve();
     expect(store.hasError()).toBe(false);
   });
 });

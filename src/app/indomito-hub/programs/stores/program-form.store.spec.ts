@@ -28,19 +28,23 @@ const CATALOGS: CatalogResponse = {
       budgetTemplateId: 'brochure-default',
     },
   ],
-  settings: {},
 };
 
-function createStore(catalog: CatalogResponse | null = null): {
+function createStore(
+  catalog: CatalogResponse | null = null,
+  minUtilityRate?: number,
+): {
   store: ProgramFormStore;
   catalogState: ReturnType<typeof signal<CatalogResponse | null>>;
   rateState: ReturnType<typeof signal<ExchangeSnapshot | null>>;
 } {
   const catalogState = signal<CatalogResponse | null>(catalog);
+  const configurationState = signal(catalog === null ? null : {});
   const rateState = signal<ExchangeSnapshot | null>(SNAPSHOT);
   const catalogStore = {
     catalogs: catalogState.asReadonly(),
-    settings: computed(() => catalogState()?.settings ?? null),
+    configuration: configurationState.asReadonly(),
+    minUtilityRate: computed(() => minUtilityRate),
     plans: computed(() => catalogState()?.plans ?? []),
     seasons: computed(() => catalogState()?.seasons ?? []),
     destinations: computed(() => catalogState()?.destinations ?? []),
@@ -312,17 +316,8 @@ describe('ProgramFormStore', () => {
       plans: [],
       seasons: [],
       destinations: [],
-      settings: {
-        margin: {
-          usdIncreaseCLP: 50,
-          brlIncreaseCLP: 10,
-          utilityRate: 20,
-          rechargeRate: 5,
-          minUtilityRate: 15,
-        },
-      },
     };
-    const { store } = createStore(catalogs);
+    const { store } = createStore(catalogs, 15);
     const schedule = store.form.controls.schedule;
     schedule.setValue({
       totalDays: 3,
