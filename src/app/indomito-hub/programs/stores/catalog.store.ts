@@ -1,18 +1,16 @@
 import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { finalize, forkJoin } from 'rxjs';
+import { finalize } from 'rxjs';
 
 import { applyMarginDefaults } from '../fn/fn-margin-preload';
 import type { ProgramFormGroup } from '../types/program-form.types';
 import type { CatalogResponse } from '../interfaces/catalog.interface';
 import type { ProgramFormConfiguration } from '../interfaces/program-form-configuration.interface';
-import { CatalogService } from '../services/catalog.service';
 import { ProgramFormConfigurationService } from '../services/program-form-configuration.service';
 
 /** Estado feature-scoped de catálogos y parámetros de empresa. */
 @Injectable()
 export class CatalogStore {
-  private readonly service = inject(CatalogService);
   private readonly configurationService = inject(ProgramFormConfigurationService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -75,17 +73,15 @@ export class CatalogStore {
     this.loadingState.set(true);
     this.errorState.set(null);
 
-    forkJoin({
-      catalog: this.service.getCatalogs(),
-      configuration: this.configurationService.get(),
-    })
+    this.configurationService
+      .get()
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.loadingState.set(false)),
       )
       .subscribe({
-        next: ({ catalog, configuration }) => {
-          this.catalogState.set(catalog);
+        next: (configuration) => {
+          this.catalogState.set(configuration.catalogs);
           this.configurationState.set(configuration);
         },
         error: (error: unknown) => this.errorState.set(error),

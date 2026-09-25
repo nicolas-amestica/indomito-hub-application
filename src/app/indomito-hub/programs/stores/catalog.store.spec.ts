@@ -1,11 +1,10 @@
 import { TestBed } from '@angular/core/testing';
-import { Subject } from 'rxjs';
+import { map, Subject } from 'rxjs';
 
 import { DEFAULT_SCENARIO_OFFSETS } from '../constants/scenario-defaults';
 import { buildProgramForm } from '../forms/program-form.builder';
 import type { CatalogResponse } from '../interfaces/catalog.interface';
 import type { ProgramFormConfiguration } from '../interfaces/program-form-configuration.interface';
-import { CatalogService } from '../services/catalog.service';
 import { ProgramFormConfigurationService } from '../services/program-form-configuration.service';
 import { CatalogStore } from './catalog.store';
 
@@ -26,6 +25,7 @@ const CATALOGS: CatalogResponse = {
 };
 
 const CONFIGURATION: ProgramFormConfiguration = {
+  catalogs: CATALOGS,
   defaults: {
     generals: { defaultPlanId: 'study' },
     pricing: {
@@ -43,22 +43,16 @@ function setup(responses: Subject<CatalogResponse>[]): {
   store: CatalogStore;
   service: { getCatalogs: ReturnType<typeof vi.fn> };
 } {
-  const getCatalogs = vi.fn();
   const getConfiguration = vi.fn();
-  for (const response of responses) getCatalogs.mockReturnValueOnce(response.asObservable());
-  for (let index = 0; index < responses.length; index += 1) {
-    const configuration = new Subject<ProgramFormConfiguration>();
-    getConfiguration.mockReturnValueOnce(configuration.asObservable());
-    queueMicrotask(() => {
-      configuration.next(CONFIGURATION);
-      configuration.complete();
-    });
+  for (const response of responses) {
+    getConfiguration.mockReturnValueOnce(
+      response.pipe(map((catalogs) => ({ ...CONFIGURATION, catalogs }))),
+    );
   }
-  const service = { getCatalogs };
+  const service = { getCatalogs: getConfiguration };
   TestBed.configureTestingModule({
     providers: [
       CatalogStore,
-      { provide: CatalogService, useValue: service },
       { provide: ProgramFormConfigurationService, useValue: { get: getConfiguration } },
     ],
   });
@@ -76,7 +70,6 @@ describe('CatalogStore', () => {
 
     response.next(CATALOGS);
     response.complete();
-    await Promise.resolve();
 
     expect(store.plans()).toEqual(CATALOGS.plans);
     expect(store.seasons()).toEqual(CATALOGS.seasons);
@@ -90,7 +83,6 @@ describe('CatalogStore', () => {
     const form = buildProgramForm();
     response.next(CATALOGS);
     response.complete();
-    await Promise.resolve();
 
     store.applyDefaults(form);
 
@@ -110,7 +102,6 @@ describe('CatalogStore', () => {
     const form = buildProgramForm();
     response.next({ ...CATALOGS, plans: [CATALOGS.plans[1]] });
     response.complete();
-    await Promise.resolve();
 
     store.applyDefaults(form);
 
@@ -127,7 +118,6 @@ describe('CatalogStore', () => {
     plan.markAsDirty();
     response.next(CATALOGS);
     response.complete();
-    await Promise.resolve();
 
     store.applyDefaults(form);
 
@@ -139,7 +129,6 @@ describe('CatalogStore', () => {
     const { store } = setup([response]);
     response.next(CATALOGS);
     response.complete();
-    await Promise.resolve();
 
     expect(store.scenarioOffsets()).toEqual(DEFAULT_SCENARIO_OFFSETS);
   });
@@ -160,7 +149,6 @@ describe('CatalogStore', () => {
 
     second.next(CATALOGS);
     second.complete();
-    await Promise.resolve();
     expect(store.hasError()).toBe(false);
   });
 });

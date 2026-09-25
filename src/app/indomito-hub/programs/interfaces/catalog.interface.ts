@@ -1,7 +1,6 @@
 /**
- * Contrato de respuesta de `GET /catalogos`. `CatalogRef` (la referencia liviana
- * que usa `Program`) vive en `program.interface.ts`; este archivo contiene las
- * formas de lista y de política de empresa que entrega el `Catalog_Endpoint`.
+ * Opciones de negocio incluidas en la configuración PGR. `CatalogRef` (la
+ * referencia liviana que usa `Program`) vive en `program.interface.ts`.
  */
 
 /** Opción de catálogo (plan o temporada). */
@@ -33,7 +32,7 @@ export interface CatalogSettings {
   scenarioOffsets?: number[];
 }
 
-/** Respuesta de `GET /catalogos`. */
+/** Catálogos exclusivos del formulario Crear Programa. */
 export interface CatalogResponse {
   plans: CatalogOption[];
   seasons: CatalogOption[];

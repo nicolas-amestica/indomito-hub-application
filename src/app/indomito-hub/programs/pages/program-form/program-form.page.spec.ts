@@ -5,7 +5,7 @@ import { provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import fc from 'fast-check';
 import { MessageService } from 'primeng/api';
-import { NEVER, of, Subject, throwError, type Observable } from 'rxjs';
+import { map, NEVER, of, Subject, throwError, type Observable } from 'rxjs';
 
 import { PreviewDialogComponent } from '../../components/preview-dialog/preview-dialog.component';
 import { FavoritesPanelComponent } from '../../components/favorites-panel/favorites-panel.component';
@@ -19,7 +19,6 @@ import type { Favorite } from '../../interfaces/favorite.interface';
 import type { ExchangeSnapshot } from '../../interfaces/program.interface';
 import type { BudgetRequest } from '../../interfaces/program.interface';
 import { BudgetPdfService } from '../../services/budget-pdf.service';
-import { CatalogService } from '../../services/catalog.service';
 import { ProgramFormConfigurationService } from '../../services/program-form-configuration.service';
 import { ExchangeRateService } from '../../services/exchange-rate.service';
 import { FavoritesService } from '../../services/favorites.service';
@@ -30,7 +29,6 @@ describe('ProgramFormPage', () => {
   let exchangeResponse$: Observable<ExchangeSnapshot>;
   let catalogResponse$: Observable<CatalogResponse>;
   let getSnapshot: ReturnType<typeof vi.fn>;
-  let getCatalogs: ReturnType<typeof vi.fn>;
   let getFormConfiguration: ReturnType<typeof vi.fn>;
   let formConfiguration: ProgramFormConfiguration;
   let exportExcelFile: ReturnType<typeof vi.fn>;
@@ -48,9 +46,12 @@ describe('ProgramFormPage', () => {
     exchangeResponse$ = NEVER;
     catalogResponse$ = NEVER;
     getSnapshot = vi.fn(() => exchangeResponse$);
-    getCatalogs = vi.fn(() => catalogResponse$);
     formConfiguration = defaultFormConfiguration();
-    getFormConfiguration = vi.fn(() => of(formConfiguration));
+    getFormConfiguration = vi.fn(() =>
+      catalogResponse$ === NEVER
+        ? NEVER
+        : catalogResponse$.pipe(map((catalogs) => ({ ...formConfiguration, catalogs }))),
+    );
     exportExcelFile = vi.fn().mockResolvedValue(undefined);
     generateBudgetPdf = vi.fn(() => of(new Blob([], { type: 'application/pdf' })));
     downloadBudgetPdf = vi.fn();
@@ -67,7 +68,6 @@ describe('ProgramFormPage', () => {
         provideRouter([]),
         provideNoopAnimations(),
         MessageService,
-        { provide: CatalogService, useValue: { getCatalogs } },
         { provide: ProgramFormConfigurationService, useValue: { get: getFormConfiguration } },
         { provide: ExchangeRateService, useValue: { getSnapshot } },
         { provide: ExcelExporter, useValue: { export: exportExcelFile } },
@@ -157,7 +157,7 @@ describe('ProgramFormPage', () => {
     const host = fixture.nativeElement as HTMLElement;
 
     expect(getSnapshot).toHaveBeenCalledOnce();
-    expect(getCatalogs).toHaveBeenCalledOnce();
+    expect(getFormConfiguration).toHaveBeenCalledOnce();
     expect(host.querySelector('[aria-busy="true"]')).not.toBeNull();
     expect(host.textContent).toContain('Obteniendo tasas vigentes…');
   });
@@ -188,7 +188,7 @@ describe('ProgramFormPage', () => {
     buttonNamed(host, 'Reintentar catálogos').click();
     await fixture.whenStable();
 
-    expect(getCatalogs).toHaveBeenCalledTimes(2);
+    expect(getFormConfiguration).toHaveBeenCalledTimes(2);
     expect(host.textContent).not.toContain('No se pudieron obtener los catálogos del programa.');
   });
 
@@ -635,6 +635,7 @@ function catalogWithOptions(): CatalogResponse {
 
 function defaultFormConfiguration(): ProgramFormConfiguration {
   return {
+    catalogs: emptyCatalog(),
     defaults: {
       generals: { defaultPlanId: 'plan-1' },
       pricing: {

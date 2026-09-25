@@ -14,6 +14,7 @@ describe('ProgramFormConfigurationService', () => {
     const service = TestBed.inject(ProgramFormConfigurationService);
     const http = TestBed.inject(HttpTestingController);
     const configuration: ProgramFormConfiguration = {
+      catalogs: { plans: [], seasons: [], destinations: [] },
       defaults: {
         generals: { defaultPlanId: 'study' },
         pricing: {
