@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { MessageService } from 'primeng/api';
+import { APP_MESSAGES } from '../../shared/constants/app-messages';
 
 /** Duración por defecto de un toast, en milisegundos. */
 const DEFAULT_LIFE_MS = 5000;
@@ -18,16 +19,31 @@ export class NotificationService {
 
   /** Muestra un toast de éxito. */
   success(message: string, life = DEFAULT_LIFE_MS): void {
-    this.messageService.add({ severity: 'success', summary: 'Éxito', detail: message, life });
+    this.messageService.add({
+      severity: 'success',
+      summary: APP_MESSAGES.notificationSummary.success,
+      detail: message,
+      life,
+    });
   }
 
   /** Muestra un toast de error. */
   error(message: string, life = DEFAULT_LIFE_MS): void {
-    this.messageService.add({ severity: 'error', summary: 'Error', detail: message, life });
+    this.messageService.add({
+      severity: 'error',
+      summary: APP_MESSAGES.notificationSummary.error,
+      detail: message,
+      life,
+    });
   }
 
   /** Muestra un toast de advertencia. */
   warn(message: string, life = DEFAULT_LIFE_MS): void {
-    this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: message, life });
+    this.messageService.add({
+      severity: 'warn',
+      summary: APP_MESSAGES.notificationSummary.warn,
+      detail: message,
+      life,
+    });
   }
 }

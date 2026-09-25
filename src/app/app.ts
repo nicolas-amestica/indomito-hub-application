@@ -1,17 +1,17 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { Toast } from 'primeng/toast';
 
 /**
  * Armazón de la aplicación.
  *
- * Deliberadamente vacío: no importa ningún componente de PrimeNG ni aporta
- * interfaz propia, porque todo lo que entra acá viaja en el chunk inicial. Cada
- * feature trae su layout y sus componentes desde la ruta que la carga de forma
- * diferida.
+ * Aloja la infraestructura visual transversal y el contenido de la ruta activa.
+ * El Toast vive aquí para que cualquier servicio o interceptor pueda notificar
+ * sin depender de que una feature monte su propio contenedor.
  */
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, Toast],
   templateUrl: './app.html',
   styleUrl: './app.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

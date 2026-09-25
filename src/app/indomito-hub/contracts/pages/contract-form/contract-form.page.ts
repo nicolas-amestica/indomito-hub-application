@@ -21,6 +21,7 @@ import { ExchangeRateService } from '../../../programs/services/exchange-rate.se
 import { FavoritesService } from '../../../programs/services/favorites.service';
 import { calculateContractPayments } from '../../fn/calculate-contract-payments';
 import { birthDateValidator, rutValidator } from '../../fn/contract-validators';
+import { getInvalidContractFields } from '../../fn/get-invalid-contract-fields';
 import { CONTRACT_MONTHS, CONTRACT_SEX_OPTIONS } from '../../constants/contract-options';
 import type {
   Contract,
@@ -33,6 +34,7 @@ import type {
 import { ContractsService } from '../../services/contracts.service';
 import { ContractTemplateService } from '../../services/contract-template.service';
 import { DocumentPreviewService } from '../../../../shared/documents/services/document-preview.service';
+import { APP_MESSAGES } from '../../../../shared/constants/app-messages';
 
 @Component({
   selector: 'app-contract-form-page',
@@ -70,12 +72,6 @@ export class ContractFormPage {
   protected readonly configuration = signal<ContractFormConfiguration | null>(null);
   protected readonly months = CONTRACT_MONTHS;
   protected readonly sexOptions = CONTRACT_SEX_OPTIONS;
-  protected readonly statusOptions: Array<{ label: string; value: ContractStatus }> = [
-    { label: 'Borrador', value: 'DRAFT' },
-    { label: 'Pendiente de aprobación', value: 'PENDING_APPROVAL' },
-    { label: 'Rechazado', value: 'REJECTED' },
-    { label: 'Cancelado', value: 'CANCELLED' },
-  ];
   protected readonly maxBirthDate = new Date();
   private readonly exchangeSnapshot = signal<ExchangeSnapshot | null>(null);
   private readonly programReference = signal<ContractProgramReference | null>(null);
@@ -93,7 +89,7 @@ export class ContractFormPage {
       address: ['', Validators.required],
       course: ['', Validators.required],
     }),
-    clientRepresentatives: this.fb.array([this.personGroup()]),
+    clientRepresentatives: this.fb.array([this.personGroup({}, true)]),
     trip: this.fb.group({
       city: ['', Validators.required],
       contractDate: [null as Date | null, Validators.required],
@@ -166,9 +162,10 @@ export class ContractFormPage {
   }
   protected addRepresentative(client = false): void {
     (client ? this.clientRepresentatives : this.representatives).push(
-      this.personGroup({
-        course: client ? (this.form.controls.institution.controls.course.value ?? '') : '',
-      }),
+      this.personGroup(
+        { course: client ? (this.form.controls.institution.controls.course.value ?? '') : '' },
+        client,
+      ),
     );
   }
   protected addPassenger(): void {
@@ -261,17 +258,15 @@ export class ContractFormPage {
       if (patch.trip) this.form.controls.trip.patchValue(patch.trip);
       if (patch.clientRepresentatives?.length)
         this.replaceArray(this.clientRepresentatives, patch.clientRepresentatives, (value) =>
-          this.personGroup(value),
+          this.personGroup(value, true),
         );
       this.syncClientCourse();
       this.replaceArray(this.passengers, patch.passengers, (value) => this.passengerGroup(value));
       this.recalculatePayments();
-      this.notifications.success(
-        `Se precargaron ${patch.passengers.length} pasajeros. Los campos siguen editables.`,
-      );
+      this.notifications.success(APP_MESSAGES.contracts.excelImported(patch.passengers.length));
     } catch (error) {
       this.notifications.error(
-        error instanceof Error ? error.message : 'No se pudo leer el Excel.',
+        error instanceof Error ? error.message : APP_MESSAGES.contracts.excelReadError,
       );
     } finally {
       this.importing.set(false);
@@ -283,7 +278,7 @@ export class ContractFormPage {
     if (this.locked() || this.busy()) return;
     if (this.passengers.length === 0 || this.form.invalid) {
       this.form.markAllAsTouched();
-      this.notifications.warn('Revisa los datos obligatorios, los RUT y las fechas.');
+      this.notifications.warn(APP_MESSAGES.forms.reviewRequiredData);
       return;
     }
     const content = this.content();
@@ -312,19 +307,76 @@ export class ContractFormPage {
       .subscribe({
         next: (contract) => {
           this.applyContract(contract);
-          this.notifications.success('Contrato guardado correctamente.');
+          this.notifications.success(APP_MESSAGES.contracts.saved);
         },
       });
+  }
+
+  protected changeStatus(nextStatus: ContractStatus): void {
+    const id = this.contractId();
+    if (!id || this.locked() || this.busy() || this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    this.busy.set(true);
+    this.api
+      .update(id, {
+        programId: this.form.controls.programId.value || undefined,
+        programReference: this.programReference() ?? undefined,
+        period: this.periodValue(this.form.controls.period.value),
+        status: nextStatus,
+        content: this.content(),
+        version: this.version(),
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.busy.set(false)),
+      )
+      .subscribe({
+        next: (contract) => {
+          this.applyContract(contract);
+          const message =
+            nextStatus === 'PENDING_APPROVAL'
+              ? APP_MESSAGES.contracts.pendingApproval
+              : nextStatus === 'REJECTED'
+                ? APP_MESSAGES.contracts.rejected
+                : nextStatus === 'CANCELLED'
+                  ? APP_MESSAGES.contracts.cancelled
+                  : APP_MESSAGES.contracts.returnedToDraft;
+          this.notifications.success(message);
+        },
+      });
+  }
+
+  protected statusLabel(): string {
+    return (
+      {
+        DRAFT: 'Borrador',
+        PENDING_APPROVAL: 'Pendiente de aprobación',
+        APPROVED: 'Aprobado',
+        REJECTED: 'Rechazado',
+        CANCELLED: 'Cancelado',
+      } as const
+    )[this.status()];
   }
 
   protected preview(): void {
     if (this.form.invalid || this.busy()) {
       this.form.markAllAsTouched();
+      if (this.form.invalid) {
+        const fields = getInvalidContractFields(this.form);
+        const visibleFields = fields.slice(0, 8);
+        const remainder = fields.length - visibleFields.length;
+        this.notifications.warn(
+          APP_MESSAGES.forms.incompleteFields(visibleFields, remainder),
+          8000,
+        );
+      }
       return;
     }
     const id = this.contractId();
     const document$: Observable<Blob | ContractPDFAccess> =
-      this.locked() && id
+      this.status() === 'APPROVED' && id
         ? this.api.getApprovedPdf(id)
         : this.api.generatePdf(this.content(), true);
     this.busy.set(true);
@@ -337,10 +389,11 @@ export class ContractFormPage {
         next: (document: Blob | ContractPDFAccess) => {
           const source = document instanceof Blob ? document : document.url;
           const ref = this.documentPreview.open({
-            title: this.locked() ? 'Contrato aprobado' : 'Vista previa del contrato',
-            description: this.locked()
-              ? 'Este es el documento definitivo almacenado al aprobar el contrato.'
-              : 'Revisa el contenido completo antes de enviarlo a aprobación.',
+            title: this.status() === 'APPROVED' ? 'Contrato aprobado' : 'Vista previa del contrato',
+            description:
+              this.status() === 'APPROVED'
+                ? 'Este es el documento definitivo almacenado al aprobar el contrato.'
+                : 'Revisa el contenido completo antes de enviarlo a aprobación.',
             documents: [
               {
                 name: 'contrato-prestacion-servicios.pdf',
@@ -389,7 +442,7 @@ export class ContractFormPage {
       .subscribe({
         next: (contract) => {
           this.applyContract(contract);
-          this.notifications.success('Contrato aprobado y PDF definitivo almacenado.');
+          this.notifications.success(APP_MESSAGES.contracts.approved);
         },
       });
   }
@@ -408,7 +461,7 @@ export class ContractFormPage {
     this.contractId.set(contract.id);
     this.version.set(contract.version);
     this.status.set(contract.status);
-    this.locked.set(contract.status === 'APPROVED');
+    this.locked.set(contract.status === 'APPROVED' || contract.status === 'CANCELLED');
     this.programReference.set(contract.programReference ?? null);
     this.form.patchValue({
       programId: contract.programId ?? '',
@@ -434,7 +487,7 @@ export class ContractFormPage {
       this.personGroup(value),
     );
     this.replaceArray(this.clientRepresentatives, contract.content.clientRepresentatives, (value) =>
-      this.personGroup(value),
+      this.personGroup(value, true),
     );
     this.replaceArray(this.services, contract.content.plan.servicesIncluded, (value) =>
       this.serviceGroup(value.description),
@@ -471,11 +524,12 @@ export class ContractFormPage {
   }
   private personGroup(
     value: Partial<{ name: string; dni: string; course: string }> = {},
+    courseRequired = false,
   ): FormGroup {
     return this.fb.group({
       name: [value.name ?? '', Validators.required],
       dni: [value.dni ?? '', [Validators.required, rutValidator]],
-      course: [value.course ?? '', Validators.required],
+      course: [value.course ?? '', courseRequired ? Validators.required : []],
     });
   }
   private passengerGroup(
@@ -547,7 +601,7 @@ export class ContractFormPage {
         },
         error: () => {
           this.programs.set([]);
-          this.notifications.error('No se pudo cargar la configuración inicial del contrato.');
+          this.notifications.error(APP_MESSAGES.contracts.initialConfigurationError);
         },
       });
   }

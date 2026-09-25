@@ -60,11 +60,17 @@
             >
           </td>
           <td>{{ contract.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</td>
-          <td>
+          <td class="flex items-center justify-end gap-3">
+            @if (contract.status === 'APPROVED') {
+              <button pButton type="button" size="small" text (click)="viewPdf(contract)">
+                <span class="pi pi-file-pdf" aria-hidden="true"></span>
+                Ver PDF
+              </button>
+            }
             <a
               [routerLink]="['/contratos', contract.id, 'editar']"
               class="text-sm font-semibold text-brand-active"
-              >{{ contract.status === 'APPROVED' ? 'Ver' : 'Editar' }}</a
+              >{{ contract.status === 'APPROVED' ? 'Detalle' : 'Editar' }}</a
             >
           </td>
         </tr></ng-template

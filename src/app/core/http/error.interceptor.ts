@@ -4,6 +4,7 @@ import { catchError, throwError } from 'rxjs';
 
 import { NotificationService } from '../notifications/notification.service';
 import { ApiErrorEnvelope } from './api-response.interface';
+import { APP_MESSAGES } from '../../shared/constants/app-messages';
 
 /**
  * Mapa de `code` del backend a mensaje de usuario en español.
@@ -17,15 +18,14 @@ import { ApiErrorEnvelope } from './api-response.interface';
  * esta feature no agrega códigos nuevos.
  */
 const ERROR_MESSAGES: Readonly<Record<string, string>> = {
-  UPSTREAM_SERVICE_ERROR:
-    'No se pudieron obtener los tipos de cambio. Intenta nuevamente en unos minutos.',
-  VALIDATION_ERROR: 'Hay datos del programa que no son válidos. Revisa el formulario.',
-  REQUIRED_FIELD_MISSING: 'Falta completar un dato obligatorio del programa.',
-  RESOURCE_NOT_FOUND: 'El favorito ya no existe. Actualiza el panel.',
+  UPSTREAM_SERVICE_ERROR: APP_MESSAGES.http.upstreamServiceError,
+  VALIDATION_ERROR: APP_MESSAGES.http.validationError,
+  REQUIRED_FIELD_MISSING: APP_MESSAGES.http.requiredFieldMissing,
+  RESOURCE_NOT_FOUND: APP_MESSAGES.http.resourceNotFound,
 };
 
 /** Mensaje para un `code` fuera del mapa, o para una respuesta sin envelope de error. */
-const FALLBACK_MESSAGE = 'Ocurrió un problema inesperado. Intenta nuevamente.';
+const FALLBACK_MESSAGE = APP_MESSAGES.http.unexpected;
 
 /**
  * Traduce el `code` de una respuesta de error a un mensaje de usuario y lo

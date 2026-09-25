@@ -15,7 +15,6 @@ import { RouterLink } from '@angular/router';
 import { ButtonDirective } from 'primeng/button';
 import { Panel } from 'primeng/panel';
 import { ProgressSpinner } from 'primeng/progressspinner';
-import { Toast } from 'primeng/toast';
 import { finalize } from 'rxjs';
 
 import { MotionPressDirective } from '../../../../shared/ui/motion-press.directive';
@@ -42,27 +41,23 @@ import { CatalogStore } from '../../stores/catalog.store';
 import { ExchangeRateStore } from '../../stores/exchange-rate.store';
 import { FavoritesStore } from '../../stores/favorites.store';
 import { ProgramFormStore } from '../../stores/program-form.store';
+import { APP_MESSAGES } from '../../../../shared/constants/app-messages';
 
 /**
  * Página del formulario de programa.
  *
  * Es el container de la feature: orquesta, no calcula. En esta tarea aporta
  * solo el layout base — el encabezado con el título y la bajada que exige el
- * Requirement 1.1, el contenedor de toasts y la región donde las tareas
+ * Requirement 1.1 y la región donde las tareas
  * siguientes del plan montan los paneles del formulario, la tabla de resumen y
  * el panel de favoritos.
  *
- * El contenedor de toasts vive acá y no en el armazón de la aplicación por el
- * presupuesto de bundle: `Toast` pesa unos 122 kB sin comprimir, suficiente
- * para pasar el chunk inicial de 413 kB a 536 kB y romper el límite de
- * advertencia de 500 kB. Montado en la ruta diferida viaja con la feature, que
- * además es de donde salen todas las notificaciones de la aplicación.
+ * El contenedor de notificaciones es responsabilidad del armazón raíz.
  */
 @Component({
   selector: 'app-program-form-page',
   imports: [
     MotionPressDirective,
-    Toast,
     DatePipe,
     RouterLink,
     ClpAmountPipe,
@@ -130,7 +125,7 @@ export class ProgramFormPage {
 
   protected requestFavoriteSave(): void {
     if (!this.favoritesAvailable) {
-      this.notifications.warn('El guardado de favoritos no está disponible en este ambiente.');
+      this.notifications.warn(APP_MESSAGES.programs.favoritesUnavailable);
       return;
     }
     if (!this.programFormStore.canPreview()) {
@@ -151,7 +146,7 @@ export class ProgramFormPage {
       .subscribe({
         next: () => {
           this.favoriteSaveOpen.set(false);
-          this.notifications.success('El favorito se guardó correctamente.');
+          this.notifications.success(APP_MESSAGES.programs.favoriteSaved);
         },
         error: (error: unknown) => this.notifyUnexpectedFavoriteError(error),
       });
@@ -161,7 +156,7 @@ export class ProgramFormPage {
     this.programFormStore.loadFavorite(favorite.content);
     this.favoritesStore.select(favorite);
     this.favoritesOpen.set(false);
-    this.notifications.success('El favorito se cargó con los tipos de cambio vigentes.');
+    this.notifications.success(APP_MESSAGES.programs.favoriteLoaded);
   }
 
   protected deleteFavorite(favorite: Favorite): void {
@@ -171,7 +166,7 @@ export class ProgramFormPage {
       .delete(favorite)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => this.notifications.success('El favorito se eliminó correctamente.'),
+        next: () => this.notifications.success(APP_MESSAGES.programs.favoriteDeleted),
         error: (error: unknown) => this.notifyUnexpectedFavoriteError(error),
       });
   }
@@ -188,7 +183,7 @@ export class ProgramFormPage {
       const layout = buildExcelLayout(program, this.programFormStore.rows(), new Date());
       await this.excelExporter.export(layout);
     } catch {
-      this.notifications.error('No se pudo exportar el detalle a Excel. Inténtalo nuevamente.');
+      this.notifications.error(APP_MESSAGES.programs.excelExportError);
     } finally {
       this.previewBusy.set(false);
     }
@@ -200,7 +195,7 @@ export class ProgramFormPage {
 
     const destination = this.programFormStore.form.controls.generals.controls.destination.value;
     if (destination === null) {
-      this.notifications.warn('Selecciona un destino antes de exportar el presupuesto.');
+      this.notifications.warn(APP_MESSAGES.programs.destinationRequired);
       return;
     }
 
@@ -240,7 +235,7 @@ export class ProgramFormPage {
         error: (error: unknown) => {
           // Los errores HTTP ya son traducidos por el interceptor global.
           if (!(error instanceof HttpErrorResponse)) {
-            this.notifications.error('No se pudo exportar el presupuesto. Inténtalo nuevamente.');
+            this.notifications.error(APP_MESSAGES.programs.pdfExportError);
           }
         },
       });
@@ -249,7 +244,7 @@ export class ProgramFormPage {
   private notifyUnexpectedFavoriteError(error: unknown): void {
     // Los errores HTTP ya son traducidos por el interceptor global.
     if (!(error instanceof HttpErrorResponse)) {
-      this.notifications.error('No se pudo completar la operación con favoritos.');
+      this.notifications.error(APP_MESSAGES.programs.favoriteOperationError);
     }
   }
 }

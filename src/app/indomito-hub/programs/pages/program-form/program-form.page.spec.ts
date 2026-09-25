@@ -111,12 +111,12 @@ describe('ProgramFormPage', () => {
     );
   });
 
-  it('aloja el contenedor de toasts de la feature', async () => {
+  it('delega las notificaciones al contenedor global', async () => {
     const fixture = TestBed.createComponent(ProgramFormPage);
     await fixture.whenStable();
     const host = fixture.nativeElement as HTMLElement;
 
-    expect(host.querySelector('p-toast')).not.toBeNull();
+    expect(host.querySelector('p-toast')).toBeNull();
   });
 
   it('monta el panel de datos generales con el formulario de la feature', async () => {

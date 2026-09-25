@@ -18,15 +18,14 @@
           "options": {
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
+            "allowedCommonJsDependencies": ["exceljs"],
             "assets": [
               {
                 "glob": "**/*",
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.css"
-            ]
+            "styles": ["src/styles.css"]
           },
           "configurations": {
             "production": {
@@ -95,9 +94,7 @@
           "builder": "@angular/build:unit-test",
           "options": {
             "runnerConfig": true,
-            "setupFiles": [
-              "src/setup-vitest.ts"
-            ]
+            "setupFiles": ["src/setup-vitest.ts"]
           }
         }
       }

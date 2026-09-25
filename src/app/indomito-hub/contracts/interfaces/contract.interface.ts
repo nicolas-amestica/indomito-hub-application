@@ -104,8 +104,12 @@ export interface Contract {
     contentType: string;
     size: number;
     sha256: string;
+    generatorVersion: string;
     generatedAt: string;
+    generatedBy: string;
   };
+  approvedAt?: string;
+  approvedBy?: string;
 }
 export interface ContractPDFAccess {
   url: string;
