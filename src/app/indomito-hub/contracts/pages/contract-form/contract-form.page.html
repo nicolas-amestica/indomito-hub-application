@@ -4,7 +4,7 @@
       <p class="text-xs font-bold uppercase tracking-[.2em] text-brand-active">Contratos</p>
       <h1 class="mt-2 text-3xl font-semibold text-ink">Contrato de prestación de servicios</h1>
       <p class="mt-2 max-w-3xl text-sm text-black/55">
-        Importa la ficha del cliente y selecciona un programa. Los totales se recalculan
+        Importa la ficha del cliente y selecciona una cotización. Los totales se recalculan
         automáticamente hasta que el contrato sea aprobado.
       </p>
     </div>
@@ -79,14 +79,14 @@
           />
         </label>
         <label class="flex flex-col gap-2"
-          ><span>Programa guardado <span class="text-red-600" aria-hidden="true">*</span></span>
+          ><span>Cotización guardada <span class="text-red-600" aria-hidden="true">*</span></span>
           <p-select
             fluid
             formControlName="programId"
             [options]="programs()"
             optionLabel="name"
             optionValue="id"
-            placeholder="Seleccionar programa"
+            placeholder="Seleccionar cotización"
             [showClear]="true"
             [filter]="true"
             filterBy="name"
@@ -233,15 +233,15 @@
     </section>
 
     <section class="rounded-2xl border border-black/10 bg-white p-6">
-      <div class="mb-5 flex items-center justify-between">
+      <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 class="text-lg font-semibold">Representantes de Giras Indómito</h2>
-        <button pButton type="button" text (click)="addRepresentative()">
+        <button pButton type="button" icon="pi pi-plus" severity="secondary" outlined (click)="addRepresentative()">
           Agregar representante
         </button>
       </div>
       <div formArrayName="representatives" class="space-y-3">
         @for (group of representatives.controls; track group; let i = $index) {
-          <div [formGroupName]="i" class="grid gap-3 md:grid-cols-[1fr_14rem_1fr_auto]">
+          <div [formGroupName]="i" class="grid items-end gap-3 md:grid-cols-[minmax(0,1fr)_14rem_auto]">
             <label class="flex flex-col gap-2"
               ><span>Nombre <span class="text-red-600" aria-hidden="true">*</span></span
               ><input pInputText formControlName="name" placeholder="Nombre completo" /></label
@@ -252,8 +252,10 @@
               pButton
               type="button"
               severity="danger"
-              text
-              class="self-end"
+              outlined
+              icon="pi pi-trash"
+              class="justify-self-start md:justify-self-end"
+              [attr.aria-label]="'Quitar representante ' + (i + 1)"
               (click)="remove(representatives, i)"
             >
               Quitar
@@ -264,15 +266,15 @@
     </section>
 
     <section class="rounded-2xl border border-black/10 bg-white p-6">
-      <div class="mb-5 flex items-center justify-between">
+      <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 class="text-lg font-semibold">Representantes del cliente</h2>
-        <button pButton type="button" text (click)="addRepresentative(true)">
+        <button pButton type="button" icon="pi pi-plus" severity="secondary" outlined (click)="addRepresentative(true)">
           Agregar representante
         </button>
       </div>
       <div formArrayName="clientRepresentatives" class="space-y-3">
         @for (group of clientRepresentatives.controls; track group; let i = $index) {
-          <div [formGroupName]="i" class="grid gap-3 md:grid-cols-[1fr_14rem_1fr_auto]">
+          <div [formGroupName]="i" class="grid items-end gap-3 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_14rem_minmax(0,1fr)_auto]">
             <label class="flex flex-col gap-2"
               ><span>Nombre <span class="text-red-600" aria-hidden="true">*</span></span
               ><input pInputText formControlName="name" placeholder="Nombre completo" /></label
@@ -286,8 +288,10 @@
               pButton
               type="button"
               severity="danger"
-              text
-              class="self-end"
+              outlined
+              icon="pi pi-trash"
+              class="justify-self-start xl:justify-self-end"
+              [attr.aria-label]="'Quitar representante del cliente ' + (i + 1)"
               (click)="remove(clientRepresentatives, i)"
             >
               Quitar
@@ -299,14 +303,14 @@
 
     <section class="rounded-2xl border border-black/10 bg-white p-6" formGroupName="plan">
       <label class="flex flex-col gap-2 mb-5"
-        ><span>Nombre del programa <span class="text-red-600" aria-hidden="true">*</span></span
-        ><input pInputText formControlName="name" placeholder="Nombre del programa seleccionado"
+        ><span>Nombre de la cotización <span class="text-red-600" aria-hidden="true">*</span></span
+        ><input pInputText formControlName="name" placeholder="Nombre de la cotización seleccionada"
       /></label>
       <div class="mb-4 flex items-center justify-between">
         <h2 class="text-lg font-semibold">
           Servicios incluidos <span class="text-red-600" aria-hidden="true">*</span>
         </h2>
-        <button pButton type="button" text (click)="addService()">Agregar servicio</button>
+        <button pButton type="button" icon="pi pi-plus" severity="secondary" outlined (click)="addService()">Agregar servicio</button>
       </div>
       <div formArrayName="servicesIncluded" class="space-y-3">
         @for (group of services.controls; track group; let i = $index) {
@@ -317,9 +321,9 @@
               class="w-full"
               placeholder="Descripción del servicio incluido"
             />
-            <p-button pButton type="button" severity="danger" text (click)="remove(services, i)">
+            <button pButton type="button" severity="danger" outlined icon="pi pi-trash" [attr.aria-label]="'Quitar servicio ' + (i + 1)" (click)="remove(services, i)">
               Quitar
-            </p-button>
+            </button>
           </div>
         }
       </div>
@@ -596,9 +600,9 @@
     </section>
 
     <section class="rounded-2xl border border-black/10 bg-white p-6">
-      <div class="mb-2 flex items-center justify-between">
+      <div class="mb-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 class="text-lg font-semibold">Nómina de pasajeros</h2>
-        <button pButton type="button" text (click)="addPassenger()">Agregar pasajero</button>
+        <button pButton type="button" icon="pi pi-plus" severity="secondary" outlined (click)="addPassenger()">Agregar pasajero</button>
       </div>
       <p class="mb-5 text-sm text-black/55">
         Obligatoria. Esta tabla se insertará después de la cláusula VIGÉSIMO SEGUNDO.
@@ -665,8 +669,10 @@
               pButton
               type="button"
               severity="danger"
-              text
-              class="self-end"
+              outlined
+              icon="pi pi-trash"
+              class="justify-self-start xl:justify-self-end"
+              [attr.aria-label]="'Quitar pasajero ' + (i + 1)"
               (click)="remove(passengers, i)"
             >
               Quitar

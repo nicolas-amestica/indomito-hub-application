@@ -8,9 +8,9 @@ export const APP_MESSAGES = {
   http: {
     upstreamServiceError:
       'No se pudieron obtener los tipos de cambio. Intenta nuevamente en unos minutos.',
-    validationError: 'Hay datos del programa que no son válidos. Revisa el formulario.',
-    requiredFieldMissing: 'Falta completar un dato obligatorio del programa.',
-    resourceNotFound: 'El favorito ya no existe. Actualiza el panel.',
+    validationError: 'Hay datos de la cotización que no son válidos. Revisa el formulario.',
+    requiredFieldMissing: 'Falta completar un dato obligatorio de la cotización.',
+    resourceNotFound: 'La cotización ya no existe. Actualiza el panel.',
     unexpected: 'Ocurrió un problema inesperado. Intenta nuevamente.',
   },
   forms: {
@@ -31,11 +31,11 @@ export const APP_MESSAGES = {
     initialConfigurationError: 'No se pudo cargar la configuración inicial del contrato.',
   },
   programs: {
-    favoritesUnavailable: 'El guardado de favoritos no está disponible en este ambiente.',
-    favoriteSaved: 'El favorito se guardó correctamente.',
-    favoriteLoaded: 'El favorito se cargó con los tipos de cambio vigentes.',
-    favoriteDeleted: 'El favorito se eliminó correctamente.',
-    favoriteOperationError: 'No se pudo completar la operación con favoritos.',
+    favoritesUnavailable: 'El guardado de cotizaciones no está disponible en este ambiente.',
+    favoriteSaved: 'La cotización se guardó correctamente.',
+    favoriteLoaded: 'La cotización se cargó con los tipos de cambio vigentes.',
+    favoriteDeleted: 'La cotización se eliminó correctamente.',
+    favoriteOperationError: 'No se pudo completar la operación con cotizaciones.',
     excelExportError: 'No se pudo exportar el detalle a Excel. Inténtalo nuevamente.',
     destinationRequired: 'Selecciona un destino antes de exportar el presupuesto.',
     pdfExportError: 'No se pudo exportar el presupuesto. Inténtalo nuevamente.',

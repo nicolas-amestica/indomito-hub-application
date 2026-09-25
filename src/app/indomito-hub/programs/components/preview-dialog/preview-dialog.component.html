@@ -1,5 +1,5 @@
 <p-dialog
-  header="Previsualización del programa"
+  header="Previsualización de la cotización"
   role="dialog"
   styleClass="w-[min(72rem,calc(100vw-2rem))]"
   contentStyleClass="p-0"
@@ -23,7 +23,7 @@
         class="rounded-xl border border-line bg-surface p-4"
       >
         <div class="flex flex-col gap-1 border-b border-line pb-3">
-          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-graphite">Programa</p>
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-graphite">Cotización</p>
           <h2 id="preview-general-heading" class="text-xl font-semibold text-ink">
             {{ program().generals.name }}
           </h2>
@@ -315,7 +315,7 @@
             </dd>
           </div>
           <div class="rounded-lg bg-canvas px-3 py-2">
-            <dt class="text-xs font-medium text-graphite">Total programa</dt>
+            <dt class="text-xs font-medium text-graphite">Total cotización</dt>
             <dd class="font-bold tabular-nums text-graphite">
               {{ program().totals.totalCLP | clpAmount }} CLP
             </dd>
@@ -382,7 +382,7 @@
           type="button"
           [disabled]="busy() || !favoriteAvailable()"
           [title]="
-            favoriteAvailable() ? 'Guardar favorito' : 'Guardado no disponible en este ambiente'
+            favoriteAvailable() ? 'Guardar cotización' : 'Guardado no disponible en este ambiente'
           "
           (click)="favoriteRequested.emit()"
         >

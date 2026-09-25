@@ -10,7 +10,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.claude/rules/global-rules.md",
       "targetPath": ".claude/rules/global-rules.md",
-      "checksum": "sha256:fd09c4dc45e71a7034d2873e0d2b47ee119e36c97d8bded49f72de4ef3c3376e"
+      "checksum": "sha256:3f3b9aae3c69f9c73092b28321af164fe677d49533ee70c2c40cc1c7f29981dd"
     },
     {
       "sourcePaths": [
@@ -87,7 +87,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/AGENTS.md",
       "targetPath": "AGENTS.md",
-      "checksum": "sha256:b7ca9ae8020ec806cccba0fbb5202e128c68f97bbcd0622b78ee26fece534c2f"
+      "checksum": "sha256:8ffa18792e732e6cdd4eec43437f55974478e91b8bf39fd3e34eb944384e9564"
     },
     {
       "sourcePaths": [
@@ -99,7 +99,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/CLAUDE.md",
       "targetPath": ".claude/CLAUDE.md",
-      "checksum": "sha256:f16fc954b62324f12a6b40661c6ec0d13565f93da4066fd1dc317ac0f16fad38"
+      "checksum": "sha256:86f9b92b988495cdf4d1c6dbbdabc4371ffe66a0c81f0418efade0b43c1f8d5b"
     },
     {
       "sourcePaths": [
@@ -111,7 +111,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/GEMINI.md",
       "targetPath": ".gemini/GEMINI.md",
-      "checksum": "sha256:bc00dbe605c812409bfe8863356512bba19fcd877d6d9c5c96d2b34035361002"
+      "checksum": "sha256:6da386cca79b6e9e64b9d1f1000a070b35c4d849e7a2f2ee17d0c3ba4c2db678"
     },
     {
       "sourcePaths": [
@@ -191,6 +191,6 @@
   ],
   "managedBy": "indomito-context-compiler",
   "artifactFormatVersion": 1,
-  "sourceCommit": "4605676eea648acf6965417483e25ed0d6b47005",
+  "sourceCommit": "fc8bb1654d6a2579e251b286abc99d07b33f5df1",
   "sourceDirty": true
 }

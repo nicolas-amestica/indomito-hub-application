@@ -16,7 +16,7 @@ import type {
 } from './program.interface';
 
 /** Colección reutilizable que identifica favoritos de programa. */
-export type FavoriteScope = 'programa';
+export type FavoriteScope = 'cotizacion';
 
 /** Favorito con el precio y el snapshot de tipo de cambio aceptados. */
 export interface Favorite {

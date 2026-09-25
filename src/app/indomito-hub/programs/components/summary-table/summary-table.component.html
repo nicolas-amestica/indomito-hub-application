@@ -10,7 +10,7 @@
     <div class="border-b border-line bg-canvas/70 px-5 py-4 sm:px-6">
       <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         @if (embedded()) {
-          <h2 id="summary-heading" class="sr-only">Resumen del programa</h2>
+          <h2 id="summary-heading" class="sr-only">Resumen de la cotización</h2>
         } @else {
           <div class="flex items-start gap-3">
             <span
@@ -276,7 +276,7 @@
     <td colspan="7" class="px-4 py-4">
       <div
         class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
-        aria-label="Totales del programa"
+        aria-label="Totales de la cotización"
         aria-live="polite"
         aria-atomic="true"
       >
@@ -331,7 +331,7 @@
           >
         </div>
         <div class="rounded-lg bg-canvas px-3 py-2 shadow-sm">
-          <span class="block text-xs font-medium text-graphite">Total del programa</span>
+          <span class="block text-xs font-medium text-graphite">Total de la cotización</span>
           <strong class="tabular-nums text-graphite"
             >{{ totals().totalCLP | clpAmount }} CLP</strong
           >

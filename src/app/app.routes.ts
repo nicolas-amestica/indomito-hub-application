@@ -15,7 +15,7 @@ export const routes: Routes = [
       import('./core/layout/app-shell.component').then((m) => m.AppShellComponent),
     children: [
       {
-        path: 'programas',
+        path: 'cotizaciones',
         data: { module: 'PROGRAMS' },
         canActivate: [moduleGuard],
         loadChildren: () =>
@@ -33,7 +33,7 @@ export const routes: Routes = [
             (m) => m.ADMINISTRATION_ROUTES,
           ),
       },
-      { path: '', pathMatch: 'full', redirectTo: 'programas' },
+      { path: '', pathMatch: 'full', redirectTo: 'cotizaciones' },
     ],
   },
   { path: '**', redirectTo: '' },

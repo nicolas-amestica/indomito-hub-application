@@ -14,8 +14,8 @@ describe('FavoritesPanelComponent', () => {
     await fixture.whenStable();
     const host = fixture.nativeElement as HTMLElement;
 
-    expect(host.textContent).toContain('No hay favoritos para mostrar.');
-    host.querySelector<HTMLButtonElement>('[aria-label="Cerrar panel de favoritos"]')?.click();
+    expect(host.textContent).toContain('No hay cotizaciones para mostrar.');
+    host.querySelector<HTMLButtonElement>('[aria-label="Cerrar panel de cotizaciones"]')?.click();
     await fixture.whenStable();
 
     expect(fixture.componentInstance.visible()).toBe(false);
@@ -69,7 +69,7 @@ describe('FavoritesPanelComponent', () => {
 
 function createFixture(favorites: Favorite[]) {
   const fixture = TestBed.createComponent(FavoritesPanelComponent);
-  fixture.componentRef.setInput('scope', 'programa');
+  fixture.componentRef.setInput('scope', 'cotizacion');
   fixture.componentRef.setInput('favorites', favorites);
   fixture.componentRef.setInput('visible', true);
   return fixture;
@@ -79,7 +79,7 @@ function favorite(): Favorite {
   return {
     id: 'favorite-1',
     name: 'Brasil pedagógico',
-    scope: 'programa',
+    scope: 'cotizacion',
     content: {
       generals: {
         name: 'Brasil 2027',

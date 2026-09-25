@@ -47,13 +47,13 @@ describe('FavoritesStore', () => {
     const first = favorite('1', 'Brasil pedagógico');
     const second = favorite('2', 'Argentina cultural');
 
-    store.load('programa');
+    store.load('cotizacion');
     expect(store.loading()).toBe(true);
     response.next([first, second]);
     response.complete();
     store.searchTerm.set('  BRASIL  ');
 
-    expect(service.list).toHaveBeenCalledWith('programa');
+    expect(service.list).toHaveBeenCalledWith('cotizacion');
     expect(store.loading()).toBe(false);
     expect(store.visibleFavorites()).toEqual([first]);
   });
@@ -106,7 +106,7 @@ describe('FavoritesStore', () => {
     const selected = favorite('selected', 'Brasil');
     service.list.mockReturnValue(of([selected, favorite('other', 'Argentina')]));
     service.delete.mockReturnValue(of(undefined));
-    store.load('programa');
+    store.load('cotizacion');
     store.select(selected);
 
     store.delete(selected).subscribe();
@@ -125,7 +125,7 @@ function favorite(id: string, name: string): Favorite {
   return {
     id,
     name,
-    scope: 'programa',
+    scope: 'cotizacion',
     content: CONTENT,
     createdAt: '2026-09-14T12:00:00Z',
     updatedAt: '2026-09-14T12:00:00Z',

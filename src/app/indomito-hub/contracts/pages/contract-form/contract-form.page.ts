@@ -20,6 +20,7 @@ import { FavoritesService } from '../../../programs/services/favorites.service';
 import { calculateContractPayments } from '../../fn/calculate-contract-payments';
 import { birthDateValidator, rutValidator } from '../../fn/contract-validators';
 import { getInvalidContractFields } from '../../fn/get-invalid-contract-fields';
+import { RequiredFieldMessageDirective } from '../../directives/required-field-message.directive';
 import { CONTRACT_MONTHS, CONTRACT_SEX_OPTIONS } from '../../constants/contract-options';
 import type {
   Contract,
@@ -43,6 +44,7 @@ import { APP_MESSAGES } from '../../../../shared/constants/app-messages';
     InputNumber,
     InputText,
     ReactiveFormsModule,
+    RequiredFieldMessageDirective,
     Select,
   ],
   templateUrl: './contract-form.page.html',
@@ -579,7 +581,7 @@ export class ContractFormPage {
   private loadInitialData(editing: boolean): void {
     this.programsLoading.set(true);
     forkJoin({
-      programs: this.favoritesApi.list('programa'),
+      programs: this.favoritesApi.list('cotizacion'),
       configuration: this.api.getConfiguration('CTX'),
     })
       .pipe(

@@ -13,6 +13,6 @@ describe('getInvalidContractFields', () => {
       ]),
     });
 
-    expect(getInvalidContractFields(form)).toEqual(['Programa guardado', 'Nombres del pasajero']);
+    expect(getInvalidContractFields(form)).toEqual(['Cotización guardada', 'Nombres del pasajero']);
   });
 });

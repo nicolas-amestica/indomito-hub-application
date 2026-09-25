@@ -86,7 +86,7 @@ describe('SummaryTableComponent', () => {
     expect(host.querySelectorAll('[data-summary-row]')).toHaveLength(2);
     expect(host.textContent).toContain('Tripulación');
     expect(host.textContent).toContain('Por pasajero por noche');
-    expect(host.querySelectorAll('[aria-label="Totales del programa"] > div')).toHaveLength(11);
+    expect(host.querySelectorAll('[aria-label="Totales de la cotización"] > div')).toHaveLength(11);
     expect(host.textContent).toContain('2.533.356 CLP');
     expect(host.textContent).toContain('Banco Central de Chile');
     expect(host.textContent).toContain('IVA incluido');

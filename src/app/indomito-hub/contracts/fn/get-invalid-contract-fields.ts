@@ -1,7 +1,7 @@
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 
 const FIELD_LABELS: Record<string, string> = {
-  programId: 'Programa guardado',
+  programId: 'Cotización guardada',
   period: 'Período',
   'representatives[].name': 'Nombre del representante de Giras Indómito',
   'representatives[].dni': 'RUT del representante de Giras Indómito',
@@ -18,7 +18,7 @@ const FIELD_LABELS: Record<string, string> = {
   'trip.days': 'Días',
   'trip.nights': 'Noches',
   'trip.departurePoint': 'Punto de salida',
-  'plan.name': 'Nombre del programa',
+  'plan.name': 'Nombre de la cotización',
   'plan.servicesIncluded[].description': 'Descripción del servicio incluido',
   'payments.freePassengers': 'Pasajeros liberados',
   'payments.pricePerPerson': 'Precio por persona',

@@ -24,11 +24,11 @@ describe('FavoritesService', () => {
     const favorite = sampleFavorite();
     let received: Favorite[] | undefined;
 
-    service.list('programa').subscribe((value) => (received = value));
+    service.list('cotizacion').subscribe((value) => (received = value));
     const request = http.expectOne(
       (candidate) =>
-        candidate.url === `${environment.apiUrl}/favoritos` &&
-        candidate.params.get('scope') === 'programa',
+        candidate.url === `${environment.apiUrl}/cotizaciones` &&
+        candidate.params.get('scope') === 'cotizacion',
     );
     expect(request.request.method).toBe('GET');
     request.flush({ data: [favorite] });
@@ -46,13 +46,13 @@ describe('FavoritesService', () => {
     const received: Favorite[] = [];
 
     service.create(body).subscribe((value) => received.push(value));
-    const createRequest = http.expectOne(`${environment.apiUrl}/favoritos`);
+    const createRequest = http.expectOne(`${environment.apiUrl}/cotizaciones`);
     expect(createRequest.request.method).toBe('POST');
     expect(createRequest.request.body).toEqual(body);
     createRequest.flush({ data: created });
 
     service.update('01/a', body).subscribe((value) => received.push(value));
-    const updateRequest = http.expectOne(`${environment.apiUrl}/favoritos/01%2Fa`);
+    const updateRequest = http.expectOne(`${environment.apiUrl}/cotizaciones/01%2Fa`);
     expect(updateRequest.request.method).toBe('PUT');
     expect(updateRequest.request.body).toEqual(body);
     updateRequest.flush({ data: updated });
@@ -64,7 +64,7 @@ describe('FavoritesService', () => {
     let completed = false;
 
     service.delete('favorite-1').subscribe({ complete: () => (completed = true) });
-    const request = http.expectOne(`${environment.apiUrl}/favoritos/favorite-1`);
+    const request = http.expectOne(`${environment.apiUrl}/cotizaciones/favorite-1`);
     expect(request.request.method).toBe('DELETE');
     request.flush(null, { status: 204, statusText: 'No Content' });
 
@@ -76,7 +76,7 @@ function sampleFavorite(): Favorite {
   return {
     id: '01JQZ8AAAAAAAAAAAAAAAAAAAA',
     name: 'Brasil',
-    scope: 'programa',
+    scope: 'cotizacion',
     content: {
       generals: {
         name: 'Brasil 2027',

@@ -1,22 +1,22 @@
 <app-side-drawer
-  title="Favoritos"
+  title="Cotizaciones guardadas"
   description="Acceso rápido a configuraciones frecuentes"
   [eyebrow]="scope()"
-  ariaLabel="Favoritos"
-  closeAriaLabel="Cerrar panel de favoritos"
+  ariaLabel="Cotizaciones guardadas"
+  closeAriaLabel="Cerrar panel de cotizaciones"
   [visible]="visible()"
   [loading]="loading() || busy()"
   (visibleChange)="visible.set($event)"
 >
-  <nav drawer-collapsed aria-label="Acciones de favoritos" class="flex flex-col gap-3">
+  <nav drawer-collapsed aria-label="Acciones de cotizaciones" class="flex flex-col gap-3">
     <button
       pButton
       appMotionPress
       type="button"
       severity="secondary"
       outlined
-      aria-label="Actualizar favoritos"
-      title="Actualizar favoritos"
+      aria-label="Actualizar cotizaciones"
+      title="Actualizar cotizaciones"
       [disabled]="loading()"
       (click)="retryRequested.emit()"
     >
@@ -24,7 +24,7 @@
     </button>
     <span
       class="text-center text-xs font-semibold text-graphite"
-      aria-label="Cantidad de favoritos"
+      aria-label="Cantidad de cotizaciones"
     >
       {{ favorites().length }}
     </span>
@@ -33,14 +33,14 @@
   <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4">
     <div>
       <label for="favorite-search" class="mb-1.5 block text-sm font-medium text-ink">
-        Buscar favorito
+        Buscar cotización
       </label>
       <input
         id="favorite-search"
         pInputText
         type="search"
         class="w-full"
-        placeholder="Nombre del favorito"
+        placeholder="Nombre de la cotización"
         [value]="searchTerm()"
         (input)="updateSearch($event)"
       />
@@ -52,15 +52,15 @@
         class="flex flex-1 items-center justify-center gap-3 text-sm text-graphite"
       >
         <p-progress-spinner
-          ariaLabel="Cargando favoritos"
+          ariaLabel="Cargando cotizaciones"
           strokeWidth="6"
           [style]="{ width: '1.75rem', height: '1.75rem' }"
         />
-        Cargando favoritos…
+        Cargando cotizaciones…
       </div>
     } @else if (hasError()) {
       <div role="alert" class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-950">
-        <p class="text-sm font-medium">No se pudieron cargar los favoritos.</p>
+        <p class="text-sm font-medium">No se pudieron cargar las cotizaciones.</p>
         <button
           pButton
           type="button"
@@ -129,9 +129,9 @@
         } @empty {
           <li class="rounded-xl border border-dashed border-slate-300 bg-canvas p-5 text-center">
             @if (totalFavoriteCount() === 0) {
-              <p class="font-medium text-ink">No hay favoritos para mostrar.</p>
+              <p class="font-medium text-ink">No hay cotizaciones para mostrar.</p>
               <p class="mt-1 text-sm leading-6 text-graphite">
-                Completa el programa, previsualízalo y usa “Guardar favorito” para crear el primero.
+                Completa la cotización, previsualízala y guárdala para crear la primera.
               </p>
             } @else {
               <p class="font-medium text-ink">No hay coincidencias.</p>
@@ -147,7 +147,7 @@
 </app-side-drawer>
 
 <p-dialog
-  header="Guardar favorito"
+  header="Guardar cotización"
   styleClass="w-[min(28rem,calc(100vw-2rem))]"
   [visible]="saveDialogVisible()"
   [modal]="true"
@@ -157,12 +157,12 @@
   [closeOnEscape]="!busy()"
   [focusOnShow]="true"
   [focusTrap]="true"
-  closeAriaLabel="Cerrar diálogo de favorito"
+  closeAriaLabel="Cerrar diálogo de cotización"
   (onShow)="prepareSaveName()"
   (visibleChange)="saveDialogVisible.set($event)"
 >
   <form class="flex flex-col gap-2" (submit)="$event.preventDefault(); submitFavoriteName()">
-    <label for="favorite-name" class="text-sm font-medium text-ink">Nombre del favorito</label>
+    <label for="favorite-name" class="text-sm font-medium text-ink">Nombre de la cotización</label>
     <input
       id="favorite-name"
       pInputText
@@ -170,7 +170,7 @@
       autocomplete="off"
       class="w-full"
       [formControl]="favoriteName"
-      placeholder="Nombre para identificar el favorito"
+      placeholder="Nombre para identificar la cotización"
       [attr.aria-invalid]="favoriteName.invalid && favoriteName.touched"
       [attr.aria-describedby]="
         favoriteName.invalid && favoriteName.touched ? 'favorite-name-error' : null
@@ -178,7 +178,7 @@
     />
     @if (favoriteName.invalid && favoriteName.touched) {
       <small id="favorite-name-error" class="text-sm text-red-700">
-        Ingresa un nombre para el favorito.
+        Ingresa un nombre para la cotización.
       </small>
     }
   </form>
@@ -215,12 +215,12 @@
     [resizable]="false"
     [focusOnShow]="true"
     [focusTrap]="true"
-    closeAriaLabel="Cerrar visualización del favorito"
+    closeAriaLabel="Cerrar visualización de la cotización"
     (visibleChange)="$event || previewFavorite.set(null)"
   >
     <dl class="grid gap-4 text-sm sm:grid-cols-2">
       <div>
-        <dt class="text-muted">Programa</dt>
+        <dt class="text-muted">Cotización</dt>
         <dd class="font-medium text-ink">{{ favorite.content.generals.name }}</dd>
       </div>
       <div>
@@ -264,7 +264,7 @@
 
 @if (deleteCandidate(); as favorite) {
   <p-dialog
-    header="Eliminar favorito"
+    header="Eliminar cotización"
     styleClass="w-[min(28rem,calc(100vw-2rem))]"
     [visible]="true"
     [modal]="true"

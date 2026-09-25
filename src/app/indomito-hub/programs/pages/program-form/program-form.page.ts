@@ -120,7 +120,7 @@ export class ProgramFormPage {
 
     const visible = !this.favoritesOpen();
     this.favoritesOpen.set(visible);
-    if (visible) this.favoritesStore.load('programa');
+    if (visible) this.favoritesStore.load('cotizacion');
   }
 
   protected requestFavoriteSave(): void {

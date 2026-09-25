@@ -50,7 +50,7 @@ describe('BudgetPdfService', () => {
     let received: Blob | undefined;
 
     service.generate(REQUEST).subscribe((value) => (received = value));
-    const request = http.expectOne(`${environment.apiUrl}/programas:presupuesto`);
+    const request = http.expectOne(`${environment.apiUrl}/cotizaciones:presupuesto`);
 
     expect(request.request.method).toBe('POST');
     expect(request.request.body).toEqual(REQUEST);

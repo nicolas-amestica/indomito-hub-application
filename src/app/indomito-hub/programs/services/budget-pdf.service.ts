@@ -23,7 +23,7 @@ export class BudgetPdfService {
    * el cliente lo recibe correctamente como `Blob`.
    */
   generate(request: BudgetRequest): Observable<Blob> {
-    return this.http.post(`${environment.apiUrl}/programas:presupuesto`, request, {
+    return this.http.post(`${environment.apiUrl}/cotizaciones:presupuesto`, request, {
       responseType: 'blob',
     });
   }

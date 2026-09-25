@@ -14,7 +14,7 @@ import type {
 @Injectable({ providedIn: 'root' })
 export class FavoritesService {
   private readonly http = inject(HttpClient);
-  private readonly endpoint = `${environment.apiUrl}/favoritos`;
+  private readonly endpoint = `${environment.apiUrl}/cotizaciones`;
 
   /** Lista la colección del usuario autenticado para el scope indicado. */
   list(scope: FavoriteScope): Observable<Favorite[]> {

@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @plugin '@iconify/tailwind4';
+@custom-variant dark (&:where(.dark, .dark *));
 /* Los módulos llegan desde DynamoDB; estas clases no pueden descubrirse en templates. */
 @source inline("icon-[tabler--settings] icon-[tabler--adjustments] icon-[tabler--shield-lock] icon-[tabler--route] icon-[tabler--map-route] icon-[tabler--point]");
 
@@ -34,6 +35,34 @@
   ::selection {
     background: var(--color-brand);
     color: var(--color-ink);
+  }
+}
+
+.dark {
+  --color-ink: #f4f4f5;
+  --color-graphite: #d4d4d8;
+  --color-muted: #a1a1aa;
+  --color-canvas: #111214;
+  --color-surface: #1b1c1f;
+  --color-line: #3f3f46;
+  --color-control-border: #71717a;
+  --color-brand-soft: #343800;
+  --shadow-panel: 0 18px 45px -36px rgba(0, 0, 0, 0.95);
+}
+
+/* Compatibilidad de las superficies legacy mientras los módulos consumen los
+   tokens semánticos. Estas equivalencias no alteran controles PrimeNG. */
+@layer utilities {
+  .dark .bg-white {
+    background-color: var(--color-surface);
+  }
+  .dark .border-black\/10 {
+    border-color: color-mix(in srgb, var(--color-line) 80%, transparent);
+  }
+  .dark .text-black\/55,
+  .dark .text-black\/50,
+  .dark .text-black\/45 {
+    color: var(--color-muted);
   }
 }
 

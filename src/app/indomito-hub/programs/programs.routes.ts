@@ -12,7 +12,7 @@ import { Routes } from '@angular/router';
 export const PROGRAMS_ROUTES: Routes = [
   {
     path: 'nuevo',
-    title: 'Programa',
+    title: 'Cotización',
     loadComponent: () =>
       import('./pages/program-form/program-form.page').then((m) => m.ProgramFormPage),
   },

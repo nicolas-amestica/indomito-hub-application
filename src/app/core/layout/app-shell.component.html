@@ -1,11 +1,23 @@
 <div class="min-h-screen bg-surface-50 text-ink">
   <header class="sticky top-0 z-40 border-b border-black/10 bg-ink/95 text-white backdrop-blur-xl">
     <div class="mx-auto flex max-w-[1500px] items-center gap-4 px-4 py-3 sm:px-8">
-      <a routerLink="/programas" class="flex items-center gap-3">
+      <a routerLink="/cotizaciones" class="flex items-center gap-3">
         <img src="brand/logo-web-large.png" alt="Giras Indómito" class="h-9 w-auto" />
         <span class="hidden text-sm font-semibold sm:block">Indómito Hub</span>
       </a>
       <div class="ml-auto flex items-center gap-3">
+        <button
+          pButton
+          type="button"
+          rounded
+          text
+          [attr.aria-label]="theme.label()"
+          [pTooltip]="theme.label()"
+          tooltipPosition="bottom"
+          (click)="theme.toggle()"
+        >
+          <i [class]="theme.icon()" aria-hidden="true"></i>
+        </button>
         <button
           type="button"
           class="flex h-10 items-center gap-2 rounded-xl border border-white/15 px-3 text-sm font-semibold transition hover:border-brand/60 hover:bg-white/10"

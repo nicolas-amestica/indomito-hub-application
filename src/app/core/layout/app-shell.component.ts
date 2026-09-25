@@ -1,15 +1,19 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Dialog } from 'primeng/dialog';
+import { ButtonDirective } from 'primeng/button';
+import { Tooltip } from 'primeng/tooltip';
 import { AuthService } from '../auth/auth.service';
+import { ThemeService } from '../theme/theme.service';
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Dialog],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Dialog, ButtonDirective, Tooltip],
   templateUrl: './app-shell.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppShellComponent {
   readonly auth = inject(AuthService);
+  readonly theme = inject(ThemeService);
   readonly open = signal(false);
   readonly category = signal('Todos');
   readonly navigableModules = computed(() =>

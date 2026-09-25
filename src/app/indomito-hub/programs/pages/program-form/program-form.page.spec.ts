@@ -105,9 +105,9 @@ describe('ProgramFormPage', () => {
     await fixture.whenStable();
     const host = fixture.nativeElement as HTMLElement;
 
-    expect(host.querySelector('h1')?.textContent?.trim()).toBe('Crear Programa');
+    expect(host.querySelector('h1')?.textContent?.trim()).toBe('Crear Cotización');
     expect(host.querySelectorAll('header p')[1]?.textContent?.trim()).toBe(
-      'Completa el formulario para crear un nuevo programa de viajes.',
+      'Completa el formulario para crear una nueva cotización de viaje.',
     );
   });
 
@@ -182,7 +182,7 @@ describe('ProgramFormPage', () => {
     const fixture = TestBed.createComponent(ProgramFormPage);
     await fixture.whenStable();
     const host = fixture.nativeElement as HTMLElement;
-    expect(host.textContent).toContain('No se pudieron obtener los catálogos del programa.');
+    expect(host.textContent).toContain('No se pudieron obtener los catálogos de la cotización.');
 
     catalogResponse$ = of(emptyCatalog());
     buttonNamed(host, 'Reintentar catálogos').click();
@@ -207,15 +207,15 @@ describe('ProgramFormPage', () => {
     await fixture.whenStable();
     const host = fixture.nativeElement as HTMLElement;
 
-    buttonNamed(host, 'Favoritos').click();
+    buttonNamed(host, 'Cotizaciones guardadas').click();
     await fixture.whenStable();
-    buttonNamed(host, 'Cerrar favoritos').click();
+    buttonNamed(host, 'Cerrar cotizaciones').click();
     await fixture.whenStable();
-    buttonNamed(host, 'Favoritos').click();
+    buttonNamed(host, 'Cotizaciones guardadas').click();
     await fixture.whenStable();
 
     expect(listFavorites).toHaveBeenCalledTimes(2);
-    expect(listFavorites).toHaveBeenNthCalledWith(1, 'programa');
+    expect(listFavorites).toHaveBeenNthCalledWith(1, 'cotizacion');
   });
 
   it('muestra el aviso y deshabilita favoritos cuando el ambiente no los expone', async () => {
@@ -225,9 +225,9 @@ describe('ProgramFormPage', () => {
     const host = fixture.nativeElement as HTMLElement;
 
     expect(host.textContent).toContain(
-      'El guardado de favoritos no está disponible en este ambiente.',
+      'El guardado de cotizaciones no está disponible en este ambiente.',
     );
-    expect(buttonNamed(host, 'Favoritos').disabled).toBe(true);
+    expect(buttonNamed(host, 'Cotizaciones guardadas').disabled).toBe(true);
     expect(listFavorites).not.toHaveBeenCalled();
   });
 
@@ -240,7 +240,7 @@ describe('ProgramFormPage', () => {
     const store = fixture.debugElement.injector.get(ProgramFormStore);
     await fixture.whenStable();
     const host = fixture.nativeElement as HTMLElement;
-    buttonNamed(host, 'Favoritos').click();
+    buttonNamed(host, 'Cotizaciones guardadas').click();
     await fixture.whenStable();
     const panel = fixture.debugElement.query(By.directive(FavoritesPanelComponent))
       .componentInstance as FavoritesPanelComponent;
@@ -252,9 +252,9 @@ describe('ProgramFormPage', () => {
     expect(store.nightsSource()).toBe('user');
     expect(store.program()?.pricing.exchange).toEqual(freshSnapshot());
     expect(store.rows()[1].effectiveRate).toBe(1_050);
-    expect(buttonNamed(host, 'Favoritos')).toBeTruthy();
+    expect(buttonNamed(host, 'Cotizaciones guardadas')).toBeTruthy();
     expect(notifySuccess).toHaveBeenCalledWith(
-      'El favorito se cargó con los tipos de cambio vigentes.',
+      'La cotización se cargó con los tipos de cambio vigentes.',
     );
   });
 
@@ -545,7 +545,7 @@ describe('ProgramFormPage', () => {
       source: 'banco-central',
       isFallback: false,
     });
-    expect(notifySuccess).toHaveBeenCalledWith('El favorito se guardó correctamente.');
+    expect(notifySuccess).toHaveBeenCalledWith('La cotización se guardó correctamente.');
   });
 
   it('deshabilita las acciones durante la exportación solicitada desde la previsualización', async () => {
@@ -654,7 +654,7 @@ function sampleFavorite(): Favorite {
   return {
     id: 'favorite-1',
     name: 'Mi favorito',
-    scope: 'programa',
+    scope: 'cotizacion',
     content: {
       generals: {
         name: 'Brasil 2027',
