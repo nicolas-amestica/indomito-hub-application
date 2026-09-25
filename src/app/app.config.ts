@@ -8,6 +8,7 @@ import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { registerLicense } from '@primeui/license-manager';
 import { MessageService } from 'primeng/api';
 import { providePrimeNG } from 'primeng/config';
+import { DialogService } from 'primeng/dynamicdialog';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './core/auth/auth.interceptor';
@@ -61,5 +62,6 @@ export const appConfig: ApplicationConfig = {
     },
 
     MessageService,
+    DialogService,
   ],
 };

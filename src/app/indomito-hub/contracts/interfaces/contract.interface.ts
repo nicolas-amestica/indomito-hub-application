@@ -99,6 +99,17 @@ export interface Contract {
   createdAt: string;
   updatedAt: string;
   version: number;
+  pdfDocument?: {
+    objectKey: string;
+    contentType: string;
+    size: number;
+    sha256: string;
+    generatedAt: string;
+  };
+}
+export interface ContractPDFAccess {
+  url: string;
+  expiresAt: string;
 }
 export interface ContractCreateRequest {
   programId?: string;

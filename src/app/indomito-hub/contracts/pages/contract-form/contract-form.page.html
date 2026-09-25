@@ -4,8 +4,8 @@
       <p class="text-xs font-bold uppercase tracking-[.2em] text-brand-active">Contratos</p>
       <h1 class="mt-2 text-3xl font-semibold text-ink">Contrato de prestación de servicios</h1>
       <p class="mt-2 max-w-3xl text-sm text-black/55">
-        Importa la ficha del cliente y selecciona un programa. Los totales se
-        recalculan automáticamente hasta que el contrato sea aprobado.
+        Importa la ficha del cliente y selecciona un programa. Los totales se recalculan
+        automáticamente hasta que el contrato sea aprobado.
       </p>
     </div>
     <div class="flex flex-wrap gap-3">
@@ -39,7 +39,7 @@
         [disabled]="busy()"
         (click)="preview()"
       >
-        Vista previa PDF
+        {{ status() === 'PENDING_APPROVAL' ? 'Revisar y aprobar PDF' : 'Vista previa PDF' }}
       </button>
       <button pButton type="button" [disabled]="locked() || busy()" (click)="save()">
         {{ busy() ? 'Guardando…' : 'Guardar contrato' }}
@@ -51,7 +51,9 @@
     <div
       class="mb-6 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900"
     >
-      Este contrato está aprobado y quedó bloqueado para edición.
+      <span class="pi pi-lock mr-2" aria-hidden="true"></span>
+      Este contrato está aprobado. El PDF definitivo quedó protegido y disponible en “Vista previa
+      PDF”.
     </div>
   }
 

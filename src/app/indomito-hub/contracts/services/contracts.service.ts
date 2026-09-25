@@ -8,6 +8,7 @@ import type {
   ContractContent,
   ContractCreateRequest,
   ContractFormConfiguration,
+  ContractPDFAccess,
   ContractUpdateRequest,
 } from '../interfaces/contract.interface';
 
@@ -46,5 +47,10 @@ export class ContractsService {
   }
   generatePdf(content: ContractContent, preview = true): Observable<Blob> {
     return this.http.post(`${this.endpoint}:pdf`, { content, preview }, { responseType: 'blob' });
+  }
+  getApprovedPdf(id: string): Observable<ContractPDFAccess> {
+    return this.http
+      .get<ApiSuccessEnvelope<ContractPDFAccess>>(`${this.endpoint}/${encodeURIComponent(id)}/pdf`)
+      .pipe(map(({ data }) => data));
   }
 }

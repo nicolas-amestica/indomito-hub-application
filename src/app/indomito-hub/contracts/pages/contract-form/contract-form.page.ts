@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '
 import { ReactiveFormsModule, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { distinctUntilChanged, finalize, forkJoin, merge, skip } from 'rxjs';
+import { distinctUntilChanged, finalize, forkJoin, merge, skip, type Observable } from 'rxjs';
 import { ButtonDirective } from 'primeng/button';
 import { DatePicker } from 'primeng/datepicker';
 import { FileUpload } from 'primeng/fileupload';
@@ -26,11 +26,13 @@ import type {
   Contract,
   ContractContent,
   ContractFormConfiguration,
+  ContractPDFAccess,
   ContractProgramReference,
   ContractStatus,
 } from '../../interfaces/contract.interface';
 import { ContractsService } from '../../services/contracts.service';
 import { ContractTemplateService } from '../../services/contract-template.service';
+import { DocumentPreviewService } from '../../../../shared/documents/services/document-preview.service';
 
 @Component({
   selector: 'app-contract-form-page',
@@ -56,6 +58,7 @@ export class ContractFormPage {
   private readonly notifications = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
+  private readonly documentPreview = inject(DocumentPreviewService);
   protected readonly busy = signal(false);
   protected readonly importing = signal(false);
   protected readonly contractId = signal<string | null>(null);
@@ -70,7 +73,6 @@ export class ContractFormPage {
   protected readonly statusOptions: Array<{ label: string; value: ContractStatus }> = [
     { label: 'Borrador', value: 'DRAFT' },
     { label: 'Pendiente de aprobación', value: 'PENDING_APPROVAL' },
-    { label: 'Aprobado', value: 'APPROVED' },
     { label: 'Rechazado', value: 'REJECTED' },
     { label: 'Cancelado', value: 'CANCELLED' },
   ];
@@ -320,18 +322,74 @@ export class ContractFormPage {
       this.form.markAllAsTouched();
       return;
     }
+    const id = this.contractId();
+    const document$: Observable<Blob | ContractPDFAccess> =
+      this.locked() && id
+        ? this.api.getApprovedPdf(id)
+        : this.api.generatePdf(this.content(), true);
     this.busy.set(true);
-    this.api
-      .generatePdf(this.content(), true)
+    document$
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.busy.set(false)),
       )
       .subscribe({
-        next: (blob) => {
-          const url = URL.createObjectURL(blob);
-          window.open(url, '_blank', 'noopener,noreferrer');
-          setTimeout(() => URL.revokeObjectURL(url), 60_000);
+        next: (document: Blob | ContractPDFAccess) => {
+          const source = document instanceof Blob ? document : document.url;
+          const ref = this.documentPreview.open({
+            title: this.locked() ? 'Contrato aprobado' : 'Vista previa del contrato',
+            description: this.locked()
+              ? 'Este es el documento definitivo almacenado al aprobar el contrato.'
+              : 'Revisa el contenido completo antes de enviarlo a aprobación.',
+            documents: [
+              {
+                name: 'contrato-prestacion-servicios.pdf',
+                mimeType: 'application/pdf',
+                source,
+              },
+            ],
+            primaryAction:
+              this.status() === 'PENDING_APPROVAL' && id
+                ? {
+                    id: 'approve',
+                    label: 'Aprobar contrato',
+                    icon: 'pi pi-check-circle',
+                    severity: 'success',
+                    confirmationMessage:
+                      'El PDF se guardará como definitivo y el contrato ya no podrá modificarse.',
+                  }
+                : undefined,
+          });
+          ref.onClose
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((result: { action?: string } | undefined) => {
+              if (result?.action === 'approve') this.approve();
+            });
+        },
+      });
+  }
+
+  private approve(): void {
+    const id = this.contractId();
+    if (!id || this.status() !== 'PENDING_APPROVAL' || this.busy()) return;
+    this.busy.set(true);
+    this.api
+      .update(id, {
+        programId: this.form.controls.programId.value || undefined,
+        programReference: this.programReference() ?? undefined,
+        period: this.periodValue(this.form.controls.period.value),
+        status: 'APPROVED',
+        content: this.content(),
+        version: this.version(),
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.busy.set(false)),
+      )
+      .subscribe({
+        next: (contract) => {
+          this.applyContract(contract);
+          this.notifications.success('Contrato aprobado y PDF definitivo almacenado.');
         },
       });
   }
