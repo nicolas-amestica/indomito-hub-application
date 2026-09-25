@@ -556,16 +556,9 @@ export class ContractFormPage {
       Object.values(passenger.getRawValue()).some(Boolean),
     ).length;
     const enteredFreePassengers = payments.freePassengers.value ?? 0;
-    const freePassengers =
-      passengerCount > 0
-        ? Math.min(Math.max(0, Math.trunc(enteredFreePassengers)), Math.max(0, passengerCount - 1))
-        : Math.max(0, Math.trunc(enteredFreePassengers));
-    if (freePassengers !== enteredFreePassengers) {
-      payments.freePassengers.setValue(freePassengers, { emitEvent: false });
-    }
     const calculated = calculateContractPayments({
       passengerCount,
-      freePassengers,
+      freePassengers: Math.max(0, Math.trunc(enteredFreePassengers)),
       pricePerPerson: payments.pricePerPerson.value ?? 0,
       downPayment: payments.downPayment.value ?? 0,
       installmentQuantity: payments.installments.controls.quantity.value ?? 0,

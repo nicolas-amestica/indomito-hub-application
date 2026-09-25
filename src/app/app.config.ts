@@ -13,6 +13,7 @@ import { routes } from './app.routes';
 import { authInterceptor } from './core/auth/auth.interceptor';
 import { correlationIdInterceptor } from './core/http/correlation-id.interceptor';
 import { errorInterceptor } from './core/http/error.interceptor';
+import { PRIMENG_ES_CL } from './core/i18n/primeng-es-cl';
 import { IndomitoPreset } from './core/theme/indomito.preset';
 
 registerLocaleData(localeEsCl);
@@ -41,6 +42,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
 
     providePrimeNG({
+      translation: PRIMENG_ES_CL,
       theme: {
         preset: IndomitoPreset,
         options: {
