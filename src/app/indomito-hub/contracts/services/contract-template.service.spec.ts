@@ -9,14 +9,26 @@ describe('ContractTemplateService', () => {
     const sheet = workbook.getWorksheet('Contrato');
     const metadata = workbook.getWorksheet('_import');
     expect(sheet).toBeDefined();
-    expect((sheet as unknown as { sheetProtection?: { sheet: boolean } }).sheetProtection?.sheet).toBe(true);
+    expect(
+      (sheet as unknown as { sheetProtection?: { sheet: boolean } }).sheetProtection?.sheet,
+    ).toBe(true);
     expect(metadata?.state).toBe('veryHidden');
     let passengerHeaderRow = 0;
-    sheet?.eachRow((row) => { if (row.getCell(1).value === 'Nombres') passengerHeaderRow = row.number; });
+    sheet?.eachRow((row) => {
+      if (row.getCell(1).value === 'Nombres') passengerHeaderRow = row.number;
+    });
     expect(passengerHeaderRow).toBeGreaterThan(0);
     const firstPassengerRow = passengerHeaderRow + 1;
     expect(sheet?.getCell(firstPassengerRow, 3).dataValidation.type).toBe('custom');
     expect(sheet?.getCell(firstPassengerRow, 4).dataValidation.type).toBe('date');
+    expect(sheet?.getCell(firstPassengerRow, 6).dataValidation.type).toBe('list');
     expect(sheet?.getCell(firstPassengerRow, 1).protection.locked).toBe(false);
+    const visibleText: string[] = [];
+    sheet?.eachRow((row) => row.eachCell((cell) => visibleText.push(String(cell.value ?? ''))));
+    expect(visibleText).toContain('REPRESENTANTES QUE FIRMARÁN EL CONTRATO');
+    expect(visibleText).toContain('Curso');
+    expect(visibleText).toContain('Sexo');
+    expect(visibleText).not.toContain('Precio por persona CLP');
+    expect(visibleText).not.toContain('Número de cuenta');
   });
 });
