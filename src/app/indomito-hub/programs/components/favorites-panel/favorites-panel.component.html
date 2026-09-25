@@ -170,6 +170,7 @@
       autocomplete="off"
       class="w-full"
       [formControl]="favoriteName"
+      placeholder="Nombre para identificar el favorito"
       [attr.aria-invalid]="favoriteName.invalid && favoriteName.touched"
       [attr.aria-describedby]="
         favoriteName.invalid && favoriteName.touched ? 'favorite-name-error' : null

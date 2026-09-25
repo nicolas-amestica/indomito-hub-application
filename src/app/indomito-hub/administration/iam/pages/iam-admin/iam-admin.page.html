@@ -326,6 +326,7 @@
                   class="iam-input"
                   name="name"
                   [(ngModel)]="user.name"
+                  placeholder="Nombre y apellidos"
                   required /></label
               ><label class="iam-field"
                 >Correo<input
@@ -333,11 +334,22 @@
                   name="email"
                   type="email"
                   [(ngModel)]="user.email"
+                  placeholder="correo@empresa.cl"
                   required /></label
               ><label class="iam-field"
-                >RUT<input class="iam-input" name="rut" [(ngModel)]="user.rut" required /></label
+                >RUT<input
+                  class="iam-input"
+                  name="rut"
+                  [(ngModel)]="user.rut"
+                  placeholder="Ej. 12.345.678-5"
+                  required /></label
               ><label class="iam-field"
-                >Perfil<select class="iam-input" name="profile" [(ngModel)]="user.profileCode">
+                >Perfil<select
+                  class="iam-input"
+                  name="profile"
+                  [(ngModel)]="user.profileCode"
+                  aria-label="Seleccionar perfil"
+                >
                   @for (p of profiles(); track p.code) {
                     <option [value]="p.code">{{ p.title }}</option>
                   }
@@ -349,6 +361,7 @@
                   name="password"
                   type="password"
                   [(ngModel)]="user.password"
+                  placeholder="Ingresa una clave segura"
                   [required]="!user.id"
               /></label>
             } @else if (dialog() === 'profile') {
@@ -357,6 +370,7 @@
                   class="iam-input uppercase"
                   name="code"
                   [(ngModel)]="profile.code"
+                  placeholder="Ej. ADM"
                   [readonly]="!!editingProfileCode()"
                   required /></label
               ><label class="iam-field"
@@ -364,12 +378,14 @@
                   class="iam-input"
                   name="title"
                   [(ngModel)]="profile.title"
+                  placeholder="Nombre del perfil"
                   required /></label
               ><label class="iam-field sm:col-span-2"
                 >Descripción<textarea
                   class="iam-input min-h-24"
                   name="description"
                   [(ngModel)]="profile.description"
+                  placeholder="Describe el propósito del perfil"
                 ></textarea>
               </label>
             } @else {
@@ -378,18 +394,21 @@
                   class="iam-input uppercase"
                   name="code"
                   [(ngModel)]="module.code"
+                  placeholder="Ej. CONTRACT_CREATE"
                   required /></label
               ><label class="iam-field"
                 >Nombre<input
                   class="iam-input"
                   name="title"
                   [(ngModel)]="module.title"
+                  placeholder="Nombre visible del módulo"
                   required /></label
               ><label class="iam-field"
                 >Módulo padre<select
                   class="iam-input"
                   name="parent"
                   [(ngModel)]="module.parentCode"
+                  aria-label="Seleccionar módulo padre"
                 >
                   <option value="">Ninguno (nivel principal)</option>
                   @for (m of rootModules(); track m.code) {
@@ -401,6 +420,7 @@
                   class="iam-input"
                   name="path"
                   [(ngModel)]="module.path"
+                  placeholder="Ej. /contratos/nuevo"
                   required /></label
               ><label class="iam-field sm:col-span-2"
                 >Endpoints autorizados<input
@@ -412,13 +432,15 @@
                 >Ícono Tabler<input
                   class="iam-input"
                   name="icon"
-                  [(ngModel)]="module.icon" /></label
+                  [(ngModel)]="module.icon"
+                  placeholder="Ej. file-description" /></label
               ><label class="iam-field"
                 >Orden<input
                   class="iam-input"
                   name="order"
                   type="number"
                   [(ngModel)]="module.order"
+                  placeholder="Orden de visualización"
               /></label>
             }
             <label class="flex items-center gap-3 text-sm font-semibold sm:col-span-2"

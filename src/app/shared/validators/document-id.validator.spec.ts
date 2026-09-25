@@ -37,6 +37,13 @@ describe('isValidDocumentId', () => {
       expect(isValidDocumentId(value)).toBe(true);
     });
 
+    it('acepta únicamente el RUT de excepción 1-9', () => {
+      expect(isValidDocumentId('1-9')).toBe(true);
+      expect(isValidDocumentId(' 1-9 ')).toBe(true);
+      expect(isValidDocumentId('1-8')).toBe(false);
+      expect(isValidDocumentId('2-7')).toBe(false);
+    });
+
     it('rechaza un cuerpo de ocho dígitos con el verificador equivocado', () => {
       // Nueve caracteres normalizados: ni el DNI ni el CPF pueden rescatarlo, así
       // que el rechazo depende solo del dígito verificador.

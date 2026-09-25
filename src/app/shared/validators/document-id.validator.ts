@@ -73,6 +73,9 @@ const DNI_MAX_LENGTH = 8;
 /** Un CPF brasileño tiene 11 dígitos, verificadores incluidos. */
 const CPF_LENGTH = 11;
 
+/** RUT convencional de excepción aceptado para tripulantes sin RUT definitivo. */
+const EXCEPTIONAL_RUT = '1-9';
+
 /**
  * Valida el documento de identidad de un control del formulario
  * (Requirement 5.9). Reporta `{ documentId: true }` cuando el valor no
@@ -106,6 +109,8 @@ export const documentIdValidator: ValidatorFn = (
  * replica a `IsValidDocumentID` de Go; el `ValidatorFn` solo la envuelve.
  */
 export function isValidDocumentId(value: string): boolean {
+  if (value.trim() === EXCEPTIONAL_RUT) return true;
+
   const normalized = normalizeDocumentId(value);
   if (normalized === '') return false;
 

@@ -15,12 +15,14 @@
         >RUT o correo<input
           formControlName="login"
           autocomplete="username"
+          placeholder="RUT o correo corporativo"
           class="h-12 rounded-xl border border-white/15 bg-black/20 px-4 text-white outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20" /></label
       ><label class="grid gap-2 text-sm font-semibold text-white/80"
         >Clave<input
           type="password"
           formControlName="password"
           autocomplete="current-password"
+          placeholder="Ingresa tu clave"
           class="h-12 rounded-xl border border-white/15 bg-black/20 px-4 text-white outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
       /></label>
       @if (error()) {
