@@ -9,14 +9,36 @@
       </p>
     </div>
     <div class="flex flex-wrap gap-3">
-      <button pButton type="button" severity="secondary" outlined [disabled]="!configuration()"
-        (click)="template.download(configuration()?.countries ?? [])">
+      <button
+        pButton
+        type="button"
+        severity="secondary"
+        outlined
+        [disabled]="!configuration()"
+        (click)="template.download(configuration()?.countries ?? [])"
+      >
         Descargar plantilla Excel
       </button>
-      <p-fileupload #excelUpload mode="basic" name="contractTemplate" accept=".xlsx" chooseIcon="pi pi-upload"
-        [chooseLabel]="importing() ? 'Importando…' : 'Cargar Excel'" [auto]="true" [customUpload]="true"
-        [disabled]="locked() || importing()" (uploadHandler)="importExcel($event.files[0], excelUpload)" />
-      <button pButton type="button" severity="secondary" outlined [disabled]="busy()" (click)="preview()">
+      <p-fileupload
+        #excelUpload
+        mode="basic"
+        name="contractTemplate"
+        accept=".xlsx"
+        chooseIcon="pi pi-upload"
+        [chooseLabel]="importing() ? 'Importando…' : 'Cargar Excel'"
+        [auto]="true"
+        [customUpload]="true"
+        [disabled]="locked() || importing()"
+        (uploadHandler)="importExcel($event.files[0], excelUpload)"
+      />
+      <button
+        pButton
+        type="button"
+        severity="secondary"
+        outlined
+        [disabled]="busy()"
+        (click)="preview()"
+      >
         {{ status() === 'PENDING_APPROVAL' ? 'Revisar y aprobar PDF' : 'Previsualizar' }}
       </button>
       <button pButton type="button" [disabled]="locked() || busy()" (click)="save()">
@@ -26,31 +48,51 @@
   </header>
 
   @if (locked()) {
-  <div class="mb-6 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900">
-    <span class="pi pi-lock mr-2" aria-hidden="true"></span>
-    @if (status() === 'APPROVED') {
-    Este contrato está aprobado. El PDF definitivo quedó protegido y disponible en “Vista previa
-    PDF”.
-    } @else {
-    Este contrato fue cancelado y ya no admite modificaciones.
-    }
-  </div>
+    <div
+      class="mb-6 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900"
+    >
+      <span class="pi pi-lock mr-2" aria-hidden="true"></span>
+      @if (status() === 'APPROVED') {
+        Este contrato está aprobado. El PDF definitivo quedó protegido y disponible en “Vista previa
+        PDF”.
+      } @else {
+        Este contrato fue cancelado y ya no admite modificaciones.
+      }
+    </div>
   }
 
   <form [formGroup]="form" class="space-y-6">
     <section class="rounded-2xl border border-black/10 bg-white p-6">
       <h2 class="mb-5 text-lg font-semibold">Control del contrato</h2>
       <div class="grid gap-4 md:grid-cols-3">
-        <label class="flex flex-col gap-2"><span>Período <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-datepicker fluid formControlName="period" view="month"
-            dateFormat="mm/yy" [showIcon]="true" [readonlyInput]="true" [appendTo]="'body'"
-            placeholder="Seleccionar período" />
+        <label class="flex flex-col gap-2"
+          ><span>Período <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-datepicker
+            fluid
+            formControlName="period"
+            view="month"
+            dateFormat="mm/yy"
+            [showIcon]="true"
+            [readonlyInput]="true"
+            [appendTo]="'body'"
+            placeholder="Seleccionar período"
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>Programa guardado <span class="text-red-600"
-              aria-hidden="true">*</span></span>
-          <p-select fluid formControlName="programId" [options]="programs()" optionLabel="name" optionValue="id"
-            placeholder="Seleccionar programa" [showClear]="true" [filter]="true" filterBy="name"
-            [loading]="programsLoading()" (onChange)="selectProgram($event.value)" />
+        <label class="flex flex-col gap-2"
+          ><span>Programa guardado <span class="text-red-600" aria-hidden="true">*</span></span>
+          <p-select
+            fluid
+            formControlName="programId"
+            [options]="programs()"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="Seleccionar programa"
+            [showClear]="true"
+            [filter]="true"
+            filterBy="name"
+            [loading]="programsLoading()"
+            (onChange)="selectProgram($event.value)"
+          />
         </label>
         <div class="flex flex-col gap-2">
           <span>Estado del contrato</span>
@@ -59,26 +101,52 @@
               {{ statusLabel() }}
             </span>
             @if (contractId() && status() === 'DRAFT') {
-            <button pButton type="button" size="small" [disabled]="busy()" (click)="changeStatus('PENDING_APPROVAL')">
-              Enviar a aprobación
-            </button>
+              <button
+                pButton
+                type="button"
+                size="small"
+                [disabled]="busy()"
+                (click)="changeStatus('PENDING_APPROVAL')"
+              >
+                Enviar a aprobación
+              </button>
             }
             @if (status() === 'PENDING_APPROVAL') {
-            <button pButton type="button" size="small" severity="danger" outlined [disabled]="busy()"
-              (click)="changeStatus('REJECTED')">
-              Rechazar
-            </button>
+              <button
+                pButton
+                type="button"
+                size="small"
+                severity="danger"
+                outlined
+                [disabled]="busy()"
+                (click)="changeStatus('REJECTED')"
+              >
+                Rechazar
+              </button>
             }
             @if (status() === 'REJECTED') {
-            <button pButton type="button" size="small" [disabled]="busy()" (click)="changeStatus('DRAFT')">
-              Corregir como borrador
-            </button>
+              <button
+                pButton
+                type="button"
+                size="small"
+                [disabled]="busy()"
+                (click)="changeStatus('DRAFT')"
+              >
+                Corregir como borrador
+              </button>
             }
             @if (!locked() && status() !== 'CANCELLED') {
-            <button pButton type="button" size="small" severity="secondary" text [disabled]="busy()"
-              (click)="changeStatus('CANCELLED')">
-              Cancelar contrato
-            </button>
+              <button
+                pButton
+                type="button"
+                size="small"
+                severity="secondary"
+                text
+                [disabled]="busy()"
+                (click)="changeStatus('CANCELLED')"
+              >
+                Cancelar contrato
+              </button>
             }
           </div>
         </div>
@@ -88,38 +156,78 @@
     <section class="rounded-2xl border border-black/10 bg-white p-6">
       <h2 class="mb-5 text-lg font-semibold">Institución y viaje</h2>
       <div formGroupName="institution" class="grid gap-4 md:grid-cols-3">
-        <label class="flex flex-col gap-2"><span>Establecimiento <span class="text-red-600"
-              aria-hidden="true">*</span></span><input pInputText formControlName="name"
-            placeholder="Nombre del establecimiento" /></label><label class="flex flex-col gap-2"><span>Curso <span
-              class="text-red-600" aria-hidden="true">*</span></span><input pInputText formControlName="course"
-            placeholder="Ej. 4° medio A" /></label><label class="flex flex-col gap-2"><span>Dirección de salida <span
-              class="text-red-600" aria-hidden="true">*</span></span><input pInputText formControlName="address"
-            placeholder="Dirección completa de salida" /></label>
+        <label class="flex flex-col gap-2"
+          ><span>Establecimiento <span class="text-red-600" aria-hidden="true">*</span></span
+          ><input
+            pInputText
+            formControlName="name"
+            placeholder="Nombre del establecimiento" /></label
+        ><label class="flex flex-col gap-2"
+          ><span>Curso <span class="text-red-600" aria-hidden="true">*</span></span
+          ><input pInputText formControlName="course" placeholder="Ej. 4° medio A" /></label
+        ><label class="flex flex-col gap-2"
+          ><span>Dirección de salida <span class="text-red-600" aria-hidden="true">*</span></span
+          ><input pInputText formControlName="address" placeholder="Dirección completa de salida"
+        /></label>
       </div>
       <div formGroupName="trip" class="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <label class="flex flex-col gap-2"><span>Ciudad de firma <span class="text-red-600"
-              aria-hidden="true">*</span></span><input pInputText formControlName="city"
-            placeholder="Ej. Santiago" /></label><label class="flex flex-col gap-2"><span>Fecha del contrato <span
-              class="text-red-600" aria-hidden="true">*</span></span><p-datepicker fluid formControlName="contractDate"
-            dateFormat="dd/mm/yy" [showIcon]="true" [appendTo]="'body'" placeholder="Seleccionar fecha" />
+        <label class="flex flex-col gap-2"
+          ><span>Ciudad de firma <span class="text-red-600" aria-hidden="true">*</span></span
+          ><input pInputText formControlName="city" placeholder="Ej. Santiago" /></label
+        ><label class="flex flex-col gap-2"
+          ><span>Fecha del contrato <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-datepicker
+            fluid
+            formControlName="contractDate"
+            dateFormat="dd/mm/yy"
+            [showIcon]="true"
+            [appendTo]="'body'"
+            placeholder="Seleccionar fecha"
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>Destino <span class="text-red-600"
-              aria-hidden="true">*</span></span><input pInputText formControlName="destination"
-            placeholder="Destino del viaje" /></label><label class="flex flex-col gap-2"><span>Punto de salida <span
-              class="text-red-600" aria-hidden="true">*</span></span><input pInputText formControlName="departurePoint"
-            placeholder="Lugar de encuentro y salida" /></label>
-        <label class="flex flex-col gap-2 lg:col-span-2"><span>Fecha salida y retorno <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-datepicker fluid formControlName="travelRange" selectionMode="range"
-            dateFormat="dd/mm/yy" [readonlyInput]="true" [showIcon]="true" [appendTo]="'body'"
-            placeholder="Seleccionar rango de fechas" (onSelect)="selectTravelStart()" />
+        <label class="flex flex-col gap-2"
+          ><span>Destino <span class="text-red-600" aria-hidden="true">*</span></span
+          ><input pInputText formControlName="destination" placeholder="Destino del viaje" /></label
+        ><label class="flex flex-col gap-2"
+          ><span>Punto de salida <span class="text-red-600" aria-hidden="true">*</span></span
+          ><input
+            pInputText
+            formControlName="departurePoint"
+            placeholder="Lugar de encuentro y salida"
+        /></label>
+        <label class="flex flex-col gap-2 lg:col-span-2"
+          ><span>Fecha salida y retorno <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-datepicker
+            fluid
+            formControlName="travelRange"
+            selectionMode="range"
+            dateFormat="dd/mm/yy"
+            [readonlyInput]="true"
+            [showIcon]="true"
+            [appendTo]="'body'"
+            placeholder="Seleccionar rango de fechas"
+            (onSelect)="selectTravelStart()"
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>Días <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-inputnumber formControlName="days" placeholder="Cantidad de días"
-            [min]="1" [useGrouping]="false" fluid />
+        <label class="flex flex-col gap-2"
+          ><span>Días <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="days"
+            placeholder="Cantidad de días"
+            [min]="1"
+            [useGrouping]="false"
+            fluid
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>Noches <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-inputnumber formControlName="nights" placeholder="Cantidad de noches"
-            [min]="0" [useGrouping]="false" fluid />
+        <label class="flex flex-col gap-2"
+          ><span>Noches <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="nights"
+            placeholder="Cantidad de noches"
+            [min]="0"
+            [useGrouping]="false"
+            fluid
+          />
         </label>
       </div>
     </section>
@@ -133,16 +241,24 @@
       </div>
       <div formArrayName="representatives" class="space-y-3">
         @for (group of representatives.controls; track group; let i = $index) {
-        <div [formGroupName]="i" class="grid gap-3 md:grid-cols-[1fr_14rem_1fr_auto]">
-          <label class="flex flex-col gap-2"><span>Nombre <span class="text-red-600"
-                aria-hidden="true">*</span></span><input pInputText formControlName="name"
-              placeholder="Nombre completo" /></label><label class="flex flex-col gap-2"><span>RUT <span
-                class="text-red-600" aria-hidden="true">*</span></span><input pInputText formControlName="dni"
-              placeholder="Ej. 12.345.678-5" /></label><button pButton type="button" severity="danger" text
-            class="self-end" (click)="remove(representatives, i)">
-            Quitar
-          </button>
-        </div>
+          <div [formGroupName]="i" class="grid gap-3 md:grid-cols-[1fr_14rem_1fr_auto]">
+            <label class="flex flex-col gap-2"
+              ><span>Nombre <span class="text-red-600" aria-hidden="true">*</span></span
+              ><input pInputText formControlName="name" placeholder="Nombre completo" /></label
+            ><label class="flex flex-col gap-2"
+              ><span>RUT <span class="text-red-600" aria-hidden="true">*</span></span
+              ><input pInputText formControlName="dni" placeholder="Ej. 12.345.678-5" /></label
+            ><button
+              pButton
+              type="button"
+              severity="danger"
+              text
+              class="self-end"
+              (click)="remove(representatives, i)"
+            >
+              Quitar
+            </button>
+          </div>
         }
       </div>
     </section>
@@ -156,26 +272,36 @@
       </div>
       <div formArrayName="clientRepresentatives" class="space-y-3">
         @for (group of clientRepresentatives.controls; track group; let i = $index) {
-        <div [formGroupName]="i" class="grid gap-3 md:grid-cols-[1fr_14rem_1fr_auto]">
-          <label class="flex flex-col gap-2"><span>Nombre <span class="text-red-600"
-                aria-hidden="true">*</span></span><input pInputText formControlName="name"
-              placeholder="Nombre completo" /></label><label class="flex flex-col gap-2"><span>RUT <span
-                class="text-red-600" aria-hidden="true">*</span></span><input pInputText formControlName="dni"
-              placeholder="Ej. 12.345.678-5" /></label><label class="flex flex-col gap-2"><span>Curso <span
-                class="text-red-600" aria-hidden="true">*</span></span><input pInputText formControlName="course"
-              placeholder="Ej. 4° medio A" /></label><button pButton type="button" severity="danger" text
-            class="self-end" (click)="remove(clientRepresentatives, i)">
-            Quitar
-          </button>
-        </div>
+          <div [formGroupName]="i" class="grid gap-3 md:grid-cols-[1fr_14rem_1fr_auto]">
+            <label class="flex flex-col gap-2"
+              ><span>Nombre <span class="text-red-600" aria-hidden="true">*</span></span
+              ><input pInputText formControlName="name" placeholder="Nombre completo" /></label
+            ><label class="flex flex-col gap-2"
+              ><span>RUT <span class="text-red-600" aria-hidden="true">*</span></span
+              ><input pInputText formControlName="dni" placeholder="Ej. 12.345.678-5" /></label
+            ><label class="flex flex-col gap-2"
+              ><span>Curso <span class="text-red-600" aria-hidden="true">*</span></span
+              ><input pInputText formControlName="course" placeholder="Ej. 4° medio A" /></label
+            ><button
+              pButton
+              type="button"
+              severity="danger"
+              text
+              class="self-end"
+              (click)="remove(clientRepresentatives, i)"
+            >
+              Quitar
+            </button>
+          </div>
         }
       </div>
     </section>
 
     <section class="rounded-2xl border border-black/10 bg-white p-6" formGroupName="plan">
-      <label class="flex flex-col gap-2 mb-5"><span>Nombre del programa <span class="text-red-600"
-            aria-hidden="true">*</span></span><input pInputText formControlName="name"
-          placeholder="Nombre del programa seleccionado" /></label>
+      <label class="flex flex-col gap-2 mb-5"
+        ><span>Nombre del programa <span class="text-red-600" aria-hidden="true">*</span></span
+        ><input pInputText formControlName="name" placeholder="Nombre del programa seleccionado"
+      /></label>
       <div class="mb-4 flex items-center justify-between">
         <h2 class="text-lg font-semibold">
           Servicios incluidos <span class="text-red-600" aria-hidden="true">*</span>
@@ -184,13 +310,17 @@
       </div>
       <div formArrayName="servicesIncluded" class="space-y-3">
         @for (group of services.controls; track group; let i = $index) {
-        <div [formGroupName]="i" class="flex gap-3">
-          <input pInputText formControlName="description" class="w-full"
-            placeholder="Descripción del servicio incluido" />
-          <p-button pButton type="button" severity="danger" text (click)="remove(services, i)">
-            Quitar
-          </p-button>
-        </div>
+          <div [formGroupName]="i" class="flex gap-3">
+            <input
+              pInputText
+              formControlName="description"
+              class="w-full"
+              placeholder="Descripción del servicio incluido"
+            />
+            <p-button pButton type="button" severity="danger" text (click)="remove(services, i)">
+              Quitar
+            </p-button>
+          </div>
         }
       </div>
     </section>
@@ -198,99 +328,270 @@
     <section class="rounded-2xl border border-black/10 bg-white p-6" formGroupName="payments">
       <h2 class="mb-5 text-lg font-semibold">Pagos</h2>
       <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <label class="flex flex-col gap-2"><span>Pasajeros pagantes (calculado)
-            <span class="text-red-600" aria-hidden="true">*</span></span><p-inputnumber
-            formControlName="totalPassengers" placeholder="Se calcula automáticamente" [useGrouping]="false" fluid />
+        <label class="flex flex-col gap-2"
+          ><span
+            >Pasajeros pagantes (calculado)
+            <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="totalPassengers"
+            placeholder="Se calcula automáticamente"
+            [useGrouping]="false"
+            fluid
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>Pasajeros liberados <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-inputnumber formControlName="freePassengers"
-            placeholder="Cantidad de pasajeros liberados" [min]="0" [useGrouping]="false" fluid />
+        <label class="flex flex-col gap-2"
+          ><span>Pasajeros liberados <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="freePassengers"
+            placeholder="Cantidad de pasajeros liberados"
+            [min]="0"
+            [useGrouping]="false"
+            fluid
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>Precio por persona CLP <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-inputnumber formControlName="pricePerPerson"
-            placeholder="Precio por persona" mode="currency" currency="CLP" locale="es-CL" [min]="0" fluid />
+        <label class="flex flex-col gap-2"
+          ><span>Precio por persona CLP <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="pricePerPerson"
+            placeholder="Precio por persona"
+            mode="currency"
+            currency="CLP"
+            locale="es-CL"
+            [min]="0"
+            fluid
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>Total grupo CLP (calculado)
-            <span class="text-red-600" aria-hidden="true">*</span></span><p-inputnumber formControlName="totalGroup"
-            placeholder="Se calcula automáticamente" mode="currency" currency="CLP" locale="es-CL" fluid />
+        <label class="flex flex-col gap-2"
+          ><span
+            >Total grupo CLP (calculado)
+            <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="totalGroup"
+            placeholder="Se calcula automáticamente"
+            mode="currency"
+            currency="CLP"
+            locale="es-CL"
+            fluid
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>Abono inicial <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-inputnumber formControlName="downPayment"
-            placeholder="Monto del abono inicial" mode="currency" currency="CLP" locale="es-CL" [min]="0" fluid />
+        <label class="flex flex-col gap-2"
+          ><span>Abono inicial <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="downPayment"
+            placeholder="Monto del abono inicial"
+            mode="currency"
+            currency="CLP"
+            locale="es-CL"
+            [min]="0"
+            fluid
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>Saldo grupal (calculado) <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-inputnumber formControlName="groupBalance"
-            placeholder="Se calcula automáticamente" mode="currency" currency="CLP" locale="es-CL" fluid />
+        <label class="flex flex-col gap-2"
+          ><span
+            >Saldo grupal (calculado) <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="groupBalance"
+            placeholder="Se calcula automáticamente"
+            mode="currency"
+            currency="CLP"
+            locale="es-CL"
+            fluid
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>Días antes del pago <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-inputnumber formControlName="daysBeforePayment"
-            placeholder="Cantidad de días" [min]="0" [useGrouping]="false" fluid />
+        <label class="flex flex-col gap-2"
+          ><span>Días antes del pago <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="daysBeforePayment"
+            placeholder="Cantidad de días"
+            [min]="0"
+            [useGrouping]="false"
+            fluid
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>Valor del dólar aumentado <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-inputnumber formControlName="maxExchangeRate"
-            placeholder="Valor en pesos chilenos" mode="currency" currency="CLP" locale="es-CL" [min]="0" fluid />
+        <label class="flex flex-col gap-2"
+          ><span
+            >Valor del dólar aumentado <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="maxExchangeRate"
+            placeholder="Valor en pesos chilenos"
+            mode="currency"
+            currency="CLP"
+            locale="es-CL"
+            [min]="0"
+            fluid
+          />
+        </label>
+        <label class="flex flex-col gap-2"
+          ><span>Descuento</span
+          ><p-inputnumber
+            formControlName="discountPercentage"
+            placeholder="Porcentaje por pago en efectivo"
+            suffix=" %"
+            [min]="0"
+            [max]="100"
+            [minFractionDigits]="0"
+            [maxFractionDigits]="2"
+            [useGrouping]="false"
+            fluid
+          />
+          <small class="text-black/55">Se aplica a la cuota solo cuando se paga en efectivo.</small>
         </label>
       </div>
       <h3 class="mb-4 mt-7 font-semibold">Cuotas</h3>
       <div formGroupName="installments" class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <label class="flex flex-col gap-2"><span>Cantidad <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-inputnumber formControlName="quantity"
-            placeholder="Cantidad de cuotas" [min]="1" [useGrouping]="false" fluid />
+        <label class="flex flex-col gap-2"
+          ><span>Cantidad <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="quantity"
+            placeholder="Cantidad de cuotas"
+            [min]="1"
+            [useGrouping]="false"
+            fluid
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>Valor grupal (calculado) <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-inputnumber formControlName="groupInstallmentValue"
-            placeholder="Se calcula automáticamente" mode="currency" currency="CLP" locale="es-CL" fluid />
+        <label class="flex flex-col gap-2"
+          ><span
+            >Valor grupal (calculado) <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="groupInstallmentValue"
+            placeholder="Se calcula automáticamente"
+            mode="currency"
+            currency="CLP"
+            locale="es-CL"
+            fluid
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>Valor individual (calculado)
-            <span class="text-red-600" aria-hidden="true">*</span></span><p-inputnumber
-            formControlName="individualInstallmentValue" placeholder="Se calcula automáticamente" mode="currency"
-            currency="CLP" locale="es-CL" fluid />
+        <label class="flex flex-col gap-2"
+          ><span
+            >Valor individual (calculado)
+            <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="individualInstallmentValue"
+            placeholder="Se calcula automáticamente"
+            mode="currency"
+            currency="CLP"
+            locale="es-CL"
+            fluid
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>Inicio pago cuotas <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-select fluid formControlName="startMonth" [options]="months"
-            optionLabel="label" optionValue="value" placeholder="Seleccionar mes" />
+        <label class="flex flex-col gap-2"
+          ><span>Inicio pago cuotas <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-select
+            fluid
+            formControlName="startMonth"
+            [options]="months"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Seleccionar mes"
+          />
         </label>
       </div>
       <h3 class="mb-4 mt-7 font-semibold">Condiciones contractuales</h3>
       <div formGroupName="conditions" class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <label class="flex flex-col gap-2"><span>% abono con pasajes <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-inputnumber formControlName="depositPercentageWithFlight"
-            placeholder="Porcentaje de abono" suffix=" %" [min]="0" [max]="100" [useGrouping]="false" fluid />
+        <label class="flex flex-col gap-2"
+          ><span>% abono con pasajes <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="depositPercentageWithFlight"
+            placeholder="Porcentaje de abono"
+            suffix=" %"
+            [min]="0"
+            [max]="100"
+            [useGrouping]="false"
+            fluid
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>% abono sin pasajes <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-inputnumber formControlName="depositPercentageWithoutFlight"
-            placeholder="Porcentaje de abono" suffix=" %" [min]="0" [max]="100" [useGrouping]="false" fluid />
+        <label class="flex flex-col gap-2"
+          ><span>% abono sin pasajes <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="depositPercentageWithoutFlight"
+            placeholder="Porcentaje de abono"
+            suffix=" %"
+            [min]="0"
+            [max]="100"
+            [useGrouping]="false"
+            fluid
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>Abono programa especial <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-inputnumber formControlName="specialProgramDeposit"
-            placeholder="Abono por persona" mode="currency" currency="CLP" locale="es-CL" [min]="0" fluid />
+        <label class="flex flex-col gap-2"
+          ><span
+            >Abono programa especial <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="specialProgramDeposit"
+            placeholder="Abono por persona"
+            mode="currency"
+            currency="CLP"
+            locale="es-CL"
+            [min]="0"
+            fluid
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>Días saldo aéreo <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-inputnumber formControlName="daysBeforeFlightBalance"
-            placeholder="Cantidad de días" [min]="0" [useGrouping]="false" fluid />
+        <label class="flex flex-col gap-2"
+          ><span>Días saldo aéreo <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="daysBeforeFlightBalance"
+            placeholder="Cantidad de días"
+            [min]="0"
+            [useGrouping]="false"
+            fluid
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>Días saldo terrestre <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-inputnumber formControlName="daysBeforeTerrestrialBalance"
-            placeholder="Cantidad de días" [min]="0" [useGrouping]="false" fluid />
+        <label class="flex flex-col gap-2"
+          ><span>Días saldo terrestre <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="daysBeforeTerrestrialBalance"
+            placeholder="Cantidad de días"
+            [min]="0"
+            [useGrouping]="false"
+            fluid
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>% penalidad cancelación <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-inputnumber formControlName="cancellationPenaltyPercentage"
-            placeholder="Porcentaje de penalidad" suffix=" %" [min]="0" [max]="100" [useGrouping]="false" fluid />
+        <label class="flex flex-col gap-2"
+          ><span
+            >% penalidad cancelación <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="cancellationPenaltyPercentage"
+            placeholder="Porcentaje de penalidad"
+            suffix=" %"
+            [min]="0"
+            [max]="100"
+            [useGrouping]="false"
+            fluid
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>Días aviso cancelación <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-inputnumber formControlName="cancellationNoticeDays"
-            placeholder="Cantidad de días" [min]="0" [useGrouping]="false" fluid />
+        <label class="flex flex-col gap-2"
+          ><span>Días aviso cancelación <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="cancellationNoticeDays"
+            placeholder="Cantidad de días"
+            [min]="0"
+            [useGrouping]="false"
+            fluid
+          />
         </label>
-        <label class="flex flex-col gap-2"><span>Días plazo reclamos <span class="text-red-600"
-              aria-hidden="true">*</span></span><p-inputnumber formControlName="complaintDeadlineDays"
-            placeholder="Cantidad de días" [min]="0" [useGrouping]="false" fluid />
+        <label class="flex flex-col gap-2"
+          ><span>Días plazo reclamos <span class="text-red-600" aria-hidden="true">*</span></span
+          ><p-inputnumber
+            formControlName="complaintDeadlineDays"
+            placeholder="Cantidad de días"
+            [min]="0"
+            [useGrouping]="false"
+            fluid
+          />
         </label>
       </div>
       <h3 class="mb-4 mt-7 font-semibold">Cuenta bancaria</h3>
-      <label class="flex flex-col gap-2 max-w-xl"><span>Cuenta para pagos <span class="text-red-600"
-            aria-hidden="true">*</span></span><p-select fluid formControlName="bankAccountId"
-          [options]="configuration()?.bankAccounts ?? []" optionLabel="label" optionValue="id"
-          placeholder="Seleccionar cuenta bancaria" (onChange)="selectBank($event.value)" />
+      <label class="flex flex-col gap-2 max-w-xl"
+        ><span>Cuenta para pagos <span class="text-red-600" aria-hidden="true">*</span></span
+        ><p-select
+          fluid
+          formControlName="bankAccountId"
+          [options]="configuration()?.bankAccounts ?? []"
+          optionLabel="label"
+          optionValue="id"
+          placeholder="Seleccionar cuenta bancaria"
+          [loading]="programsLoading()"
+          (onChange)="selectBank($event.value)"
+        />
       </label>
     </section>
 
@@ -304,28 +605,73 @@
       </p>
       <div formArrayName="passengers" class="space-y-3">
         @for (group of passengers.controls; track group; let i = $index) {
-        <div [formGroupName]="i" class="grid gap-3 md:grid-cols-2 xl:grid-cols-[1fr_1fr_11rem_11rem_10rem_11rem_auto]">
-          <label class="flex flex-col gap-2"><span>Nombres <span class="text-red-600"
-                aria-hidden="true">*</span></span><input pInputText formControlName="names"
-              placeholder="Nombres del pasajero" /></label><label class="flex flex-col gap-2"><span>Apellidos <span
-                class="text-red-600" aria-hidden="true">*</span></span><input pInputText formControlName="lastNames"
-              placeholder="Apellidos del pasajero" /></label><label class="flex flex-col gap-2"><span>RUT <span
-                class="text-red-600" aria-hidden="true">*</span></span><input pInputText formControlName="dni"
-              placeholder="Ej. 12.345.678-5" /></label><label class="flex flex-col gap-2"><span>Fecha de nacimiento
-              <span class="text-red-600" aria-hidden="true">*</span></span><p-datepicker fluid
-              formControlName="birthDate" dateFormat="dd/mm/yy" [maxDate]="maxBirthDate" [showIcon]="true"
-              [appendTo]="'body'" placeholder="Seleccionar fecha" /> </label><label
-            class="flex flex-col gap-2"><span>Nacionalidad <span class="text-red-600"
-                aria-hidden="true">*</span></span><p-select fluid formControlName="nationality"
-              [options]="configuration()?.countries ?? []" optionLabel="name" optionValue="name"
-              placeholder="Seleccionar país" [filter]="true" filterBy="name" [appendTo]="'body'" /> </label><label
-            class="flex flex-col gap-2"><span>Sexo <span class="text-red-600"
-                aria-hidden="true">*</span></span><p-select fluid formControlName="sex" [options]="sexOptions"
-              optionLabel="label" optionValue="value" placeholder="Seleccionar" [appendTo]="'body'" /> </label><button
-            pButton type="button" severity="danger" text class="self-end" (click)="remove(passengers, i)">
-            Quitar
-          </button>
-        </div>
+          <div
+            [formGroupName]="i"
+            class="grid gap-3 md:grid-cols-2 xl:grid-cols-[1fr_1fr_11rem_11rem_10rem_11rem_auto]"
+          >
+            <label class="flex flex-col gap-2"
+              ><span>Nombres <span class="text-red-600" aria-hidden="true">*</span></span
+              ><input
+                pInputText
+                formControlName="names"
+                placeholder="Nombres del pasajero" /></label
+            ><label class="flex flex-col gap-2"
+              ><span>Apellidos <span class="text-red-600" aria-hidden="true">*</span></span
+              ><input
+                pInputText
+                formControlName="lastNames"
+                placeholder="Apellidos del pasajero" /></label
+            ><label class="flex flex-col gap-2"
+              ><span>RUT <span class="text-red-600" aria-hidden="true">*</span></span
+              ><input pInputText formControlName="dni" placeholder="Ej. 12.345.678-5" /></label
+            ><label class="flex flex-col gap-2"
+              ><span
+                >Fecha de nacimiento <span class="text-red-600" aria-hidden="true">*</span></span
+              ><p-datepicker
+                fluid
+                formControlName="birthDate"
+                dateFormat="dd/mm/yy"
+                [maxDate]="maxBirthDate"
+                [showIcon]="true"
+                [appendTo]="'body'"
+                placeholder="Seleccionar fecha"
+              /> </label
+            ><label class="flex flex-col gap-2"
+              ><span>Nacionalidad <span class="text-red-600" aria-hidden="true">*</span></span
+              ><p-select
+                fluid
+                formControlName="nationality"
+                [options]="configuration()?.countries ?? []"
+                optionLabel="name"
+                optionValue="name"
+                placeholder="Seleccionar país"
+                [filter]="true"
+                filterBy="name"
+                [loading]="programsLoading()"
+                [appendTo]="'body'"
+              /> </label
+            ><label class="flex flex-col gap-2"
+              ><span>Sexo <span class="text-red-600" aria-hidden="true">*</span></span
+              ><p-select
+                fluid
+                formControlName="sex"
+                [options]="sexOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Seleccionar"
+                [appendTo]="'body'"
+              /> </label
+            ><button
+              pButton
+              type="button"
+              severity="danger"
+              text
+              class="self-end"
+              (click)="remove(passengers, i)"
+            >
+              Quitar
+            </button>
+          </div>
         }
       </div>
     </section>

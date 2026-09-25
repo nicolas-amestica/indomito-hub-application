@@ -18,7 +18,7 @@ import type {
 /** Colección reutilizable que identifica favoritos de programa. */
 export type FavoriteScope = 'programa';
 
-/** Favorito. `content` es el programa sin totales ni snapshot de tipo de cambio. */
+/** Favorito con el precio y el snapshot de tipo de cambio aceptados. */
 export interface Favorite {
   id: string;
   name: string;
@@ -29,18 +29,9 @@ export interface Favorite {
 }
 
 /**
- * Contenido guardado de un favorito. Omite `totals` y el snapshot de tipo de
- * cambio a propósito (Requirement 11.17): al cargar un favorito los montos se
- * recalculan con la tasa vigente (Requirement 11.10), así que guardar la tasa
- * histórica solo permitiría usarla por error.
- *
- * La exclusión es **por tipo, no por convención**: `totals` no existe como
- * propiedad de nivel superior (en vez de omitirla de `Program` con `Omit`,
- * `FavoriteContent` simplemente no la declara), y `exchange` se excluye dentro
- * de `pricing` con `Omit<ProgramPricing, 'exchange'>`, en el mismo nivel de
- * anidamiento en el que vive dentro de `Program` (`pricing.exchange`). Un
- * `Program` completo no es asignable a `FavoriteContent` en un contexto de
- * objeto literal ni viceversa sin pasar por esta forma explícita.
+ * Contenido guardado de un favorito. Los nuevos favoritos conservan la tasa
+ * histórica para que un contrato respete el precio aceptado por el cliente.
+ * `exchange` sigue siendo opcional por compatibilidad con favoritos antiguos.
  *
  * `totalNights` sí se guarda dentro de `schedule`, porque es una decisión del
  * usuario y no un derivado del snapshot.
@@ -51,8 +42,8 @@ export interface FavoriteContent {
     ProgramSchedule,
     'totalDays' | 'totalNights' | 'totalPassengers' | 'freePassengers'
   >;
-  pricing: Omit<ProgramPricing, 'exchange'>;
-  /** Auditoría de la tasa usada al guardar; no se reutiliza al recalcular. */
+  pricing: Omit<ProgramPricing, 'exchange'> & { exchange?: ProgramPricing['exchange'] };
+  /** Auditoría resumida mantenida por compatibilidad. */
   rateOrigin?: ExchangeRateOrigin;
   /** Totales y porcentajes efectivos usados al guardar el programa. */
   totals?: ProgramTotals;

@@ -164,7 +164,8 @@ export class ProgramFormStore {
         { emitEvent: false },
       );
       controls.schedule.setValue(content.schedule, { emitEvent: false });
-      controls.pricing.setValue(content.pricing, { emitEvent: false });
+      const { exchange: _, ...pricing } = content.pricing;
+      controls.pricing.setValue(pricing, { emitEvent: false });
 
       controls.crews.clear({ emitEvent: false });
       for (const crew of content.crews) {

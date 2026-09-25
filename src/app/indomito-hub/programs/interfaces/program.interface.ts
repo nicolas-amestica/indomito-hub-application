@@ -63,8 +63,8 @@ export interface ProgramPricing {
 }
 
 /**
- * Tipos de cambio con los que se calcula el programa. No se persiste, porque el
- * programa no se persiste: se obtiene al abrir el formulario y vive en memoria.
+ * Tipos de cambio con los que se calcula el programa. El formulario obtiene el
+ * snapshot vigente y el favorito conserva una copia para contratos posteriores.
  */
 export interface ExchangeSnapshot {
   /** ISO 8601, fecha informada por la fuente de tasas. */

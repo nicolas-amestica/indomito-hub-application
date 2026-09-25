@@ -539,7 +539,7 @@ describe('ProgramFormPage', () => {
       vatCLP: expect.any(Number),
       crewWithholdingCLP: expect.any(Number),
     });
-    expect(content.pricing).not.toHaveProperty('exchange');
+    expect(content.pricing['exchange']).toEqual(freshSnapshot());
     expect(content['rateOrigin']).toEqual({
       date: '2027-03-01',
       source: 'banco-central',

@@ -12,12 +12,10 @@ import { Select } from 'primeng/select';
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { ContractExcelImporter } from '../../importers/contract-excel.importer';
 import type { Favorite } from '../../../programs/interfaces/favorite.interface';
-import type { ExchangeSnapshot } from '../../../programs/interfaces/program.interface';
 import {
   buildEffectiveRates,
   calculateProgram,
 } from '../../../programs/calculation/calculation-engine';
-import { ExchangeRateService } from '../../../programs/services/exchange-rate.service';
 import { FavoritesService } from '../../../programs/services/favorites.service';
 import { calculateContractPayments } from '../../fn/calculate-contract-payments';
 import { birthDateValidator, rutValidator } from '../../fn/contract-validators';
@@ -54,7 +52,6 @@ export class ContractFormPage {
   private readonly fb = inject(FormBuilder);
   private readonly api = inject(ContractsService);
   private readonly favoritesApi = inject(FavoritesService);
-  private readonly exchangeRateApi = inject(ExchangeRateService);
   protected readonly template = inject(ContractTemplateService);
   private readonly importer = inject(ContractExcelImporter);
   private readonly notifications = inject(NotificationService);
@@ -73,7 +70,6 @@ export class ContractFormPage {
   protected readonly months = CONTRACT_MONTHS;
   protected readonly sexOptions = CONTRACT_SEX_OPTIONS;
   protected readonly maxBirthDate = new Date();
-  private readonly exchangeSnapshot = signal<ExchangeSnapshot | null>(null);
   private readonly programReference = signal<ContractProgramReference | null>(null);
 
   protected readonly form = this.fb.group({
@@ -112,6 +108,7 @@ export class ContractFormPage {
       groupBalance: [{ value: 0, disabled: true }, Validators.required],
       daysBeforePayment: [10, [Validators.required, Validators.min(0)]],
       maxExchangeRate: [0, [Validators.required, Validators.min(1)]],
+      discountPercentage: [0, [Validators.min(0), Validators.max(100)]],
       bankAccountId: ['', Validators.required],
       installments: this.fb.group({
         quantity: [0, [Validators.required, Validators.min(1)]],
@@ -211,7 +208,7 @@ export class ContractFormPage {
     const program = this.programs().find(({ id }) => id === programId);
     if (!program) return;
     const content = program.content;
-    const exchange = this.exchangeSnapshot();
+    const exchange = content.pricing.exchange;
     const effectiveRates = exchange ? buildEffectiveRates(content.pricing, exchange) : null;
     const pricePerPerson = effectiveRates
       ? calculateProgram({
@@ -583,7 +580,6 @@ export class ContractFormPage {
     this.programsLoading.set(true);
     forkJoin({
       programs: this.favoritesApi.list('programa'),
-      exchange: this.exchangeRateApi.getSnapshot(),
       configuration: this.api.getConfiguration('CTX'),
     })
       .pipe(
@@ -591,9 +587,8 @@ export class ContractFormPage {
         finalize(() => this.programsLoading.set(false)),
       )
       .subscribe({
-        next: ({ programs, exchange, configuration }) => {
+        next: ({ programs, configuration }) => {
           this.programs.set(programs);
-          this.exchangeSnapshot.set(exchange);
           this.configuration.set(configuration);
           if (!editing) this.applyInitialConfiguration(configuration);
           else

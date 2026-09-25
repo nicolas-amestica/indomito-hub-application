@@ -63,6 +63,7 @@ export interface ContractContent {
     groupBalance: number;
     daysBeforePayment: number;
     maxExchangeRate: number;
+    discountPercentage: number;
     installments: {
       quantity: number;
       groupInstallmentValue: number;

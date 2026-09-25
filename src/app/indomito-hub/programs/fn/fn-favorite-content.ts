@@ -1,7 +1,7 @@
 import type { FavoriteContent } from '../interfaces/favorite.interface';
 import type { Program } from '../interfaces/program.interface';
 
-/** Proyecta un programa al contrato persistible, sin totales ni snapshot de tasas. */
+/** Proyecta un programa al contrato persistible con su precio y tasa aceptados. */
 export function favoriteContentFromProgram(program: Program): FavoriteContent {
   return {
     generals: program.generals,
@@ -16,6 +16,7 @@ export function favoriteContentFromProgram(program: Program): FavoriteContent {
       brlIncreaseCLP: program.pricing.brlIncreaseCLP,
       utilityRate: program.pricing.utilityRate,
       rechargeRate: program.pricing.rechargeRate,
+      exchange: program.pricing.exchange,
     },
     rateOrigin: {
       date: program.pricing.exchange.date,
