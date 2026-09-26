@@ -73,10 +73,10 @@
 | Repo           | Módulo referencia        | Paradigma             |
 | -------------- | ------------------------ | --------------------- |
 | application    | `src/app/indomito-hub/programs` | Feature autocontenida con rutas, stores, servicios y tipos |
-| services       | `services/api-catalog`, `services/api-favorite`, `services/api-program` | Endpoint-per-function |
+| services       | `services/api-catalog`, `services/api-program` | Endpoint-per-function |
 | authorizer     | `src/functions/authorize.ts` | Handler unico + politicas IAM |
 
-> Los servicios reales de catalogos, favoritos y generacion de presupuesto
+> Los servicios reales de catalogos, cotizaciones y generacion de presupuesto
 > viven en `ind-hub-api-gox-sls-pri-gh/services/`. La guia para crear un servicio
 > nuevo esta en el `README.md` de ese repo.
 

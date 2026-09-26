@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Dialog } from 'primeng/dialog';
-import { ButtonDirective } from 'primeng/button';
 import { Tooltip } from 'primeng/tooltip';
 import { AuthService } from '../auth/auth.service';
 import { ThemeService } from '../theme/theme.service';
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Dialog, ButtonDirective, Tooltip],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Dialog, Tooltip],
   templateUrl: './app-shell.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

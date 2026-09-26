@@ -6,7 +6,7 @@ import { environment } from '../../../../environments/environment';
 import type { ApiSuccessEnvelope } from '../../../core/http/api-response.interface';
 import type { ProgramFormConfiguration } from '../interfaces/program-form-configuration.interface';
 
-/** Obtiene la configuración dinámica del formulario Crear Programa. */
+/** Obtiene la configuración dinámica del formulario Crear Cotización. */
 @Injectable({ providedIn: 'root' })
 export class ProgramFormConfigurationService {
   private readonly http = inject(HttpClient);

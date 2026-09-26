@@ -32,7 +32,7 @@ export interface CatalogSettings {
   scenarioOffsets?: number[];
 }
 
-/** Catálogos exclusivos del formulario Crear Programa. */
+/** Catálogos exclusivos del formulario Crear Cotización. */
 export interface CatalogResponse {
   plans: CatalogOption[];
   seasons: CatalogOption[];

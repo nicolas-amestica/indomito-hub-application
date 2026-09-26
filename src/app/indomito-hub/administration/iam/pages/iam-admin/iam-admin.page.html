@@ -34,12 +34,12 @@
   }
 
   <section
-    class="mt-6 overflow-hidden rounded-3xl border border-black/8 bg-white shadow-[0_16px_40px_rgba(28,28,28,.06)]"
+    class="mt-6 overflow-hidden rounded-3xl border border-line bg-surface shadow-panel"
   >
     <div
-      class="flex flex-col gap-4 border-b border-black/8 p-4 md:flex-row md:items-center md:justify-between md:p-5"
+      class="flex flex-col gap-4 border-b border-line p-4 md:flex-row md:items-center md:justify-between md:p-5"
     >
-      <nav class="flex gap-1 rounded-2xl bg-[#f1f2f3] p-1" aria-label="Secciones IAM">
+      <nav class="flex gap-1 rounded-2xl bg-canvas p-1" aria-label="Secciones IAM">
         @for (
           item of [
             { id: 'users', label: 'Usuarios', icon: 'icon-[tabler--users]' },
@@ -51,9 +51,9 @@
           <button
             type="button"
             class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition"
-            [class.bg-white]="tab() === item.id"
+            [class.bg-surface]="tab() === item.id"
             [class.shadow-sm]="tab() === item.id"
-            [class.text-black/45]="tab() !== item.id"
+            [class.text-muted]="tab() !== item.id"
             (click)="changeTab($any(item.id))"
           >
             <i [class]="item.icon"></i>{{ item.label }}
@@ -63,7 +63,7 @@
       <div class="flex gap-2">
         <label class="relative flex-1"
           ><i
-            class="icon-[tabler--search] absolute left-3 top-1/2 -translate-y-1/2 text-black/35"
+            class="icon-[tabler--search] absolute left-3 top-1/2 -translate-y-1/2 text-muted"
           ></i
           ><input
             class="iam-input min-w-64 pl-10"
@@ -72,7 +72,7 @@
             placeholder="Buscar" /></label
         ><button
           type="button"
-          class="rounded-xl bg-brand px-4 py-2.5 text-sm font-bold text-ink transition hover:brightness-95"
+          class="rounded-xl bg-brand px-4 py-2.5 text-sm font-bold text-night transition hover:brightness-95"
           (click)="openCreate()"
         >
           <i class="icon-[tabler--plus] mr-1"></i>Crear
@@ -81,7 +81,7 @@
     </div>
 
     @if (busy()) {
-      <div class="grid place-items-center py-24 text-sm text-black/45">
+      <div class="grid place-items-center py-24 text-sm text-muted">
         <i class="icon-[tabler--loader-2] mb-3 animate-spin text-3xl"></i>Cargando accesos…
       </div>
     } @else {
@@ -89,7 +89,7 @@
         <table class="w-full min-w-[760px] text-left text-sm">
           <thead>
             <tr
-              class="border-b border-black/8 bg-[#fafafa] text-[10px] font-bold uppercase tracking-[.13em] text-black/45"
+              class="border-b border-line bg-canvas text-[10px] font-bold uppercase tracking-[.13em] text-muted"
             >
               @if (tab() === 'users') {
                 <th class="px-5 py-3">Usuario</th>
@@ -111,10 +111,10 @@
           <tbody>
             @if (tab() === 'users') {
               @for (item of visibleUsers(); track item.id) {
-                <tr class="border-b border-black/6 last:border-0 hover:bg-black/[.018]">
+                <tr class="border-b border-line last:border-0 hover:bg-canvas">
                   <td class="px-5 py-4">
                     <strong class="block">{{ item.name }}</strong
-                    ><span class="text-xs text-black/45">{{ item.email }}</span>
+                    ><span class="text-xs text-muted">{{ item.email }}</span>
                   </td>
                   <td class="px-5 py-4 font-mono text-xs">{{ item.rut }}</td>
                   <td class="px-5 py-4">
@@ -148,10 +148,10 @@
               }
             } @else if (tab() === 'profiles') {
               @for (item of visibleProfiles(); track item.code) {
-                <tr class="border-b border-black/6 last:border-0 hover:bg-black/[.018]">
+                <tr class="border-b border-line last:border-0 hover:bg-canvas">
                   <td class="px-5 py-4">
                     <strong class="block">{{ item.title }}</strong
-                    ><span class="font-mono text-xs text-black/45"
+                    ><span class="font-mono text-xs text-muted"
                       >{{ item.code }} · {{ item.description }}</span
                     >
                   </td>
@@ -184,15 +184,15 @@
               }
             } @else {
               @for (item of visibleModules(); track item.code) {
-                <tr class="border-b border-black/6 last:border-0 hover:bg-black/[.018]">
+                <tr class="border-b border-line last:border-0 hover:bg-canvas">
                   <td class="px-5 py-4">
                     <div class="flex items-center gap-3">
-                      <span class="grid size-9 place-items-center rounded-xl bg-ink text-brand"
+                      <span class="grid size-9 place-items-center rounded-xl bg-night text-brand"
                         ><i [class]="item.icon"></i
                       ></span>
                       <div>
                         <strong class="block">{{ item.title }}</strong
-                        ><span class="font-mono text-xs text-black/45">{{ item.code }}</span>
+                        ><span class="font-mono text-xs text-muted">{{ item.code }}</span>
                       </div>
                     </div>
                   </td>
@@ -204,7 +204,7 @@
                       >{{ item.level }}{{ item.parentCode ? ' · ' + item.parentCode : '' }}</span
                     >
                   </td>
-                  <td class="px-5 py-4 font-mono text-xs text-black/55">{{ item.path }}</td>
+                  <td class="px-5 py-4 font-mono text-xs text-muted">{{ item.path }}</td>
                   <td class="px-5 py-4">{{ item.active ? 'Activo' : 'Inactivo' }}</td>
                   <td class="px-5 py-4 text-right">
                     <button class="iam-action" title="Editar" (click)="editModule(item)">
@@ -232,15 +232,15 @@
       (click)="closeDialog()"
     >
       <section
-        class="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-[1.75rem] bg-white shadow-2xl"
+        class="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-[1.75rem] bg-surface text-ink shadow-2xl"
         [class.max-w-5xl]="dialog() === 'permissions'"
         (click)="$event.stopPropagation()"
       >
         <header
-          class="sticky top-0 z-10 flex items-center justify-between border-b border-black/8 bg-white/95 px-6 py-5 backdrop-blur"
+          class="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-surface/95 px-6 py-5 backdrop-blur"
         >
           <div>
-            <p class="text-[10px] font-bold uppercase tracking-[.18em] text-black/40">
+            <p class="text-[10px] font-bold uppercase tracking-[.18em] text-muted">
               Administración IAM
             </p>
             <h2 class="mt-1 text-xl font-bold">
@@ -260,7 +260,7 @@
         @if (dialog() === 'permissions') {
           <div class="p-6">
             <div
-              class="mb-4 grid grid-cols-[1fr_repeat(4,4.5rem)] items-center gap-2 px-3 text-center text-[10px] font-bold uppercase tracking-wider text-black/40"
+              class="mb-4 grid grid-cols-[1fr_repeat(4,4.5rem)] items-center gap-2 px-3 text-center text-[10px] font-bold uppercase tracking-wider text-muted"
             >
               <span class="text-left">Módulo / componente</span>
               @for (a of allowances; track a.code) {
@@ -268,13 +268,13 @@
               }
             </div>
             @for (root of rootModules(); track root.code) {
-              <div class="mb-3 overflow-hidden rounded-2xl border border-black/8">
+              <div class="mb-3 overflow-hidden rounded-2xl border border-line">
                 <div
-                  class="grid grid-cols-[1fr_repeat(4,4.5rem)] items-center gap-2 bg-[#f5f5f4] px-4 py-3"
+                  class="grid grid-cols-[1fr_repeat(4,4.5rem)] items-center gap-2 bg-canvas px-4 py-3"
                 >
                   <strong
                     >{{ root.title }}
-                    <small class="ml-2 font-mono text-black/40">{{ root.code }}</small></strong
+                    <small class="ml-2 font-mono text-muted">{{ root.code }}</small></strong
                   >
                   @for (a of allowances; track a.code) {
                     <label class="grid place-items-center"
@@ -288,12 +288,12 @@
                 </div>
                 @for (child of children(root.code); track child.code) {
                   <div
-                    class="grid grid-cols-[1fr_repeat(4,4.5rem)] items-center gap-2 border-t border-black/6 px-4 py-3"
+                    class="grid grid-cols-[1fr_repeat(4,4.5rem)] items-center gap-2 border-t border-line px-4 py-3"
                   >
                     <span class="pl-5 text-sm"
-                      ><i class="icon-[tabler--corner-down-right] mr-2 text-black/30"></i
+                      ><i class="icon-[tabler--corner-down-right] mr-2 text-muted"></i
                       >{{ child.title }}
-                      <small class="ml-2 font-mono text-black/40">{{ child.code }}</small></span
+                      <small class="ml-2 font-mono text-muted">{{ child.code }}</small></span
                     >
                     @for (a of allowances; track a.code) {
                       <label class="grid place-items-center"
@@ -427,7 +427,7 @@
                   class="iam-input"
                   name="endpoints"
                   [(ngModel)]="module.endpoints"
-                  placeholder="/programas, /favoritos" /></label
+                  placeholder="/cotizaciones, /contratos" /></label
               ><label class="iam-field"
                 >Ícono Tabler<input
                   class="iam-input"
@@ -467,15 +467,15 @@
           </form>
         }
         <footer
-          class="sticky bottom-0 flex justify-end gap-2 border-t border-black/8 bg-white/95 px-6 py-4 backdrop-blur"
+          class="sticky bottom-0 flex justify-end gap-2 border-t border-line bg-surface/95 px-6 py-4 backdrop-blur"
         >
           <button
-            class="rounded-xl px-4 py-2.5 text-sm font-semibold text-black/55"
+            class="rounded-xl px-4 py-2.5 text-sm font-semibold text-muted"
             (click)="closeDialog()"
           >
             Cancelar</button
           ><button
-            class="rounded-xl bg-brand px-5 py-2.5 text-sm font-bold text-ink disabled:opacity-50"
+            class="rounded-xl bg-brand px-5 py-2.5 text-sm font-bold text-night disabled:opacity-50"
             [disabled]="saving()"
             (click)="
               dialog() === 'permissions'

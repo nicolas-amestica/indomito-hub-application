@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  signal,
+  viewChildren,
+} from '@angular/core';
 import { ReactiveFormsModule, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -51,6 +58,7 @@ import { APP_MESSAGES } from '../../../../shared/constants/app-messages';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContractFormPage {
+  private readonly requiredMessages = viewChildren(RequiredFieldMessageDirective);
   private readonly fb = inject(FormBuilder);
   private readonly api = inject(ContractsService);
   private readonly favoritesApi = inject(FavoritesService);
@@ -362,6 +370,7 @@ export class ContractFormPage {
   protected preview(): void {
     if (this.form.invalid || this.busy()) {
       this.form.markAllAsTouched();
+      this.requiredMessages().forEach((message) => message.refresh());
       if (this.form.invalid) {
         const fields = getInvalidContractFields(this.form);
         const visibleFields = fields.slice(0, 8);

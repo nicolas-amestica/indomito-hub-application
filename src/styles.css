@@ -2,7 +2,7 @@
 @plugin '@iconify/tailwind4';
 @custom-variant dark (&:where(.dark, .dark *));
 /* Los módulos llegan desde DynamoDB; estas clases no pueden descubrirse en templates. */
-@source inline("icon-[tabler--settings] icon-[tabler--adjustments] icon-[tabler--shield-lock] icon-[tabler--route] icon-[tabler--map-route] icon-[tabler--point]");
+@source inline("icon-[tabler--settings] icon-[tabler--adjustments] icon-[tabler--shield-lock] icon-[tabler--route] icon-[tabler--map-route] icon-[tabler--point] icon-[tabler--sun] icon-[tabler--moon]");
 
 /* Fuente única de valores visuales; PrimeNG consume estas mismas variables. */
 @theme static {
@@ -12,6 +12,7 @@
   --color-brand-active: #c5d600;
   --color-brand-soft: #f8fbcf;
   --color-ink: #1c1c1c;
+  --color-night: #1c1c1c;
   --color-graphite: #3a3a3a;
   --color-muted: #616161;
   --color-canvas: #f9fafb;
@@ -27,6 +28,7 @@
   html {
     color-scheme: light;
     scroll-behavior: smooth;
+    background: var(--color-canvas);
   }
   body {
     @apply m-0 bg-canvas font-sans text-ink antialiased;
@@ -48,21 +50,87 @@
   --color-control-border: #71717a;
   --color-brand-soft: #343800;
   --shadow-panel: 0 18px 45px -36px rgba(0, 0, 0, 0.95);
+
+  /* PrimeNG genera pares light-dark a partir de la paleta. Como nuestros
+     tokens semánticos cambian en runtime, fijamos aquí el lado oscuro para
+     evitar controles claros dentro de superficies oscuras. */
+  --p-form-field-background: #242528;
+  --p-form-field-disabled-background: #303136;
+  --p-form-field-color: #f4f4f5;
+  --p-form-field-disabled-color: #a1a1aa;
+  --p-form-field-placeholder-color: #a1a1aa;
+  --p-form-field-border-color: #52525b;
+  --p-form-field-hover-border-color: #71717a;
+  --p-form-field-focus-border-color: #d8eb00;
+  --p-inputtext-background: #242528;
+  --p-inputtext-disabled-background: #303136;
+  --p-inputtext-color: #f4f4f5;
+  --p-inputtext-disabled-color: #a1a1aa;
+  --p-inputtext-placeholder-color: #a1a1aa;
+  --p-inputtext-border-color: #52525b;
+  --p-select-background: #242528;
+  --p-select-disabled-background: #303136;
+  --p-select-color: #f4f4f5;
+  --p-select-placeholder-color: #a1a1aa;
+  --p-select-border-color: #52525b;
+  --p-select-overlay-background: #242528;
+  --p-select-overlay-color: #f4f4f5;
+  --p-select-option-color: #f4f4f5;
+  --p-select-option-focus-background: #34353a;
+  --p-content-background: #242528;
+  --p-content-color: #f4f4f5;
+  --p-content-hover-background: #34353a;
+  --p-dialog-background: #1b1c1f;
+  --p-dialog-color: #f4f4f5;
+  --p-overlay-modal-background: #1b1c1f;
+  --p-overlay-popover-background: #242528;
+  --p-overlay-popover-color: #f4f4f5;
+  --p-overlay-select-background: #242528;
+  --p-overlay-select-color: #f4f4f5;
+  --p-datepicker-panel-background: #242528;
+  --p-datepicker-panel-color: #f4f4f5;
+  --p-datepicker-header-background: #242528;
+  --p-datepicker-header-color: #f4f4f5;
+  --p-datepicker-dropdown-background: #303136;
+  --p-datepicker-dropdown-hover-background: #3f4046;
+  --p-datepicker-dropdown-color: #d4d4d8;
+  --p-button-outlined-secondary-color: #d4d4d8;
+  --p-button-outlined-secondary-border-color: #71717a;
+  --p-button-outlined-secondary-hover-background: #34353a;
+  --p-button-outlined-secondary-active-background: #3f4046;
+  --p-fileupload-background: #1b1c1f;
+  --p-fileupload-color: #f4f4f5;
 }
 
-/* Compatibilidad de las superficies legacy mientras los módulos consumen los
-   tokens semánticos. Estas equivalencias no alteran controles PrimeNG. */
-@layer utilities {
-  .dark .bg-white {
-    background-color: var(--color-surface);
+html.dark {
+  color-scheme: dark;
+}
+
+/* Controles nativos y PrimeNG heredan una superficie coherente con el tema. */
+@layer base {
+  input,
+  select,
+  textarea {
+    color: var(--color-ink);
   }
-  .dark .border-black\/10 {
-    border-color: color-mix(in srgb, var(--color-line) 80%, transparent);
+}
+
+@layer components {
+  .app-panel {
+    @apply rounded-2xl border border-line bg-surface;
   }
-  .dark .text-black\/55,
-  .dark .text-black\/50,
-  .dark .text-black\/45 {
+
+  .app-muted {
     color: var(--color-muted);
+  }
+
+  .p-dialog,
+  .p-popover,
+  .p-select-overlay,
+  .p-datepicker-panel,
+  .p-panel,
+  .p-drawer {
+    color: var(--color-ink);
   }
 }
 
@@ -82,7 +150,8 @@
     width: 100%;
     border: 1px solid rgb(28 28 28 / 0.14);
     border-radius: 0.75rem;
-    background: #f9fafb;
+    background: var(--color-canvas);
+    color: var(--color-ink);
     padding: 0.75rem 1rem;
     outline: none;
     transition: 0.18s ease;
@@ -96,7 +165,7 @@
     gap: 0.5rem;
     font-size: 0.75rem;
     font-weight: 700;
-    color: rgb(28 28 28 / 0.62);
+    color: var(--color-muted);
   }
   .iam-action {
     display: inline-grid;

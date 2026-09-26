@@ -7,7 +7,9 @@ const THEME_STORAGE_KEY = 'indomito-theme';
 export class ThemeService {
   private readonly document = inject(DOCUMENT);
   readonly isDark = signal(false);
-  readonly icon = computed(() => (this.isDark() ? 'pi pi-sun' : 'pi pi-moon'));
+  readonly icon = computed(() =>
+    this.isDark() ? 'icon-[tabler--sun]' : 'icon-[tabler--moon]',
+  );
   readonly label = computed(() =>
     this.isDark() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro',
   );

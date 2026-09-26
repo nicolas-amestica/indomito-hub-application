@@ -183,7 +183,7 @@ export interface BudgetScenario extends ScenarioShape {
   pricePerPassengerCLP: number;
 }
 
-/** Cuerpo de `POST /programas:presupuesto` (Requirement 13.10). */
+/** Cuerpo de `POST /cotizaciones:presupuesto` (Requirement 13.10). */
 export interface BudgetRequest {
   programName: string;
   destination: DestinationOption;

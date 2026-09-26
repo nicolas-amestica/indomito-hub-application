@@ -1,6 +1,6 @@
 import type { CatalogResponse, MarginDefaults } from './catalog.interface';
 
-/** Valores configurables que se aplican al iniciar Crear Programa. */
+/** Valores configurables que se aplican al iniciar Crear Cotización. */
 export interface ProgramFormConfiguration {
   catalogs: CatalogResponse;
   defaults: {

@@ -20,7 +20,7 @@
         <div>
           <h2 id="general-data-heading" class="text-lg font-semibold text-ink">Datos generales</h2>
           <p class="mt-0.5 text-sm text-graphite">
-            Identifica el programa y define su contexto comercial.
+            Identifica la cotización y define su contexto comercial.
           </p>
         </div>
       </div>
@@ -30,7 +30,7 @@
   <form [formGroup]="group()" class="grid gap-x-5 gap-y-5 p-5 sm:grid-cols-2 sm:p-6 lg:grid-cols-3">
     <div class="flex flex-col gap-2 sm:col-span-2">
       <label for="program-name" class="text-sm font-medium text-ink">
-        Nombre del programa <span class="text-red-600" aria-hidden="true">*</span>
+        Nombre de la cotización <span class="text-red-600" aria-hidden="true">*</span>
       </label>
       <input
         id="program-name"
@@ -52,7 +52,7 @@
           @if (group().controls.name.hasError('minlength')) {
             El nombre debe tener al menos 3 caracteres.
           } @else {
-            Ingresa el nombre del programa.
+            Ingresa el nombre de la cotización.
           }
         </p>
       }

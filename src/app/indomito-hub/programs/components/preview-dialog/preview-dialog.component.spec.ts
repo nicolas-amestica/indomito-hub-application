@@ -134,7 +134,7 @@ describe('PreviewDialogComponent', () => {
 
     buttonNamed(buttons, 'Exportar a Excel').click();
     buttonNamed(buttons, 'Exportar presupuesto').click();
-    buttonNamed(buttons, 'Guardar favorito').click();
+    buttonNamed(buttons, 'Guardar cotización').click();
     await fixture.whenStable();
 
     expect(excel).toHaveBeenCalledOnce();
