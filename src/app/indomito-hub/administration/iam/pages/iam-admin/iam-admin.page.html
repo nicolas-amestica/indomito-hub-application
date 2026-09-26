@@ -1,5 +1,5 @@
-<main class="mx-auto max-w-[1500px] px-4 py-7 sm:px-8">
-  <header class="overflow-hidden rounded-[2rem] bg-[#1c1c1c] text-white">
+<main class="mx-auto max-w-375 px-4 py-7 sm:px-8">
+  <header class="overflow-hidden rounded-4xl bg-[#1c1c1c] text-white">
     <div class="grid gap-6 p-7 md:grid-cols-[1fr_auto] md:items-end md:p-9">
       <div>
         <p class="text-xs font-bold uppercase tracking-[.22em] text-brand">Seguridad y accesos</p>
@@ -33,9 +33,7 @@
     </div>
   }
 
-  <section
-    class="mt-6 overflow-hidden rounded-3xl border border-line bg-surface shadow-panel"
-  >
+  <section class="mt-6 overflow-hidden rounded-3xl border border-line bg-surface shadow-panel">
     <div
       class="flex flex-col gap-4 border-b border-line p-4 md:flex-row md:items-center md:justify-between md:p-5"
     >
@@ -62,9 +60,7 @@
       </nav>
       <div class="flex gap-2">
         <label class="relative flex-1"
-          ><i
-            class="icon-[tabler--search] absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-          ></i
+          ><i class="icon-[tabler--search] absolute left-3 top-1/2 -translate-y-1/2 text-muted"></i
           ><input
             class="iam-input min-w-64 pl-10"
             [ngModel]="search()"
@@ -86,7 +82,7 @@
       </div>
     } @else {
       <div class="overflow-x-auto">
-        <table class="w-full min-w-[760px] text-left text-sm">
+        <table class="w-full min-w-190 text-left text-sm">
           <thead>
             <tr
               class="border-b border-line bg-canvas text-[10px] font-bold uppercase tracking-[.13em] text-muted"
@@ -228,22 +224,22 @@
 
   @if (dialog()) {
     <div
-      class="fixed inset-0 z-[1200] grid place-items-center bg-black/55 p-4 backdrop-blur-sm"
+      class="fixed inset-0 z-1200 grid place-items-center bg-black/55 p-2 backdrop-blur-sm sm:p-4"
       (click)="closeDialog()"
     >
       <section
-        class="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-[1.75rem] bg-surface text-ink shadow-2xl"
+        class="max-h-[92vh] min-w-0 w-full max-w-2xl overflow-y-auto rounded-[1.75rem] bg-surface text-ink shadow-2xl"
         [class.max-w-5xl]="dialog() === 'permissions'"
         (click)="$event.stopPropagation()"
       >
         <header
-          class="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-surface/95 px-6 py-5 backdrop-blur"
+          class="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line bg-surface/95 px-4 py-4 backdrop-blur sm:px-6 sm:py-5"
         >
-          <div>
+          <div class="min-w-0">
             <p class="text-[10px] font-bold uppercase tracking-[.18em] text-muted">
               Administración IAM
             </p>
-            <h2 class="mt-1 text-xl font-bold">
+            <h2 class="mt-1 wrap-break-word text-xl font-bold">
               {{
                 dialog() === 'permissions'
                   ? 'Permisos de ' + selectedProfile()?.title
@@ -253,61 +249,63 @@
               }}
             </h2>
           </div>
-          <button class="iam-action" (click)="closeDialog()">
+          <button class="iam-action shrink-0" (click)="closeDialog()">
             <i class="icon-[tabler--x]"></i>
           </button>
         </header>
         @if (dialog() === 'permissions') {
-          <div class="p-6">
-            <div
-              class="mb-4 grid grid-cols-[1fr_repeat(4,4.5rem)] items-center gap-2 px-3 text-center text-[10px] font-bold uppercase tracking-wider text-muted"
-            >
-              <span class="text-left">Módulo / componente</span>
-              @for (a of allowances; track a.code) {
-                <span>{{ a.label }}</span>
-              }
-            </div>
-            @for (root of rootModules(); track root.code) {
-              <div class="mb-3 overflow-hidden rounded-2xl border border-line">
-                <div
-                  class="grid grid-cols-[1fr_repeat(4,4.5rem)] items-center gap-2 bg-canvas px-4 py-3"
-                >
-                  <strong
-                    >{{ root.title }}
-                    <small class="ml-2 font-mono text-muted">{{ root.code }}</small></strong
-                  >
-                  @for (a of allowances; track a.code) {
-                    <label class="grid place-items-center"
-                      ><input
-                        class="size-4 accent-[#1c1c1c]"
-                        type="checkbox"
-                        [checked]="hasGrant(root.code, a.code)"
-                        (change)="toggleGrant(root.code, a.code)"
-                    /></label>
-                  }
-                </div>
-                @for (child of children(root.code); track child.code) {
+          <div class="overflow-x-auto p-4 sm:p-6">
+            <div class="min-w-2xl">
+              <div
+                class="mb-4 grid grid-cols-[1fr_repeat(4,4.5rem)] items-center gap-2 px-3 text-center text-[10px] font-bold uppercase tracking-wider text-muted"
+              >
+                <span class="text-left">Módulo / componente</span>
+                @for (a of allowances; track a.code) {
+                  <span>{{ a.label }}</span>
+                }
+              </div>
+              @for (root of rootModules(); track root.code) {
+                <div class="mb-3 overflow-hidden rounded-2xl border border-line">
                   <div
-                    class="grid grid-cols-[1fr_repeat(4,4.5rem)] items-center gap-2 border-t border-line px-4 py-3"
+                    class="grid grid-cols-[1fr_repeat(4,4.5rem)] items-center gap-2 bg-canvas px-4 py-3"
                   >
-                    <span class="pl-5 text-sm"
-                      ><i class="icon-[tabler--corner-down-right] mr-2 text-muted"></i
-                      >{{ child.title }}
-                      <small class="ml-2 font-mono text-muted">{{ child.code }}</small></span
+                    <strong
+                      >{{ root.title }}
+                      <small class="ml-2 font-mono text-muted">{{ root.code }}</small></strong
                     >
                     @for (a of allowances; track a.code) {
                       <label class="grid place-items-center"
                         ><input
                           class="size-4 accent-[#1c1c1c]"
                           type="checkbox"
-                          [checked]="hasGrant(child.code, a.code)"
-                          (change)="toggleGrant(child.code, a.code)"
+                          [checked]="hasGrant(root.code, a.code)"
+                          (change)="toggleGrant(root.code, a.code)"
                       /></label>
                     }
                   </div>
-                }
-              </div>
-            }
+                  @for (child of children(root.code); track child.code) {
+                    <div
+                      class="grid grid-cols-[1fr_repeat(4,4.5rem)] items-center gap-2 border-t border-line px-4 py-3"
+                    >
+                      <span class="pl-5 text-sm"
+                        ><i class="icon-[tabler--corner-down-right] mr-2 text-muted"></i
+                        >{{ child.title }}
+                        <small class="ml-2 font-mono text-muted">{{ child.code }}</small></span
+                      >
+                      @for (a of allowances; track a.code) {
+                        <label class="grid place-items-center"
+                          ><input
+                            class="size-4 accent-[#1c1c1c]"
+                            type="checkbox"
+                            [checked]="hasGrant(child.code, a.code)"
+                            (change)="toggleGrant(child.code, a.code)"
+                        /></label>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
           </div>
         } @else {
           <form
