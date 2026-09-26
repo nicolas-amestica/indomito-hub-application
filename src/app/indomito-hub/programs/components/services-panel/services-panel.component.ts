@@ -25,6 +25,7 @@ import type { ServiceArray, ServiceRowGroup } from '../../types/program-form.typ
 export class ServicesPanelComponent {
   readonly services = input.required<ServiceArray>();
   readonly embedded = input(false);
+  readonly revision = input(0);
 
   protected readonly chargeTypes = [...CHARGE_TYPE_OPTIONS];
   protected readonly currencies = CURRENCY_OPTIONS;

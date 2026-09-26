@@ -36,7 +36,7 @@
   }
   ::selection {
     background: var(--color-brand);
-    color: var(--color-ink);
+    color: var(--color-night);
   }
 }
 

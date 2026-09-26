@@ -11,6 +11,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
+import { ButtonDirective } from 'primeng/button';
 import { Table } from 'primeng/table';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 
@@ -36,6 +37,7 @@ export const SUMMARY_VIRTUAL_SCROLL_THRESHOLD = 50;
     NgTemplateOutlet,
     ReactiveFormsModule,
     InputText,
+    ButtonDirective,
     Table,
     ClpAmountPipe,
     FallbackRatesNoticeComponent,
@@ -55,8 +57,11 @@ export class SummaryTableComponent {
   readonly snapshotIsFallback = input.required<boolean>();
   readonly fallbackDate = input<string | null>(null);
   readonly embedded = input(false);
+  readonly busy = input(false);
 
   readonly searchChanged = output<string>();
+  readonly pdfRequested = output<void>();
+  readonly excelRequested = output<void>();
 
   protected readonly searchControl = new FormControl('', { nonNullable: true });
   protected readonly virtualScrollThreshold = SUMMARY_VIRTUAL_SCROLL_THRESHOLD;

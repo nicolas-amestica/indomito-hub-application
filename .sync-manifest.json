@@ -10,7 +10,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/.claude/rules/global-rules.md",
       "targetPath": ".claude/rules/global-rules.md",
-      "checksum": "sha256:b07251d73b6b47610ec212cf03907a51a626addef5cede8ae0335786f56863d7"
+      "checksum": "sha256:89111da136777f805a43e6e24b2853510d13cd14e2afb42f5166e5c85332a98c"
     },
     {
       "sourcePaths": [
@@ -87,7 +87,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/AGENTS.md",
       "targetPath": "AGENTS.md",
-      "checksum": "sha256:96e8406bb983192e1594c4fddb429146611064ee5c62744a5f561f996be8f3dc"
+      "checksum": "sha256:ce90a43c27f66b0d7ce4f3ca8b153eba3817ca1fe12e087847efa6405f1231ba"
     },
     {
       "sourcePaths": [
@@ -99,7 +99,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/CLAUDE.md",
       "targetPath": ".claude/CLAUDE.md",
-      "checksum": "sha256:e197e4353d87b0681a3a38ce167553c82e93a4836d014625a83dd10bd4076a82"
+      "checksum": "sha256:00522242e351aa658d64649be98cf05721b176ca9f0e238e5e709cc999c423ed"
     },
     {
       "sourcePaths": [
@@ -111,7 +111,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/GEMINI.md",
       "targetPath": ".gemini/GEMINI.md",
-      "checksum": "sha256:6f4f0aa8cce97a60a02735658bbff028fe2dae2dab5492c19ae58b6784ad3a11"
+      "checksum": "sha256:48d44773f564e0627860a064d75888424f70ca0b68b043606b9c0f835b74b18d"
     },
     {
       "sourcePaths": [
@@ -146,7 +146,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/skills/claude/angular-best-practices.md",
       "targetPath": ".claude/skills/angular-best-practices.md",
-      "checksum": "sha256:912461f514a27fc7eb68a8b7e7129f89ff0b5376489f070cc705505bfc969a35"
+      "checksum": "sha256:41279d5a76c7dc57f75bffc6fc7b790015eeb137f15a937f3034bbc5e0c78d7c"
     },
     {
       "sourcePaths": [
@@ -170,7 +170,7 @@
       ],
       "outputPath": "ai/generated/ind-hub-app/skills/kiro/angular-best-practices.md",
       "targetPath": ".kiro/skills/angular-best-practices.md",
-      "checksum": "sha256:912461f514a27fc7eb68a8b7e7129f89ff0b5376489f070cc705505bfc969a35"
+      "checksum": "sha256:41279d5a76c7dc57f75bffc6fc7b790015eeb137f15a937f3034bbc5e0c78d7c"
     },
     {
       "sourcePaths": [
@@ -191,6 +191,6 @@
   ],
   "managedBy": "indomito-context-compiler",
   "artifactFormatVersion": 1,
-  "sourceCommit": "0d334d3265cb8f33931a8bd3f3533193dd9ca89f",
+  "sourceCommit": "938d185515ddb393277f4d06b3656f67c9051a12",
   "sourceDirty": true
 }

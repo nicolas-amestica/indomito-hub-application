@@ -55,7 +55,7 @@
     </div>
   </div>
 
-  <div class="flex flex-col gap-4 p-5 sm:p-6">
+  <div class="flex flex-col gap-4 p-5 sm:p-6" [attr.data-revision]="revision()">
     @for (row of services().controls; track row.controls.id.value; let index = $index) {
       <article [formGroup]="row" class="rounded-xl border border-line bg-canvas/50 p-4">
         <div class="mb-4 flex items-center justify-between gap-3">

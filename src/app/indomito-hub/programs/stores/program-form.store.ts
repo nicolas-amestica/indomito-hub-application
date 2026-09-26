@@ -46,10 +46,12 @@ export class ProgramFormStore {
   private readonly crewsState = signal(this.form.controls.crews.getRawValue());
   private readonly servicesState = signal(this.form.controls.services.getRawValue());
   private readonly nightsSourceState = signal<NightsSource>('preloaded');
+  private readonly dynamicRowsRevisionState = signal(0);
 
   private applyingPreload = false;
 
   readonly nightsSource = this.nightsSourceState.asReadonly();
+  readonly dynamicRowsRevision = this.dynamicRowsRevisionState.asReadonly();
   readonly totalDays = computed(() => this.scheduleState().totalDays ?? 0);
   readonly payingPassengers = computed(() => {
     const schedule = this.scheduleState();
@@ -130,6 +132,7 @@ export class ProgramFormStore {
     this.nightsSourceState.set('preloaded');
     this.applyingPreload = false;
     this.refreshAllSections();
+    this.dynamicRowsRevisionState.update((revision) => revision + 1);
   }
 
   /**
@@ -167,16 +170,18 @@ export class ProgramFormStore {
       const { exchange: _, ...pricing } = content.pricing;
       controls.pricing.setValue(pricing, { emitEvent: false });
 
+      const crews = content.crews ?? [];
       controls.crews.clear({ emitEvent: false });
-      for (const crew of content.crews) {
+      for (const crew of crews) {
         controls.crews.push(createCrewRow(crew), { emitEvent: false });
       }
       if (controls.crews.length === 0) {
         controls.crews.push(createCrewRow(), { emitEvent: false });
       }
 
+      const services = content.services ?? [];
       controls.services.clear({ emitEvent: false });
-      for (const service of content.services) {
+      for (const service of services) {
         controls.services.push(createServiceRow(service), { emitEvent: false });
       }
       if (controls.services.length === 0) {
@@ -190,6 +195,7 @@ export class ProgramFormStore {
     }
 
     this.refreshAllSections();
+    this.dynamicRowsRevisionState.update((revision) => revision + 1);
   }
 
   private subscribeToSections(): void {

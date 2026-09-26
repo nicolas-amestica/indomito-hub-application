@@ -34,6 +34,7 @@ import { SummaryTableComponent } from '../../components/summary-table/summary-ta
 import { ExcelExporter } from '../../exporters/excel-exporter';
 import { buildExcelLayout } from '../../exporters/excel-layout';
 import { favoriteContentFromProgram } from '../../fn/fn-favorite-content';
+import { exchangeRateSourceLabel } from '../../fn/fn-exchange-rate-source';
 import type { Favorite } from '../../interfaces/favorite.interface';
 import type { BudgetRequest } from '../../interfaces/program.interface';
 import { BudgetPdfService } from '../../services/budget-pdf.service';
@@ -91,7 +92,11 @@ export class ProgramFormPage {
   protected readonly actionBusy = computed(
     () => this.previewBusy() || this.favoritesStore.mutating(),
   );
-  protected readonly panelPt = { content: { class: 'p-0!' } } as const;
+  protected readonly panelPt = {
+    contentContainer: { class: 'min-w-0 max-w-full overflow-hidden' },
+    content: { class: 'min-w-0 max-w-full overflow-hidden p-0!' },
+  } as const;
+  protected readonly exchangeRateSourceLabel = exchangeRateSourceLabel;
 
   private readonly previewTrigger = viewChild<ElementRef<HTMLButtonElement>>('previewTrigger');
   private readonly destroyRef = inject(DestroyRef);

@@ -2,7 +2,7 @@ import type { ExchangeRateSource, ExchangeSnapshot } from '../interfaces/program
 
 const SOURCE_LABELS: Record<ExchangeSnapshot['source'], string> = {
   'banco-central': 'Banco Central de Chile',
-  'currency-api': 'Currency API',
+  'currency-api': '@fawazahmed0/currency-api',
   unknown: 'Fuente histórica no registrada',
 };
 

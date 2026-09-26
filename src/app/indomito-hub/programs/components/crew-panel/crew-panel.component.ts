@@ -20,6 +20,7 @@ import type { CrewArray, CrewRowGroup } from '../../types/program-form.types';
 export class CrewPanelComponent {
   readonly crews = input.required<CrewArray>();
   readonly embedded = input(false);
+  readonly revision = input(0);
 
   protected readonly currencies = CURRENCY_OPTIONS;
   protected readonly limits = FIELD_LIMITS;

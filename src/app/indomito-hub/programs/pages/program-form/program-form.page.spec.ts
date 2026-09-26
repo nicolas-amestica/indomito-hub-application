@@ -249,6 +249,10 @@ describe('ProgramFormPage', () => {
     await fixture.whenStable();
 
     expect(store.form.controls.generals.controls.name.value).toBe('Brasil 2027');
+    expect(store.form.controls.crews.at(0).controls.name.value).toBe('Coordinador');
+    expect(store.form.controls.services.at(0).controls.name.value).toBe('Hotel');
+    expect(host.querySelector<HTMLInputElement>('#crew-0-name')?.value).toBe('Coordinador');
+    expect(host.querySelector<HTMLInputElement>('#service-0-name')?.value).toBe('Hotel');
     expect(store.nightsSource()).toBe('user');
     expect(store.program()?.pricing.exchange).toEqual(freshSnapshot());
     expect(store.rows()[1].effectiveRate).toBe(1_050);
@@ -256,9 +260,13 @@ describe('ProgramFormPage', () => {
     expect(notifySuccess).toHaveBeenCalledWith(
       'La cotización se cargó con los tipos de cambio vigentes.',
     );
+
+    buttonNamed(host, 'Cotizaciones guardadas').click();
+    await fixture.whenStable();
+    expect(host.querySelector('app-side-drawer aside')).not.toBeNull();
   });
 
-  it('carga la tabla diferida cuando aparece el primer item válido', async () => {
+  it('muestra la tabla de resumen cuando aparece el primer ítem válido', async () => {
     exchangeResponse$ = of(freshSnapshot());
     const fixture = TestBed.createComponent(ProgramFormPage);
     const store = fixture.debugElement.injector.get(ProgramFormStore);

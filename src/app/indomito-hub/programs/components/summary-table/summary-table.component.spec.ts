@@ -122,6 +122,22 @@ describe('SummaryTableComponent', () => {
     }
   });
 
+  it('expone las exportaciones junto al filtro', async () => {
+    const fixture = createTable([summaryRow(0)]);
+    const pdfRequested = vi.fn();
+    const excelRequested = vi.fn();
+    fixture.componentInstance.pdfRequested.subscribe(pdfRequested);
+    fixture.componentInstance.excelRequested.subscribe(excelRequested);
+    await fixture.whenStable();
+    const host = fixture.nativeElement as HTMLElement;
+
+    buttonNamed(host, 'Exportar presupuesto').click();
+    buttonNamed(host, 'Exportar a Excel').click();
+
+    expect(pdfRequested).toHaveBeenCalledOnce();
+    expect(excelRequested).toHaveBeenCalledOnce();
+  });
+
   it('activa el virtual scrolling a partir de cincuenta filas', async () => {
     const rows = Array.from({ length: SUMMARY_VIRTUAL_SCROLL_THRESHOLD }, (_, index) =>
       summaryRow(index),
@@ -172,3 +188,9 @@ describe('SummaryTableComponent', () => {
     );
   });
 });
+
+function buttonNamed(host: HTMLElement, text: string): HTMLButtonElement {
+  return [...host.querySelectorAll<HTMLButtonElement>('button')].find(
+    (button) => button.textContent?.trim() === text,
+  )!;
+}

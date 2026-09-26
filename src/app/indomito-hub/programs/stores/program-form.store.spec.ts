@@ -4,6 +4,7 @@ import fc from 'fast-check';
 
 import { favoriteContentFromProgram } from '../fn/fn-favorite-content';
 import type { CatalogResponse } from '../interfaces/catalog.interface';
+import type { FavoriteContent } from '../interfaces/favorite.interface';
 import type { ExchangeSnapshot } from '../interfaces/program.interface';
 import { CatalogStore } from './catalog.store';
 import { ExchangeRateStore } from './exchange-rate.store';
@@ -205,6 +206,20 @@ describe('ProgramFormStore', () => {
       ),
       { numRuns: 100 },
     );
+  });
+
+  it('restaura cotizaciones antiguas aunque sus listas dinámicas vengan nulas', () => {
+    const { store } = createStore(CATALOGS);
+    completeCalculationFields(store);
+    completeGeneralFields(store);
+    const content = favoriteContentFromProgram(store.program()!);
+
+    store.loadFavorite({ ...content, crews: null, services: null } as unknown as FavoriteContent);
+
+    expect(store.form.controls.crews.length).toBe(1);
+    expect(store.form.controls.crews.at(0).controls.name.value).toBe('');
+    expect(store.form.controls.services.length).toBe(1);
+    expect(store.form.controls.services.at(0).controls.name.value).toBe('');
   });
 
   it('no recalcula los totales al cambiar datos generales o el filtro', () => {
