@@ -35,6 +35,29 @@ describe('AuthService', () => {
 
     expect(JSON.parse(sessionStorage.getItem(STORAGE_KEY)!)).toEqual(session);
     expect(service.authenticated()).toBe(true);
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/cotizaciones');
+  });
+
+  it('navega al primer modulo LV2 legible y no al contenedor LV1', async () => {
+    const service = TestBed.inject(AuthService);
+    const http = TestBed.inject(HttpTestingController);
+    const session = authSession(jwtExpiringIn(3_600));
+    session.permissions.unshift({
+      module: {
+        code: 'PRG', title: 'Programas', category: 'Programas', path: '/programas',
+        icon: 'icon-[tabler--route]', order: 0, active: true, endpoints: [], level: 'LV1',
+      },
+      allowances: ['r'],
+    });
+    session.permissions[1].module.level = 'LV2';
+    session.permissions[1].module.parentCode = 'PRG';
+    session.permissions[1].module.path = '/cotizaciones';
+
+    const login = service.login('17137440-5', 'secret');
+    http.expectOne(`${environment.apiUrl}/auth/login`).flush({ data: session });
+    await login;
+
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/cotizaciones');
   });
 
   it('restaura una sesión almacenada cuyo JWT sigue vigente', () => {
@@ -105,11 +128,11 @@ function authSession(token: string): AuthSession {
           code: 'PROGRAMS',
           title: 'Programas',
           category: 'Programas',
-          path: '/programas',
+          path: '/cotizaciones',
           icon: 'icon-[tabler--file]',
           order: 1,
           active: true,
-          endpoints: ['/programas'],
+          endpoints: ['/cotizaciones'],
         },
         allowances: ['r', 'w'],
       },

@@ -14,6 +14,7 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./core/layout/app-shell.component').then((m) => m.AppShellComponent),
     children: [
+      { path: '', pathMatch: 'full', redirectTo: 'cotizaciones' },
       {
         path: 'cotizaciones',
         data: { module: 'PROGRAMS' },
@@ -33,7 +34,6 @@ export const routes: Routes = [
             (m) => m.ADMINISTRATION_ROUTES,
           ),
       },
-      { path: '', pathMatch: 'full', redirectTo: 'cotizaciones' },
     ],
   },
   { path: '**', redirectTo: '' },

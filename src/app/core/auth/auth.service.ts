@@ -44,7 +44,8 @@ export class AuthService {
         .pipe(map((x) => x.data)),
     );
     this.setSession(session);
-    await this.router.navigateByUrl(session.permissions[0]?.module.path || '/cotizaciones');
+    const firstAccessibleModule = this.modules().find((module) => module.level === 'LV2');
+    await this.router.navigateByUrl(firstAccessibleModule?.path || '/cotizaciones');
   }
   token(): string | null {
     return this.state()?.token ?? null;
