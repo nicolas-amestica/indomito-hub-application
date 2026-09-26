@@ -18,7 +18,7 @@ export const IndomitoPreset = definePreset(Aura, {
       900: 'var(--color-ink)',
       950: 'var(--color-ink)',
       color: 'var(--color-brand)',
-      contrastColor: 'var(--color-ink)',
+      contrastColor: 'var(--color-night)',
       hoverColor: 'var(--color-brand-hover)',
       activeColor: 'var(--color-brand-active)',
     },

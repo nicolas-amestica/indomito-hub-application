@@ -83,6 +83,8 @@ export const MiStore = signalStore(
 - Usar el componente o la directiva PrimeNG disponible para cada control interactivo; por ejemplo, `pInputText`, `p-select`, `p-datepicker`, `p-inputnumber`, `pButton` y `p-fileupload`.
 - Usar HTML semántico nativo únicamente para estructura o cuando PrimeNG no tenga un equivalente aplicable.
 - Usar TailwindCSS para layout, espaciado, responsividad y composición externa. No recrear con utilidades la apariencia interna de un componente PrimeNG.
+- En acciones con fondo amarillo de marca, usar el token estable de primer plano oscuro (`--color-night`/`text-night`) en ambos temas; nunca `--color-ink`/`text-ink`, porque es adaptativo y pasa a blanco en modo oscuro. Configurar la pareja en el preset/tokens compartidos y validar contraste en todos los estados del botón.
+- Implementar layouts mobile-first y validar cada feature a 320 px, 390 px, tablet y escritorio, incluyendo formularios, tablas, diálogos, overlays y grupos de acciones. No aceptar scroll horizontal accidental, controles fuera del viewport ni áreas táctiles inaccesibles.
 - PROHIBIDO CSS/SCSS propio o `<style>` en componentes.
 - PROHIBIDO agregar selectores globales para `input`, `select`, `textarea`, `button` o elementos internos `.p-*` con el fin de corregir una pantalla.
 - No colocar clases tipográficas heredables como `uppercase`, `font-*`, `text-*` o `tracking-*` en un `label` o contenedor que envuelva un componente PrimeNG. Separar el texto de la etiqueta en un elemento hermano.
