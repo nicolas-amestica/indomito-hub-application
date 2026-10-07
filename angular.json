@@ -28,37 +28,6 @@
             "styles": ["src/styles.css"]
           },
           "configurations": {
-            "payments": {
-              "browser": "src/main.payments.ts",
-              "outputPath": "dist/payment-portal-local",
-              "optimization": false,
-              "sourceMap": true
-            },
-            "payments-dev": {
-              "browser": "src/main.payments.ts",
-              "outputPath": "dist/payment-portal-dev",
-              "optimization": true,
-              "sourceMap": false,
-              "outputHashing": "all",
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "2MB",
-                  "maximumError": "3MB"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
-                }
-              ],
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.dev.ts"
-                }
-              ]
-            },
             "production": {
               "budgets": [
                 {
@@ -112,9 +81,6 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "configurations": {
-            "payments": {
-              "buildTarget": "ind-hub-app-ngx-pri-gh:build:payments"
-            },
             "production": {
               "buildTarget": "ind-hub-app-ngx-pri-gh:build:production"
             },

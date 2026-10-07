@@ -2,7 +2,7 @@
 <!-- Managed-By: indomito-context-compiler -->
 <!-- Artifact-Format: 1 -->
 <!-- Engine-Version: 1.0.0 -->
-<!-- Source: ai/source/repo-overrides/ind-hub-app.md -->
+<!-- Source: ai/source/repo-overrides/app-ngx-hub.md -->
 ---
 inclusion: manual
 description: Estandares de dominio y scope del repo
@@ -11,7 +11,7 @@ globs:
   - "src/app/**/*.html"
 ---
 
-# Domain Context — ind-hub-app
+# Domain Context — app-ngx-hub
 
 Contexto de dominio especifico para ind-hub-app-ngx-pri-gh (scope: frontend).
 

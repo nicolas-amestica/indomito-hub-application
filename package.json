@@ -5,11 +5,6 @@
   "scripts": {
     "ng": "ng",
     "start": "npm run clean && ng serve --no-hmr --port 4300",
-    "start:payments": "ng serve --configuration payments --host localhost --port 4400 --proxy-config proxy.payments.json",
-    "build:payments": "ng build --configuration payments",
-    "build:payments:dev": "ng build --configuration payments-dev",
-    "deploy:payments:dev": "bash tools/deploy-payment-spa.sh dev",
-    "build:deploy:payments:dev": "npm run build:payments:dev && npm run deploy:payments:dev",
     "clean": "rm -rf .angular/cache",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",

@@ -5,7 +5,7 @@
 <!-- Source: ai/source/skills/angular-best-practices.md -->
 # Angular Best Practices — Indómito Hub
 
-Skill de revisión de código Angular para el repositorio `application`.
+Skill de revisión de código Angular para los repositorios `app-ngx-hub` y `app-ngx-pay`.
 Basado en las convenciones del equipo de Indómito Hub.
 
 ## Componentes
