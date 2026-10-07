@@ -1,4 +1,0 @@
-{
-  "/api/pagos/**": { "target": "http://127.0.0.1:8095", "secure": false, "changeOrigin": true },
-  "/api/khipu-dev/**": { "target": "http://127.0.0.1:8096", "secure": false, "changeOrigin": true }
-}
