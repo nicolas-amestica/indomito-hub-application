@@ -3,6 +3,13 @@ import { moduleGuard } from '../../core/auth/auth.guard';
 
 export const ADMINISTRATION_ROUTES: Routes = [
   {
+    path: 'administracion/catalogo-servicios',
+    data: { module: 'SERVICE_CATALOG' },
+    canActivate: [moduleGuard],
+    loadChildren: () =>
+      import('./service-catalog/service-catalog.routes').then((m) => m.SERVICE_CATALOG_ROUTES),
+  },
+  {
     path: 'iam',
     data: { module: 'IAM' },
     canActivate: [moduleGuard],

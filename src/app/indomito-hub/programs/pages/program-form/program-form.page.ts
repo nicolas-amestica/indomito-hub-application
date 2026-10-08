@@ -42,6 +42,7 @@ import { CatalogStore } from '../../stores/catalog.store';
 import { ExchangeRateStore } from '../../stores/exchange-rate.store';
 import { FavoritesStore } from '../../stores/favorites.store';
 import { ProgramFormStore } from '../../stores/program-form.store';
+import { ServiceCatalogStore } from '../../stores/service-catalog.store';
 import { APP_MESSAGES } from '../../../../shared/constants/app-messages';
 
 /**
@@ -77,12 +78,19 @@ import { APP_MESSAGES } from '../../../../shared/constants/app-messages';
   ],
   templateUrl: './program-form.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [CatalogStore, ExchangeRateStore, FavoritesStore, ProgramFormStore],
+  providers: [
+    CatalogStore,
+    ExchangeRateStore,
+    FavoritesStore,
+    ServiceCatalogStore,
+    ProgramFormStore,
+  ],
 })
 export class ProgramFormPage {
   protected readonly catalogStore = inject(CatalogStore);
   protected readonly exchangeRateStore = inject(ExchangeRateStore);
   protected readonly programFormStore = inject(ProgramFormStore);
+  protected readonly serviceCatalogStore = inject(ServiceCatalogStore);
   protected readonly favoritesStore = inject(FavoritesStore);
   protected readonly favoritesAvailable = inject(FAVORITES_AVAILABLE);
   protected readonly previewOpen = signal(false);

@@ -9,6 +9,8 @@ import type { ExchangeSnapshot } from '../interfaces/program.interface';
 import { CatalogStore } from './catalog.store';
 import { ExchangeRateStore } from './exchange-rate.store';
 import { ProgramFormStore } from './program-form.store';
+import { ServiceCatalogStore } from './service-catalog.store';
+import type { ServiceCatalogItem } from '../../../shared/service-catalog/interfaces/service-catalog.interface';
 
 const SNAPSHOT: ExchangeSnapshot = {
   date: '2026-09-14',
@@ -34,6 +36,7 @@ const CATALOGS: CatalogResponse = {
 function createStore(
   catalog: CatalogResponse | null = null,
   minUtilityRate?: number,
+  serviceDefaults: ServiceCatalogItem[] = [],
 ): {
   store: ProgramFormStore;
   catalogState: ReturnType<typeof signal<CatalogResponse | null>>;
@@ -52,12 +55,17 @@ function createStore(
     applyDefaults: vi.fn(),
   };
   const rateStore = { snapshot: rateState.asReadonly() };
+  const serviceCatalogStore = {
+    loaded: signal(serviceDefaults.length > 0).asReadonly(),
+    defaults: computed(() => serviceDefaults),
+  };
 
   TestBed.configureTestingModule({
     providers: [
       ProgramFormStore,
       { provide: CatalogStore, useValue: catalogStore },
       { provide: ExchangeRateStore, useValue: rateStore },
+      { provide: ServiceCatalogStore, useValue: serviceCatalogStore },
     ],
   });
 
@@ -106,6 +114,34 @@ function completeGeneralFields(store: ProgramFormStore, name = 'Brasil 2027'): v
 }
 
 describe('ProgramFormStore', () => {
+  it('precarga y restaura los servicios marcados como default', () => {
+    const defaults: ServiceCatalogItem[] = [
+      {
+        id: '01M4C8EFRFHRK7DJW09DT6J6CX',
+        scope: 'CTZ',
+        glosa: 'Hotel Bariloche',
+        price: 45,
+        currency: 'USD',
+        chargeType: 'per_passenger_day',
+        active: true,
+        default: true,
+      },
+    ];
+    const { store } = createStore(null, undefined, defaults);
+    TestBed.tick();
+
+    expect(store.form.controls.services.at(0).getRawValue()).toMatchObject({
+      name: 'Hotel Bariloche',
+      unitPrice: 45,
+      currency: 'USD',
+      chargeType: 'per_passenger_day',
+    });
+
+    store.form.controls.services.at(0).controls.name.setValue('Editado');
+    store.resetForm();
+    expect(store.form.controls.services.at(0).controls.name.value).toBe('Hotel Bariloche');
+  });
+
   it('mantiene los derivados vacíos mientras faltan entradas obligatorias', () => {
     const { store } = createStore();
 

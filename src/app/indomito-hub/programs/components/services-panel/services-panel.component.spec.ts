@@ -107,6 +107,36 @@ describe('ServicesPanelComponent', () => {
     ]);
   });
 
+  it('parchea los cuatro campos al elegir un servicio del catálogo', () => {
+    const { fixture, services } = createPanel();
+    const item = {
+      id: '01M4C8EFRFHRK7DJW09DT6J6CX',
+      scope: 'CTZ' as const,
+      glosa: 'HOTEL BARILOCHE SKI',
+      price: 45,
+      currency: 'USD' as const,
+      chargeType: 'per_passenger_day' as const,
+      active: true,
+      default: false,
+    };
+
+    (
+      fixture.componentInstance as unknown as {
+        selectCatalogItem: (
+          row: (typeof services.controls)[number],
+          event: { value: typeof item },
+        ) => void;
+      }
+    ).selectCatalogItem(services.at(0), { value: item });
+
+    expect(services.at(0).getRawValue()).toMatchObject({
+      name: 'HOTEL BARILOCHE SKI',
+      unitPrice: 45,
+      currency: 'USD',
+      chargeType: 'per_passenger_day',
+    });
+  });
+
   it('rechaza precios decimales en CLP y muestra un error asociado', async () => {
     const { fixture, services } = createPanel();
     const row = services.at(0);

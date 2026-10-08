@@ -114,21 +114,22 @@
             <label [for]="'service-' + index + '-name'" class="text-sm font-medium text-ink">
               Nombre <span class="text-red-600" aria-hidden="true">*</span>
             </label>
-            <input
-              [id]="'service-' + index + '-name'"
-              pInputText
+            <p-autocomplete
+              [inputId]="'service-' + index + '-name'"
               fluid
               formControlName="name"
-              autocomplete="off"
+              optionLabel="glosa"
+              [suggestions]="suggestions()"
+              [minQueryLength]="2"
+              [forceSelection]="false"
+              [completeOnFocus]="false"
+              appendTo="body"
               placeholder="Ej. Hotel"
               [invalid]="row.controls.name.touched && row.controls.name.invalid"
-              [attr.aria-invalid]="row.controls.name.touched && row.controls.name.invalid"
-              [attr.aria-describedby]="
-                row.controls.name.touched && row.controls.name.invalid
-                  ? 'service-' + index + '-name-error'
-                  : null
-              "
+              (completeMethod)="searchCatalog($event)"
+              (onSelect)="selectCatalogItem(row, $event)"
             />
+            <p class="text-xs text-muted">Escribe al menos 2 letras para buscar en el catálogo.</p>
             @if (row.controls.name.touched && row.controls.name.invalid) {
               <p [id]="'service-' + index + '-name-error'" class="text-sm text-red-700">
                 Ingresa el nombre del servicio.

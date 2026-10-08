@@ -81,6 +81,27 @@
         </aside>
       }
 
+      @if (serviceCatalogStore.hasError()) {
+        <aside
+          role="alert"
+          class="flex flex-col gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-950 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <p class="text-sm font-medium">
+            No se pudo cargar el catálogo de servicios. Puedes seguir escribiéndolos manualmente.
+          </p>
+          <button
+            pButton
+            type="button"
+            severity="warn"
+            outlined
+            [disabled]="serviceCatalogStore.loading()"
+            (click)="serviceCatalogStore.retry()"
+          >
+            Reintentar servicios
+          </button>
+        </aside>
+      }
+
       <p-panel
         id="datos-generales"
         class="scroll-mt-6"
@@ -242,6 +263,7 @@
       >
         <app-services-panel
           [services]="programFormStore.form.controls.services"
+          [catalog]="serviceCatalogStore.items()"
           [revision]="programFormStore.dynamicRowsRevision()"
           [embedded]="true"
         />

@@ -1,14 +1,27 @@
 <div class="min-h-screen bg-canvas text-ink">
-  <header class="sticky top-0 z-40 border-b border-white/10 bg-[#171719]/95 text-white backdrop-blur-xl">
+  <header
+    class="sticky top-0 z-40 border-b border-white/10 bg-[#171719]/95 text-white backdrop-blur-xl"
+  >
     <div class="mx-auto flex max-w-[1500px] items-center gap-2 px-3 py-3 sm:gap-4 sm:px-8">
       <a routerLink="/cotizaciones" class="flex items-center gap-3">
-        <img src="brand/logo-web-large.png" alt="Giras Indómito" width="768" height="391" class="h-9 w-auto object-contain dark:brightness-0 dark:invert" />
+        <img
+          src="brand/logo-web-large.png"
+          alt="Giras Indómito"
+          width="768"
+          height="391"
+          class="h-9 w-auto object-contain dark:brightness-0 dark:invert"
+        />
         <span class="hidden text-sm font-semibold sm:block">Indómito Hub</span>
       </a>
       <div class="ml-auto flex items-center gap-3">
         <button
+          pButton
           type="button"
-          class="grid size-11 shrink-0 place-items-center rounded-xl border border-white/20 text-white transition-colors duration-150 hover:border-brand hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+          severity="secondary"
+          text
+          rounded
+          iconOnly
+          class="text-white!"
           [attr.aria-label]="theme.label()"
           [pTooltip]="theme.label()"
           tooltipPosition="bottom"
@@ -17,8 +30,11 @@
           <span [class]="theme.icon() + ' size-6'" aria-hidden="true"></span>
         </button>
         <button
+          pButton
           type="button"
-          class="flex h-10 items-center gap-2 rounded-xl border border-white/15 px-3 text-sm font-semibold transition hover:border-brand/60 hover:bg-white/10"
+          severity="secondary"
+          outlined
+          class="border-white/20! text-white!"
           (click)="toggle()"
           aria-label="Abrir menú de módulos"
         >
@@ -54,64 +70,6 @@
     </div>
   </header>
 
-  <p-dialog
-    [visible]="open()"
-    (visibleChange)="open.set($event)"
-    [modal]="true"
-    [draggable]="false"
-    [resizable]="false"
-    [dismissableMask]="true"
-    [style]="{ width: 'min(92vw, 62rem)' }"
-    styleClass="overflow-hidden rounded-3xl border-0"
-  >
-    <ng-template #header>
-      <div>
-        <p class="text-xs font-bold uppercase tracking-[.2em] text-brand-active">Navegación</p>
-        <h2 class="mt-1 text-2xl font-semibold text-ink">Módulos disponibles</h2>
-      </div>
-    </ng-template>
-    <div class="border-y border-line bg-canvas px-1 py-4">
-      <div class="flex flex-wrap gap-2" aria-label="Filtrar módulos por categoría">
-        @for (item of categories(); track item) {
-          <button
-            type="button"
-            class="rounded-full border px-4 py-2 text-sm font-semibold transition"
-            [class.border-night]="category() === item"
-            [class.bg-night]="category() === item"
-            [class.text-white]="category() === item"
-            [class.border-line]="category() !== item"
-            [class.bg-surface]="category() !== item"
-            (click)="category.set(item)"
-          >
-            {{ item }}
-          </button>
-        }
-      </div>
-    </div>
-    <nav class="grid gap-3 py-5 sm:grid-cols-2 lg:grid-cols-3">
-      @for (module of visibleModules(); track module.code) {
-        <a
-          [routerLink]="module.path"
-          routerLinkActive="border-brand-active bg-brand-soft"
-          class="group flex min-h-28 flex-col justify-between rounded-2xl border border-line bg-surface p-5 transition-[transform,border-color,box-shadow] duration-150 hover:-translate-y-0.5 hover:border-brand-active hover:shadow-lg"
-          (click)="open.set(false)"
-        >
-          <span class="grid size-10 place-items-center rounded-xl bg-night text-brand"
-            ><i [class]="module.icon || 'icon-[tabler--point]'"></i
-          ></span>
-          <span class="mt-4"
-            ><strong class="block text-base text-ink">{{ module.title }}</strong
-            ><small class="mt-1 block text-muted">{{
-              module.category || 'General'
-            }}</small></span
-          >
-        </a>
-      } @empty {
-        <p class="col-span-full rounded-2xl bg-canvas px-5 py-10 text-center text-sm text-muted">
-          No hay módulos disponibles en esta categoría.
-        </p>
-      }
-    </nav>
-  </p-dialog>
+  <app-mega-menu [modules]="navigableModules()" [(visible)]="open" />
   <main><router-outlet /></main>
 </div>

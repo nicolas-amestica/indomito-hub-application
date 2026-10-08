@@ -24,6 +24,7 @@ import { ExchangeRateService } from '../../services/exchange-rate.service';
 import { FavoritesService } from '../../services/favorites.service';
 import { ProgramFormStore } from '../../stores/program-form.store';
 import { ProgramFormPage } from './program-form.page';
+import { ServiceCatalogApiService } from '../../../../shared/service-catalog/services/service-catalog-api.service';
 
 describe('ProgramFormPage', () => {
   let exchangeResponse$: Observable<ExchangeSnapshot>;
@@ -72,6 +73,7 @@ describe('ProgramFormPage', () => {
         MessageService,
         { provide: ProgramFormConfigurationService, useValue: { get: getFormConfiguration } },
         { provide: ExchangeRateService, useValue: { getSnapshot } },
+        { provide: ServiceCatalogApiService, useValue: { list: () => NEVER } },
         { provide: ExcelExporter, useValue: { export: exportExcelFile } },
         {
           provide: BudgetPdfService,

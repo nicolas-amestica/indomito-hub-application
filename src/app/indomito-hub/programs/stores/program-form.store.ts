@@ -29,12 +29,14 @@ import type {
 import { CatalogStore } from './catalog.store';
 import { ExchangeRateStore } from './exchange-rate.store';
 import { AppConfigurationService } from '../../../core/configuration/app-configuration.service';
+import { ServiceCatalogStore } from './service-catalog.store';
 
 /** Puente feature-scoped entre el formulario tipado y el motor puro de cálculo. */
 @Injectable()
 export class ProgramFormStore {
   private readonly rates = inject(ExchangeRateStore);
   private readonly catalogs = inject(CatalogStore);
+  private readonly serviceCatalog = inject(ServiceCatalogStore);
   private readonly destroyRef = inject(DestroyRef);
   private readonly configuration = inject(AppConfigurationService);
 
@@ -123,12 +125,21 @@ export class ProgramFormStore {
       this.generalsState.set(this.form.controls.generals.getRawValue());
       this.pricingState.set(this.form.controls.pricing.getRawValue());
     });
+
+    effect(() => {
+      if (!this.serviceCatalog.loaded()) return;
+      const rows = this.form.controls.services;
+      const untouchedInitialRow =
+        rows.pristine && rows.length === 1 && rows.at(0).controls.name.value.trim() === '';
+      if (untouchedInitialRow) this.replaceServicesWithDefaults();
+    });
   }
 
   /** Reinicia una edición y reactiva la precarga automática de noches. */
   resetForm(): void {
     this.applyingPreload = true;
     this.form.reset();
+    this.replaceServicesWithDefaults();
     this.nightsSourceState.set('preloaded');
     this.applyingPreload = false;
     this.refreshAllSections();
@@ -245,6 +256,27 @@ export class ProgramFormStore {
     this.pricingState.set(this.form.controls.pricing.getRawValue());
     this.crewsState.set(this.form.controls.crews.getRawValue());
     this.servicesState.set(this.form.controls.services.getRawValue());
+  }
+
+  private replaceServicesWithDefaults(): void {
+    const services = this.form.controls.services;
+    services.clear({ emitEvent: false });
+    const defaults = this.serviceCatalog.defaults();
+    for (const item of defaults) {
+      services.push(
+        createServiceRow({
+          name: item.glosa,
+          chargeType: item.chargeType,
+          unitPrice: item.price,
+          currency: item.currency,
+        }),
+        { emitEvent: false },
+      );
+    }
+    if (services.length === 0) services.push(createServiceRow(), { emitEvent: false });
+    services.markAsPristine();
+    this.servicesState.set(services.getRawValue());
+    this.dynamicRowsRevisionState.update((revision) => revision + 1);
   }
 
   /** Proyecta el formulario válido y los derivados a su contrato de salida. */
