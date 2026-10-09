@@ -74,4 +74,53 @@
       </p>
     }
   </form>
+
+  <section class="mt-6 grid gap-5 rounded-3xl border border-line bg-surface p-6 shadow-sm">
+    <div>
+      <h2 class="text-xl font-semibold text-ink">Acceso maestro a Indómito Pay</h2>
+      <p class="mt-2 text-sm text-muted">
+        Credencial exclusiva para administración. Permite consultar por RUT sin conocer el código
+        particular de cada gira.
+      </p>
+    </div>
+    @if (masterError()) {
+      <p-message severity="error">{{ masterError() }}</p-message>
+    }
+    @if (masterAccess(); as access) {
+      <dl class="grid gap-3 sm:grid-cols-2">
+        <div>
+          <dt class="text-sm text-muted">Estado</dt>
+          <dd class="font-semibold text-ink">{{ access.active ? 'Activo' : 'Revocado' }}</dd>
+        </div>
+        <div>
+          <dt class="text-sm text-muted">Versión</dt>
+          <dd class="font-semibold text-ink">{{ access.version }}</dd>
+        </div>
+      </dl>
+    }
+    @if (revealedCode()) {
+      <p-message severity="warn"
+        >Copia el código ahora. Por seguridad no podrá volver a mostrarse.</p-message
+      >
+      <label class="grid gap-2"
+        ><span class="font-semibold text-ink">Nuevo código maestro</span
+        ><input pInputText readonly [value]="revealedCode()" autocomplete="off"
+      /></label>
+    }
+    <div class="flex flex-wrap gap-3 border-t border-line pt-5">
+      <button pButton type="button" [loading]="masterBusy()" (click)="rotateMasterAccess()">
+        {{ masterAccess()?.active ? 'Rotar código' : 'Crear código' }}
+      </button>
+      <button
+        pButton
+        type="button"
+        severity="danger"
+        outlined
+        [disabled]="masterBusy() || !masterAccess()?.active"
+        (click)="revokeMasterAccess()"
+      >
+        Revocar
+      </button>
+    </div>
+  </section>
 </main>
