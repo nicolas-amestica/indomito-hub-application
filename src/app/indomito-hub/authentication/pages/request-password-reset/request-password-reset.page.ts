@@ -5,34 +5,37 @@ import { ButtonDirective } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
 import { AuthService } from '../../../../core/auth/auth.service';
+
 @Component({
-  selector: 'app-login',
+  selector: 'app-request-password-reset',
   imports: [ReactiveFormsModule, RouterLink, ButtonDirective, InputText, Message],
-  templateUrl: './login.page.html',
+  templateUrl: './request-password-reset.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginPage {
+export class RequestPasswordResetPage {
   private readonly auth = inject(AuthService);
   readonly loading = signal(false);
+  readonly sent = signal(false);
   readonly error = signal('');
   readonly form = new FormGroup({
-    login: new FormControl('', {
+    email: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(254)],
-    }),
-    password: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(8), Validators.maxLength(128)],
+      validators: [Validators.required, Validators.email, Validators.maxLength(254)],
     }),
   });
-  async submit() {
-    if (this.form.invalid || this.loading()) return;
+
+  async submit(): Promise<void> {
+    if (this.form.invalid || this.loading()) {
+      this.form.markAllAsTouched();
+      return;
+    }
     this.loading.set(true);
     this.error.set('');
     try {
-      await this.auth.login(this.form.controls.login.value, this.form.controls.password.value);
+      await this.auth.requestPasswordReset(this.form.controls.email.value);
+      this.sent.set(true);
     } catch {
-      this.error.set('No pudimos iniciar sesión. Revisa tu RUT o correo y clave.');
+      this.error.set('No pudimos procesar la solicitud. Inténtalo nuevamente en unos minutos.');
     } finally {
       this.loading.set(false);
     }

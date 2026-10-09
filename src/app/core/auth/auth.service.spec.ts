@@ -108,6 +108,33 @@ describe('AuthService', () => {
     expect(sessionStorage.getItem(STORAGE_KEY)).toBeNull();
     expect(router.navigateByUrl).toHaveBeenCalledWith('/login');
   });
+
+  it('solicita recuperación sin depender de la existencia del correo', async () => {
+    const service = TestBed.inject(AuthService);
+    const http = TestBed.inject(HttpTestingController);
+
+    const request = service.requestPasswordReset('usuario@example.com');
+    http.expectOne(`${environment.apiUrl}/auth/recuperar-clave`).flush({
+      data: { message: 'Solicitud procesada' },
+    });
+
+    await expect(request).resolves.toBeUndefined();
+  });
+
+  it('envía el token y la nueva clave al restablecer', async () => {
+    const service = TestBed.inject(AuthService);
+    const http = TestBed.inject(HttpTestingController);
+
+    const request = service.resetPassword('token-seguro', 'nueva-clave-segura');
+    const call = http.expectOne(`${environment.apiUrl}/auth/restablecer-clave`);
+    expect(call.request.body).toEqual({
+      token: 'token-seguro',
+      newPassword: 'nueva-clave-segura',
+    });
+    call.flush({ data: { passwordReset: true } });
+
+    await expect(request).resolves.toBeUndefined();
+  });
 });
 
 function authSession(token: string): AuthSession {

@@ -47,6 +47,22 @@ export class AuthService {
     const firstAccessibleModule = this.modules().find((module) => module.level === 'LV2');
     await this.router.navigateByUrl(firstAccessibleModule?.path || '/cotizaciones');
   }
+  async requestPasswordReset(email: string): Promise<void> {
+    await firstValueFrom(
+      this.http.post<ApiEnvelope<{ message: string }>>(
+        `${environment.apiUrl}/auth/recuperar-clave`,
+        { email },
+      ),
+    );
+  }
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    await firstValueFrom(
+      this.http.post<ApiEnvelope<{ passwordReset: boolean }>>(
+        `${environment.apiUrl}/auth/restablecer-clave`,
+        { token, newPassword },
+      ),
+    );
+  }
   token(): string | null {
     return this.state()?.token ?? null;
   }

@@ -9,6 +9,20 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'recuperar-clave',
+    loadComponent: () =>
+      import('./indomito-hub/authentication/pages/request-password-reset/request-password-reset.page').then(
+        (m) => m.RequestPasswordResetPage,
+      ),
+  },
+  {
+    path: 'restablecer-clave',
+    loadComponent: () =>
+      import('./indomito-hub/authentication/pages/reset-password/reset-password.page').then(
+        (m) => m.ResetPasswordPage,
+      ),
+  },
+  {
     path: '',
     canActivate: [authGuard],
     loadComponent: () =>
