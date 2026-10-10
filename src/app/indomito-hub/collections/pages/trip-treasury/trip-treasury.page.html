@@ -124,7 +124,12 @@
 
   <p-panel header="Cobros Khipu por conciliar">
     <div class="max-w-full overflow-x-auto">
-      <p-table [value]="settlements()" [tableStyle]="{ 'min-width': '52rem' }" styleClass="text-sm">
+      <p-table
+        [value]="settlements()"
+        [scrollable]="true"
+        [tableStyle]="{ 'min-width': '52rem' }"
+        styleClass="text-sm"
+      >
         <ng-template #header
           ><tr>
             <th>Referencia</th>
@@ -245,7 +250,12 @@
   @if (cash(); as view) {
     <p-panel header="Movimientos bancarios del período">
       <div class="max-w-full overflow-x-auto">
-        <p-table [value]="view.events" [tableStyle]="{ 'min-width': '48rem' }" styleClass="text-sm">
+        <p-table
+          [value]="view.events"
+          [scrollable]="true"
+          [tableStyle]="{ 'min-width': '48rem' }"
+          styleClass="text-sm"
+        >
           <ng-template #header
             ><tr>
               <th>Fecha</th>
