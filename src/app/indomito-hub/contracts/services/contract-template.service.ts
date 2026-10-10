@@ -25,7 +25,7 @@ export class ContractTemplateService {
     const { default: ExcelJSRuntime } = await import('exceljs');
     const workbook = new ExcelJSRuntime.Workbook();
     workbook.creator = 'Giras Indómito';
-    workbook.title = 'Plantilla de creación de contrato';
+    Object.assign(workbook, { title: 'Plantilla de creación de contrato' });
     workbook.created = new Date();
     const lists = workbook.addWorksheet('_listas', { state: 'veryHidden' });
     lists.getCell('A1').value = 'Países';

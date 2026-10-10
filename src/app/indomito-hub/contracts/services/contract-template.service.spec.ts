@@ -9,6 +9,7 @@ describe('ContractTemplateService', () => {
     ]);
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(buffer);
+    expect(workbook.model.title).toBe('Plantilla de creación de contrato');
     const sheet = workbook.getWorksheet('Contrato');
     const metadata = workbook.getWorksheet('_import');
     const lists = workbook.getWorksheet('_listas');
