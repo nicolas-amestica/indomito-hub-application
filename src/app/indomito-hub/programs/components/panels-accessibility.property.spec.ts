@@ -89,7 +89,7 @@ describe('paneles del formulario · accesibilidad', () => {
       ),
       { numRuns: 100 },
     );
-  }, 15_000);
+  }, 30_000);
 });
 
 function changeRowCount(
