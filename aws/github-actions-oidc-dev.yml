@@ -5,9 +5,15 @@ Parameters:
   GitHubOwner:
     Type: String
     Default: nicolas-amestica
+  GitHubOwnerId:
+    Type: String
+    Default: '5573027'
   GitHubRepository:
     Type: String
     Default: indomito-hub-application
+  GitHubRepositoryId:
+    Type: String
+    Default: '1328457778'
   SpaBucketName:
     Type: String
     Default: ind-dev-hub-spa-s3-dev-pri-use1
@@ -48,9 +54,10 @@ Resources:
               StringEquals:
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
               StringLike:
-                # GitHub cambia el subject según el disparador o si luego se usa un environment.
-                # El rol sigue limitado exclusivamente a este repositorio.
-                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOwner}/${GitHubRepository}:*
+                # Admite subjects clásicos y los reforzados con IDs inmutables de GitHub.
+                token.actions.githubusercontent.com:sub:
+                  - !Sub repo:${GitHubOwner}/${GitHubRepository}:*
+                  - !Sub repo:${GitHubOwner}@${GitHubOwnerId}/${GitHubRepository}@${GitHubRepositoryId}:*
       Policies:
         - PolicyName: deploy-spa-dev
           PolicyDocument:
