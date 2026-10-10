@@ -32,9 +32,9 @@
     <p-message severity="error">{{ error() }}</p-message>
   }
   <p-panel header="Casos que requieren revisión o seguimiento">
-    <div class="overflow-x-auto">
+    <div class="app-table-viewport">
       <p-table
-        class="block max-w-full overflow-x-auto"
+        class="block w-full min-w-0 max-w-full overflow-x-auto"
         [value]="rows()"
         [scrollable]="true"
         [tableStyle]="{ 'min-width': '72rem' }"

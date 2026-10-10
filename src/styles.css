@@ -120,6 +120,44 @@ html.dark {
     @apply rounded-2xl border border-line/55 bg-surface;
   }
 
+  /*
+   * PrimeNG tables expose a wide intrinsic size. Inside flex/panel layouts that
+   * size can propagate to the page before the table's own scrollbar is
+   * calculated. The legacy portal avoids it with a constrained grid viewport
+   * (`grid w-full` + `min-w-0 overflow-x-auto`). Keep that invariant in one
+   * global place so every current and future table remains inside the viewport.
+   */
+  p-table {
+    @apply grid w-full min-w-0 max-w-full overflow-x-auto;
+  }
+
+  p-table > .p-datatable,
+  p-table .p-datatable-table-container,
+  p-panel:has(p-table),
+  p-panel:has(p-table) .p-panel,
+  p-panel:has(p-table) .p-panel-content-container,
+  p-panel:has(p-table) .p-panel-content {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  p-panel:has(p-table) {
+    display: block;
+    width: 100%;
+  }
+
+  p-table .p-datatable-table-container {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .app-table-viewport {
+    @apply grid w-full min-w-0 max-w-full overflow-x-auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .app-muted {
     color: var(--color-muted);
   }

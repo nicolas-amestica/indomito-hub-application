@@ -136,7 +136,7 @@
         <strong class="font-semibold text-ink">{{ totalRowCount() }}</strong> filas.
       </p>
 
-      <div class="w-0 min-w-full max-w-full overflow-x-auto rounded-xl border border-line">
+      <div class="app-table-viewport rounded-xl border border-line">
         @if (totalRowCount() >= virtualScrollThreshold) {
           <p-table
             dataKey="key"

@@ -122,8 +122,8 @@
     </p-panel>
   }
 
-  <p-panel header="Cobros Khipu por conciliar">
-    <div class="max-w-full overflow-x-auto">
+  <p-panel class="block min-w-0 max-w-full" header="Cobros Khipu por conciliar">
+    <div class="app-table-viewport">
       <p-table
         [value]="settlements()"
         [scrollable]="true"
@@ -248,8 +248,8 @@
   }
 
   @if (cash(); as view) {
-    <p-panel header="Movimientos bancarios del período">
-      <div class="max-w-full overflow-x-auto">
+    <p-panel class="block min-w-0 max-w-full" header="Movimientos bancarios del período">
+      <div class="app-table-viewport">
         <p-table
           [value]="view.events"
           [scrollable]="true"

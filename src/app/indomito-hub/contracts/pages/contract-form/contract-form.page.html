@@ -243,7 +243,7 @@
               </p>
             }
           </div>
-          <div class="mt-3 hidden max-w-full overflow-x-auto md:block">
+          <div class="app-table-viewport mt-3 hidden md:grid">
             <p-table
               [value]="signedDocuments()"
               [scrollable]="true"
@@ -959,7 +959,7 @@
       <p class="mb-5 text-sm text-muted">
         Obligatoria. Esta tabla se insertará después de la cláusula VIGÉSIMO SEGUNDO.
       </p>
-      <div formArrayName="passengers" class="min-w-0 max-w-full overflow-hidden">
+      <div formArrayName="passengers" class="app-table-viewport">
         <p-table
           [value]="passengers.controls"
           [scrollable]="true"
