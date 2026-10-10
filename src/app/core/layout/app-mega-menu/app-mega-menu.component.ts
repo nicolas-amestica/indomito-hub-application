@@ -16,6 +16,11 @@ import { InputText } from 'primeng/inputtext';
 
 import type { AuthModule } from '../../auth/auth.models';
 
+const moduleIconFallbacks: Readonly<Record<string, string>> = {
+  PAYMENT_SETUP: 'icon-[tabler--rocket]',
+  PAYMENT_OPERATIONS: 'icon-[tabler--cash-register]',
+};
+
 @Component({
   selector: 'app-mega-menu',
   imports: [ButtonDirective, Drawer, InputText, RouterLink],
@@ -54,6 +59,10 @@ export class AppMegaMenuComponent {
 
   protected updateSearch(event: Event): void {
     this.searchQuery.set((event.target as HTMLInputElement).value);
+  }
+
+  protected moduleIcon(module: AuthModule): string {
+    return moduleIconFallbacks[module.code] || module.icon || 'icon-[tabler--point]';
   }
 
   protected close(): void {
