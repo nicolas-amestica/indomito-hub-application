@@ -41,6 +41,21 @@ jobs:
       - name: Build DEV
         run: npm run build:dev
 
+      - name: Verify OIDC claims
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const token = await core.getIDToken('sts.amazonaws.com');
+            const claims = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
+            console.log(JSON.stringify({
+              iss: claims.iss,
+              aud: claims.aud,
+              sub: claims.sub,
+              repository: claims.repository,
+              ref: claims.ref,
+              environment: claims.environment ?? null,
+            }, null, 2));
+
       - name: Configure temporary AWS credentials
         uses: aws-actions/configure-aws-credentials@v5
         with:
