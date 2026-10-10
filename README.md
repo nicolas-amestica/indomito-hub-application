@@ -44,6 +44,41 @@ To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use th
 ng test
 ```
 
+## Despliegue automático DEV desde GitHub
+
+El workflow `.github/workflows/deploy-dev.yml` ejecuta pruebas, compila DEV y publica la SPA en S3/CloudFront al actualizar `main`. AWS se autentica mediante OIDC y entrega credenciales temporales; no se guardan access keys en GitHub.
+
+Configuración inicial, una sola vez:
+
+```bash
+aws cloudformation deploy \
+  --profile pa-dev \
+  --region us-east-1 \
+  --stack-name ind-dev-hub-github-oidc \
+  --template-file aws/github-actions-oidc-dev.yml \
+  --capabilities CAPABILITY_NAMED_IAM
+```
+
+Si la cuenta ya tiene el proveedor OIDC de GitHub, agrega:
+
+```bash
+--parameter-overrides \
+  ExistingOidcProviderArn=arn:aws:iam::382670112717:oidc-provider/token.actions.githubusercontent.com
+```
+
+Obtén el rol creado:
+
+```bash
+aws cloudformation describe-stacks \
+  --profile pa-dev \
+  --region us-east-1 \
+  --stack-name ind-dev-hub-github-oidc \
+  --query "Stacks[0].Outputs[?OutputKey=='GitHubActionsRoleArn'].OutputValue" \
+  --output text
+```
+
+Guarda ese ARN en GitHub → Settings → Secrets and variables → Actions → Variables, con el nombre `DEV_AWS_ROLE_ARN`. Desde ese momento, cada push a `main` despliega DEV automáticamente; también puede relanzarse con **Run workflow**.
+
 ## Running end-to-end tests
 
 For end-to-end (e2e) testing, run:

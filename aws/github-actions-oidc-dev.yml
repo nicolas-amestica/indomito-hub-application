@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Acceso OIDC de GitHub Actions para desplegar Indomito Hub en DEV
+
+Parameters:
+  GitHubOwner:
+    Type: String
+    Default: nicolas-amestica
+  GitHubRepository:
+    Type: String
+    Default: indomito-hub-application
+  SpaBucketName:
+    Type: String
+    Default: ind-dev-hub-spa-s3-dev-pri-use1
+  ExistingOidcProviderArn:
+    Type: String
+    Default: ''
+    Description: ARN del proveedor token.actions.githubusercontent.com si ya existe en la cuenta
+
+Conditions:
+  CreateOidcProvider: !Equals [!Ref ExistingOidcProviderArn, '']
+
+Resources:
+  GitHubOidcProvider:
+    Type: AWS::IAM::OIDCProvider
+    Condition: CreateOidcProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList:
+        - sts.amazonaws.com
+
+  GitHubDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ind-dev-hub-github-deploy-role
+      Description: Despliega la SPA administrativa DEV desde GitHub Actions
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !If
+                - CreateOidcProvider
+                - !Ref GitHubOidcProvider
+                - !Ref ExistingOidcProviderArn
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOwner}/${GitHubRepository}:ref:refs/heads/main
+      Policies:
+        - PolicyName: deploy-spa-dev
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: ListSpaBucket
+                Effect: Allow
+                Action:
+                  - s3:GetBucketLocation
+                  - s3:ListBucket
+                Resource: !Sub arn:${AWS::Partition}:s3:::${SpaBucketName}
+              - Sid: ManageSpaObjects
+                Effect: Allow
+                Action:
+                  - s3:DeleteObject
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource: !Sub arn:${AWS::Partition}:s3:::${SpaBucketName}/*
+              - Sid: ReadCdnStack
+                Effect: Allow
+                Action: cloudformation:DescribeStacks
+                Resource: '*'
+              - Sid: InvalidateCloudFront
+                Effect: Allow
+                Action:
+                  - cloudfront:CreateInvalidation
+                  - cloudfront:GetInvalidation
+                Resource: !Sub arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/*
+
+Outputs:
+  GitHubActionsRoleArn:
+    Description: Guardar como variable DEV_AWS_ROLE_ARN en GitHub
+    Value: !GetAtt GitHubDeployRole.Arn
+  OidcProviderArn:
+    Value: !If
+      - CreateOidcProvider
+      - !Ref GitHubOidcProvider
+      - !Ref ExistingOidcProviderArn

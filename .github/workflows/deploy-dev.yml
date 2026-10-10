@@ -1,0 +1,57 @@
+name: Deploy DEV
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  test-build-deploy:
+    name: Test, build and deploy
+    if: ${{ vars.DEV_AWS_ROLE_ARN != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      AWS_REGION: us-east-1
+      EXPECTED_AWS_ACCOUNT: '382670112717'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test -- --watch=false
+
+      - name: Build DEV
+        run: npm run build:dev
+
+      - name: Configure temporary AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ vars.DEV_AWS_ROLE_ARN }}
+          role-session-name: ind-hub-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Verify AWS account
+        run: |
+          ACTUAL_ACCOUNT="$(aws sts get-caller-identity --query Account --output text)"
+          test "$ACTUAL_ACCOUNT" = "$EXPECTED_AWS_ACCOUNT"
+
+      - name: Deploy SPA
+        run: bash tools/deploy-spa.sh dev

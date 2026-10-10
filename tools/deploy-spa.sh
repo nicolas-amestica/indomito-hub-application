@@ -35,6 +35,12 @@ case "$STAGE" in
     ;;
 esac
 
+# En GitHub Actions las credenciales temporales ya vienen configuradas por OIDC.
+# En desarrollo local se mantiene el perfil SSO existente.
+if [[ -z "${GITHUB_ACTIONS:-}" ]]; then
+  export AWS_PROFILE="$PROFILE"
+fi
+
 # --- Colores ---
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -82,11 +88,15 @@ echo ""
 
 # --- Verificar credenciales AWS ---
 echo -e "${YELLOW}▶ Verificando credenciales AWS...${NC}"
-if ! aws sts get-caller-identity --profile "$PROFILE" --no-cli-pager > /dev/null 2>&1; then
+if ! aws sts get-caller-identity --no-cli-pager > /dev/null 2>&1; then
+  if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
+    echo -e "${RED}Error: GitHub Actions no recibió credenciales AWS mediante OIDC${NC}"
+    exit 1
+  fi
   echo -e "${YELLOW}⟳ Sesión SSO expirada. Iniciando login...${NC}"
   aws sso login --profile "$PROFILE"
 fi
-ACCOUNT=$(aws sts get-caller-identity --profile "$PROFILE" --query Account --output text)
+ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
 echo -e "${GREEN}✓ Autenticado — Account: $ACCOUNT${NC}"
 echo ""
 
@@ -97,7 +107,7 @@ DISTRIBUTION_ID=$(aws cloudformation describe-stacks \
   --query "Stacks[0].Outputs[?OutputKey=='DistributionId'].OutputValue" \
   --output text \
   --region "$REGION" \
-  --profile "$PROFILE" 2>/dev/null || echo "")
+  2>/dev/null || echo "")
 
 if [[ -z "$DISTRIBUTION_ID" || "$DISTRIBUTION_ID" == "None" ]]; then
   echo -e "${RED}Error: no se pudo obtener el Distribution ID${NC}"
@@ -115,11 +125,10 @@ aws s3 sync "$DIST_PATH" "s3://$BUCKET" \
   --exclude "styles.css.map" \
   --exclude "3rdpartylicenses.txt" \
   --cache-control "public, max-age=31536000, immutable" \
-  --profile "$PROFILE" \
   --region "$REGION" \
   --no-cli-pager
 
-ASSETS_COUNT=$(aws s3 ls "s3://$BUCKET" --recursive --profile "$PROFILE" --region "$REGION" | wc -l | tr -d ' ')
+ASSETS_COUNT=$(aws s3 ls "s3://$BUCKET" --recursive --region "$REGION" | wc -l | tr -d ' ')
 echo -e "${GREEN}✓ Assets sincronizados ($ASSETS_COUNT archivos en bucket)${NC}"
 echo ""
 
@@ -128,7 +137,6 @@ echo -e "${YELLOW}▶ [2/5] Subiendo index.html (sin cache)...${NC}"
 aws s3 cp "$DIST_PATH/index.html" "s3://$BUCKET/index.html" \
   --cache-control "no-cache, no-store, must-revalidate" \
   --content-type "text/html; charset=utf-8" \
-  --profile "$PROFILE" \
   --region "$REGION" \
   --no-cli-pager
 echo -e "${GREEN}✓ index.html subido${NC}"
@@ -140,7 +148,6 @@ if [[ -f "$DIST_PATH/styles.css" ]]; then
   aws s3 cp "$DIST_PATH/styles.css" "s3://$BUCKET/styles.css" \
     --cache-control "no-cache, no-store, must-revalidate" \
     --content-type "text/css; charset=utf-8" \
-    --profile "$PROFILE" \
     --region "$REGION" \
     --no-cli-pager
   echo -e "${GREEN}✓ styles.css subido${NC}"
@@ -149,7 +156,6 @@ if [[ -f "$DIST_PATH/styles.css" ]]; then
     aws s3 cp "$DIST_PATH/styles.css.map" "s3://$BUCKET/styles.css.map" \
       --cache-control "no-cache, no-store, must-revalidate" \
       --content-type "application/json" \
-      --profile "$PROFILE" \
       --region "$REGION" \
       --no-cli-pager
   fi
@@ -164,7 +170,6 @@ if [[ -f "$DIST_PATH/3rdpartylicenses.txt" ]]; then
   aws s3 cp "$DIST_PATH/3rdpartylicenses.txt" "s3://$BUCKET/3rdpartylicenses.txt" \
     --cache-control "public, max-age=86400" \
     --content-type "text/plain" \
-    --profile "$PROFILE" \
     --region "$REGION" \
     --no-cli-pager
   EXTRA_COUNT=$((EXTRA_COUNT + 1))
@@ -184,7 +189,6 @@ INVALIDATION_ID=$(aws cloudfront create-invalidation \
   --paths "/index.html" "/styles.css" \
   --query "Invalidation.Id" \
   --output text \
-  --profile "$PROFILE" \
   --no-cli-pager)
 echo -e "${GREEN}✓ Invalidación creada: $INVALIDATION_ID${NC}"
 echo -e "  (Se propaga a todos los edge locations en ~30-60 segundos)"
@@ -198,7 +202,7 @@ echo ""
 echo -e "${YELLOW}▶ Limpiando assets huérfanos...${NC}"
 
 # Listar archivos en S3
-S3_FILES=$(aws s3 ls "s3://$BUCKET" --recursive --profile "$PROFILE" --region "$REGION" \
+S3_FILES=$(aws s3 ls "s3://$BUCKET" --recursive --region "$REGION" \
   | awk '{print $4}' | sort)
 
 # Listar archivos en el dist local
@@ -209,7 +213,7 @@ ORPHANED=0
 while IFS= read -r s3_file; do
   [[ -z "$s3_file" ]] && continue
   if ! echo "$LOCAL_FILES" | grep -qxF "$s3_file"; then
-    aws s3 rm "s3://$BUCKET/$s3_file" --profile "$PROFILE" --region "$REGION" --no-cli-pager > /dev/null 2>&1
+    aws s3 rm "s3://$BUCKET/$s3_file" --region "$REGION" --no-cli-pager > /dev/null 2>&1
     ORPHANED=$((ORPHANED + 1))
   fi
 done <<< "$S3_FILES"
