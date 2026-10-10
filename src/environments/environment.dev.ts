@@ -3,7 +3,7 @@
  */
 export const environment = {
   production: false,
-  version: 'v0.18.0',
+  version: 'v0.18.1',
   apiUrl: 'https://api.dev.girasindomito.cl',
   stage: 'dev',
   favoritesEnabled: true,
