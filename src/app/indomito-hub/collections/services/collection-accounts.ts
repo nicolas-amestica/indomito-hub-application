@@ -20,7 +20,11 @@ export class CollectionAccounts {
       .pipe(map(({ data }) => data.account));
   }
   attempts(id: string, cursor = '') {
-    return this.http.get<{ data: AccountAttemptPage }>(this.url(id) + '/intentos', { params: cursor ? { cursor } : {} }).pipe(map(({ data }) => data));
+    return this.http
+      .get<{ data: AccountAttemptPage }>(this.url(id) + '/intentos', {
+        params: cursor ? { cursor } : {},
+      })
+      .pipe(map(({ data }) => data));
   }
   private url(id: string): string {
     return `${environment.apiUrl}/pagos/cuentas/${encodeURIComponent(id)}`;

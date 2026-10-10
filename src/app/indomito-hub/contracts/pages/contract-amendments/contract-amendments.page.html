@@ -3,49 +3,246 @@
     <div>
       <p class="text-xs font-bold uppercase tracking-widest text-brand-active">Contratos</p>
       <h1 class="mt-2 text-3xl font-semibold text-ink">Anexos de fechas y servicios</h1>
-      <p class="mt-2 max-w-3xl text-sm text-muted">Conserva el contrato aprobado y documenta únicamente fechas o servicios. Las cuotas y pagos no se recalculan.</p>
+      <p class="mt-2 max-w-3xl text-sm text-muted">
+        Conserva el contrato aprobado y documenta únicamente fechas o servicios. Las cuotas y pagos
+        no se recalculan.
+      </p>
     </div>
-    <a pButton severity="secondary" outlined [routerLink]="['/contratos', contractId(), 'editar']">Volver al contrato</a>
+    <a pButton severity="secondary" outlined [routerLink]="['/contratos', contractId(), 'editar']"
+      >Volver al contrato</a
+    >
   </header>
 
-  @if (error()) { <p-message severity="error" aria-live="assertive">{{ error() }}</p-message> }
-  @if (loading()) { <p role="status">Cargando contrato y anexos…</p> }
+  @if (error()) {
+    <p-message severity="error" aria-live="assertive">{{ error() }}</p-message>
+  }
+  @if (loading()) {
+    <p role="status">Cargando contrato y anexos…</p>
+  }
 
   @if (!loading() && contract()) {
     @if (currentDraft(); as draft) {
       <section class="app-panel space-y-5 p-5 sm:p-6" aria-labelledby="approval-title">
-        <div><h2 id="approval-title" class="text-xl font-semibold">Borrador pendiente de aprobación</h2><p class="mt-1 text-sm text-muted">Revisa el motivo, las fechas y todos los servicios antes de crear el PDF definitivo.</p></div>
-        <dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><div><dt class="text-sm text-muted">Motivo</dt><dd class="font-medium">{{ draft.reason }}</dd></div><div><dt class="text-sm text-muted">Salida</dt><dd>{{ draft.after.departureDate ? (draft.after.departureDate | date: 'dd/MM/yyyy' : 'UTC') : 'Por definir' }}</dd></div><div><dt class="text-sm text-muted">Retorno</dt><dd>{{ draft.after.returnDate ? (draft.after.returnDate | date: 'dd/MM/yyyy' : 'UTC') : 'Por definir' }}</dd></div><div><dt class="text-sm text-muted">Duración</dt><dd>{{ draft.after.days }} días / {{ draft.after.nights }} noches</dd></div></dl>
-        <ul class="list-disc space-y-1 pl-5 text-sm">@for (service of draft.after.services; track service.description) { <li>{{ service.description }}</li> }</ul>
-        <p-message severity="warn">La aprobación es irreversible. Este anexo no modifica precios, abonos, cuotas, pagos, descuentos ni devoluciones.</p-message>
-        <div class="flex items-start gap-3"><p-checkbox inputId="amendment-reviewed" [binary]="true" [formControl]="reviewed" /><label for="amendment-reviewed" class="text-sm">Revisé las condiciones anteriores y nuevas, y confirmo que este documento refleja el acuerdo de las partes.</label></div>
-        <button pButton type="button" severity="danger" [disabled]="!reviewed.value" [loading]="busy()" (click)="approve()">Aprobar y generar PDF definitivo</button>
+        <div>
+          <h2 id="approval-title" class="text-xl font-semibold">
+            Borrador pendiente de aprobación
+          </h2>
+          <p class="mt-1 text-sm text-muted">
+            Revisa el motivo, las fechas y todos los servicios antes de crear el PDF definitivo.
+          </p>
+        </div>
+        <dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <dt class="text-sm text-muted">Motivo</dt>
+            <dd class="font-medium">{{ draft.reason }}</dd>
+          </div>
+          <div>
+            <dt class="text-sm text-muted">Salida</dt>
+            <dd>
+              {{
+                draft.after.departureDate
+                  ? (draft.after.departureDate | date: 'dd/MM/yyyy' : 'UTC')
+                  : 'Por definir'
+              }}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-sm text-muted">Retorno</dt>
+            <dd>
+              {{
+                draft.after.returnDate
+                  ? (draft.after.returnDate | date: 'dd/MM/yyyy' : 'UTC')
+                  : 'Por definir'
+              }}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-sm text-muted">Duración</dt>
+            <dd>{{ draft.after.days }} días / {{ draft.after.nights }} noches</dd>
+          </div>
+        </dl>
+        <ul class="list-disc space-y-1 pl-5 text-sm">
+          @for (service of draft.after.services; track service.description) {
+            <li>{{ service.description }}</li>
+          }
+        </ul>
+        <p-message severity="warn"
+          >La aprobación es irreversible. Este anexo no modifica precios, abonos, cuotas, pagos,
+          descuentos ni devoluciones.</p-message
+        >
+        <div class="flex items-start gap-3">
+          <p-checkbox inputId="amendment-reviewed" [binary]="true" [formControl]="reviewed" /><label
+            for="amendment-reviewed"
+            class="text-sm"
+            >Revisé las condiciones anteriores y nuevas, y confirmo que este documento refleja el
+            acuerdo de las partes.</label
+          >
+        </div>
+        <button
+          pButton
+          type="button"
+          severity="danger"
+          [disabled]="!reviewed.value"
+          [loading]="busy()"
+          (click)="approve()"
+        >
+          Aprobar y generar PDF definitivo
+        </button>
       </section>
     } @else {
       <form class="space-y-6" [formGroup]="form" (ngSubmit)="createDraft()">
-        <section class="app-panel grid gap-4 p-5 sm:grid-cols-2 sm:p-6" aria-labelledby="terms-title">
-          <h2 id="terms-title" class="text-xl font-semibold sm:col-span-2">Nuevas condiciones operativas</h2>
-          <div class="sm:col-span-2"><label for="amendment-reason" class="mb-1 block text-sm font-medium">Motivo del anexo</label><textarea id="amendment-reason" pTextarea formControlName="reason" rows="3" maxlength="500" class="w-full"></textarea></div>
-          <div><label for="amendment-departure" class="mb-1 block text-sm font-medium">Fecha de salida</label><input id="amendment-departure" pInputText type="date" formControlName="departureDate" class="w-full" /></div>
-          <div><label for="amendment-return" class="mb-1 block text-sm font-medium">Fecha de retorno</label><input id="amendment-return" pInputText type="date" formControlName="returnDate" class="w-full" /></div>
-          <div><label for="amendment-days" class="mb-1 block text-sm font-medium">Días</label><p-inputnumber inputId="amendment-days" formControlName="days" [min]="1" [useGrouping]="false" class="w-full" /></div>
-          <div><label for="amendment-nights" class="mb-1 block text-sm font-medium">Noches</label><p-inputnumber inputId="amendment-nights" formControlName="nights" [min]="0" [useGrouping]="false" class="w-full" /></div>
+        <section
+          class="app-panel grid gap-4 p-5 sm:grid-cols-2 sm:p-6"
+          aria-labelledby="terms-title"
+        >
+          <h2 id="terms-title" class="text-xl font-semibold sm:col-span-2">
+            Nuevas condiciones operativas
+          </h2>
+          <div class="sm:col-span-2">
+            <label for="amendment-reason" class="mb-1 block text-sm font-medium"
+              >Motivo del anexo</label
+            ><textarea
+              id="amendment-reason"
+              pTextarea
+              formControlName="reason"
+              rows="3"
+              maxlength="500"
+              class="w-full"
+            ></textarea>
+          </div>
+          <div>
+            <label for="amendment-departure" class="mb-1 block text-sm font-medium"
+              >Fecha de salida</label
+            ><app-date-only-picker inputId="amendment-departure" formControlName="departureDate" />
+          </div>
+          <div>
+            <label for="amendment-return" class="mb-1 block text-sm font-medium"
+              >Fecha de retorno</label
+            ><app-date-only-picker inputId="amendment-return" formControlName="returnDate" />
+          </div>
+          <div>
+            <label for="amendment-days" class="mb-1 block text-sm font-medium">Días</label
+            ><p-inputnumber
+              inputId="amendment-days"
+              formControlName="days"
+              [min]="1"
+              [useGrouping]="false"
+              class="w-full"
+            />
+          </div>
+          <div>
+            <label for="amendment-nights" class="mb-1 block text-sm font-medium">Noches</label
+            ><p-inputnumber
+              inputId="amendment-nights"
+              formControlName="nights"
+              [min]="0"
+              [useGrouping]="false"
+              class="w-full"
+            />
+          </div>
         </section>
         <section class="app-panel space-y-4 p-5 sm:p-6" aria-labelledby="services-title">
-          <div class="flex flex-wrap items-center justify-between gap-3"><div><h2 id="services-title" class="text-xl font-semibold">Servicios vigentes</h2><p class="mt-1 text-sm text-muted">La lista completa reemplaza únicamente la sección de servicios del contrato.</p></div><button pButton type="button" severity="secondary" outlined (click)="addService()">Agregar servicio</button></div>
-          <div formArrayName="services" class="space-y-3">@for (control of form.controls.services.controls; track control; let index = $index) { <div class="flex gap-2"><label class="sr-only" [for]="'amendment-service-' + index">Servicio {{ index + 1 }}</label><input pInputText [id]="'amendment-service-' + index" [formControlName]="index" class="min-w-0 flex-1" /><button pButton type="button" severity="danger" text [disabled]="form.controls.services.length === 1" (click)="removeService(index)">Quitar</button></div> }</div>
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 id="services-title" class="text-xl font-semibold">Servicios vigentes</h2>
+              <p class="mt-1 text-sm text-muted">
+                La lista completa reemplaza únicamente la sección de servicios del contrato.
+              </p>
+            </div>
+            <button pButton type="button" severity="secondary" outlined (click)="addService()">
+              Agregar servicio
+            </button>
+          </div>
+          <div formArrayName="services" class="space-y-3">
+            @for (control of form.controls.services.controls; track control; let index = $index) {
+              <div class="flex gap-2">
+                <label class="sr-only" [for]="'amendment-service-' + index"
+                  >Servicio {{ index + 1 }}</label
+                ><input
+                  pInputText
+                  [id]="'amendment-service-' + index"
+                  [formControlName]="index"
+                  class="min-w-0 flex-1"
+                /><button
+                  pButton
+                  type="button"
+                  severity="danger"
+                  text
+                  [disabled]="form.controls.services.length === 1"
+                  (click)="removeService(index)"
+                >
+                  Quitar
+                </button>
+              </div>
+            }
+          </div>
         </section>
-        <p-message severity="info">El contrato original y su PDF permanecen intactos. El anexo tendrá su propio PDF e historial.</p-message>
+        <p-message severity="info"
+          >El contrato original y su PDF permanecen intactos. El anexo tendrá su propio PDF e
+          historial.</p-message
+        >
         <button pButton type="submit" [loading]="busy()">Preparar borrador para revisión</button>
       </form>
     }
 
     <section class="app-panel min-w-0 space-y-4 p-5 sm:p-6" aria-labelledby="history-title">
       <h2 id="history-title" class="text-xl font-semibold">Historial de anexos</h2>
-      <p-table [value]="amendments()" dataKey="id" [scrollable]="true" [tableStyle]="{ 'min-width': '48rem' }" size="small">
-        <ng-template #header><tr><th>Creación</th><th>Motivo</th><th>Fechas vigentes</th><th>Estado</th><th aria-label="Acciones"></th></tr></ng-template>
-        <ng-template #body let-amendment><tr><td>{{ amendment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td><td>{{ amendment.reason }}</td><td>{{ amendment.after.departureDate ? (amendment.after.departureDate | date: 'dd/MM/yyyy' : 'UTC') : 'Por definir' }} – {{ amendment.after.returnDate ? (amendment.after.returnDate | date: 'dd/MM/yyyy' : 'UTC') : 'Por definir' }}</td><td>{{ amendment.status === 'APPROVED' ? 'Aprobado' : 'Borrador' }}</td><td>@if (amendment.status === 'APPROVED') { <button pButton type="button" text size="small" [loading]="busy()" (click)="viewPdf(amendment)">Ver PDF</button> }</td></tr></ng-template>
-        <ng-template #emptymessage><tr><td colspan="5" class="py-8 text-center text-sm text-muted">Este contrato todavía no tiene anexos.</td></tr></ng-template>
+      <p-table
+        [value]="amendments()"
+        dataKey="id"
+        [scrollable]="true"
+        [tableStyle]="{ 'min-width': '48rem' }"
+        size="small"
+      >
+        <ng-template #header
+          ><tr>
+            <th>Creación</th>
+            <th>Motivo</th>
+            <th>Fechas vigentes</th>
+            <th>Estado</th>
+            <th aria-label="Acciones"></th></tr
+        ></ng-template>
+        <ng-template #body let-amendment
+          ><tr>
+            <td>{{ amendment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ amendment.reason }}</td>
+            <td>
+              {{
+                amendment.after.departureDate
+                  ? (amendment.after.departureDate | date: 'dd/MM/yyyy' : 'UTC')
+                  : 'Por definir'
+              }}
+              –
+              {{
+                amendment.after.returnDate
+                  ? (amendment.after.returnDate | date: 'dd/MM/yyyy' : 'UTC')
+                  : 'Por definir'
+              }}
+            </td>
+            <td>{{ amendment.status === 'APPROVED' ? 'Aprobado' : 'Borrador' }}</td>
+            <td>
+              @if (amendment.status === 'APPROVED') {
+                <button
+                  pButton
+                  type="button"
+                  text
+                  size="small"
+                  [loading]="busy()"
+                  (click)="viewPdf(amendment)"
+                >
+                  Ver PDF
+                </button>
+              }
+            </td>
+          </tr></ng-template
+        >
+        <ng-template #emptymessage
+          ><tr>
+            <td colspan="5" class="py-8 text-center text-sm text-muted">
+              Este contrato todavía no tiene anexos.
+            </td>
+          </tr></ng-template
+        >
       </p-table>
     </section>
   }

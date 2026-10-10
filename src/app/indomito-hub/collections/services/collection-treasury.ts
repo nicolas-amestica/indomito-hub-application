@@ -48,7 +48,9 @@ export class CollectionTreasury {
   getConsolidatedCash(from: string, to: string) {
     const params = new HttpParams().set('from', from).set('to', to);
     return this.http
-      .get<ApiSuccessEnvelope<ConsolidatedCashView>>(`${environment.apiUrl}/pagos/tesoreria/caja`, { params })
+      .get<ApiSuccessEnvelope<ConsolidatedCashView>>(`${environment.apiUrl}/pagos/tesoreria/caja`, {
+        params,
+      })
       .pipe(map(({ data }) => data));
   }
 
@@ -61,10 +63,11 @@ export class CollectionTreasury {
 
   operateSupplier(tripId: string, supplierId: string, request: SupplierOperationRequest) {
     return this.http
-      .post<ApiSuccessEnvelope<{ supplier: import('../interfaces/collection-treasury.interface').SupplierCommitment }>>(
-        `${this.base(tripId)}/proveedores/${encodeURIComponent(supplierId)}`,
-        request,
-      )
+      .post<
+        ApiSuccessEnvelope<{
+          supplier: import('../interfaces/collection-treasury.interface').SupplierCommitment;
+        }>
+      >(`${this.base(tripId)}/proveedores/${encodeURIComponent(supplierId)}`, request)
       .pipe(map(({ data }) => data.supplier));
   }
 
@@ -77,18 +80,35 @@ export class CollectionTreasury {
 
   getAlerts(tripId: string, asOf: string) {
     const params = new HttpParams().set('asOf', asOf);
-    return this.http.get<ApiSuccessEnvelope<CollectionAlertView>>(`${this.base(tripId)}/alertas`, { params }).pipe(map(({ data }) => data));
+    return this.http
+      .get<ApiSuccessEnvelope<CollectionAlertView>>(`${this.base(tripId)}/alertas`, { params })
+      .pipe(map(({ data }) => data));
   }
 
   getGlobalAlerts(year: number, asOf: string) {
     const params = new HttpParams().set('year', String(year)).set('asOf', asOf);
-    return this.http.get<ApiSuccessEnvelope<GlobalCollectionAlertView>>(`${environment.apiUrl}/pagos/tesoreria/alertas`, { params }).pipe(map(({ data }) => data));
+    return this.http
+      .get<ApiSuccessEnvelope<GlobalCollectionAlertView>>(
+        `${environment.apiUrl}/pagos/tesoreria/alertas`,
+        { params },
+      )
+      .pipe(map(({ data }) => data));
   }
 
-  recoverOperation(commandId: string, kind: OperationRecovery['kind'], entityId: string, tripId = '') {
+  recoverOperation(
+    commandId: string,
+    kind: OperationRecovery['kind'],
+    entityId: string,
+    tripId = '',
+  ) {
     let params = new HttpParams().set('kind', kind).set('entityId', entityId);
     if (tripId) params = params.set('tripId', tripId);
-    return this.http.get<ApiSuccessEnvelope<OperationRecovery>>(`${environment.apiUrl}/pagos/operaciones/${encodeURIComponent(commandId)}`, { params }).pipe(map(({ data }) => data));
+    return this.http
+      .get<ApiSuccessEnvelope<OperationRecovery>>(
+        `${environment.apiUrl}/pagos/operaciones/${encodeURIComponent(commandId)}`,
+        { params },
+      )
+      .pipe(map(({ data }) => data));
   }
 
   private base(tripId: string): string {

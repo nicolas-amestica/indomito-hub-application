@@ -40,7 +40,7 @@
           preparación.</p-message
         >
       } @else {
-        <button pButton type="button" (click)="recover()" [disabled]="busy()">
+        <button pButton type="button" (click)="recover()" [loading]="busy()" [disabled]="busy()">
           Consultar avance
         </button>
       }
@@ -163,7 +163,12 @@
           >
         }
       </div>
-      <button pButton type="submit" [disabled]="busy() || result()?.status === 'APPLIED'">
+      <button
+        pButton
+        type="submit"
+        [loading]="busy()"
+        [disabled]="busy() || result()?.status === 'APPLIED'"
+      >
         {{
           busy()
             ? 'Procesando…'

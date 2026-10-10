@@ -21,7 +21,9 @@ export class AuthService {
     const permissions = this.permissions();
     const readableParents = new Set(
       permissions
-        .filter((permission) => permission.module.level === 'LV1' && permission.allowances.includes('r'))
+        .filter(
+          (permission) => permission.module.level === 'LV1' && permission.allowances.includes('r'),
+        )
         .map((permission) => permission.module.code),
     );
     return permissions
@@ -29,7 +31,8 @@ export class AuthService {
         (permission) =>
           permission.module.active &&
           permission.allowances.includes('r') &&
-          (permission.module.level !== 'LV2' || readableParents.has(permission.module.parentCode ?? '')),
+          (permission.module.level !== 'LV2' ||
+            readableParents.has(permission.module.parentCode ?? '')),
       )
       .sort((a, b) => a.module.order - b.module.order)
       .map((permission) => permission.module);

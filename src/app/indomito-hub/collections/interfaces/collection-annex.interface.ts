@@ -1,10 +1,5 @@
 export type AnnexStatus =
-  | 'PREPARING_DRAFT'
-  | 'DRAFT'
-  | 'VALIDATING'
-  | 'APPLYING'
-  | 'REJECTED'
-  | 'APPLIED';
+  'PREPARING_DRAFT' | 'DRAFT' | 'VALIDATING' | 'APPLYING' | 'REJECTED' | 'APPLIED';
 
 export interface RosterMember {
   accountId: string;

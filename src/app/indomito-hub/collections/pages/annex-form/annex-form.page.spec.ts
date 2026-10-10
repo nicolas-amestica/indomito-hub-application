@@ -13,8 +13,24 @@ describe('AnnexFormPage', () => {
       roster: vi.fn().mockReturnValue(
         of({
           items: [
-            { accountId: 'active', participantId: 'p1', name: 'Pasajero activo', document: '1-9', active: true, free: false, version: 2 },
-            { accountId: 'inactive', participantId: 'p2', name: 'Pasajero inactivo', document: '2-7', active: false, free: false, version: 3 },
+            {
+              accountId: 'active',
+              participantId: 'p1',
+              name: 'Pasajero activo',
+              document: '1-9',
+              active: true,
+              free: false,
+              version: 2,
+            },
+            {
+              accountId: 'inactive',
+              participantId: 'p2',
+              name: 'Pasajero inactivo',
+              document: '2-7',
+              active: false,
+              free: false,
+              version: 3,
+            },
           ],
         }),
       ),
@@ -37,8 +53,10 @@ describe('AnnexFormPage', () => {
     const fixture = TestBed.createComponent(AnnexFormPage);
     await fixture.whenStable();
     const root = fixture.nativeElement as HTMLElement;
-    const withdrawals = root.querySelector('[aria-labelledby="withdrawals-title"]')?.textContent ?? '';
-    const history = root.querySelector('[aria-labelledby="participation-history-title"]')?.textContent ?? '';
+    const withdrawals =
+      root.querySelector('[aria-labelledby="withdrawals-title"]')?.textContent ?? '';
+    const history =
+      root.querySelector('[aria-labelledby="participation-history-title"]')?.textContent ?? '';
     expect(api.roster).toHaveBeenCalledWith('trip', '');
     expect(withdrawals).toContain('Pasajero activo');
     expect(withdrawals).not.toContain('Pasajero inactivo');
@@ -92,12 +110,14 @@ describe('AnnexFormPage', () => {
       roster: vi
         .fn()
         .mockReturnValueOnce(of({ items: [], closed: false }))
-        .mockReturnValue(of({
-          items: [],
-          closed: true,
-          closedAt: '2026-10-05T14:00:00Z',
-          closeReason: 'Nómina definitiva revisada',
-        })),
+        .mockReturnValue(
+          of({
+            items: [],
+            closed: true,
+            closedAt: '2026-10-05T14:00:00Z',
+            closeReason: 'Nómina definitiva revisada',
+          }),
+        ),
       closeRoster: vi.fn().mockReturnValue(of({ tripId: 'trip', closed: true })),
     };
     await TestBed.configureTestingModule({
@@ -126,11 +146,7 @@ describe('AnnexFormPage', () => {
     component.closureReviewed.set(true);
     await component.closeRoster();
     fixture.detectChanges();
-    expect(api.closeRoster).toHaveBeenCalledWith(
-      'trip',
-      'trip',
-      'Nómina definitiva revisada',
-    );
+    expect(api.closeRoster).toHaveBeenCalledWith('trip', 'trip', 'Nómina definitiva revisada');
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(text).toContain('Nómina cerrada');
     expect(text).toContain('La cobranza, los comprobantes y las devoluciones continúan');

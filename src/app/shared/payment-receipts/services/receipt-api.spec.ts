@@ -18,7 +18,9 @@ describe('ReceiptApi', () => {
   afterEach(() => http.verify());
   it('lista comprobantes de una cuenta solo bajo autenticación administrativa', () => {
     api.list({ accountId: 'account' }, 'cursor').subscribe();
-    const req = http.expectOne(`${environment.apiUrl}/pagos/cuentas/account/comprobantes?cursor=cursor`);
+    const req = http.expectOne(
+      `${environment.apiUrl}/pagos/cuentas/account/comprobantes?cursor=cursor`,
+    );
     expect(req.request.headers.has('Authorization')).toBe(false);
     req.flush({ data: { items: [] } });
   });
@@ -33,7 +35,9 @@ describe('ReceiptApi', () => {
   it('reenvía solo identificador de solicitud y correo como administrador', () => {
     const body = { commandId: 'command', email: 'other@example.test' };
     api.resend({ accountId: 'account' }, 'receipt', body).subscribe();
-    const req = http.expectOne(`${environment.apiUrl}/pagos/cuentas/account/comprobantes/receipt/reenvios`);
+    const req = http.expectOne(
+      `${environment.apiUrl}/pagos/cuentas/account/comprobantes/receipt/reenvios`,
+    );
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(body);
     expect(req.request.headers.has('Authorization')).toBe(false);

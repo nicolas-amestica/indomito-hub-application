@@ -1,0 +1,111 @@
+<main
+  class="mx-auto flex max-w-[1440px] flex-col gap-6 px-4 py-8 sm:px-8"
+  [attr.aria-busy]="loading()"
+>
+  <header class="rounded-2xl bg-night p-5 text-white sm:p-7">
+    <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-[.2em] text-brand">Resumen ejecutivo</p>
+        <h1 class="mt-2 text-3xl font-semibold">Indómito Hub</h1>
+        <p class="mt-2 max-w-2xl text-sm text-white/70">
+          Contratos, caja, cobranza y próximos hitos del año seleccionado.
+        </p>
+      </div>
+      <label class="flex min-w-40 flex-col gap-2 text-sm"
+        ><span>Año</span
+        ><p-select
+          [options]="years"
+          [ngModel]="year()"
+          (ngModelChange)="changeYear($event)"
+          [disabled]="loading()"
+      /></label>
+    </div>
+  </header>
+
+  @if (error()) {
+    <p-message severity="error">{{ error() }}</p-message>
+    <button pButton type="button" class="self-start" [loading]="loading()" (click)="load()">
+      Reintentar
+    </button>
+  }
+
+  @if (view(); as data) {
+    <section aria-label="Indicadores principales" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <article class="app-panel p-5">
+        <p class="text-sm text-muted">Contratos aprobados</p>
+        <p class="mt-2 text-3xl font-semibold">{{ approved() }}</p>
+        <p class="mt-1 text-xs text-muted">de {{ data.contracts.length }} contratos</p>
+      </article>
+      <article class="app-panel p-5">
+        <p class="text-sm text-muted">Pasajeros contratados</p>
+        <p class="mt-2 text-3xl font-semibold">{{ passengers() }}</p>
+      </article>
+      <article class="app-panel p-5">
+        <p class="text-sm text-muted">Caja neta observada</p>
+        <p class="mt-2 text-3xl font-semibold">
+          {{ data.cash.net | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}
+        </p>
+      </article>
+      <article class="app-panel p-5">
+        <p class="text-sm text-muted">Saldo pendiente</p>
+        <p class="mt-2 text-3xl font-semibold">
+          {{ data.alerts.outstanding | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}
+        </p>
+      </article>
+    </section>
+
+    <section class="grid gap-6 lg:grid-cols-2">
+      <article class="app-panel min-w-0 p-5">
+        <h2 class="text-base font-semibold">Contratos por estado</h2>
+        <div class="mt-4 h-72">
+          <p-chart type="doughnut" [data]="statusChart()" [options]="chartOptions" />
+        </div>
+      </article>
+      <article class="app-panel min-w-0 p-5">
+        <h2 class="text-base font-semibold">Resumen financiero</h2>
+        <div class="mt-4 h-72">
+          <p-chart type="bar" [data]="cashChart()" [options]="chartOptions" />
+        </div>
+      </article>
+    </section>
+
+    <section class="grid gap-6 lg:grid-cols-2">
+      <article class="app-panel p-5">
+        <h2 class="text-base font-semibold">Atención requerida</h2>
+        <dl class="mt-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <dt class="text-sm text-muted">Firmas pendientes</dt>
+            <dd class="text-2xl font-semibold">{{ pendingSignatures() }}</dd>
+          </div>
+          <div>
+            <dt class="text-sm text-muted">Monto vencido</dt>
+            <dd class="text-2xl font-semibold">
+              {{ data.alerts.overdue | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}
+            </dd>
+          </div>
+        </dl>
+        <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+          <a pButton routerLink="/contratos" severity="secondary" outlined>Revisar contratos</a
+          ><a pButton routerLink="/cobranza/alertas">Revisar cobranza</a>
+        </div>
+      </article>
+      <article class="app-panel p-5">
+        <h2 class="text-base font-semibold">Próximos viajes informados</h2>
+        <div class="mt-4 flex flex-col gap-3">
+          @for (group of upcomingTrips(); track group.tripId) {
+            <a
+              [routerLink]="['/cobranza/giras', group.tripId, 'tesoreria']"
+              class="rounded-xl border border-line p-3 hover:border-brand-active"
+              ><span class="font-semibold">{{ group.institutionName }}</span
+              ><span class="mt-1 block text-sm text-muted"
+                >{{ group.destination }} · {{ group.departureDate || 'Fecha por definir' }}</span
+              ></a
+            >
+          } @empty {
+            <p class="text-sm text-muted">No hay viajes con cobranza activa para este año.</p>
+          }
+        </div>
+      </article>
+    </section>
+  }
+</main>

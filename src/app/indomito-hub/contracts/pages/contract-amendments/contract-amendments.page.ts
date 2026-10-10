@@ -1,13 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {
-  FormArray,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { ButtonDirective } from 'primeng/button';
@@ -19,6 +13,7 @@ import { TableModule } from 'primeng/table';
 import { Textarea } from 'primeng/textarea';
 import { DocumentPreviewService } from '../../../../shared/documents/services/document-preview.service';
 import { newUlid } from '../../../../shared/fn/new-ulid';
+import { DateOnlyPickerComponent } from '../../../../shared/date-only/date-only-picker.component';
 import type {
   Contract,
   ContractAmendment,
@@ -32,6 +27,7 @@ import { ContractsService } from '../../services/contracts.service';
     ButtonDirective,
     Checkbox,
     DatePipe,
+    DateOnlyPickerComponent,
     InputNumber,
     InputText,
     Message,
@@ -210,13 +206,14 @@ export class ContractAmendmentsPage {
     draft: ContractAmendment | null,
     latestApproved?: ContractAmendment,
   ): void {
-    const source = draft?.after ?? latestApproved?.after ?? {
-      departureDate: contract.content.trip.departureDate,
-      returnDate: contract.content.trip.returnDate,
-      days: contract.content.trip.days,
-      nights: contract.content.trip.nights,
-      services: contract.content.plan.servicesIncluded,
-    };
+    const source = draft?.after ??
+      latestApproved?.after ?? {
+        departureDate: contract.content.trip.departureDate,
+        returnDate: contract.content.trip.returnDate,
+        days: contract.content.trip.days,
+        nights: contract.content.trip.nights,
+        services: contract.content.plan.servicesIncluded,
+      };
     this.form.controls.services.clear();
     for (const service of source.services) this.addService(service.description);
     this.form.patchValue({

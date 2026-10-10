@@ -16,4 +16,3 @@ describe('buildAnnexInstallments', () => {
     expect(buildAnnexInstallments('2027-01-05', 2, 0)).toEqual([]);
   });
 });
-

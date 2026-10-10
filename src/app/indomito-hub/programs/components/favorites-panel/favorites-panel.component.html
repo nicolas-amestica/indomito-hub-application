@@ -287,7 +287,14 @@
       >
         Cancelar
       </button>
-      <button pButton type="button" severity="danger" [disabled]="busy()" (click)="confirmDelete()">
+      <button
+        pButton
+        type="button"
+        severity="danger"
+        [loading]="busy()"
+        [disabled]="busy()"
+        (click)="confirmDelete()"
+      >
         Eliminar
       </button>
     </ng-template>

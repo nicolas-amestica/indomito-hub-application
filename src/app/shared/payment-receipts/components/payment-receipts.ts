@@ -26,7 +26,15 @@ import { newUlid } from '../../fn/new-ulid';
 
 @Component({
   selector: 'app-payment-receipts',
-  imports: [CurrencyPipe, DatePipe, ButtonDirective, Panel, Message, ReactiveFormsModule, InputText],
+  imports: [
+    CurrencyPipe,
+    DatePipe,
+    ButtonDirective,
+    Panel,
+    Message,
+    ReactiveFormsModule,
+    InputText,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './payment-receipts.html',
 })
@@ -35,9 +43,7 @@ export class PaymentReceipts {
   readonly tripId = input('');
   private readonly api = inject(ReceiptApi);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly scopeKey = computed(
-    () => `${this.accountId()}|${this.tripId()}`,
-  );
+  private readonly scopeKey = computed(() => `${this.accountId()}|${this.tripId()}`);
   protected readonly view = linkedSignal<string, ReceiptView>({
     source: this.scopeKey,
     computation: () => ({ items: [], cursor: '', loaded: false, busy: false, error: '', url: '' }),

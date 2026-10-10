@@ -114,9 +114,7 @@ export class ContractsService {
     const path = documentId
       ? `${this.endpoint}/${encodeURIComponent(id)}/documentos-firmados/${encodeURIComponent(documentId)}/pdf`
       : `${this.endpoint}/${encodeURIComponent(id)}/documento-firmado/pdf`;
-    return this.http
-      .get<ApiSuccessEnvelope<ContractPDFAccess>>(path)
-      .pipe(map(({ data }) => data));
+    return this.http.get<ApiSuccessEnvelope<ContractPDFAccess>>(path).pipe(map(({ data }) => data));
   }
   createAmendment(
     contractId: string,
@@ -150,10 +148,7 @@ export class ContractsService {
       )
       .pipe(map(({ data }) => data));
   }
-  getApprovedAmendmentPdf(
-    contractId: string,
-    amendmentId: string,
-  ): Observable<ContractPDFAccess> {
+  getApprovedAmendmentPdf(contractId: string, amendmentId: string): Observable<ContractPDFAccess> {
     return this.http
       .get<ApiSuccessEnvelope<ContractPDFAccess>>(
         `${this.endpoint}/${encodeURIComponent(contractId)}/anexos/${encodeURIComponent(amendmentId)}/pdf`,

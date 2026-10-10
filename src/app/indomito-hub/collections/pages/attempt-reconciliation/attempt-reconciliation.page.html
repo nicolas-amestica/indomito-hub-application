@@ -1,1 +1,98 @@
-<main class="mx-auto flex max-w-4xl flex-col gap-6 px-4 py-8 sm:px-8" [attr.aria-busy]="busy()"><header class="flex flex-wrap items-start justify-between gap-4"><div><p class="text-sm text-muted">Cobranza · Khipu</p><h1 class="mt-2 text-3xl font-semibold text-ink">Conciliar intento ambiguo</h1><p class="mt-2 break-all text-sm text-muted">{{attemptId}}</p></div><a pButton severity="secondary" outlined routerLink="/contratos">Volver a contratos</a></header><p-message severity="warn">Cerrar el navegador, recibir una URL de cancelación o superar el vencimiento local no demuestra que no hubo pago. Esta acción consulta Khipu: la cuota solo se libera ante un resultado terminal explícito de no pago; una respuesta pendiente o ambigua conserva el bloqueo.</p-message>@if(error()){<p-message severity="error">{{error()}}</p-message>}@if(result();as r){<p-panel header="Estado autoritativo"><dl class="grid gap-4 sm:grid-cols-2"><div><dt>Resultado</dt><dd>{{r.status}}</dd></div><div><dt>Monto informado</dt><dd>{{r.amount|currency:'CLP':'symbol-narrow':'1.0-0'}}</dd></div><div><dt>Estado Khipu</dt><dd>{{r.providerStatus||'registrado'}} · {{r.providerDetail||'resuelto previamente'}}</dd></div><div><dt>ID de pago</dt><dd class="break-all">{{r.paymentId}}</dd></div></dl>@if(r.status==='PENDING'){<p-message severity="warn">El intento sigue bloqueado. No abras otro cobro.</p-message>}@if(r.status==='REVIEW_REQUIRED'){<p-message severity="warn">Khipu no acredita un pago normal o el monto requiere revisión. No se contabilizó como cuota.</p-message>}@if(r.status==='UNPAID_FINAL'){<p-message severity="success">Khipu informó un no pago terminal. El intento quedó cerrado sin ingreso y la cuota puede volver a cobrarse.</p-message>}@if(r.status==='REVERSED'){<p-message severity="info">La reversa del proveedor quedó auditada y la deuda original se reabrió.</p-message>}@if(r.status==='CONFIRMED'){<p-message severity="success">El pago real quedó confirmado una sola vez.</p-message>}</p-panel>}<p-panel header="Consultar proveedor"><form [formGroup]="form" (ngSubmit)="reconcile()" class="flex flex-col gap-5"><div class="flex flex-col gap-2"><label for="payment-id">ID de pago Khipu (solo si la creación quedó sin respuesta)</label><input pInputText id="payment-id" formControlName="paymentId" maxlength="12"/><p class="text-sm text-muted">Si el sistema guardó el checkout, déjalo vacío. Si no, copia el ID exacto desde el panel Khipu; la transacción debe coincidir con este intento.</p></div><div class="flex flex-col gap-2"><label for="reason">Motivo y evidencia revisada</label><textarea pTextarea id="reason" formControlName="reason" rows="3" maxlength="500"></textarea></div><div class="flex items-start gap-3"><p-checkbox inputId="reviewed" formControlName="reviewed" [binary]="true"/><label for="reviewed">Entiendo que esta operación puede confirmar dinero, liberar un intento definitivamente no pagado o registrar una reversa; usaré únicamente el ID obtenido del proveedor.</label></div><button pButton type="submit" [disabled]="busy()">{{busy()?'Consultando…':'Consultar y conciliar'}}</button></form></p-panel></main>
+<main class="mx-auto flex max-w-4xl flex-col gap-6 px-4 py-8 sm:px-8" [attr.aria-busy]="busy()">
+  <header class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <p class="text-sm text-muted">Cobranza · Khipu</p>
+      <h1 class="mt-2 text-3xl font-semibold text-ink">Conciliar intento ambiguo</h1>
+      <p class="mt-2 break-all text-sm text-muted">{{ attemptId }}</p>
+    </div>
+    <a pButton severity="secondary" outlined routerLink="/contratos">Volver a contratos</a>
+  </header>
+  <p-message severity="warn"
+    >Cerrar el navegador, recibir una URL de cancelación o superar el vencimiento local no demuestra
+    que no hubo pago. Esta acción consulta Khipu: la cuota solo se libera ante un resultado terminal
+    explícito de no pago; una respuesta pendiente o ambigua conserva el bloqueo.</p-message
+  >
+  @if (error()) {
+    <p-message severity="error">{{ error() }}</p-message>
+  }
+  @if (result(); as r) {
+    <p-panel header="Estado autoritativo"
+      ><dl class="grid gap-4 sm:grid-cols-2">
+        <div>
+          <dt>Resultado</dt>
+          <dd>{{ r.status }}</dd>
+        </div>
+        <div>
+          <dt>Monto informado</dt>
+          <dd>{{ r.amount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</dd>
+        </div>
+        <div>
+          <dt>Estado Khipu</dt>
+          <dd>
+            {{ r.providerStatus || 'registrado' }} ·
+            {{ r.providerDetail || 'resuelto previamente' }}
+          </dd>
+        </div>
+        <div>
+          <dt>ID de pago</dt>
+          <dd class="break-all">{{ r.paymentId }}</dd>
+        </div>
+      </dl>
+      @if (r.status === 'PENDING') {
+        <p-message severity="warn">El intento sigue bloqueado. No abras otro cobro.</p-message>
+      }
+      @if (r.status === 'REVIEW_REQUIRED') {
+        <p-message severity="warn"
+          >Khipu no acredita un pago normal o el monto requiere revisión. No se contabilizó como
+          cuota.</p-message
+        >
+      }
+      @if (r.status === 'UNPAID_FINAL') {
+        <p-message severity="success"
+          >Khipu informó un no pago terminal. El intento quedó cerrado sin ingreso y la cuota puede
+          volver a cobrarse.</p-message
+        >
+      }
+      @if (r.status === 'REVERSED') {
+        <p-message severity="info"
+          >La reversa del proveedor quedó auditada y la deuda original se reabrió.</p-message
+        >
+      }
+      @if (r.status === 'CONFIRMED') {
+        <p-message severity="success">El pago real quedó confirmado una sola vez.</p-message>
+      }
+    </p-panel>
+  }
+  <p-panel header="Consultar proveedor"
+    ><form [formGroup]="form" (ngSubmit)="reconcile()" class="flex flex-col gap-5">
+      <div class="flex flex-col gap-2">
+        <label for="payment-id">ID de pago Khipu (solo si la creación quedó sin respuesta)</label
+        ><input pInputText id="payment-id" formControlName="paymentId" maxlength="12" />
+        <p class="text-sm text-muted">
+          Si el sistema guardó el checkout, déjalo vacío. Si no, copia el ID exacto desde el panel
+          Khipu; la transacción debe coincidir con este intento.
+        </p>
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="reason">Motivo y evidencia revisada</label
+        ><textarea
+          pTextarea
+          id="reason"
+          formControlName="reason"
+          rows="3"
+          maxlength="500"
+        ></textarea>
+      </div>
+      <div class="flex items-start gap-3">
+        <p-checkbox inputId="reviewed" formControlName="reviewed" [binary]="true" /><label
+          for="reviewed"
+          >Entiendo que esta operación puede confirmar dinero, liberar un intento definitivamente no
+          pagado o registrar una reversa; usaré únicamente el ID obtenido del proveedor.</label
+        >
+      </div>
+      <button pButton type="submit" [loading]="busy()" [disabled]="busy()">
+        {{ busy() ? 'Consultando…' : 'Consultar y conciliar' }}
+      </button>
+    </form></p-panel
+  >
+</main>

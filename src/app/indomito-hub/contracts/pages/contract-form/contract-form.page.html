@@ -83,9 +83,21 @@
         [disabled]="busy()"
         (click)="preview()"
       >
-        {{ status() === 'PENDING_APPROVAL' ? 'Revisar y aprobar PDF' : status() === 'APPROVED' ? 'Ver contrato generado' : 'Previsualizar' }}
+        {{
+          status() === 'PENDING_APPROVAL'
+            ? 'Revisar y aprobar PDF'
+            : status() === 'APPROVED'
+              ? 'Ver contrato generado'
+              : 'Previsualizar'
+        }}
       </button>
-      <button pButton type="button" [disabled]="locked() || busy()" (click)="save()">
+      <button
+        pButton
+        type="button"
+        [loading]="busy()"
+        [disabled]="locked() || busy()"
+        (click)="save()"
+      >
         {{ busy() ? 'Guardando…' : 'Guardar contrato' }}
       </button>
     </div>
@@ -109,10 +121,16 @@
     <section class="app-panel mb-6 p-6" aria-labelledby="signed-contract-title">
       <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div class="max-w-3xl">
-          <p class="text-xs font-bold uppercase tracking-[.16em] text-brand-active">Documentación obligatoria</p>
-          <h2 id="signed-contract-title" class="mt-2 text-xl font-semibold text-ink">Contrato firmado presencialmente</h2>
+          <p class="text-xs font-bold uppercase tracking-[.16em] text-brand-active">
+            Documentación obligatoria
+          </p>
+          <h2 id="signed-contract-title" class="mt-2 text-xl font-semibold text-ink">
+            Contrato firmado presencialmente
+          </h2>
           <p class="mt-2 text-sm text-muted">
-            El contrato generado permanece protegido. Después de firmarlo ante notaría, carga aquí la copia PDF firmada por todas las partes. No existe una fecha máxima, pero el expediente seguirá pendiente hasta publicarla.
+            El contrato generado permanece protegido. Después de firmarlo ante notaría, carga aquí
+            la copia PDF firmada por todas las partes. No existe una fecha máxima, pero el
+            expediente seguirá pendiente hasta publicarla.
           </p>
         </div>
         <span
@@ -121,19 +139,35 @@
           [class.text-amber-900]="signatureStatus() === 'PENDING_SIGNED_UPLOAD'"
           [class.bg-emerald-100]="signatureStatus() === 'SIGNED_UPLOADED'"
           [class.text-emerald-900]="signatureStatus() === 'SIGNED_UPLOADED'"
-        >{{ signatureStatus() === 'SIGNED_UPLOADED' ? 'Copia firmada publicada' : 'Carga firmada pendiente' }}</span>
+          >{{
+            signatureStatus() === 'SIGNED_UPLOADED'
+              ? 'Copia firmada publicada'
+              : 'Carga firmada pendiente'
+          }}</span
+        >
       </div>
 
-      <div class="mt-6 grid gap-5 lg:grid-cols-2">
-        <div class="space-y-4">
+      <div class="mt-6 grid min-w-0 gap-5 lg:grid-cols-2">
+        <div class="min-w-0 space-y-4">
           @if (signedDocument()) {
-            <button pButton type="button" severity="secondary" outlined [disabled]="signedUploadBusy()" (click)="viewSignedDocument()">
+            <button
+              pButton
+              type="button"
+              severity="secondary"
+              outlined
+              [loading]="signedUploadBusy()"
+              [disabled]="signedUploadBusy()"
+              (click)="viewSignedDocument()"
+            >
               <span class="pi pi-file-pdf" aria-hidden="true"></span>
               Ver copia firmada vigente
             </button>
             <label class="flex flex-col gap-2" for="signed-replacement-reason">
-              <span>Motivo del reemplazo <span class="text-red-600" aria-hidden="true">*</span></span>
+              <span
+                >Motivo del reemplazo <span class="text-red-600" aria-hidden="true">*</span></span
+              >
               <textarea
+                class="min-w-0 w-full"
                 pTextarea
                 id="signed-replacement-reason"
                 rows="3"
@@ -152,7 +186,8 @@
               (ngModelChange)="confirmsAllSignatures.set($event)"
             />
             <label for="confirm-signed-contract" class="text-sm text-ink">
-              Confirmo que el archivo corresponde a este contrato y que contiene las firmas de todas las partes. Esta confirmación no certifica criptográficamente las firmas manuscritas.
+              Confirmo que el archivo corresponde a este contrato y que contiene las firmas de todas
+              las partes. Esta confirmación no certifica criptográficamente las firmas manuscritas.
             </label>
           </div>
           <p-fileupload
@@ -161,22 +196,62 @@
             name="signedContract"
             accept="application/pdf,.pdf"
             chooseIcon="pi pi-upload"
-            [chooseLabel]="signedUploadBusy() ? 'Publicando…' : signedDocument() ? 'Cargar nueva versión' : 'Cargar contrato firmado'"
+            [chooseLabel]="
+              signedUploadBusy()
+                ? 'Publicando…'
+                : signedDocument()
+                  ? 'Cargar nueva versión'
+                  : 'Cargar contrato firmado'
+            "
             [auto]="true"
             [customUpload]="true"
             [maxFileSize]="26214400"
             [disabled]="signedUploadBusy()"
             (uploadHandler)="uploadSignedDocument($event.files[0], signedUpload)"
           />
-          <p class="text-xs text-muted">Solo PDF, máximo 25 MiB. Las versiones anteriores permanecen auditables.</p>
+          <p class="text-xs text-muted">
+            Solo PDF, máximo 25 MiB. Las versiones anteriores permanecen auditables.
+          </p>
         </div>
 
-        <div>
+        <div class="min-w-0">
           <h3 class="text-base font-semibold text-ink">Historial de versiones firmadas</h3>
-          <div class="mt-3 overflow-x-auto">
+          <div class="mt-3 grid gap-3 md:hidden">
+            @for (document of signedDocuments(); track document.id) {
+              <article class="min-w-0 rounded-xl border border-line p-4">
+                <p class="font-semibold">{{ document.uploadedAt | date: 'dd-MM-yyyy HH:mm' }}</p>
+                <p class="mt-1 break-words text-sm text-muted">{{ document.uploadedBy }}</p>
+                <p class="mt-2 break-words text-sm">
+                  {{ document.replacementReason || 'Primera carga' }}
+                </p>
+                <button
+                  class="mt-3 w-full"
+                  pButton
+                  type="button"
+                  severity="secondary"
+                  outlined
+                  [loading]="signedUploadBusy()"
+                  [disabled]="signedUploadBusy()"
+                  (click)="viewSignedDocument(document)"
+                >
+                  Ver PDF
+                </button>
+              </article>
+            } @empty {
+              <p class="py-6 text-center text-sm text-muted">
+                Todavía no se ha publicado una copia firmada.
+              </p>
+            }
+          </div>
+          <div class="mt-3 hidden max-w-full overflow-x-auto md:block">
             <p-table [value]="signedDocuments()" [tableStyle]="{ 'min-width': '34rem' }">
               <ng-template #header>
-                <tr><th>Fecha</th><th>Responsable</th><th>Motivo</th><th aria-label="Acciones"></th></tr>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Responsable</th>
+                  <th>Motivo</th>
+                  <th aria-label="Acciones"></th>
+                </tr>
               </ng-template>
               <ng-template #body let-document>
                 <tr>
@@ -184,17 +259,41 @@
                   <td>{{ document.uploadedBy }}</td>
                   <td>{{ document.replacementReason || 'Primera carga' }}</td>
                   <td class="text-right">
-                    <button pButton type="button" size="small" text [disabled]="signedUploadBusy()" (click)="viewSignedDocument(document)">Ver PDF</button>
+                    <button
+                      pButton
+                      type="button"
+                      size="small"
+                      text
+                      [loading]="signedUploadBusy()"
+                      [disabled]="signedUploadBusy()"
+                      (click)="viewSignedDocument(document)"
+                    >
+                      Ver PDF
+                    </button>
                   </td>
                 </tr>
               </ng-template>
               <ng-template #emptymessage>
-                <tr><td colspan="4" class="py-8 text-center text-sm text-muted">Todavía no se ha publicado una copia firmada.</td></tr>
+                <tr>
+                  <td colspan="4" class="py-8 text-center text-sm text-muted">
+                    Todavía no se ha publicado una copia firmada.
+                  </td>
+                </tr>
               </ng-template>
             </p-table>
           </div>
           @if (signedDocumentsNextCursor()) {
-            <button class="mt-3" pButton type="button" severity="secondary" text (click)="loadMoreSignedDocuments()">Cargar versiones anteriores</button>
+            <button
+              class="mt-3"
+              pButton
+              type="button"
+              severity="secondary"
+              text
+              [loading]="signedUploadBusy()"
+              (click)="loadMoreSignedDocuments()"
+            >
+              Cargar versiones anteriores
+            </button>
           }
         </div>
       </div>

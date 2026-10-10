@@ -1,24 +1,217 @@
 <main class="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 sm:px-8" [attr.aria-busy]="busy()">
-  <header class="flex flex-wrap items-start justify-between gap-4"><div><p class="text-sm text-muted">Tesorería · proveedores</p><h1 class="mt-2 text-3xl font-semibold text-ink">Compromisos y movimientos de servicios</h1></div><div class="flex flex-wrap gap-3"><button pButton type="button" [disabled]="!!operation()" (click)="begin('CREATE')">Agregar proveedor</button><a pButton severity="secondary" outlined [routerLink]="['/cobranza/giras', tripId, 'tesoreria']">Volver a tesorería</a></div></header>
-  <p-message severity="info">Un compromiso o una devolución acordada no cambia la caja. Solo un pago o una recuperación verificados en cartola generan salida o entrada bancaria.</p-message>
-  @if (success()) { <p-message severity="success">{{ success() }}</p-message> }
-  @if (error()) { <p-message severity="error">{{ error() }}</p-message> }
+  <header class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <p class="text-sm text-muted">Tesorería · proveedores</p>
+      <h1 class="mt-2 text-3xl font-semibold text-ink">Compromisos y movimientos de servicios</h1>
+    </div>
+    <div class="flex flex-wrap gap-3">
+      <button pButton type="button" [disabled]="!!operation()" (click)="begin('CREATE')">
+        Agregar proveedor</button
+      ><a
+        pButton
+        severity="secondary"
+        outlined
+        [routerLink]="['/cobranza/giras', tripId, 'tesoreria']"
+        >Volver a tesorería</a
+      >
+    </div>
+  </header>
+  <p-message severity="info"
+    >Un compromiso o una devolución acordada no cambia la caja. Solo un pago o una recuperación
+    verificados en cartola generan salida o entrada bancaria.</p-message
+  >
+  @if (success()) {
+    <p-message severity="success">{{ success() }}</p-message>
+  }
+  @if (error()) {
+    <p-message severity="error">{{ error() }}</p-message>
+  }
   <p-panel header="Proveedores y servicios">
-    <p-table [value]="suppliers()" [tableStyle]="{ 'min-width': '64rem' }" styleClass="text-sm">
-      <ng-template #header><tr><th>Proveedor</th><th>Servicio</th><th>Comprometido</th><th>Pagado</th><th>Devolución acordada</th><th>Recuperada</th><th>Acciones</th></tr></ng-template>
-      <ng-template #body let-item><tr><td>{{ item.name }}</td><td>{{ item.service }}</td><td>{{ item.committed | currency:'CLP':'symbol-narrow':'1.0-0' }}</td><td>{{ item.paid | currency:'CLP':'symbol-narrow':'1.0-0' }}</td><td>{{ item.refundAgreed | currency:'CLP':'symbol-narrow':'1.0-0' }}</td><td>{{ item.refundReceived | currency:'CLP':'symbol-narrow':'1.0-0' }}</td><td><div class="flex flex-wrap gap-2"><button pButton type="button" severity="secondary" outlined [disabled]="!!operation()" (click)="begin('REVISE', item)">Revisar</button><button pButton type="button" severity="secondary" outlined [disabled]="!!operation()" (click)="begin('PAY', item)">Pagar</button><button pButton type="button" severity="secondary" outlined [disabled]="!!operation() || item.refundReceived >= item.refundAgreed" (click)="begin('RECEIVE_REFUND', item)">Recibir devolución</button></div></td></tr></ng-template>
-      <ng-template #emptymessage><tr><td colspan="7">Todavía no hay compromisos de proveedores registrados.</td></tr></ng-template>
+    <p-table
+      class="block max-w-full overflow-x-auto"
+      [value]="suppliers()"
+      [tableStyle]="{ 'min-width': '64rem' }"
+      styleClass="text-sm"
+    >
+      <ng-template #header
+        ><tr>
+          <th>Proveedor</th>
+          <th>Servicio</th>
+          <th>Comprometido</th>
+          <th>Pagado</th>
+          <th>Devolución acordada</th>
+          <th>Recuperada</th>
+          <th>Acciones</th>
+        </tr></ng-template
+      >
+      <ng-template #body let-item
+        ><tr>
+          <td>{{ item.name }}</td>
+          <td>{{ item.service }}</td>
+          <td>{{ item.committed | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</td>
+          <td>{{ item.paid | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</td>
+          <td>{{ item.refundAgreed | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</td>
+          <td>{{ item.refundReceived | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</td>
+          <td>
+            <div class="flex flex-wrap gap-2">
+              <button
+                pButton
+                type="button"
+                severity="secondary"
+                outlined
+                [disabled]="!!operation()"
+                (click)="begin('REVISE', item)"
+              >
+                Revisar</button
+              ><button
+                pButton
+                type="button"
+                severity="secondary"
+                outlined
+                [disabled]="!!operation()"
+                (click)="begin('PAY', item)"
+              >
+                Pagar</button
+              ><button
+                pButton
+                type="button"
+                severity="secondary"
+                outlined
+                [disabled]="!!operation() || item.refundReceived >= item.refundAgreed"
+                (click)="begin('RECEIVE_REFUND', item)"
+              >
+                Recibir devolución
+              </button>
+            </div>
+          </td>
+        </tr></ng-template
+      >
+      <ng-template #emptymessage
+        ><tr>
+          <td colspan="7">Todavía no hay compromisos de proveedores registrados.</td>
+        </tr></ng-template
+      >
     </p-table>
   </p-panel>
   @if (operation(); as op) {
-    <p-panel [header]="op === 'CREATE' ? 'Nuevo compromiso' : op === 'REVISE' ? 'Revisar compromiso y recuperación acordada' : op === 'PAY' ? 'Registrar pago bancario' : 'Registrar recuperación bancaria'">
+    <p-panel
+      [header]="
+        op === 'CREATE'
+          ? 'Nuevo compromiso'
+          : op === 'REVISE'
+            ? 'Revisar compromiso y recuperación acordada'
+            : op === 'PAY'
+              ? 'Registrar pago bancario'
+              : 'Registrar recuperación bancaria'
+      "
+    >
       <form [formGroup]="form" (ngSubmit)="save()" class="flex flex-col gap-5">
-        @if (op === 'CREATE') { <div class="grid gap-5 sm:grid-cols-2"><div class="flex flex-col gap-2"><label for="supplier-name">Proveedor</label><input pInputText id="supplier-name" formControlName="name" maxlength="150" /></div><div class="flex flex-col gap-2"><label for="supplier-service">Servicio</label><input pInputText id="supplier-service" formControlName="service" maxlength="250" /></div></div><div class="flex flex-col gap-2"><label for="supplier-committed">Monto comprometido</label><p-inputnumber inputId="supplier-committed" formControlName="committed" [min]="1" [maxFractionDigits]="0" /></div> }
-        @if (op === 'REVISE') { <div class="grid gap-5 sm:grid-cols-3"><div class="flex flex-col gap-2"><label for="revised-committed">Nuevo compromiso</label><p-inputnumber inputId="revised-committed" formControlName="committed" [min]="0" [maxFractionDigits]="0" /></div><div class="flex flex-col gap-2"><label for="refund-agreed">Devolución acordada acumulada</label><p-inputnumber inputId="refund-agreed" formControlName="refundAgreed" [min]="0" [maxFractionDigits]="0" /></div><div class="flex flex-col gap-2"><label for="annex-id">Anexo o respaldo</label><input pInputText id="annex-id" formControlName="annexId" maxlength="150" /></div></div> }
-        @if (op === 'PAY' || op === 'RECEIVE_REFUND') { <div class="grid gap-5 sm:grid-cols-3"><div class="flex flex-col gap-2"><label for="supplier-amount">Monto observado</label><p-inputnumber inputId="supplier-amount" formControlName="amount" [min]="1" [maxFractionDigits]="0" /></div><div class="flex flex-col gap-2"><label for="supplier-reference">Referencia bancaria</label><input pInputText id="supplier-reference" formControlName="reference" maxlength="150" /></div><div class="flex flex-col gap-2"><label for="supplier-date">Fecha efectiva</label><input pInputText id="supplier-date" formControlName="effectiveDate" maxlength="10" /></div></div> }
-        <div class="flex flex-col gap-2"><label for="supplier-reason">Motivo y evidencia</label><textarea pTextarea id="supplier-reason" formControlName="reason" rows="3" maxlength="500"></textarea></div>
-        <div class="flex items-start gap-3"><p-checkbox inputId="supplier-reviewed" formControlName="reviewed" [binary]="true" /><label for="supplier-reviewed">Revisé el contrato, anexo o movimiento bancario que respalda esta operación.</label></div>
-        <div class="flex flex-wrap gap-3"><button pButton type="submit" [disabled]="busy()">{{ pending ? 'Reintentar misma operación' : 'Registrar operación' }}</button><button pButton type="button" severity="secondary" outlined [disabled]="busy() || !!pending" (click)="cancel()">Cancelar</button></div>
+        @if (op === 'CREATE') {
+          <div class="grid gap-5 sm:grid-cols-2">
+            <div class="flex flex-col gap-2">
+              <label for="supplier-name">Proveedor</label
+              ><input pInputText id="supplier-name" formControlName="name" maxlength="150" />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label for="supplier-service">Servicio</label
+              ><input pInputText id="supplier-service" formControlName="service" maxlength="250" />
+            </div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <label for="supplier-committed">Monto comprometido</label
+            ><p-inputnumber
+              inputId="supplier-committed"
+              formControlName="committed"
+              [min]="1"
+              [maxFractionDigits]="0"
+            />
+          </div>
+        }
+        @if (op === 'REVISE') {
+          <div class="grid gap-5 sm:grid-cols-3">
+            <div class="flex flex-col gap-2">
+              <label for="revised-committed">Nuevo compromiso</label
+              ><p-inputnumber
+                inputId="revised-committed"
+                formControlName="committed"
+                [min]="0"
+                [maxFractionDigits]="0"
+              />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label for="refund-agreed">Devolución acordada acumulada</label
+              ><p-inputnumber
+                inputId="refund-agreed"
+                formControlName="refundAgreed"
+                [min]="0"
+                [maxFractionDigits]="0"
+              />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label for="annex-id">Anexo o respaldo</label
+              ><input pInputText id="annex-id" formControlName="annexId" maxlength="150" />
+            </div>
+          </div>
+        }
+        @if (op === 'PAY' || op === 'RECEIVE_REFUND') {
+          <div class="grid gap-5 sm:grid-cols-3">
+            <div class="flex flex-col gap-2">
+              <label for="supplier-amount">Monto observado</label
+              ><p-inputnumber
+                inputId="supplier-amount"
+                formControlName="amount"
+                [min]="1"
+                [maxFractionDigits]="0"
+              />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label for="supplier-reference">Referencia bancaria</label
+              ><input
+                pInputText
+                id="supplier-reference"
+                formControlName="reference"
+                maxlength="150"
+              />
+            </div>
+            <div class="flex min-w-0 flex-col gap-2">
+              <label for="supplier-date">Fecha efectiva</label
+              ><app-date-only-picker inputId="supplier-date" formControlName="effectiveDate" />
+            </div>
+          </div>
+        }
+        <div class="flex flex-col gap-2">
+          <label for="supplier-reason">Motivo y evidencia</label
+          ><textarea
+            pTextarea
+            id="supplier-reason"
+            formControlName="reason"
+            rows="3"
+            maxlength="500"
+          ></textarea>
+        </div>
+        <div class="flex items-start gap-3">
+          <p-checkbox
+            inputId="supplier-reviewed"
+            formControlName="reviewed"
+            [binary]="true"
+          /><label for="supplier-reviewed"
+            >Revisé el contrato, anexo o movimiento bancario que respalda esta operación.</label
+          >
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <button pButton type="submit" [loading]="busy()" [disabled]="busy()">
+            {{ pending ? 'Reintentar misma operación' : 'Registrar operación' }}</button
+          ><button
+            pButton
+            type="button"
+            severity="secondary"
+            outlined
+            [disabled]="busy() || !!pending"
+            (click)="cancel()"
+          >
+            Cancelar
+          </button>
+        </div>
       </form>
     </p-panel>
   }

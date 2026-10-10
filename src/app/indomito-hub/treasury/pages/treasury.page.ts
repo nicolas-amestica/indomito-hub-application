@@ -13,12 +13,15 @@ import { Select } from 'primeng/select';
 import { Dialog } from 'primeng/dialog';
 import { TreasuryApiService } from '../services/treasury-api.service';
 import type { TreasuryExpense, TreasuryView } from '../interfaces/treasury.interface';
+import { DateOnlyPickerComponent } from '../../../shared/date-only/date-only-picker.component';
+import { todayDateOnly } from '../../../shared/date-only/date-only';
 
 /** Tesorería por viaje con vocabulario operativo y proyección de caja. */
 @Component({
   selector: 'app-treasury-page',
   imports: [
     CurrencyPipe,
+    DateOnlyPickerComponent,
     ReactiveFormsModule,
     RouterLink,
     ButtonDirective,
@@ -68,7 +71,7 @@ export class TreasuryPage {
       nonNullable: true,
       validators: [Validators.required, Validators.maxLength(120)],
     }),
-    dueDate: new FormControl(new Date().toISOString().slice(0, 10), {
+    dueDate: new FormControl(todayDateOnly(), {
       nonNullable: true,
       validators: [Validators.required, Validators.pattern(/^\d{4}-\d{2}-\d{2}$/)],
     }),

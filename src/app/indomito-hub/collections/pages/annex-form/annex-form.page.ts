@@ -28,6 +28,7 @@ import { Select } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { Textarea } from 'primeng/textarea';
 import { newUlid } from '../../../../shared/fn/new-ulid';
+import { DateOnlyPickerComponent } from '../../../../shared/date-only/date-only-picker.component';
 import { buildAnnexInstallments } from '../../fn/build-annex-installments';
 import type {
   AnnexDraftRequest,
@@ -51,6 +52,7 @@ type AdmissionForm = FormGroup<{
 @Component({
   selector: 'app-annex-form',
   imports: [
+    DateOnlyPickerComponent,
     CurrencyPipe,
     RouterLink,
     FormsModule,
@@ -325,7 +327,10 @@ export class AnnexFormPage {
         if (replaced.has(value.replacesAccountId)) return null;
         replaced.add(value.replacesAccountId);
         withdrawalIds.add(value.replacesAccountId);
-        replacements.push({ outgoingAccountId: value.replacesAccountId, incomingAccountId: accountId });
+        replacements.push({
+          outgoingAccountId: value.replacesAccountId,
+          incomingAccountId: accountId,
+        });
       }
       const installments = value.free
         ? []
@@ -357,7 +362,11 @@ export class AnnexFormPage {
       accountId,
       expectedVersion: byId.get(accountId)?.version ?? 0,
     }));
-    if ((!admissions.length && !withdrawals.length) || withdrawals.some(({ expectedVersion }) => expectedVersion < 1)) return null;
+    if (
+      (!admissions.length && !withdrawals.length) ||
+      withdrawals.some(({ expectedVersion }) => expectedVersion < 1)
+    )
+      return null;
     return {
       id: newUlid(),
       reason: this.form.controls.reason.getRawValue().trim(),

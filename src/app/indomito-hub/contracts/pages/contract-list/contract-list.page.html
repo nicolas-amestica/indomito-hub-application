@@ -7,11 +7,7 @@
         Consulta contratos de cualquier estado según su año contractual.
       </p>
     </div>
-    <a
-      routerLink="/contratos/nuevo"
-      class="rounded-xl bg-night px-5 py-2.5 text-center text-sm font-semibold text-white"
-      >Crear contrato</a
-    >
+    <a pButton routerLink="/contratos/nuevo">Crear contrato</a>
   </header>
   <section class="app-panel p-5">
     <div class="mb-5 flex items-center gap-3">
@@ -27,76 +23,162 @@
         [disabled]="loading()"
       />
     </div>
-    <p-table
-      [value]="contracts()"
-      [loading]="loading()"
-      [paginator]="contracts().length > 10"
-      [rows]="10"
-      [tableStyle]="{ 'min-width': '58rem' }"
-    >
-      <ng-template #header
-        ><tr>
-          <th>Cotización</th>
-          <th>Institución</th>
-          <th>Destino</th>
-          <th>Período</th>
-          <th>Pasajeros</th>
-          <th>Estado</th>
-          <th>Documento firmado</th>
-          <th>Actualización</th>
-          <th aria-label="Acciones"></th></tr
-      ></ng-template>
-      <ng-template #body let-contract
-        ><tr>
-          <td class="font-semibold">{{ contract.planName || 'Sin nombre' }}</td>
-          <td>{{ contract.institutionName || 'Sin institución' }}</td>
-          <td>{{ contract.destination || 'Sin destino' }}</td>
-          <td>{{ contract.period }}</td>
-          <td>{{ contract.passengerCount }}</td>
-          <td>
+    <div class="grid gap-4 md:hidden">
+      @for (contract of contracts(); track contract.id) {
+        <article class="rounded-xl border border-line p-4">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <h2 class="truncate font-semibold">
+                {{ contract.institutionName || 'Sin institución' }}
+              </h2>
+              <p class="mt-1 text-sm text-muted">
+                {{ contract.planName || 'Sin nombre' }} ·
+                {{ contract.destination || 'Sin destino' }}
+              </p>
+            </div>
             <span
-              class="rounded-full px-3 py-1 text-xs font-semibold"
+              class="shrink-0 rounded-full px-3 py-1 text-xs font-semibold"
               [class]="statusClass(contract.status)"
               >{{ statusLabel(contract.status) }}</span
             >
-          </td>
-          <td>
+          </div>
+          <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
+            <div>
+              <dt class="text-muted">Período</dt>
+              <dd>{{ contract.period }}</dd>
+            </div>
+            <div>
+              <dt class="text-muted">Pasajeros</dt>
+              <dd>{{ contract.passengerCount }}</dd>
+            </div>
+            <div class="col-span-2">
+              <dt class="text-muted">Documento</dt>
+              <dd>
+                {{
+                  contract.status === 'APPROVED'
+                    ? signatureLabel(contract.signatureStatus || 'PENDING_SIGNED_UPLOAD')
+                    : 'No aplica'
+                }}
+              </dd>
+            </div>
+          </dl>
+          <div class="mt-4 flex flex-col gap-2">
             @if (contract.status === 'APPROVED') {
+              <button
+                pButton
+                type="button"
+                severity="secondary"
+                outlined
+                [loading]="loading()"
+                (click)="viewPdf(contract)"
+              >
+                Ver PDF</button
+              ><a
+                pButton
+                severity="secondary"
+                outlined
+                [routerLink]="['/contratos', contract.id, 'anexos']"
+                >Anexos</a
+              >
+            }
+            <a pButton [routerLink]="['/contratos', contract.id, 'editar']">{{
+              contract.status === 'APPROVED' ? 'Ver detalle' : 'Editar'
+            }}</a>
+          </div>
+        </article>
+      } @empty {
+        <p class="py-8 text-center text-sm text-muted">
+          No hay registros de contratos en el año seleccionado.
+        </p>
+      }
+    </div>
+    <div class="hidden max-w-full overflow-x-auto md:block">
+      <p-table
+        [value]="contracts()"
+        [loading]="loading()"
+        [paginator]="contracts().length > 10"
+        [rows]="10"
+        [tableStyle]="{ 'min-width': '58rem' }"
+      >
+        <ng-template #header
+          ><tr>
+            <th>Cotización</th>
+            <th>Institución</th>
+            <th>Destino</th>
+            <th>Período</th>
+            <th>Pasajeros</th>
+            <th>Estado</th>
+            <th>Documento firmado</th>
+            <th>Actualización</th>
+            <th aria-label="Acciones"></th></tr
+        ></ng-template>
+        <ng-template #body let-contract
+          ><tr>
+            <td class="font-semibold">{{ contract.planName || 'Sin nombre' }}</td>
+            <td>{{ contract.institutionName || 'Sin institución' }}</td>
+            <td>{{ contract.destination || 'Sin destino' }}</td>
+            <td>{{ contract.period }}</td>
+            <td>{{ contract.passengerCount }}</td>
+            <td>
               <span
                 class="rounded-full px-3 py-1 text-xs font-semibold"
-                [class.bg-amber-100]="contract.signatureStatus !== 'SIGNED_UPLOADED'"
-                [class.text-amber-900]="contract.signatureStatus !== 'SIGNED_UPLOADED'"
-                [class.bg-emerald-100]="contract.signatureStatus === 'SIGNED_UPLOADED'"
-                [class.text-emerald-900]="contract.signatureStatus === 'SIGNED_UPLOADED'"
-              >{{ signatureLabel(contract.signatureStatus || 'PENDING_SIGNED_UPLOAD') }}</span>
-            } @else {
-              <span class="text-sm text-muted">No aplica</span>
-            }
-          </td>
-          <td>{{ contract.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</td>
-          <td class="flex items-center justify-end gap-3">
-            @if (contract.status === 'APPROVED') {
-              <button pButton type="button" size="small" text (click)="viewPdf(contract)">
-                <span class="pi pi-file-pdf" aria-hidden="true"></span>
-                Ver PDF
-              </button>
-              <a pButton size="small" severity="secondary" text [routerLink]="['/contratos', contract.id, 'anexos']">Anexos</a>
-            }
-            <a
-              [routerLink]="['/contratos', contract.id, 'editar']"
-              class="text-sm font-semibold text-brand-active"
-              >{{ contract.status === 'APPROVED' ? 'Detalle' : 'Editar' }}</a
-            >
-          </td>
-        </tr></ng-template
-      >
-      <ng-template #emptymessage
-        ><tr>
-          <td colspan="9" class="py-12 text-center text-sm text-muted">
-            No hay registros de contratos en el año seleccionado.
-          </td>
-        </tr></ng-template
-      >
-    </p-table>
+                [class]="statusClass(contract.status)"
+                >{{ statusLabel(contract.status) }}</span
+              >
+            </td>
+            <td>
+              @if (contract.status === 'APPROVED') {
+                <span
+                  class="rounded-full px-3 py-1 text-xs font-semibold"
+                  [class.bg-amber-100]="contract.signatureStatus !== 'SIGNED_UPLOADED'"
+                  [class.text-amber-900]="contract.signatureStatus !== 'SIGNED_UPLOADED'"
+                  [class.bg-emerald-100]="contract.signatureStatus === 'SIGNED_UPLOADED'"
+                  [class.text-emerald-900]="contract.signatureStatus === 'SIGNED_UPLOADED'"
+                  >{{ signatureLabel(contract.signatureStatus || 'PENDING_SIGNED_UPLOAD') }}</span
+                >
+              } @else {
+                <span class="text-sm text-muted">No aplica</span>
+              }
+            </td>
+            <td>{{ contract.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td class="flex items-center justify-end gap-3">
+              @if (contract.status === 'APPROVED') {
+                <button
+                  pButton
+                  type="button"
+                  size="small"
+                  text
+                  [loading]="loading()"
+                  (click)="viewPdf(contract)"
+                >
+                  <span class="pi pi-file-pdf" aria-hidden="true"></span>
+                  Ver PDF
+                </button>
+                <a
+                  pButton
+                  size="small"
+                  severity="secondary"
+                  text
+                  [routerLink]="['/contratos', contract.id, 'anexos']"
+                  >Anexos</a
+                >
+              }
+              <a
+                [routerLink]="['/contratos', contract.id, 'editar']"
+                class="text-sm font-semibold text-brand-active"
+                >{{ contract.status === 'APPROVED' ? 'Detalle' : 'Editar' }}</a
+              >
+            </td>
+          </tr></ng-template
+        >
+        <ng-template #emptymessage
+          ><tr>
+            <td colspan="9" class="py-12 text-center text-sm text-muted">
+              No hay registros de contratos en el año seleccionado.
+            </td>
+          </tr></ng-template
+        >
+      </p-table>
+    </div>
   </section>
 </div>

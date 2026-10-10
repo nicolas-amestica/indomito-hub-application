@@ -7,11 +7,28 @@ import {
   viewChildren,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { distinctUntilChanged, finalize, forkJoin, from, merge, skip, switchMap, throwError, type Observable } from 'rxjs';
+import {
+  distinctUntilChanged,
+  finalize,
+  forkJoin,
+  from,
+  merge,
+  skip,
+  switchMap,
+  throwError,
+  type Observable,
+} from 'rxjs';
 import { ButtonDirective } from 'primeng/button';
 import { DatePicker } from 'primeng/datepicker';
 import { FileUpload } from 'primeng/fileupload';
@@ -432,13 +449,19 @@ export class ContractFormPage {
   protected uploadSignedDocument(file: File | undefined, uploader: FileUpload): void {
     const contractId = this.contractId();
     if (!contractId || !file || this.signedUploadBusy()) return;
-    if (!file.name.toLowerCase().endsWith('.pdf') || file.size < 5 || file.size > 25 * 1024 * 1024) {
+    if (
+      !file.name.toLowerCase().endsWith('.pdf') ||
+      file.size < 5 ||
+      file.size > 25 * 1024 * 1024
+    ) {
       this.notifications.error('Selecciona un PDF válido de hasta 25 MiB.');
       uploader.clear();
       return;
     }
     if (!this.confirmsAllSignatures()) {
-      this.notifications.warn('Confirma que el documento corresponde al contrato y contiene todas las firmas.');
+      this.notifications.warn(
+        'Confirma que el documento corresponde al contrato y contiene todas las firmas.',
+      );
       uploader.clear();
       return;
     }
@@ -465,9 +488,10 @@ export class ContractFormPage {
           preparation.status === 'COMPLETED'
             ? this.api.get(contractId)
             : preparation.uploadUrl
-              ? this.api
-                  .uploadSignedDocument(preparation.uploadUrl, file)
-                  .pipe(switchMap(() => this.api.finalizeSignedDocument(contractId, clientRequestId)), switchMap(() => this.api.get(contractId)))
+              ? this.api.uploadSignedDocument(preparation.uploadUrl, file).pipe(
+                  switchMap(() => this.api.finalizeSignedDocument(contractId, clientRequestId)),
+                  switchMap(() => this.api.get(contractId)),
+                )
               : throwError(() => new Error('La API no entregó una URL de carga.')),
         ),
         takeUntilDestroyed(this.destroyRef),
@@ -481,9 +505,14 @@ export class ContractFormPage {
           this.applyContract(contract);
           this.confirmsAllSignatures.set(false);
           this.replacementReason.set('');
-          this.notifications.success('La copia firmada quedó publicada y vinculada al contrato aprobado.');
+          this.notifications.success(
+            'La copia firmada quedó publicada y vinculada al contrato aprobado.',
+          );
         },
-        error: () => this.notifications.error('No se pudo publicar la copia firmada. Revisa el archivo y vuelve a intentarlo.'),
+        error: () =>
+          this.notifications.error(
+            'No se pudo publicar la copia firmada. Revisa el archivo y vuelve a intentarlo.',
+          ),
       });
   }
 
@@ -493,11 +522,15 @@ export class ContractFormPage {
     this.signedUploadBusy.set(true);
     this.api
       .getSignedDocumentPdf(contractId, document?.id)
-      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.signedUploadBusy.set(false)))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.signedUploadBusy.set(false)),
+      )
       .subscribe(({ url }) =>
         this.documentPreview.open({
           title: 'Contrato firmado',
-          description: document?.replacementReason || 'Copia firmada presencialmente por las partes.',
+          description:
+            document?.replacementReason || 'Copia firmada presencialmente por las partes.',
           documents: [{ name: 'contrato-firmado.pdf', mimeType: 'application/pdf', source: url }],
         }),
       );
@@ -516,7 +549,9 @@ export class ContractFormPage {
       .subscribe({
         next: ({ items, nextCursor }) => {
           const documents = append ? [...this.signedDocuments(), ...items] : items;
-          this.signedDocuments.set(documents.sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt)));
+          this.signedDocuments.set(
+            documents.sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt)),
+          );
           this.signedDocumentsNextCursor.set(nextCursor ?? '');
         },
         error: () => {
@@ -630,7 +665,8 @@ export class ContractFormPage {
     this.status.set(contract.status);
     this.locked.set(contract.status === 'APPROVED' || contract.status === 'CANCELLED');
     this.signatureStatus.set(
-      contract.signatureStatus ?? (contract.status === 'APPROVED' ? 'PENDING_SIGNED_UPLOAD' : 'NOT_REQUIRED'),
+      contract.signatureStatus ??
+        (contract.status === 'APPROVED' ? 'PENDING_SIGNED_UPLOAD' : 'NOT_REQUIRED'),
     );
     this.signedDocument.set(contract.signedDocument ?? null);
     if (contract.status === 'APPROVED') this.loadSignedDocuments(contract.id);

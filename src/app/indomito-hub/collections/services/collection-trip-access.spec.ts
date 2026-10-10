@@ -7,7 +7,9 @@ import { CollectionTripAccess } from './collection-trip-access';
 
 describe('CollectionTripAccess', () => {
   it('consulta y cambia solamente el acceso de la gira indicada', () => {
-    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    });
     const api = TestBed.inject(CollectionTripAccess);
     const http = TestBed.inject(HttpTestingController);
 

@@ -15,7 +15,10 @@ describe('TripAccessPage', () => {
       imports: [TripAccessPage],
       providers: [
         provideRouter([]),
-        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({ id: 'trip' }) } } },
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: convertToParamMap({ id: 'trip' }) } },
+        },
         { provide: CollectionTripAccess, useValue: api },
       ],
     });
@@ -30,7 +33,9 @@ describe('TripAccessPage', () => {
   });
 
   it('publica el codigo nuevo devuelto por la operacion durable', async () => {
-    api.change.mockReturnValue(of({ tripId: 'trip', tripCode: 'ABC234', version: 2, status: 'ACTIVE' }));
+    api.change.mockReturnValue(
+      of({ tripId: 'trip', tripCode: 'ABC234', version: 2, status: 'ACTIVE' }),
+    );
     const fixture = TestBed.createComponent(TripAccessPage);
     await fixture.whenStable();
     const component = fixture.componentInstance as unknown as {

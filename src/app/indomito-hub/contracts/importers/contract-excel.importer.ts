@@ -192,9 +192,10 @@ export class ContractExcelImporter {
   }
   private cellValue(value: ExcelJS.CellValue): unknown {
     if (value instanceof Date) {
-      const day = String(value.getUTCDate()).padStart(2, '0');
-      const month = String(value.getUTCMonth() + 1).padStart(2, '0');
-      return `${value.getUTCFullYear()}-${month}-${day}`;
+      // Excel representa estas celdas como fechas civiles, no como instantes UTC.
+      const day = String(value.getDate()).padStart(2, '0');
+      const month = String(value.getMonth() + 1).padStart(2, '0');
+      return `${value.getFullYear()}-${month}-${day}`;
     }
     if (typeof value === 'object' && value !== null && 'text' in value) return value.text;
     if (typeof value === 'object' && value !== null && 'result' in value) return value.result;

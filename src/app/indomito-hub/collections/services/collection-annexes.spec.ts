@@ -6,7 +6,9 @@ import { CollectionAnnexes } from './collection-annexes';
 
 describe('CollectionAnnexes', () => {
   beforeEach(() =>
-    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] }),
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    }),
   );
 
   it('encodes trip and cursor when listing the roster', () => {

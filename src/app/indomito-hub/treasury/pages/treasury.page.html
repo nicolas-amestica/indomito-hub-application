@@ -23,7 +23,9 @@
           Disponible en el archivo tmp/payment-demo/admin.key del backend. No uses aquí claves de
           Khipu.
         </p>
-        <button pButton type="submit" [disabled]="busy() || !key.value">Abrir tesorería</button>
+        <button pButton type="submit" [loading]="busy()" [disabled]="busy() || !key.value">
+          Abrir tesorería
+        </button>
       </form></p-panel
     >
   }
@@ -39,7 +41,7 @@
           optionValue="value"
         />
       </div>
-      <button pButton [disabled]="busy()" (click)="refresh()">Actualizar</button
+      <button pButton [loading]="busy()" [disabled]="busy()" (click)="refresh()">Actualizar</button
       ><button pButton severity="secondary" (click)="lock()">Cerrar acceso</button>
     </div>
     <dl class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -164,9 +166,9 @@
             placeholder="Ej.: Hotel del viaje"
           />
         </div>
-        <div class="flex flex-col gap-2">
+        <div class="flex min-w-0 flex-col gap-2">
           <label for="expense-date">Fecha de pago esperada</label
-          ><input pInputText id="expense-date" formControlName="dueDate" placeholder="AAAA-MM-DD" />
+          ><app-date-only-picker inputId="expense-date" formControlName="dueDate" />
         </div>
         <div class="flex flex-col gap-2">
           <label for="expense-amount">Costo total acordado</label
@@ -180,7 +182,13 @@
             fluid
           />
         </div>
-        <button pButton type="submit" class="self-end" [disabled]="busy() || form.invalid">
+        <button
+          pButton
+          type="submit"
+          class="self-end"
+          [loading]="busy()"
+          [disabled]="busy() || form.invalid"
+        >
           Registrar compromiso
         </button>
       </form>
@@ -232,7 +240,13 @@
             {{ payment.amount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }} bruto ·
             {{ payment.fee | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }} comisión estimada
           </p>
-          <button pButton severity="secondary" [disabled]="busy()" (click)="settle(payment.id)">
+          <button
+            pButton
+            severity="secondary"
+            [loading]="busy()"
+            [disabled]="busy()"
+            (click)="settle(payment.id)"
+          >
             Registrar abono bancario de prueba
           </button>
         </div>

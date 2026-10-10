@@ -29,11 +29,16 @@ export const routes: Routes = [
       import('./core/layout/app-shell.component').then((m) => m.AppShellComponent),
     children: [
       {
+        path: 'inicio',
+        loadChildren: () =>
+          import('./indomito-hub/dashboard/dashboard.routes').then((m) => m.DASHBOARD_ROUTES),
+      },
+      {
         path: 'cobranza',
         loadChildren: () =>
           import('./indomito-hub/collections/collections.routes').then((m) => m.COLLECTIONS_ROUTES),
       },
-      { path: '', pathMatch: 'full', redirectTo: 'cotizaciones' },
+      { path: '', pathMatch: 'full', redirectTo: 'inicio' },
       {
         path: 'cotizaciones',
         data: { module: 'PROGRAMS' },

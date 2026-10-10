@@ -26,8 +26,20 @@ const approved = {
   version: 2,
   status: 'APPROVED',
   reason: 'Definir fechas',
-  before: { departureDate: '', returnDate: '', days: 4, nights: 3, services: [{ description: 'Transporte original' }] },
-  after: { departureDate: '2027-10-05T00:00:00Z', returnDate: '2027-10-08T00:00:00Z', days: 4, nights: 3, services: [{ description: 'Transporte vigente' }] },
+  before: {
+    departureDate: '',
+    returnDate: '',
+    days: 4,
+    nights: 3,
+    services: [{ description: 'Transporte original' }],
+  },
+  after: {
+    departureDate: '2027-10-05T00:00:00Z',
+    returnDate: '2027-10-08T00:00:00Z',
+    days: 4,
+    nights: 3,
+    services: [{ description: 'Transporte vigente' }],
+  },
   createdAt: '2026-10-05T00:00:00Z',
   createdBy: 'operator',
 } as ContractAmendment;
@@ -37,9 +49,20 @@ describe('ContractAmendmentsPage', () => {
     const api = {
       get: vi.fn().mockReturnValue(of(contract)),
       listAmendments: vi.fn().mockReturnValue(of({ items: [approved] })),
-      createAmendment: vi.fn().mockImplementation((_id, request) =>
-        of({ ...request, contractId: 'contract', baseTermsRevision: 1, version: 1, status: 'DRAFT', before: approved.after, createdAt: '', createdBy: '' }),
-      ),
+      createAmendment: vi
+        .fn()
+        .mockImplementation((_id, request) =>
+          of({
+            ...request,
+            contractId: 'contract',
+            baseTermsRevision: 1,
+            version: 1,
+            status: 'DRAFT',
+            before: approved.after,
+            createdAt: '',
+            createdBy: '',
+          }),
+        ),
     };
     await TestBed.configureTestingModule({
       imports: [ContractAmendmentsPage],
@@ -48,7 +71,10 @@ describe('ContractAmendmentsPage', () => {
         provideNoopAnimations(),
         { provide: ContractsService, useValue: api },
         { provide: DocumentPreviewService, useValue: { open: vi.fn() } },
-        { provide: ActivatedRoute, useValue: { paramMap: of(convertToParamMap({ id: 'contract' })) } },
+        {
+          provide: ActivatedRoute,
+          useValue: { paramMap: of(convertToParamMap({ id: 'contract' })) },
+        },
       ],
     }).compileComponents();
     const fixture = TestBed.createComponent(ContractAmendmentsPage);

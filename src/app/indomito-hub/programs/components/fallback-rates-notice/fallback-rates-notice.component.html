@@ -19,8 +19,8 @@
   <div>
     <p class="font-semibold">Estás cotizando con tasas de respaldo.</p>
     <p class="mt-0.5 text-sm leading-5">
-      Corresponden al {{ date() | date: 'longDate' : 'UTC' }}. Puedes continuar, pero revisa esta
-      fecha antes de confirmar la cotización.
+      Corresponden al {{ localDate() | date: 'longDate' }}. Puedes continuar, pero revisa esta fecha
+      antes de confirmar la cotización.
     </p>
   </div>
 </aside>

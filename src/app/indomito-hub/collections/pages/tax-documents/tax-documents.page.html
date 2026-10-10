@@ -7,54 +7,190 @@
     <a pButton severity="secondary" outlined routerLink="/cobranza/tesoreria">Volver a tesorería</a>
   </header>
 
-  <p-message severity="info">Cada pendiente nace de un pago Khipu confirmado. Emite la boleta manualmente en el SII y registra aquí el folio y el PDF. Este módulo no emite ni certifica documentos ante el SII.</p-message>
-  @if (error()) { <p-message severity="error">{{ error() }}</p-message> }
-  @if (success()) { <p-message severity="success">{{ success() }}</p-message> }
+  <p-message severity="info"
+    >Cada pendiente nace de un pago Khipu confirmado. Emite la boleta manualmente en el SII y
+    registra aquí el folio y el PDF. Este módulo no emite ni certifica documentos ante el
+    SII.</p-message
+  >
+  @if (error()) {
+    <p-message severity="error">{{ error() }}</p-message>
+  }
+  @if (success()) {
+    <p-message severity="success">{{ success() }}</p-message>
+  }
 
   <div class="flex flex-wrap items-center justify-between gap-3">
-    <p-selectbutton [options]="statusOptions" optionLabel="label" optionValue="value" [ngModel]="status()" (ngModelChange)="changeStatus($event)" ariaLabel="Estado de boletas" />
-    <button pButton type="button" severity="secondary" outlined [disabled]="busy()" (click)="load(false)">Actualizar</button>
+    <p-selectbutton
+      [options]="statusOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="status()"
+      (ngModelChange)="changeStatus($event)"
+      ariaLabel="Estado de boletas"
+    />
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      outlined
+      [disabled]="busy()"
+      (click)="load(false)"
+    >
+      Actualizar
+    </button>
   </div>
 
   <div class="overflow-x-auto">
-    <p-table [value]="items()" [tableStyle]="{ 'min-width': '64rem' }" styleClass="text-sm">
-      <ng-template #header><tr><th>Pago</th><th>Fecha</th><th>Monto</th><th>Gira</th><th>Cuenta</th><th>Estado tributario</th><th><span class="sr-only">Acción</span></th></tr></ng-template>
+    <p-table
+      class="block max-w-full overflow-x-auto"
+      [value]="items()"
+      [tableStyle]="{ 'min-width': '64rem' }"
+      styleClass="text-sm"
+    >
+      <ng-template #header
+        ><tr>
+          <th>Pago</th>
+          <th>Fecha</th>
+          <th>Monto</th>
+          <th>Gira</th>
+          <th>Cuenta</th>
+          <th>Estado tributario</th>
+          <th><span class="sr-only">Acción</span></th>
+        </tr></ng-template
+      >
       <ng-template #body let-item>
         <tr>
           <td class="break-all">{{ item.receiptId }}</td>
-          <td>{{ item.effectiveDate | date:'dd-MM-yyyy':'UTC' }}</td>
-          <td>{{ item.grossAmount | currency:'CLP':'symbol-narrow':'1.0-0' }}</td>
+          <td>{{ item.effectiveDate | date: 'dd-MM-yyyy' : 'UTC' }}</td>
+          <td>{{ item.grossAmount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</td>
           <td class="break-all">{{ item.tripId }}</td>
-          <td><a class="underline" [routerLink]="['/cobranza/cuentas', item.accountId]">Ver cuenta</a></td>
-          <td>{{ item.status === 'PENDING_MANUAL_ISSUE' ? 'Pendiente de emisión' : 'Registrada, sin validación automática SII' }}</td>
+          <td>
+            <a class="underline" [routerLink]="['/cobranza/cuentas', item.accountId]">Ver cuenta</a>
+          </td>
+          <td>
+            {{
+              item.status === 'PENDING_MANUAL_ISSUE'
+                ? 'Pendiente de emisión'
+                : 'Registrada, sin validación automática SII'
+            }}
+          </td>
           <td>
             @if (item.status === 'PENDING_MANUAL_ISSUE') {
-              <button pButton type="button" [disabled]="busy()" (click)="begin(item)">Registrar boleta</button>
+              <button
+                pButton
+                type="button"
+                [loading]="busy()"
+                [disabled]="busy()"
+                (click)="begin(item)"
+              >
+                Registrar boleta
+              </button>
             } @else {
-              <button pButton type="button" severity="secondary" outlined [disabled]="busy()" (click)="download(item)">Descargar PDF</button>
+              <button
+                pButton
+                type="button"
+                severity="secondary"
+                outlined
+                [disabled]="busy()"
+                (click)="download(item)"
+              >
+                Descargar PDF
+              </button>
             }
           </td>
         </tr>
       </ng-template>
-      <ng-template #emptymessage><tr><td colspan="7">No hay boletas en este estado.</td></tr></ng-template>
+      <ng-template #emptymessage
+        ><tr>
+          <td colspan="7">No hay boletas en este estado.</td>
+        </tr></ng-template
+      >
     </p-table>
   </div>
-  @if (nextCursor()) { <button pButton type="button" severity="secondary" outlined class="self-start" [disabled]="busy()" (click)="load(true)">Cargar más</button> }
+  @if (nextCursor()) {
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      outlined
+      class="self-start"
+      [disabled]="busy()"
+      (click)="load(true)"
+    >
+      Cargar más
+    </button>
+  }
 
   @if (selected(); as item) {
     <p-panel header="Registrar boleta emitida manualmente">
       <form [formGroup]="form" (ngSubmit)="save()" class="grid gap-5 lg:grid-cols-2">
-        <p-message class="lg:col-span-2" severity="warn">Monto esperado: {{ item.grossAmount | currency:'CLP':'symbol-narrow':'1.0-0' }}. El sistema no permite cambiarlo; verifica que coincida con la boleta emitida.</p-message>
-        <div class="flex flex-col gap-2"><label for="tax-folio">Folio SII</label><input pInputText id="tax-folio" formControlName="folio" inputmode="numeric" maxlength="18" /></div>
-        <div class="flex flex-col gap-2"><label for="tax-date">Fecha de emisión</label><input pInputText id="tax-date" formControlName="issueDate" type="date" /></div>
-        <div class="flex flex-col gap-2 lg:col-span-2"><label for="tax-reason">Nota de registro</label><textarea pTextarea id="tax-reason" formControlName="reason" rows="3" maxlength="500"></textarea></div>
+        <p-message class="lg:col-span-2" severity="warn"
+          >Monto esperado: {{ item.grossAmount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}. El
+          sistema no permite cambiarlo; verifica que coincida con la boleta emitida.</p-message
+        >
+        <div class="flex flex-col gap-2">
+          <label for="tax-folio">Folio SII</label
+          ><input
+            pInputText
+            id="tax-folio"
+            formControlName="folio"
+            inputmode="numeric"
+            maxlength="18"
+          />
+        </div>
+        <div class="flex min-w-0 flex-col gap-2">
+          <label for="tax-date">Fecha de emisión</label
+          ><app-date-only-picker inputId="tax-date" formControlName="issueDate" />
+        </div>
+        <div class="flex flex-col gap-2 lg:col-span-2">
+          <label for="tax-reason">Nota de registro</label
+          ><textarea
+            pTextarea
+            id="tax-reason"
+            formControlName="reason"
+            rows="3"
+            maxlength="500"
+          ></textarea>
+        </div>
         <div class="flex flex-col gap-2 lg:col-span-2">
           <span>PDF de la boleta emitida</span>
-          <p-fileupload #taxUpload mode="basic" name="taxDocument" accept="application/pdf,.pdf" chooseLabel="Seleccionar PDF" chooseIcon="pi pi-upload" [auto]="true" [customUpload]="true" [maxFileSize]="5242880" [disabled]="busy()" (uploadHandler)="selectPDF($event, taxUpload)" />
-          @if (selectedPDF(); as file) { <small class="text-muted">Archivo seleccionado: {{ file.name }}</small> }
+          <p-fileupload
+            #taxUpload
+            mode="basic"
+            name="taxDocument"
+            accept="application/pdf,.pdf"
+            chooseLabel="Seleccionar PDF"
+            chooseIcon="pi pi-upload"
+            [auto]="true"
+            [customUpload]="true"
+            [maxFileSize]="5242880"
+            [disabled]="busy()"
+            (uploadHandler)="selectPDF($event, taxUpload)"
+          />
+          @if (selectedPDF(); as file) {
+            <small class="text-muted">Archivo seleccionado: {{ file.name }}</small>
+          }
         </div>
-        <div class="flex items-start gap-3 lg:col-span-2"><p-checkbox inputId="tax-reviewed" formControlName="reviewed" [binary]="true" /><label for="tax-reviewed">Verifiqué folio, fecha, monto y que el PDF corresponde al pago indicado.</label></div>
-        <div class="flex flex-wrap gap-3 lg:col-span-2"><button pButton type="submit" [disabled]="busy()">Guardar boleta</button><button pButton type="button" severity="secondary" outlined [disabled]="busy()" (click)="cancel()">Cancelar</button></div>
+        <div class="flex items-start gap-3 lg:col-span-2">
+          <p-checkbox inputId="tax-reviewed" formControlName="reviewed" [binary]="true" /><label
+            for="tax-reviewed"
+            >Verifiqué folio, fecha, monto y que el PDF corresponde al pago indicado.</label
+          >
+        </div>
+        <div class="flex flex-wrap gap-3 lg:col-span-2">
+          <button pButton type="submit" [loading]="busy()" [disabled]="busy()">
+            Guardar boleta</button
+          ><button
+            pButton
+            type="button"
+            severity="secondary"
+            outlined
+            [disabled]="busy()"
+            (click)="cancel()"
+          >
+            Cancelar
+          </button>
+        </div>
       </form>
     </p-panel>
   }

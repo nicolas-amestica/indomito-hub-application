@@ -31,6 +31,7 @@ import type {
 } from '../../interfaces/collection-account.interface';
 import type { AccountAttemptSummary } from '../../interfaces/attempt-reconciliation.interface';
 import { newUlid } from '../../../../shared/fn/new-ulid';
+import { DateOnlyPickerComponent } from '../../../../shared/date-only/date-only-picker.component';
 
 @Component({
   selector: 'app-account-operations',
@@ -39,6 +40,7 @@ import { newUlid } from '../../../../shared/fn/new-ulid';
     CurrencyPipe,
     RouterLink,
     ReactiveFormsModule,
+    DateOnlyPickerComponent,
     ButtonDirective,
     Panel,
     Message,
@@ -110,7 +112,8 @@ export class AccountOperationsPage {
     return a ? a.withdrawalRefundApproved + a.unappliedRefundApproved - a.refunded : 0;
   });
   constructor() {
-    this.route.paramMap.pipe(
+    this.route.paramMap
+      .pipe(
         tap(() => {
           this.account.set(null);
           this.busy.set(true);
@@ -155,7 +158,7 @@ export class AccountOperationsPage {
         (this.needsPercentage() &&
           (!Number.isFinite(v.percentage) || v.percentage < 0 || v.percentage > 100)) ||
         (['DISCOUNT', 'ALLOCATE_UNAPPLIED'].includes(v.operation) && !v.installmentIds.length) ||
-		(v.operation === 'DISCOUNT' && v.percentage <= 0) ||
+        (v.operation === 'DISCOUNT' && v.percentage <= 0) ||
         (this.isBank() &&
           (!/^\d{4}-\d{2}-\d{2}$/.test(v.effectiveDate) || v.reference.trim().length < 5)) ||
         (this.isBank() && v.operation !== 'CONFIRM_REFUND' && !v.email)
@@ -171,14 +174,19 @@ export class AccountOperationsPage {
       };
       if (this.needsAmount()) this.pending.amount = v.amount;
       if (this.needsPercentage()) this.pending.basisPoints = Math.round(v.percentage * 100);
-      if (['DISCOUNT', 'ALLOCATE_UNAPPLIED'].includes(v.operation)) this.pending.installmentIds = [...v.installmentIds];
+      if (['DISCOUNT', 'ALLOCATE_UNAPPLIED'].includes(v.operation))
+        this.pending.installmentIds = [...v.installmentIds];
       if (this.isBank()) {
         this.pending.reference = v.reference.trim();
         this.pending.effectiveDate = v.effectiveDate;
         if (v.operation !== 'CONFIRM_REFUND') this.pending.email = v.email;
       }
       this.form.disable();
-      void this.router.navigate([], { relativeTo: this.route, queryParams: { operacion: this.pending.commandId }, replaceUrl: true });
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { operacion: this.pending.commandId },
+        replaceUrl: true,
+      });
     }
     this.busy.set(true);
     this.api
@@ -193,7 +201,11 @@ export class AccountOperationsPage {
           this.form.enable();
           this.busy.set(false);
           this.success.set(true);
-          void this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
+          void this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: {},
+            replaceUrl: true,
+          });
         },
         error: () => {
           if (this.account()?.id !== account.id) return;
@@ -206,27 +218,50 @@ export class AccountOperationsPage {
   }
   private recover(commandId: string, accountId: string): void {
     this.busy.set(true);
-    this.treasury.recoverOperation(commandId, 'ACCOUNT', accountId).pipe(
-      switchMap(() => this.api.get(accountId)),
-      takeUntilDestroyed(this.destroyRef),
-    ).subscribe({
-      next: (account) => { this.account.set(account); this.busy.set(false); this.success.set(true); void this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true }); },
-      error: () => { this.busy.set(false); this.error.set('No existe un resultado aplicado para la operación pendiente. Revisa la cuenta antes de volver a ingresarla.'); },
-    });
+    this.treasury
+      .recoverOperation(commandId, 'ACCOUNT', accountId)
+      .pipe(
+        switchMap(() => this.api.get(accountId)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (account) => {
+          this.account.set(account);
+          this.busy.set(false);
+          this.success.set(true);
+          void this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: {},
+            replaceUrl: true,
+          });
+        },
+        error: () => {
+          this.busy.set(false);
+          this.error.set(
+            'No existe un resultado aplicado para la operación pendiente. Revisa la cuenta antes de volver a ingresarla.',
+          );
+        },
+      });
   }
   protected loadAttempts(more = false): void {
     const account = this.account();
     if (!account || this.busy()) return;
     this.busy.set(true);
-    this.api.attempts(account.id, more ? this.attemptsCursor() : '').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (page) => {
-        if (this.account()?.id !== account.id) return;
-        this.attempts.update((items) => more ? [...items, ...page.items] : page.items);
-        this.attemptsCursor.set(page.nextCursor ?? '');
-        this.attemptsLoaded.set(true);
-        this.busy.set(false);
-      },
-      error: () => { this.busy.set(false); this.error.set('No se pudo cargar el historial de intentos.'); },
-    });
+    this.api
+      .attempts(account.id, more ? this.attemptsCursor() : '')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (page) => {
+          if (this.account()?.id !== account.id) return;
+          this.attempts.update((items) => (more ? [...items, ...page.items] : page.items));
+          this.attemptsCursor.set(page.nextCursor ?? '');
+          this.attemptsLoaded.set(true);
+          this.busy.set(false);
+        },
+        error: () => {
+          this.busy.set(false);
+          this.error.set('No se pudo cargar el historial de intentos.');
+        },
+      });
   }
 }

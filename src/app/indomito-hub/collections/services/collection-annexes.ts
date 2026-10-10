@@ -35,10 +35,10 @@ export class CollectionAnnexes {
 
   closeRoster(tripId: string, commandId: string, reason: string) {
     return this.http
-      .post<ApiSuccessEnvelope<RosterClosureState>>(
-        `${this.tripUrl(tripId)}/pasajeros/cierre`,
-        { commandId, reason },
-      )
+      .post<ApiSuccessEnvelope<RosterClosureState>>(`${this.tripUrl(tripId)}/pasajeros/cierre`, {
+        commandId,
+        reason,
+      })
       .pipe(map(({ data }) => data));
   }
 
@@ -57,10 +57,9 @@ export class CollectionAnnexes {
   proposals(tripId: string, annexId: string, cursor = '') {
     const params = cursor ? new HttpParams().set('cursor', cursor) : undefined;
     return this.http
-      .get<ApiSuccessEnvelope<AnnexProposalPage>>(
-        `${this.annexUrl(tripId, annexId)}/propuestas`,
-        { params },
-      )
+      .get<ApiSuccessEnvelope<AnnexProposalPage>>(`${this.annexUrl(tripId, annexId)}/propuestas`, {
+        params,
+      })
       .pipe(map(({ data }) => data));
   }
 

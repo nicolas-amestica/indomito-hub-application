@@ -6,7 +6,9 @@ import { ContractsService } from './contracts.service';
 
 describe('ContractsService amendments', () => {
   beforeEach(() =>
-    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] }),
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    }),
   );
 
   it('creates an amendment without financial fields', () => {
@@ -66,7 +68,9 @@ describe('ContractsService amendments', () => {
     );
     expect(http.request.method).toBe('POST');
     expect(http.request.body).toEqual(preparation);
-    http.flush({ data: { clientRequestId: preparation.clientRequestId, uploadUrl: 'https://s3.test' } });
+    http.flush({
+      data: { clientRequestId: preparation.clientRequestId, uploadUrl: 'https://s3.test' },
+    });
 
     service.finalizeSignedDocument('contract/a', preparation.clientRequestId).subscribe();
     http = controller.expectOne(
@@ -76,9 +80,7 @@ describe('ContractsService amendments', () => {
     http.flush({ data: { id: preparation.clientRequestId } });
 
     service.listSignedDocuments('contract/a').subscribe();
-    http = controller.expectOne(
-      `${environment.apiUrl}/contratos/contract%2Fa/documentos-firmados`,
-    );
+    http = controller.expectOne(`${environment.apiUrl}/contratos/contract%2Fa/documentos-firmados`);
     expect(http.request.method).toBe('GET');
     http.flush({ data: { items: [] } });
 

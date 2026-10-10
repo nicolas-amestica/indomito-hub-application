@@ -1,12 +1,90 @@
 <main class="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 sm:px-8" [attr.aria-busy]="busy()">
-  <header class="flex flex-wrap items-start justify-between gap-4"><div><p class="text-sm text-muted">Tesorería · devoluciones</p><h1 class="mt-2 text-3xl font-semibold text-ink">Devoluciones y saldos por pasajero</h1></div><div class="flex flex-wrap gap-3"><button pButton type="button" severity="secondary" outlined [disabled]="busy()" (click)="refresh()">Actualizar</button><a pButton severity="secondary" outlined [routerLink]="['/cobranza/giras', tripId, 'tesoreria']">Volver a tesorería</a></div></header>
-  <p-message severity="warn">La baja no devuelve el abono inicial. Las cuotas pagadas solo se convierten en obligación cuando se aprueba el porcentaje; una aprobación tampoco equivale a dinero devuelto hasta registrar la salida bancaria.</p-message>
-  @if (error()) { <p-message severity="error">{{ error() }}</p-message> }
+  <header class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <p class="text-sm text-muted">Tesorería · devoluciones</p>
+      <h1 class="mt-2 text-3xl font-semibold text-ink">Devoluciones y saldos por pasajero</h1>
+    </div>
+    <div class="flex flex-wrap gap-3">
+      <button
+        pButton
+        type="button"
+        severity="secondary"
+        outlined
+        [disabled]="busy()"
+        (click)="refresh()"
+      >
+        Actualizar</button
+      ><a
+        pButton
+        severity="secondary"
+        outlined
+        [routerLink]="['/cobranza/giras', tripId, 'tesoreria']"
+        >Volver a tesorería</a
+      >
+    </div>
+  </header>
+  <p-message severity="warn"
+    >La baja no devuelve el abono inicial. Las cuotas pagadas solo se convierten en obligación
+    cuando se aprueba el porcentaje; una aprobación tampoco equivale a dinero devuelto hasta
+    registrar la salida bancaria.</p-message
+  >
+  @if (error()) {
+    <p-message severity="error">{{ error() }}</p-message>
+  }
   <p-panel header="Casos que requieren revisión o seguimiento">
-    <div class="overflow-x-auto"><p-table [value]="rows()" [tableStyle]="{ 'min-width': '72rem' }" styleClass="text-sm">
-      <ng-template #header><tr><th>Pasajero</th><th>Estado</th><th>Cuotas pagadas</th><th>Fondos sin aplicar</th><th>Aprobado</th><th>Devuelto</th><th>Pendiente de pago</th><th><span class="sr-only">Acción</span></th></tr></ng-template>
-      <ng-template #body let-item><tr><td><span class="block font-medium">{{ item.name }}</span><span class="text-muted">{{ item.document }}</span></td><td>{{ item.active ? 'Activo con saldo excepcional' : 'Baja' }}</td><td>{{ item.paidInstallments | currency:'CLP':'symbol-narrow':'1.0-0' }}</td><td>{{ item.unappliedReceived | currency:'CLP':'symbol-narrow':'1.0-0' }}</td><td>{{ item.withdrawalRefundApproved + item.unappliedRefundApproved | currency:'CLP':'symbol-narrow':'1.0-0' }}</td><td>{{ item.refunded | currency:'CLP':'symbol-narrow':'1.0-0' }}</td><td>{{ item.refundPayable | currency:'CLP':'symbol-narrow':'1.0-0' }}</td><td><a pButton severity="secondary" outlined [routerLink]="['/cobranza/cuentas', item.accountId]">Gestionar</a></td></tr></ng-template>
-      <ng-template #emptymessage><tr><td colspan="8">No hay bajas, fondos excepcionales ni devoluciones pendientes.</td></tr></ng-template>
-    </p-table></div>
+    <div class="overflow-x-auto">
+      <p-table
+        class="block max-w-full overflow-x-auto"
+        [value]="rows()"
+        [tableStyle]="{ 'min-width': '72rem' }"
+        styleClass="text-sm"
+      >
+        <ng-template #header
+          ><tr>
+            <th>Pasajero</th>
+            <th>Estado</th>
+            <th>Cuotas pagadas</th>
+            <th>Fondos sin aplicar</th>
+            <th>Aprobado</th>
+            <th>Devuelto</th>
+            <th>Pendiente de pago</th>
+            <th><span class="sr-only">Acción</span></th>
+          </tr></ng-template
+        >
+        <ng-template #body let-item
+          ><tr>
+            <td>
+              <span class="block font-medium">{{ item.name }}</span
+              ><span class="text-muted">{{ item.document }}</span>
+            </td>
+            <td>{{ item.active ? 'Activo con saldo excepcional' : 'Baja' }}</td>
+            <td>{{ item.paidInstallments | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</td>
+            <td>{{ item.unappliedReceived | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</td>
+            <td>
+              {{
+                item.withdrawalRefundApproved + item.unappliedRefundApproved
+                  | currency: 'CLP' : 'symbol-narrow' : '1.0-0'
+              }}
+            </td>
+            <td>{{ item.refunded | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</td>
+            <td>{{ item.refundPayable | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</td>
+            <td>
+              <a
+                pButton
+                severity="secondary"
+                outlined
+                [routerLink]="['/cobranza/cuentas', item.accountId]"
+                >Gestionar</a
+              >
+            </td>
+          </tr></ng-template
+        >
+        <ng-template #emptymessage
+          ><tr>
+            <td colspan="8">No hay bajas, fondos excepcionales ni devoluciones pendientes.</td>
+          </tr></ng-template
+        >
+      </p-table>
+    </div>
   </p-panel>
 </main>

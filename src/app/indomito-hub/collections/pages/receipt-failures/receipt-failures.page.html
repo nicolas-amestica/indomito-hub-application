@@ -1,1 +1,95 @@
-<main class="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 sm:px-8" [attr.aria-busy]="busy()"><header class="flex flex-wrap items-start justify-between gap-4"><div><p class="text-sm text-muted">Comprobantes · operación</p><h1 class="mt-2 text-3xl font-semibold text-ink">Entregas fallidas</h1></div><a pButton severity="secondary" outlined routerLink="/cobranza/tesoreria">Volver a tesorería</a></header><p-message severity="warn">Reintentar solo vuelve a generar o enviar el comprobante. No registra otro pago, no cambia saldos y no reemplaza una boleta o factura del SII.</p-message>@if(error()){<p-message severity="error">{{error()}}</p-message>}@if(success()){<p-message severity="success">{{success()}}</p-message>}<form [formGroup]="form" class="grid gap-4 md:grid-cols-[14rem_1fr_auto] md:items-end"><div class="flex flex-col gap-2"><label for="failure-date">Fecha del trabajo</label><input pInputText id="failure-date" formControlName="date" maxlength="10"></div><div class="flex flex-col gap-2"><label for="retry-reason">Motivo y verificación del reintento</label><textarea pTextarea id="retry-reason" formControlName="reason" rows="2" maxlength="500"></textarea></div><button pButton type="button" severity="secondary" outlined [disabled]="busy()" (click)="load(false)">Consultar</button></form><p-table [value]="items()" [tableStyle]="{'min-width':'48rem'}" styleClass="text-sm"><ng-template #header><tr><th>Comprobante</th><th>Entrega</th><th>Motivo seguro</th><th>Intentos</th><th><span class="sr-only">Acción</span></th></tr></ng-template><ng-template #body let-item><tr><td class="break-all">{{item.receiptId}}</td><td class="break-all">{{item.deliveryId||'Original'}}</td><td>{{item.failureCode}}</td><td>{{item.deliveryAttempts}}</td><td><button pButton type="button" [disabled]="busy()" (click)="retry(item)">Reintentar</button></td></tr></ng-template><ng-template #emptymessage><tr><td colspan="5">No hay entregas agotadas en esta página del día.</td></tr></ng-template></p-table>@if(nextCursor()){<button pButton type="button" severity="secondary" outlined class="self-start" [disabled]="busy()" (click)="load(true)">Cargar siguiente página</button>}</main>
+<main class="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 sm:px-8" [attr.aria-busy]="busy()">
+  <header class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <p class="text-sm text-muted">Comprobantes · operación</p>
+      <h1 class="mt-2 text-3xl font-semibold text-ink">Entregas fallidas</h1>
+    </div>
+    <a pButton severity="secondary" outlined routerLink="/cobranza/tesoreria">Volver a tesorería</a>
+  </header>
+  <p-message severity="warn"
+    >Reintentar solo vuelve a generar o enviar el comprobante. No registra otro pago, no cambia
+    saldos y no reemplaza una boleta o factura del SII.</p-message
+  >
+  @if (error()) {
+    <p-message severity="error">{{ error() }}</p-message>
+  }
+  @if (success()) {
+    <p-message severity="success">{{ success() }}</p-message>
+  }
+  <form [formGroup]="form" class="grid gap-4 md:grid-cols-[14rem_1fr_auto] md:items-end">
+    <div class="flex min-w-0 flex-col gap-2">
+      <label for="failure-date">Fecha del trabajo</label
+      ><app-date-only-picker inputId="failure-date" formControlName="date" />
+    </div>
+    <div class="flex flex-col gap-2">
+      <label for="retry-reason">Motivo y verificación del reintento</label
+      ><textarea
+        pTextarea
+        id="retry-reason"
+        formControlName="reason"
+        rows="2"
+        maxlength="500"
+      ></textarea>
+    </div>
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      outlined
+      [disabled]="busy()"
+      (click)="load(false)"
+    >
+      Consultar
+    </button>
+  </form>
+  <p-table
+    class="block max-w-full overflow-x-auto"
+    [value]="items()"
+    [tableStyle]="{ 'min-width': '48rem' }"
+    styleClass="text-sm"
+    ><ng-template #header
+      ><tr>
+        <th>Comprobante</th>
+        <th>Entrega</th>
+        <th>Motivo seguro</th>
+        <th>Intentos</th>
+        <th><span class="sr-only">Acción</span></th>
+      </tr></ng-template
+    ><ng-template #body let-item
+      ><tr>
+        <td class="break-all">{{ item.receiptId }}</td>
+        <td class="break-all">{{ item.deliveryId || 'Original' }}</td>
+        <td>{{ item.failureCode }}</td>
+        <td>{{ item.deliveryAttempts }}</td>
+        <td>
+          <button
+            pButton
+            type="button"
+            [loading]="busy()"
+            [disabled]="busy()"
+            (click)="retry(item)"
+          >
+            Reintentar
+          </button>
+        </td>
+      </tr></ng-template
+    ><ng-template #emptymessage
+      ><tr>
+        <td colspan="5">No hay entregas agotadas en esta página del día.</td>
+      </tr></ng-template
+    ></p-table
+  >
+  @if (nextCursor()) {
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      outlined
+      class="self-start"
+      [disabled]="busy()"
+      (click)="load(true)"
+    >
+      Cargar siguiente página
+    </button>
+  }
+</main>

@@ -1,11 +1,138 @@
 <main class="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8 sm:px-8" [attr.aria-busy]="busy()">
-  <header class="flex flex-wrap items-start justify-between gap-4"><div><p class="text-sm text-muted">Cobranza · administración</p><h1 class="mt-2 text-3xl font-semibold text-ink">Descuento extraordinario grupal</h1></div><a pButton severity="secondary" outlined routerLink="/contratos">Volver a contratos</a></header>
-  <p-message severity="warn">El descuento reduce deuda; no registra un pago ni una salida bancaria. Los beneficiarios se congelan en el borrador y las altas posteriores no se incorporan. Si alguna cuenta tiene un cobro abierto o cambia antes de aprobar, se rechaza todo sin aplicación parcial.</p-message>
-  @if(error()){<p-message severity="error">{{error()}}</p-message>}
-  @if(state();as s){<p-panel header="Impacto congelado"><dl class="grid gap-4 sm:grid-cols-2"><div><dt>Estado</dt><dd>{{s.status}}</dd></div><div><dt>Beneficiarios</dt><dd>{{s.expected}}</dd></div><div><dt>Porcentaje</dt><dd>{{s.basisPoints/100}} %</dd></div><div><dt>Descuento total al aprobar</dt><dd>{{s.amount|currency:'CLP':'symbol-narrow':'1.0-0'}}</dd></div></dl></p-panel>
-    @if(s.status==='DRAFT'){<p-panel header="Aprobación irreversible"><form [formGroup]="approvalForm" (ngSubmit)="approve()" class="flex flex-col gap-4"><label for="approval-reason">Fundamento de aprobación</label><textarea pTextarea id="approval-reason" formControlName="reason" rows="3" maxlength="500"></textarea><div class="flex items-start gap-3"><p-checkbox inputId="approval-reviewed" formControlName="reviewed" [binary]="true"/><label for="approval-reviewed">Revisé beneficiarios, porcentaje e impacto total. Entiendo que la aprobación modifica todas las cuentas y queda auditada.</label></div><button pButton type="submit" [disabled]="busy()">Aprobar y aplicar descuento</button></form></p-panel>}
-    @if(s.status==='VALIDATING'||s.status==='APPLYING'){<button pButton type="button" (click)="recover()" [disabled]="busy()">Continuar operación</button>}
-    @if(s.status==='APPLIED'){<p-message severity="success">El descuento se publicó completamente en {{s.applied}} cuentas.</p-message>}
-    @if(s.status==='REJECTED'){<p-message severity="error">El borrador fue rechazado sin aplicación parcial porque la nómina, una cuenta o un intento de pago cambió.</p-message>}
-  }@else{<p-panel header="Crear borrador"><form [formGroup]="draftForm" (ngSubmit)="create()" class="flex flex-col gap-5"><div class="flex items-start gap-3"><p-checkbox inputId="all-payers" formControlName="all" [binary]="true"/><label for="all-payers">Aplicar a todos los pagantes activos con cuotas pendientes</label></div>@if(!draftForm.controls.all.value){<div class="flex flex-col gap-2"><label for="beneficiaries">Beneficiarios</label><p-multiselect inputId="beneficiaries" formControlName="accountIds" [options]="payerOptions()" optionLabel="label" optionValue="accountId" display="chip"/></div>}<div class="flex flex-col gap-2"><label for="percentage">Porcentaje de descuento</label><p-inputnumber inputId="percentage" formControlName="percentage" [min]="0.01" [max]="100" [minFractionDigits]="0" [maxFractionDigits]="2" suffix=" %"/></div><div class="flex flex-col gap-2"><label for="reason">Motivo extraordinario</label><textarea pTextarea id="reason" formControlName="reason" rows="3" maxlength="500"></textarea></div><div class="flex items-start gap-3"><p-checkbox inputId="draft-reviewed" formControlName="reviewed" [binary]="true"/><label for="draft-reviewed">Revisé la nómina y el porcentaje. Crear el borrador no modifica deudas; requiere una aprobación posterior.</label></div><button pButton type="submit" [disabled]="busy()">Crear borrador e impacto</button></form></p-panel>}
+  <header class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <p class="text-sm text-muted">Cobranza · administración</p>
+      <h1 class="mt-2 text-3xl font-semibold text-ink">Descuento extraordinario grupal</h1>
+    </div>
+    <a pButton severity="secondary" outlined routerLink="/contratos">Volver a contratos</a>
+  </header>
+  <p-message severity="warn"
+    >El descuento reduce deuda; no registra un pago ni una salida bancaria. Los beneficiarios se
+    congelan en el borrador y las altas posteriores no se incorporan. Si alguna cuenta tiene un
+    cobro abierto o cambia antes de aprobar, se rechaza todo sin aplicación parcial.</p-message
+  >
+  @if (error()) {
+    <p-message severity="error">{{ error() }}</p-message>
+  }
+  @if (state(); as s) {
+    <p-panel header="Impacto congelado"
+      ><dl class="grid gap-4 sm:grid-cols-2">
+        <div>
+          <dt>Estado</dt>
+          <dd>{{ s.status }}</dd>
+        </div>
+        <div>
+          <dt>Beneficiarios</dt>
+          <dd>{{ s.expected }}</dd>
+        </div>
+        <div>
+          <dt>Porcentaje</dt>
+          <dd>{{ s.basisPoints / 100 }} %</dd>
+        </div>
+        <div>
+          <dt>Descuento total al aprobar</dt>
+          <dd>{{ s.amount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</dd>
+        </div>
+      </dl></p-panel
+    >
+    @if (s.status === 'DRAFT') {
+      <p-panel header="Aprobación irreversible"
+        ><form [formGroup]="approvalForm" (ngSubmit)="approve()" class="flex flex-col gap-4">
+          <label for="approval-reason">Fundamento de aprobación</label
+          ><textarea
+            pTextarea
+            id="approval-reason"
+            formControlName="reason"
+            rows="3"
+            maxlength="500"
+          ></textarea>
+          <div class="flex items-start gap-3">
+            <p-checkbox
+              inputId="approval-reviewed"
+              formControlName="reviewed"
+              [binary]="true"
+            /><label for="approval-reviewed"
+              >Revisé beneficiarios, porcentaje e impacto total. Entiendo que la aprobación modifica
+              todas las cuentas y queda auditada.</label
+            >
+          </div>
+          <button pButton type="submit" [loading]="busy()" [disabled]="busy()">
+            Aprobar y aplicar descuento
+          </button>
+        </form></p-panel
+      >
+    }
+    @if (s.status === 'VALIDATING' || s.status === 'APPLYING') {
+      <button pButton type="button" (click)="recover()" [loading]="busy()" [disabled]="busy()">
+        Continuar operación
+      </button>
+    }
+    @if (s.status === 'APPLIED') {
+      <p-message severity="success"
+        >El descuento se publicó completamente en {{ s.applied }} cuentas.</p-message
+      >
+    }
+    @if (s.status === 'REJECTED') {
+      <p-message severity="error"
+        >El borrador fue rechazado sin aplicación parcial porque la nómina, una cuenta o un intento
+        de pago cambió.</p-message
+      >
+    }
+  } @else {
+    <p-panel header="Crear borrador"
+      ><form [formGroup]="draftForm" (ngSubmit)="create()" class="flex flex-col gap-5">
+        <div class="flex items-start gap-3">
+          <p-checkbox inputId="all-payers" formControlName="all" [binary]="true" /><label
+            for="all-payers"
+            >Aplicar a todos los pagantes activos con cuotas pendientes</label
+          >
+        </div>
+        @if (!draftForm.controls.all.value) {
+          <div class="flex flex-col gap-2">
+            <label for="beneficiaries">Beneficiarios</label
+            ><p-multiselect
+              inputId="beneficiaries"
+              formControlName="accountIds"
+              [options]="payerOptions()"
+              optionLabel="label"
+              optionValue="accountId"
+              display="chip"
+            />
+          </div>
+        }
+        <div class="flex flex-col gap-2">
+          <label for="percentage">Porcentaje de descuento</label
+          ><p-inputnumber
+            inputId="percentage"
+            formControlName="percentage"
+            [min]="0.01"
+            [max]="100"
+            [minFractionDigits]="0"
+            [maxFractionDigits]="2"
+            suffix=" %"
+          />
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="reason">Motivo extraordinario</label
+          ><textarea
+            pTextarea
+            id="reason"
+            formControlName="reason"
+            rows="3"
+            maxlength="500"
+          ></textarea>
+        </div>
+        <div class="flex items-start gap-3">
+          <p-checkbox inputId="draft-reviewed" formControlName="reviewed" [binary]="true" /><label
+            for="draft-reviewed"
+            >Revisé la nómina y el porcentaje. Crear el borrador no modifica deudas; requiere una
+            aprobación posterior.</label
+          >
+        </div>
+        <button pButton type="submit" [loading]="busy()" [disabled]="busy()">
+          Crear borrador e impacto
+        </button>
+      </form></p-panel
+    >
+  }
 </main>

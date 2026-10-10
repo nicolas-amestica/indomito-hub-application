@@ -36,16 +36,16 @@
         </button>
       </article>
       @if (!tripId()) {
-      <button
-        pButton
-        type="button"
-        severity="secondary"
-        outlined
-        (click)="selectResend(receipt.id)"
-        [disabled]="delivery().busy || !!delivery().request"
-      >
-        Reenviar este comprobante
-      </button>
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          outlined
+          (click)="selectResend(receipt.id)"
+          [disabled]="delivery().busy || !!delivery().request"
+        >
+          Reenviar este comprobante
+        </button>
       }
     }
     @if (delivery().receiptId) {

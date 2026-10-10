@@ -45,7 +45,13 @@
           >Existe un cobro abierto. No registres un pago manual de cuota ni un descuento hasta
           conciliarlo.</p-message
         >
-        <a pButton severity="warn" outlined [routerLink]="['/cobranza/intentos', a.openAttemptId, 'conciliacion']">Conciliar intento en Khipu</a>
+        <a
+          pButton
+          severity="warn"
+          outlined
+          [routerLink]="['/cobranza/intentos', a.openAttemptId, 'conciliacion']"
+          >Conciliar intento en Khipu</a
+        >
       }
       @if (a.reviewAttemptId || a.unappliedReceived > (a.reviewedUnapplied ?? 0)) {
         <p-message severity="warn"
@@ -68,15 +74,50 @@
     <app-payment-receipts [accountId]="a.id" />
     <p-panel header="Intentos de pago Khipu">
       <div class="flex flex-col gap-3">
-        <button pButton type="button" severity="secondary" outlined (click)="loadAttempts()" [disabled]="busy()">Consultar historial</button>
-        @if (attemptsLoaded() && !attempts().length) { <p>No hay intentos proyectados para esta cuenta.</p> }
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          outlined
+          (click)="loadAttempts()"
+          [disabled]="busy()"
+        >
+          Consultar historial
+        </button>
+        @if (attemptsLoaded() && !attempts().length) {
+          <p>No hay intentos proyectados para esta cuenta.</p>
+        }
         @for (attempt of attempts(); track attempt.id) {
-          <article class="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
-            <div><p class="font-semibold">{{ attempt.amount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }} · {{ attempt.status }}</p><p class="break-all text-sm text-muted">{{ attempt.id }}</p></div>
-            <a pButton severity="secondary" outlined [routerLink]="['/cobranza/intentos', attempt.id, 'conciliacion']">Consultar Khipu</a>
+          <article
+            class="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3"
+          >
+            <div>
+              <p class="font-semibold">
+                {{ attempt.amount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }} ·
+                {{ attempt.status }}
+              </p>
+              <p class="break-all text-sm text-muted">{{ attempt.id }}</p>
+            </div>
+            <a
+              pButton
+              severity="secondary"
+              outlined
+              [routerLink]="['/cobranza/intentos', attempt.id, 'conciliacion']"
+              >Consultar Khipu</a
+            >
           </article>
         }
-        @if (attemptsCursor()) { <button pButton type="button" (click)="loadAttempts(true)" [disabled]="busy()">Ver más</button> }
+        @if (attemptsCursor()) {
+          <button
+            pButton
+            type="button"
+            (click)="loadAttempts(true)"
+            [loading]="busy()"
+            [disabled]="busy()"
+          >
+            Ver más
+          </button>
+        }
       </div>
     </p-panel>
     <p-panel header="Registrar operación">
@@ -108,7 +149,11 @@
           >
         }
         @if (operation() === 'ALLOCATE_UNAPPLIED') {
-          <p-message severity="warn">Solo mueve fondos que ya ingresaron y quedaron en revisión. Cada cuota seleccionada se cubrirá completa; no se registrará otro ingreso ni se aceptará una aplicación parcial.</p-message>
+          <p-message severity="warn"
+            >Solo mueve fondos que ya ingresaron y quedaron en revisión. Cada cuota seleccionada se
+            cubrirá completa; no se registrará otro ingreso ni se aceptará una aplicación
+            parcial.</p-message
+          >
         }
         @if (needsAmount()) {
           <div class="flex flex-col gap-2">
@@ -137,7 +182,11 @@
         }
         @if (operation() === 'DISCOUNT' || operation() === 'ALLOCATE_UNAPPLIED') {
           <div class="flex flex-col gap-2">
-            <label for="quotas">{{ operation() === 'DISCOUNT' ? 'Cuotas beneficiadas' : 'Cuotas completas a cubrir' }} (obligatorio)</label
+            <label for="quotas"
+              >{{
+                operation() === 'DISCOUNT' ? 'Cuotas beneficiadas' : 'Cuotas completas a cubrir'
+              }}
+              (obligatorio)</label
             ><p-multiselect
               inputId="quotas"
               formControlName="installmentIds"
@@ -158,15 +207,9 @@
               <label for="reference">Referencia bancaria única (obligatoria)</label
               ><input pInputText id="reference" formControlName="reference" maxlength="150" />
             </div>
-            <div class="flex flex-col gap-2">
-              <label for="effective-date">Fecha efectiva (AAAA-MM-DD)</label
-              ><input
-                pInputText
-                id="effective-date"
-                formControlName="effectiveDate"
-                placeholder="2026-10-01"
-                maxlength="10"
-              />
+            <div class="flex min-w-0 flex-col gap-2">
+              <label for="effective-date">Fecha efectiva</label
+              ><app-date-only-picker inputId="effective-date" formControlName="effectiveDate" />
             </div>
           </div>
           @if (operation() !== 'CONFIRM_REFUND') {
@@ -202,7 +245,7 @@
             el registro financiero, no realiza transferencias y no se elimina del historial.</label
           >
         </div>
-        <button pButton type="submit" [disabled]="busy()">
+        <button pButton type="submit" [loading]="busy()" [disabled]="busy()">
           {{ busy() ? 'Registrando…' : 'Confirmar operación' }}
         </button>
       </form>

@@ -44,8 +44,15 @@ describe('AuthService', () => {
     const session = authSession(jwtExpiringIn(3_600));
     session.permissions.unshift({
       module: {
-        code: 'PRG', title: 'Programas', category: 'Programas', path: '/programas',
-        icon: 'icon-[tabler--route]', order: 0, active: true, endpoints: [], level: 'LV1',
+        code: 'PRG',
+        title: 'Programas',
+        category: 'Programas',
+        path: '/programas',
+        icon: 'icon-[tabler--route]',
+        order: 0,
+        active: true,
+        endpoints: [],
+        level: 'LV1',
       },
       allowances: ['r'],
     });
@@ -83,8 +90,15 @@ describe('AuthService', () => {
     const session = authSession(jwtExpiringIn(3_600));
     session.permissions.unshift({
       module: {
-        code: 'PRG', title: 'Programas', category: 'Programas', path: '/programas',
-        icon: 'icon-[tabler--route]', order: 1, active: true, endpoints: [], level: 'LV1',
+        code: 'PRG',
+        title: 'Programas',
+        category: 'Programas',
+        path: '/programas',
+        icon: 'icon-[tabler--route]',
+        order: 1,
+        active: true,
+        endpoints: [],
+        level: 'LV1',
       },
       allowances: [],
     });

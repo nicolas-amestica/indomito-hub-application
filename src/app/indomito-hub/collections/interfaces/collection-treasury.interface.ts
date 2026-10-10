@@ -128,7 +128,10 @@ export interface RefundRow {
   version: number;
 }
 
-export interface RefundPage { items: RefundRow[]; nextCursor?: string }
+export interface RefundPage {
+  items: RefundRow[];
+  nextCursor?: string;
+}
 
 export interface CollectionAlertView {
   asOf: string;
@@ -138,7 +141,13 @@ export interface CollectionAlertView {
   overdue: number;
   outstanding: number;
   dueByCutoff: number;
-  accounts: Array<{ accountId: string; name: string; overdue: number; outstanding: number; nextDueDate?: string }>;
+  accounts: Array<{
+    accountId: string;
+    name: string;
+    overdue: number;
+    outstanding: number;
+    nextDueDate?: string;
+  }>;
 }
 
 export interface GlobalCollectionAlertView {
@@ -146,7 +155,9 @@ export interface GlobalCollectionAlertView {
   asOf: string;
   overdue: number;
   outstanding: number;
-  groups: Array<CollectionAlertView & { tripId: string; institutionName: string; destination: string }>;
+  groups: Array<
+    CollectionAlertView & { tripId: string; institutionName: string; destination: string }
+  >;
 }
 
 export interface OperationRecovery {

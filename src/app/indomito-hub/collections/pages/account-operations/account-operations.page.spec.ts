@@ -40,7 +40,10 @@ describe('AccountOperationsPage', () => {
         { provide: CollectionTreasury, useValue: treasury },
         {
           provide: ActivatedRoute,
-          useValue: { paramMap: of(convertToParamMap({ id: 'account' })), snapshot: { queryParamMap: convertToParamMap({}) } },
+          useValue: {
+            paramMap: of(convertToParamMap({ id: 'account' })),
+            snapshot: { queryParamMap: convertToParamMap({}) },
+          },
         },
       ],
     });
@@ -69,7 +72,7 @@ describe('AccountOperationsPage', () => {
     const root = fixture.nativeElement as HTMLElement;
     input(root, '#reason', 'Transferencia verificada en cartola');
     input(root, '#reference', 'account-001:movement-001');
-    input(root, '#effective-date', '2026-09-30');
+    fixture.componentInstance['form'].controls.effectiveDate.setValue('2026-09-30');
     input(root, '#receipt-email', 'payer@example.com');
     (root.querySelector('#reviewed') as HTMLInputElement).click();
     await fixture.whenStable();
@@ -98,5 +101,43 @@ describe('AccountOperationsPage', () => {
     expect(root.textContent).toContain('Operación registrada');
     expect(root.textContent).toContain('versión 2');
   });
-  it('envía asignación de fondos en revisión sin monto ni referencia bancaria',async()=>{api.get.mockReturnValue(of({...account,unappliedReceived:20000,reviewAttemptId:'attempt'}));api.apply.mockReturnValue(of({...account,version:2,unappliedReceived:0,installments:[{...account.installments[0],paid:20000}]}));const fixture=TestBed.createComponent(AccountOperationsPage);await fixture.whenStable();const component=fixture.componentInstance as unknown as{form:{setValue(v:unknown):void}};component.form.setValue({operation:'ALLOCATE_UNAPPLIED',reason:'Fondos y cuota completa revisados',amount:0,percentage:0,installmentIds:['0001'],reference:'',effectiveDate:'',email:'',reviewed:true});fixture.detectChanges();submit(fixture.nativeElement);await fixture.whenStable();expect(api.apply).toHaveBeenCalledTimes(1);expect(api.apply.mock.calls[0][1]).toMatchObject({operation:'ALLOCATE_UNAPPLIED',installmentIds:['0001']});expect(api.apply.mock.calls[0][1].amount).toBeUndefined();expect(api.apply.mock.calls[0][1].reference).toBeUndefined()});
+  it('envía asignación de fondos en revisión sin monto ni referencia bancaria', async () => {
+    api.get.mockReturnValue(
+      of({ ...account, unappliedReceived: 20000, reviewAttemptId: 'attempt' }),
+    );
+    api.apply.mockReturnValue(
+      of({
+        ...account,
+        version: 2,
+        unappliedReceived: 0,
+        installments: [{ ...account.installments[0], paid: 20000 }],
+      }),
+    );
+    const fixture = TestBed.createComponent(AccountOperationsPage);
+    await fixture.whenStable();
+    const component = fixture.componentInstance as unknown as {
+      form: { setValue(v: unknown): void };
+    };
+    component.form.setValue({
+      operation: 'ALLOCATE_UNAPPLIED',
+      reason: 'Fondos y cuota completa revisados',
+      amount: 0,
+      percentage: 0,
+      installmentIds: ['0001'],
+      reference: '',
+      effectiveDate: '',
+      email: '',
+      reviewed: true,
+    });
+    fixture.detectChanges();
+    submit(fixture.nativeElement);
+    await fixture.whenStable();
+    expect(api.apply).toHaveBeenCalledTimes(1);
+    expect(api.apply.mock.calls[0][1]).toMatchObject({
+      operation: 'ALLOCATE_UNAPPLIED',
+      installmentIds: ['0001'],
+    });
+    expect(api.apply.mock.calls[0][1].amount).toBeUndefined();
+    expect(api.apply.mock.calls[0][1].reference).toBeUndefined();
+  });
 });

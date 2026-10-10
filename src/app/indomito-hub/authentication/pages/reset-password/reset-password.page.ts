@@ -22,7 +22,10 @@ export class ResetPasswordPage {
   readonly error = signal('');
   readonly form = new FormGroup(
     {
-      password: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(12), Validators.maxLength(128)] }),
+      password: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.minLength(12), Validators.maxLength(128)],
+      }),
       confirmation: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     },
     { validators: passwordsMatchValidator },

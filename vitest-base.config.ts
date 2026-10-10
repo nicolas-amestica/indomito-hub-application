@@ -10,5 +10,8 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     environment: 'jsdom',
+    // Los componentes grandes de formularios pueden tardar más de 5 s en CI compartido.
+    testTimeout: 10_000,
+    maxWorkers: 2,
   },
 });

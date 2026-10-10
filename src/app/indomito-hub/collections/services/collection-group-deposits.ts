@@ -3,10 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { map } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import type { ApiSuccessEnvelope } from '../../../core/http/api-response.interface';
-import type {
-  GroupDepositRequest,
-  GroupDepositState,
-} from '../interfaces/group-deposit.interface';
+import type { GroupDepositRequest, GroupDepositState } from '../interfaces/group-deposit.interface';
 
 @Injectable({ providedIn: 'root' })
 export class CollectionGroupDeposits {

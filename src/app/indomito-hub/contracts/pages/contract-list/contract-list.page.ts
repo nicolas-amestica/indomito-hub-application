@@ -7,7 +7,11 @@ import { Select } from 'primeng/select';
 import { ButtonDirective } from 'primeng/button';
 import { Table } from 'primeng/table';
 import { finalize } from 'rxjs';
-import type { ContractSignatureStatus, ContractStatus, ContractSummary } from '../../interfaces/contract.interface';
+import type {
+  ContractSignatureStatus,
+  ContractStatus,
+  ContractSummary,
+} from '../../interfaces/contract.interface';
 import { ContractsService } from '../../services/contracts.service';
 import { DocumentPreviewService } from '../../../../shared/documents/services/document-preview.service';
 

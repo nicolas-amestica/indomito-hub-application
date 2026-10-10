@@ -1,1 +1,88 @@
-<main class="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 sm:px-8" [attr.aria-busy]="busy()"><header class="flex flex-wrap items-start justify-between gap-4"><div><p class="text-sm text-muted">Cobranza · alertas</p><h1 class="mt-2 text-3xl font-semibold text-ink">Morosidad y corte previo al viaje</h1></div><a pButton severity="secondary" outlined [routerLink]="['/cobranza/giras',tripId,'tesoreria']">Volver a tesorería</a></header>@if(error()){<p-message severity="error">{{error()}}</p-message>}<p-panel header="Fecha de evaluación"><div class="flex flex-wrap items-end gap-3"><div class="flex flex-col gap-2"><label for="alerts-date">Evaluar al</label><input pInputText id="alerts-date" [formControl]="asOf" maxlength="10" /></div><button pButton type="button" [disabled]="busy()" (click)="load()">Actualizar</button></div></p-panel>@if(view();as result){@if(result.travelDateDefined){<p-message severity="info">Salida: {{result.departureDate|date:'dd-MM-yyyy':'UTC'}}. Fecha contractual límite: {{result.cutoffDate|date:'dd-MM-yyyy':'UTC'}}.</p-message>}@else{<p-message severity="warn">La fecha del viaje sigue por definir. Se muestran cuotas vencidas, pero no se inventa una fecha de corte previa al viaje.</p-message>}<p-panel header="Resumen"><dl class="grid gap-4 sm:grid-cols-3"><div><dt>Vencido</dt><dd>{{result.overdue|currency:'CLP':'symbol-narrow':'1.0-0'}}</dd></div><div><dt>Saldo total pendiente</dt><dd>{{result.outstanding|currency:'CLP':'symbol-narrow':'1.0-0'}}</dd></div><div><dt>Pendiente con vencimiento hasta el corte</dt><dd>{{result.dueByCutoff|currency:'CLP':'symbol-narrow':'1.0-0'}}</dd></div></dl></p-panel><p-panel header="Cuentas morosas"><p-table [value]="result.accounts" [tableStyle]="{'min-width':'44rem'}"><ng-template #header><tr><th>Pasajero</th><th>Próximo vencimiento pendiente</th><th>Vencido</th><th>Saldo</th><th></th></tr></ng-template><ng-template #body let-item><tr><td>{{item.name}}</td><td>{{item.nextDueDate|date:'dd-MM-yyyy':'UTC'}}</td><td>{{item.overdue|currency:'CLP':'symbol-narrow':'1.0-0'}}</td><td>{{item.outstanding|currency:'CLP':'symbol-narrow':'1.0-0'}}</td><td><a pButton severity="secondary" outlined [routerLink]="['/cobranza/cuentas',item.accountId]">Ver cuenta</a></td></tr></ng-template><ng-template #emptymessage><tr><td colspan="5">No hay cuotas vencidas a la fecha evaluada.</td></tr></ng-template></p-table></p-panel>}</main>
+<main class="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 sm:px-8" [attr.aria-busy]="busy()">
+  <header class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <p class="text-sm text-muted">Cobranza · alertas</p>
+      <h1 class="mt-2 text-3xl font-semibold text-ink">Morosidad y corte previo al viaje</h1>
+    </div>
+    <a pButton severity="secondary" outlined [routerLink]="['/cobranza/giras', tripId, 'tesoreria']"
+      >Volver a tesorería</a
+    >
+  </header>
+  @if (error()) {
+    <p-message severity="error">{{ error() }}</p-message>
+  }
+  <p-panel header="Fecha de evaluación"
+    ><div class="flex flex-wrap items-end gap-3">
+      <div class="flex min-w-0 flex-col gap-2">
+        <label for="alerts-date">Evaluar al</label
+        ><app-date-only-picker inputId="alerts-date" [formControl]="asOf" />
+      </div>
+      <button pButton type="button" [loading]="busy()" [disabled]="busy()" (click)="load()">
+        Actualizar
+      </button>
+    </div></p-panel
+  >
+  @if (view(); as result) {
+    @if (result.travelDateDefined) {
+      <p-message severity="info"
+        >Salida: {{ result.departureDate | date: 'dd-MM-yyyy' : 'UTC' }}. Fecha contractual límite:
+        {{ result.cutoffDate | date: 'dd-MM-yyyy' : 'UTC' }}.</p-message
+      >
+    } @else {
+      <p-message severity="warn"
+        >La fecha del viaje sigue por definir. Se muestran cuotas vencidas, pero no se inventa una
+        fecha de corte previa al viaje.</p-message
+      >
+    }
+    <p-panel header="Resumen"
+      ><dl class="grid gap-4 sm:grid-cols-3">
+        <div>
+          <dt>Vencido</dt>
+          <dd>{{ result.overdue | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</dd>
+        </div>
+        <div>
+          <dt>Saldo total pendiente</dt>
+          <dd>{{ result.outstanding | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</dd>
+        </div>
+        <div>
+          <dt>Pendiente con vencimiento hasta el corte</dt>
+          <dd>{{ result.dueByCutoff | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</dd>
+        </div>
+      </dl></p-panel
+    ><p-panel header="Cuentas morosas"
+      ><p-table
+        class="block max-w-full overflow-x-auto"
+        [value]="result.accounts"
+        [tableStyle]="{ 'min-width': '44rem' }"
+        ><ng-template #header
+          ><tr>
+            <th>Pasajero</th>
+            <th>Próximo vencimiento pendiente</th>
+            <th>Vencido</th>
+            <th>Saldo</th>
+            <th></th></tr></ng-template
+        ><ng-template #body let-item
+          ><tr>
+            <td>{{ item.name }}</td>
+            <td>{{ item.nextDueDate | date: 'dd-MM-yyyy' : 'UTC' }}</td>
+            <td>{{ item.overdue | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</td>
+            <td>{{ item.outstanding | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</td>
+            <td>
+              <a
+                pButton
+                severity="secondary"
+                outlined
+                [routerLink]="['/cobranza/cuentas', item.accountId]"
+                >Ver cuenta</a
+              >
+            </td>
+          </tr></ng-template
+        ><ng-template #emptymessage
+          ><tr>
+            <td colspan="5">No hay cuotas vencidas a la fecha evaluada.</td>
+          </tr></ng-template
+        ></p-table
+      ></p-panel
+    >
+  }
+</main>

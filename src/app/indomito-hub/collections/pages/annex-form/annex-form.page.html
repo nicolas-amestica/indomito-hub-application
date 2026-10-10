@@ -1,25 +1,58 @@
 <main class="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-8" [attr.aria-busy]="loading() || busy()">
   <header class="flex flex-wrap items-start justify-between gap-4">
-    <div><p class="text-xs font-bold uppercase tracking-widest text-brand-active">Cobranza</p><h1 class="mt-2 text-3xl font-semibold text-ink">Anexo de nómina</h1><p class="mt-2 max-w-3xl text-sm text-muted">Registra bajas y altas sin modificar el contrato original ni trasladar pagos entre personas.</p></div>
-    <a pButton severity="secondary" outlined [routerLink]="['/contratos', tripId(), 'editar']">Volver al contrato</a>
+    <div>
+      <p class="text-xs font-bold uppercase tracking-widest text-brand-active">Cobranza</p>
+      <h1 class="mt-2 text-3xl font-semibold text-ink">Anexo de nómina</h1>
+      <p class="mt-2 max-w-3xl text-sm text-muted">
+        Registra bajas y altas sin modificar el contrato original ni trasladar pagos entre personas.
+      </p>
+    </div>
+    <a pButton severity="secondary" outlined [routerLink]="['/contratos', tripId(), 'editar']"
+      >Volver al contrato</a
+    >
   </header>
-  @if (error()) { <p-message severity="error" aria-live="assertive">{{ error() }}</p-message> }
-  @if (loading()) { <p role="status">Cargando la nómina vigente…</p> }
+  @if (error()) {
+    <p-message severity="error" aria-live="assertive">{{ error() }}</p-message>
+  }
+  @if (loading()) {
+    <p role="status">Cargando la nómina vigente…</p>
+  }
   @if (migrationRequired()) {
     <section class="app-panel space-y-4 p-5 sm:p-6" aria-labelledby="migration-title">
       <h2 id="migration-title" class="text-xl font-semibold">Preparar nómina histórica</h2>
-      <p class="text-sm text-muted">Esta gira fue creada antes de la proyección administrativa de pasajeros. La preparación copiará nombres y documentos desde el contrato aprobado, sin cambiar cuentas, pagos ni saldos.</p>
-      <button pButton type="button" [loading]="busy()" (click)="migrateRoster()">Preparar nómina para anexos</button>
+      <p class="text-sm text-muted">
+        Esta gira fue creada antes de la proyección administrativa de pasajeros. La preparación
+        copiará nombres y documentos desde el contrato aprobado, sin cambiar cuentas, pagos ni
+        saldos.
+      </p>
+      <button pButton type="button" [loading]="busy()" (click)="migrateRoster()">
+        Preparar nómina para anexos
+      </button>
     </section>
   }
-  @if (state(); as annex) { <p-message [severity]="annex.status === 'APPLIED' ? 'success' : annex.status === 'REJECTED' ? 'error' : 'info'">Estado del anexo: {{ annex.status }} · {{ annex.prepared }} de {{ annex.expected }} propuestas preparadas.</p-message> }
+  @if (state(); as annex) {
+    <p-message
+      [severity]="
+        annex.status === 'APPLIED' ? 'success' : annex.status === 'REJECTED' ? 'error' : 'info'
+      "
+      >Estado del anexo: {{ annex.status }} · {{ annex.prepared }} de
+      {{ annex.expected }} propuestas preparadas.</p-message
+    >
+  }
 
   @if (rosterClosed()) {
     <section class="app-panel space-y-3 p-5 sm:p-6" aria-labelledby="roster-closed-title">
       <h2 id="roster-closed-title" class="text-xl font-semibold">Nómina cerrada</h2>
-      <p class="text-sm text-muted">No se pueden crear ni aplicar nuevos anexos. La cobranza, los comprobantes y las devoluciones continúan disponibles.</p>
-      @if (rosterCloseReason()) { <p><span class="font-medium">Motivo:</span> {{ rosterCloseReason() }}</p> }
-      @if (rosterClosedAt()) { <p class="text-sm text-muted">Cierre registrado: {{ rosterClosedAt() }}</p> }
+      <p class="text-sm text-muted">
+        No se pueden crear ni aplicar nuevos anexos. La cobranza, los comprobantes y las
+        devoluciones continúan disponibles.
+      </p>
+      @if (rosterCloseReason()) {
+        <p><span class="font-medium">Motivo:</span> {{ rosterCloseReason() }}</p>
+      }
+      @if (rosterClosedAt()) {
+        <p class="text-sm text-muted">Cierre registrado: {{ rosterClosedAt() }}</p>
+      }
     </section>
   }
 
@@ -28,60 +61,323 @@
       <section class="app-panel space-y-4 p-5 sm:p-6" aria-labelledby="reason-title">
         <h2 id="reason-title" class="text-xl font-semibold">Motivo y alcance</h2>
         <label for="annex-reason" class="block text-sm font-medium">Motivo del anexo</label>
-        <textarea id="annex-reason" pTextarea formControlName="reason" rows="3" class="w-full" maxlength="500"></textarea>
-        <p-message severity="warn">Una baja no reduce las cuotas de los demás pasajeros. Los pagos, descuentos y devoluciones permanecen en la cuenta original.</p-message>
+        <textarea
+          id="annex-reason"
+          pTextarea
+          formControlName="reason"
+          rows="3"
+          class="w-full"
+          maxlength="500"
+        ></textarea>
+        <p-message severity="warn"
+          >Una baja no reduce las cuotas de los demás pasajeros. Los pagos, descuentos y
+          devoluciones permanecen en la cuenta original.</p-message
+        >
       </section>
 
       <section class="app-panel min-w-0 space-y-4 p-5 sm:p-6" aria-labelledby="withdrawals-title">
-        <div class="flex flex-wrap items-center justify-between gap-3"><div><h2 id="withdrawals-title" class="text-xl font-semibold">Pasajeros que salen</h2><p class="mt-1 text-sm text-muted">Selecciona solo cuentas activas. La versión se valida nuevamente al aprobar.</p></div><span class="text-sm" role="status">{{ selectedWithdrawals().size }} seleccionados</span></div>
-        <p-table [value]="activeRoster()" dataKey="accountId" [scrollable]="true" scrollHeight="24rem" [tableStyle]="{ 'min-width': '42rem' }" size="small">
-          <ng-template #header><tr><th scope="col">Baja</th><th scope="col">Pasajero</th><th scope="col">Documento</th><th scope="col">Condición</th><th scope="col">Versión</th></tr></ng-template>
-          <ng-template #body let-member><tr><td><p-checkbox [binary]="true" [ngModel]="selectedWithdrawals().has(member.accountId)" [ngModelOptions]="{ standalone: true }" (ngModelChange)="selectWithdrawal(member.accountId, $event)" [disabled]="form.disabled" [ariaLabel]="'Dar de baja a ' + member.name" /></td><td>{{ member.name || 'Identidad pendiente de migración' }}</td><td>{{ member.document || 'Documento pendiente' }}</td><td>{{ member.free ? 'Liberado' : 'Pagante' }}</td><td>{{ member.version }}</td></tr></ng-template>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 id="withdrawals-title" class="text-xl font-semibold">Pasajeros que salen</h2>
+            <p class="mt-1 text-sm text-muted">
+              Selecciona solo cuentas activas. La versión se valida nuevamente al aprobar.
+            </p>
+          </div>
+          <span class="text-sm" role="status">{{ selectedWithdrawals().size }} seleccionados</span>
+        </div>
+        <p-table
+          [value]="activeRoster()"
+          dataKey="accountId"
+          [scrollable]="true"
+          scrollHeight="24rem"
+          [tableStyle]="{ 'min-width': '42rem' }"
+          size="small"
+        >
+          <ng-template #header
+            ><tr>
+              <th scope="col">Baja</th>
+              <th scope="col">Pasajero</th>
+              <th scope="col">Documento</th>
+              <th scope="col">Condición</th>
+              <th scope="col">Versión</th>
+            </tr></ng-template
+          >
+          <ng-template #body let-member
+            ><tr>
+              <td>
+                <p-checkbox
+                  [binary]="true"
+                  [ngModel]="selectedWithdrawals().has(member.accountId)"
+                  [ngModelOptions]="{ standalone: true }"
+                  (ngModelChange)="selectWithdrawal(member.accountId, $event)"
+                  [disabled]="form.disabled"
+                  [ariaLabel]="'Dar de baja a ' + member.name"
+                />
+              </td>
+              <td>{{ member.name || 'Identidad pendiente de migración' }}</td>
+              <td>{{ member.document || 'Documento pendiente' }}</td>
+              <td>{{ member.free ? 'Liberado' : 'Pagante' }}</td>
+              <td>{{ member.version }}</td>
+            </tr></ng-template
+          >
         </p-table>
       </section>
 
-      <section class="app-panel min-w-0 space-y-4 p-5 sm:p-6" aria-labelledby="participation-history-title">
-        <div><h2 id="participation-history-title" class="text-xl font-semibold">Historial de participaciones</h2><p class="mt-1 text-sm text-muted">Cada reingreso conserva su cuenta anterior separada; pagos, descuentos y devoluciones no se trasladan.</p></div>
-        <p-table [value]="roster()" dataKey="accountId" [scrollable]="true" scrollHeight="24rem" [tableStyle]="{ 'min-width': '42rem' }" size="small">
-          <ng-template #header><tr><th scope="col">Pasajero</th><th scope="col">Documento</th><th scope="col">Estado</th><th scope="col">Participación</th><th scope="col">Versión</th></tr></ng-template>
-          <ng-template #body let-member><tr><td>{{ member.name }}</td><td>{{ member.document }}</td><td>{{ member.active ? 'Activa' : 'Inactiva' }}</td><td>{{ member.previousParticipation ? 'Reingreso' : member.nextParticipation ? 'Reemplazada por reingreso' : 'Original' }}</td><td>{{ member.version }}</td></tr></ng-template>
+      <section
+        class="app-panel min-w-0 space-y-4 p-5 sm:p-6"
+        aria-labelledby="participation-history-title"
+      >
+        <div>
+          <h2 id="participation-history-title" class="text-xl font-semibold">
+            Historial de participaciones
+          </h2>
+          <p class="mt-1 text-sm text-muted">
+            Cada reingreso conserva su cuenta anterior separada; pagos, descuentos y devoluciones no
+            se trasladan.
+          </p>
+        </div>
+        <p-table
+          [value]="roster()"
+          dataKey="accountId"
+          [scrollable]="true"
+          scrollHeight="24rem"
+          [tableStyle]="{ 'min-width': '42rem' }"
+          size="small"
+        >
+          <ng-template #header
+            ><tr>
+              <th scope="col">Pasajero</th>
+              <th scope="col">Documento</th>
+              <th scope="col">Estado</th>
+              <th scope="col">Participación</th>
+              <th scope="col">Versión</th>
+            </tr></ng-template
+          >
+          <ng-template #body let-member
+            ><tr>
+              <td>{{ member.name }}</td>
+              <td>{{ member.document }}</td>
+              <td>{{ member.active ? 'Activa' : 'Inactiva' }}</td>
+              <td>
+                {{
+                  member.previousParticipation
+                    ? 'Reingreso'
+                    : member.nextParticipation
+                      ? 'Reemplazada por reingreso'
+                      : 'Original'
+                }}
+              </td>
+              <td>{{ member.version }}</td>
+            </tr></ng-template
+          >
         </p-table>
       </section>
 
       <section class="app-panel space-y-5 p-5 sm:p-6" aria-labelledby="admissions-title">
-        <div class="flex flex-wrap items-center justify-between gap-3"><div><h2 id="admissions-title" class="text-xl font-semibold">Pasajeros que ingresan</h2><p class="mt-1 text-sm text-muted">Cada alta crea una cuenta nueva, aunque reemplace a otra persona.</p></div><button pButton type="button" severity="secondary" outlined (click)="addAdmission()" [disabled]="form.disabled">Agregar pasajero</button></div>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 id="admissions-title" class="text-xl font-semibold">Pasajeros que ingresan</h2>
+            <p class="mt-1 text-sm text-muted">
+              Cada alta crea una cuenta nueva, aunque reemplace a otra persona.
+            </p>
+          </div>
+          <button
+            pButton
+            type="button"
+            severity="secondary"
+            outlined
+            (click)="addAdmission()"
+            [disabled]="form.disabled"
+          >
+            Agregar pasajero
+          </button>
+        </div>
         <div formArrayName="admissions" class="space-y-6">
           @for (group of form.controls.admissions.controls; track group; let index = $index) {
-            <fieldset [formGroupName]="index" class="grid gap-4 border-t border-surface pt-5 sm:grid-cols-2 lg:grid-cols-4">
+            <fieldset
+              [formGroupName]="index"
+              class="grid gap-4 border-t border-surface pt-5 sm:grid-cols-2 lg:grid-cols-4"
+            >
               <legend class="sr-only">Pasajero entrante {{ index + 1 }}</legend>
-              <div class="lg:col-span-2"><label [for]="'name-' + index" class="mb-1 block text-sm font-medium">Nombre completo</label><input pInputText [id]="'name-' + index" formControlName="name" class="w-full" /></div>
-              <div><label [for]="'dni-' + index" class="mb-1 block text-sm font-medium">RUT</label><input pInputText [id]="'dni-' + index" formControlName="dni" class="w-full" /></div>
-              <div><label [for]="'replacement-' + index" class="mb-1 block text-sm font-medium">Reemplaza a</label><p-select [inputId]="'replacement-' + index" formControlName="replacesAccountId" [options]="activeRoster()" optionLabel="name" optionValue="accountId" placeholder="No reemplaza" [showClear]="true" class="w-full" /></div>
-              <div class="flex items-center gap-2"><p-checkbox [inputId]="'free-' + index" formControlName="free" [binary]="true" /><label [for]="'free-' + index">Pasajero liberado</label></div>
+              <div class="lg:col-span-2">
+                <label [for]="'name-' + index" class="mb-1 block text-sm font-medium"
+                  >Nombre completo</label
+                ><input pInputText [id]="'name-' + index" formControlName="name" class="w-full" />
+              </div>
+              <div>
+                <label [for]="'dni-' + index" class="mb-1 block text-sm font-medium">RUT</label
+                ><input pInputText [id]="'dni-' + index" formControlName="dni" class="w-full" />
+              </div>
+              <div>
+                <label [for]="'replacement-' + index" class="mb-1 block text-sm font-medium"
+                  >Reemplaza a</label
+                ><p-select
+                  [inputId]="'replacement-' + index"
+                  formControlName="replacesAccountId"
+                  [options]="activeRoster()"
+                  optionLabel="name"
+                  optionValue="accountId"
+                  placeholder="No reemplaza"
+                  [showClear]="true"
+                  class="w-full"
+                />
+              </div>
+              <div class="flex items-center gap-2">
+                <p-checkbox
+                  [inputId]="'free-' + index"
+                  formControlName="free"
+                  [binary]="true"
+                /><label [for]="'free-' + index">Pasajero liberado</label>
+              </div>
               @if (!group.controls.free.value) {
-                <div><label [for]="'deposit-' + index" class="mb-1 block text-sm font-medium">Abono pactado individual</label><p-inputnumber [inputId]="'deposit-' + index" formControlName="depositAgreed" mode="currency" currency="CLP" locale="es-CL" [min]="0" class="w-full" /></div>
-                <div><label [for]="'count-' + index" class="mb-1 block text-sm font-medium">Cantidad de cuotas</label><p-inputnumber [inputId]="'count-' + index" formControlName="installmentQuantity" [min]="1" [max]="120" [useGrouping]="false" class="w-full" /></div>
-                <div><label [for]="'amount-' + index" class="mb-1 block text-sm font-medium">Valor de cada cuota</label><p-inputnumber [inputId]="'amount-' + index" formControlName="installmentAmount" mode="currency" currency="CLP" locale="es-CL" [min]="1" class="w-full" /></div>
-                <div><label [for]="'date-' + index" class="mb-1 block text-sm font-medium">Primer vencimiento</label><input pInputText [id]="'date-' + index" type="date" formControlName="firstDueDate" class="w-full" /></div>
+                <div>
+                  <label [for]="'deposit-' + index" class="mb-1 block text-sm font-medium"
+                    >Abono pactado individual</label
+                  ><p-inputnumber
+                    [inputId]="'deposit-' + index"
+                    formControlName="depositAgreed"
+                    mode="currency"
+                    currency="CLP"
+                    locale="es-CL"
+                    [min]="0"
+                    class="w-full"
+                  />
+                </div>
+                <div>
+                  <label [for]="'count-' + index" class="mb-1 block text-sm font-medium"
+                    >Cantidad de cuotas</label
+                  ><p-inputnumber
+                    [inputId]="'count-' + index"
+                    formControlName="installmentQuantity"
+                    [min]="1"
+                    [max]="120"
+                    [useGrouping]="false"
+                    class="w-full"
+                  />
+                </div>
+                <div>
+                  <label [for]="'amount-' + index" class="mb-1 block text-sm font-medium"
+                    >Valor de cada cuota</label
+                  ><p-inputnumber
+                    [inputId]="'amount-' + index"
+                    formControlName="installmentAmount"
+                    mode="currency"
+                    currency="CLP"
+                    locale="es-CL"
+                    [min]="1"
+                    class="w-full"
+                  />
+                </div>
+                <div>
+                  <label [for]="'date-' + index" class="mb-1 block text-sm font-medium"
+                    >Primer vencimiento</label
+                  ><app-date-only-picker
+                    [inputId]="'date-' + index"
+                    formControlName="firstDueDate"
+                  />
+                </div>
               }
-              <div class="sm:col-span-2 lg:col-span-4"><button pButton type="button" severity="danger" text (click)="removeAdmission(index)" [disabled]="form.disabled">Quitar pasajero</button></div>
+              <div class="sm:col-span-2 lg:col-span-4">
+                <button
+                  pButton
+                  type="button"
+                  severity="danger"
+                  text
+                  (click)="removeAdmission(index)"
+                  [disabled]="form.disabled"
+                >
+                  Quitar pasajero
+                </button>
+              </div>
             </fieldset>
           }
         </div>
       </section>
-      @if (!state()) { <button pButton type="submit" [loading]="busy()">Preparar borrador para revisión</button> }
+      @if (!state()) {
+        <button pButton type="submit" [loading]="busy()">Preparar borrador para revisión</button>
+      }
     </form>
   }
 
   @if (impact(); as summary) {
     <section class="app-panel space-y-5 p-5 sm:p-6" aria-labelledby="impact-title">
       <h2 id="impact-title" class="text-xl font-semibold">Impacto antes de aprobar</h2>
-      <dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><div><dt class="text-sm text-muted">Altas</dt><dd class="text-lg font-semibold">{{ summary.admissions }}</dd></div><div><dt class="text-sm text-muted">Bajas</dt><dd class="text-lg font-semibold">{{ summary.withdrawals }}</dd></div><div><dt class="text-sm text-muted">Reemplazos</dt><dd class="text-lg font-semibold">{{ summary.replacements }}</dd></div><div><dt class="text-sm text-muted">Versiones obsoletas</dt><dd class="text-lg font-semibold">{{ summary.staleAccounts }}</dd></div><div><dt class="text-sm text-muted">Deuda agregada</dt><dd class="font-semibold">{{ summary.debtAdded | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</dd></div><div><dt class="text-sm text-muted">Deuda cancelada</dt><dd class="font-semibold">{{ summary.debtRemoved | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</dd></div><div><dt class="text-sm text-muted">Variación por cobrar</dt><dd class="font-semibold">{{ summary.receivableDelta | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</dd></div></dl>
-      @if (summary.staleAccounts > 0) { <p-message severity="error">La nómina cambió después de preparar el borrador. No lo apruebes; crea un anexo nuevo.</p-message> }
+      <dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <dt class="text-sm text-muted">Altas</dt>
+          <dd class="text-lg font-semibold">{{ summary.admissions }}</dd>
+        </div>
+        <div>
+          <dt class="text-sm text-muted">Bajas</dt>
+          <dd class="text-lg font-semibold">{{ summary.withdrawals }}</dd>
+        </div>
+        <div>
+          <dt class="text-sm text-muted">Reemplazos</dt>
+          <dd class="text-lg font-semibold">{{ summary.replacements }}</dd>
+        </div>
+        <div>
+          <dt class="text-sm text-muted">Versiones obsoletas</dt>
+          <dd class="text-lg font-semibold">{{ summary.staleAccounts }}</dd>
+        </div>
+        <div>
+          <dt class="text-sm text-muted">Deuda agregada</dt>
+          <dd class="font-semibold">
+            {{ summary.debtAdded | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}
+          </dd>
+        </div>
+        <div>
+          <dt class="text-sm text-muted">Deuda cancelada</dt>
+          <dd class="font-semibold">
+            {{ summary.debtRemoved | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}
+          </dd>
+        </div>
+        <div>
+          <dt class="text-sm text-muted">Variación por cobrar</dt>
+          <dd class="font-semibold">
+            {{ summary.receivableDelta | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}
+          </dd>
+        </div>
+      </dl>
+      @if (summary.staleAccounts > 0) {
+        <p-message severity="error"
+          >La nómina cambió después de preparar el borrador. No lo apruebes; crea un anexo
+          nuevo.</p-message
+        >
+      }
       @if (state()?.status === 'DRAFT') {
-        <div><label for="approval-reason" class="mb-1 block text-sm font-medium">Motivo de aprobación</label><textarea id="approval-reason" pTextarea [formControl]="approvalReason" rows="2" class="w-full" maxlength="500"></textarea></div>
-        <div class="flex items-start gap-3"><p-checkbox inputId="annex-reviewed" [binary]="true" [ngModel]="reviewed()" (ngModelChange)="reviewed.set($event)" /><label for="annex-reviewed" class="text-sm">Revisé cada alta, baja, monto y vencimiento. Entiendo que esta aprobación no mueve pagos entre pasajeros ni devuelve dinero automáticamente.</label></div>
-        <button pButton type="button" severity="danger" [disabled]="!reviewed() || approvalReason.invalid || summary.staleAccounts > 0" [loading]="busy()" (click)="apply()">Aprobar y aplicar anexo</button>
+        <div>
+          <label for="approval-reason" class="mb-1 block text-sm font-medium"
+            >Motivo de aprobación</label
+          ><textarea
+            id="approval-reason"
+            pTextarea
+            [formControl]="approvalReason"
+            rows="2"
+            class="w-full"
+            maxlength="500"
+          ></textarea>
+        </div>
+        <div class="flex items-start gap-3">
+          <p-checkbox
+            inputId="annex-reviewed"
+            [binary]="true"
+            [ngModel]="reviewed()"
+            (ngModelChange)="reviewed.set($event)"
+          /><label for="annex-reviewed" class="text-sm"
+            >Revisé cada alta, baja, monto y vencimiento. Entiendo que esta aprobación no mueve
+            pagos entre pasajeros ni devuelve dinero automáticamente.</label
+          >
+        </div>
+        <button
+          pButton
+          type="button"
+          severity="danger"
+          [disabled]="!reviewed() || approvalReason.invalid || summary.staleAccounts > 0"
+          [loading]="busy()"
+          (click)="apply()"
+        >
+          Aprobar y aplicar anexo
+        </button>
       }
     </section>
   }
@@ -89,10 +385,37 @@
     @if (current.status === 'VALIDATING' || current.status === 'APPLYING') {
       <section class="app-panel space-y-4 p-5 sm:p-6" aria-labelledby="resume-title">
         <h2 id="resume-title" class="text-xl font-semibold">Aplicación pendiente de confirmar</h2>
-        <p class="text-sm text-muted">La gira permanece protegida mientras termina el anexo. Reanudar usa la misma clave y el motivo registrado.</p>
-        <textarea pTextarea aria-label="Motivo de aprobación" [formControl]="approvalReason" rows="2" class="w-full" maxlength="500"></textarea>
-        <div class="flex items-start gap-3"><p-checkbox inputId="resume-reviewed" [binary]="true" [ngModel]="reviewed()" (ngModelChange)="reviewed.set($event)" /><label for="resume-reviewed" class="text-sm">Confirmo que deseo reanudar exactamente este anexo.</label></div>
-        <button pButton type="button" [disabled]="!reviewed() || approvalReason.invalid" [loading]="busy()" (click)="apply()">Reanudar aplicación</button>
+        <p class="text-sm text-muted">
+          La gira permanece protegida mientras termina el anexo. Reanudar usa la misma clave y el
+          motivo registrado.
+        </p>
+        <textarea
+          pTextarea
+          aria-label="Motivo de aprobación"
+          [formControl]="approvalReason"
+          rows="2"
+          class="w-full"
+          maxlength="500"
+        ></textarea>
+        <div class="flex items-start gap-3">
+          <p-checkbox
+            inputId="resume-reviewed"
+            [binary]="true"
+            [ngModel]="reviewed()"
+            (ngModelChange)="reviewed.set($event)"
+          /><label for="resume-reviewed" class="text-sm"
+            >Confirmo que deseo reanudar exactamente este anexo.</label
+          >
+        </div>
+        <button
+          pButton
+          type="button"
+          [disabled]="!reviewed() || approvalReason.invalid"
+          [loading]="busy()"
+          (click)="apply()"
+        >
+          Reanudar aplicación
+        </button>
       </section>
     }
   }
@@ -101,17 +424,44 @@
     <section class="app-panel space-y-4 p-5 sm:p-6" aria-labelledby="closure-title">
       <div>
         <h2 id="closure-title" class="text-xl font-semibold">Cerrar nómina definitivamente</h2>
-        <p class="mt-1 text-sm text-muted">Este cierre impide nuevas altas, bajas y reemplazos. No cierra la cobranza ni impide pagos, comprobantes o devoluciones.</p>
+        <p class="mt-1 text-sm text-muted">
+          Este cierre impide nuevas altas, bajas y reemplazos. No cierra la cobranza ni impide
+          pagos, comprobantes o devoluciones.
+        </p>
       </div>
       <div>
         <label for="closure-reason" class="mb-1 block text-sm font-medium">Motivo del cierre</label>
-        <textarea id="closure-reason" pTextarea [formControl]="closureReason" rows="2" class="w-full" maxlength="500"></textarea>
+        <textarea
+          id="closure-reason"
+          pTextarea
+          [formControl]="closureReason"
+          rows="2"
+          class="w-full"
+          maxlength="500"
+        ></textarea>
       </div>
       <div class="flex items-start gap-3">
-        <p-checkbox inputId="closure-reviewed" [binary]="true" [ngModel]="closureReviewed()" (ngModelChange)="closureReviewed.set($event)" />
-        <label for="closure-reviewed" class="text-sm">Revisé la nómina completa y entiendo que, después del cierre, no podré crear ni aplicar nuevos anexos.</label>
+        <p-checkbox
+          inputId="closure-reviewed"
+          [binary]="true"
+          [ngModel]="closureReviewed()"
+          (ngModelChange)="closureReviewed.set($event)"
+        />
+        <label for="closure-reviewed" class="text-sm"
+          >Revisé la nómina completa y entiendo que, después del cierre, no podré crear ni aplicar
+          nuevos anexos.</label
+        >
       </div>
-      <button pButton type="button" severity="danger" [disabled]="!closureReviewed() || closureReason.invalid" [loading]="busy()" (click)="closeRoster()">Cerrar nómina</button>
+      <button
+        pButton
+        type="button"
+        severity="danger"
+        [disabled]="!closureReviewed() || closureReason.invalid"
+        [loading]="busy()"
+        (click)="closeRoster()"
+      >
+        Cerrar nómina
+      </button>
     </section>
   }
 </main>

@@ -1,1 +1,91 @@
-<main class="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-8 sm:px-8" [attr.aria-busy]="busy()"><header class="flex flex-wrap items-start justify-between gap-4"><div><p class="text-sm text-muted">Portal de pagos · seguridad</p><h1 class="mt-2 text-3xl font-semibold text-ink">Código de acceso de la gira</h1></div><a pButton severity="secondary" outlined routerLink="/contratos">Volver a contratos</a></header><p-message severity="warn">Rotar o revocar invalida inmediatamente el código anterior y las sesiones públicas asociadas. El contrato aprobado no se reescribe.</p-message>@if(error()){<p-message severity="error">{{error()}}</p-message>}@if(success()){<p-message severity="success">{{success()}}</p-message>}@if(access();as current){<p-panel header="Estado actual"><dl class="grid gap-4 sm:grid-cols-3"><div><dt>Estado</dt><dd>{{current.status==='ACTIVE'?'Activo':'Revocado'}}</dd></div><div><dt>Versión</dt><dd>{{current.version}}</dd></div><div><dt>Código vigente</dt><dd class="font-mono text-xl font-semibold tracking-[.2em]">{{current.tripCode||'No disponible'}}</dd></div></dl>@if(current.tripCode){<div class="mt-5 flex flex-wrap gap-3"><button pButton type="button" severity="secondary" outlined (click)="copyCode()">Copiar código</button><a pButton href="https://pagos.dev.girasindomito.cl" target="_blank" rel="noopener noreferrer">Abrir portal de pagos</a></div>}</p-panel><p-panel header="Cambio de acceso"><form [formGroup]="form" class="flex flex-col gap-5"><div class="flex flex-col gap-2"><label for="access-reason">Motivo auditado</label><textarea pTextarea id="access-reason" formControlName="reason" rows="3" maxlength="500"></textarea></div><div class="flex items-start gap-3"><p-checkbox inputId="access-reviewed" formControlName="reviewed" [binary]="true"/><label for="access-reviewed">Entiendo que las personas con el código anterior perderán acceso y deberán recibir el nuevo código si se rota.</label></div><div class="flex flex-wrap gap-3"><button pButton type="button" [disabled]="busy()||current.status==='REVOKED'" (click)="change('rotate')">Rotar código</button><button pButton type="button" severity="danger" outlined [disabled]="busy()||current.status==='REVOKED'" (click)="change('revoke')">Revocar acceso</button></div></form></p-panel>}</main>
+<main class="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-8 sm:px-8" [attr.aria-busy]="busy()">
+  <header class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <p class="text-sm text-muted">Portal de pagos · seguridad</p>
+      <h1 class="mt-2 text-3xl font-semibold text-ink">Código de acceso de la gira</h1>
+    </div>
+    <a pButton severity="secondary" outlined routerLink="/contratos">Volver a contratos</a>
+  </header>
+  <p-message severity="warn"
+    >Rotar o revocar invalida inmediatamente el código anterior y las sesiones públicas asociadas.
+    El contrato aprobado no se reescribe.</p-message
+  >
+  @if (error()) {
+    <p-message severity="error">{{ error() }}</p-message>
+  }
+  @if (success()) {
+    <p-message severity="success">{{ success() }}</p-message>
+  }
+  @if (access(); as current) {
+    <p-panel header="Estado actual"
+      ><dl class="grid gap-4 sm:grid-cols-3">
+        <div>
+          <dt>Estado</dt>
+          <dd>{{ current.status === 'ACTIVE' ? 'Activo' : 'Revocado' }}</dd>
+        </div>
+        <div>
+          <dt>Versión</dt>
+          <dd>{{ current.version }}</dd>
+        </div>
+        <div>
+          <dt>Código vigente</dt>
+          <dd class="font-mono text-xl font-semibold tracking-[.2em]">
+            {{ current.tripCode || 'No disponible' }}
+          </dd>
+        </div>
+      </dl>
+      @if (current.tripCode) {
+        <div class="mt-5 flex flex-wrap gap-3">
+          <button pButton type="button" severity="secondary" outlined (click)="copyCode()">
+            Copiar código</button
+          ><a
+            pButton
+            href="https://pagos.dev.girasindomito.cl"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Abrir portal de pagos</a
+          >
+        </div>
+      }</p-panel
+    ><p-panel header="Cambio de acceso"
+      ><form [formGroup]="form" class="flex flex-col gap-5">
+        <div class="flex flex-col gap-2">
+          <label for="access-reason">Motivo auditado</label
+          ><textarea
+            pTextarea
+            id="access-reason"
+            formControlName="reason"
+            rows="3"
+            maxlength="500"
+          ></textarea>
+        </div>
+        <div class="flex items-start gap-3">
+          <p-checkbox inputId="access-reviewed" formControlName="reviewed" [binary]="true" /><label
+            for="access-reviewed"
+            >Entiendo que las personas con el código anterior perderán acceso y deberán recibir el
+            nuevo código si se rota.</label
+          >
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <button
+            pButton
+            type="button"
+            [disabled]="busy() || current.status === 'REVOKED'"
+            (click)="change('rotate')"
+          >
+            Rotar código</button
+          ><button
+            pButton
+            type="button"
+            severity="danger"
+            outlined
+            [disabled]="busy() || current.status === 'REVOKED'"
+            (click)="change('revoke')"
+          >
+            Revocar acceso
+          </button>
+        </div>
+      </form></p-panel
+    >
+  }
+</main>
