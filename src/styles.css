@@ -1,7 +1,8 @@
 @import 'tailwindcss';
 @plugin '@iconify/tailwind4';
 @custom-variant dark (&:where(.dark, .dark *));
-/* Los módulos llegan desde DynamoDB; estas clases no pueden descubrirse en templates.\n * Esta lista cubre los iconos disponibles en los módulos actuales del Hub. */
+/* Los módulos llegan desde DynamoDB; estas clases no pueden descubrirse en templates.
+ * Esta lista cubre los iconos disponibles en los módulos actuales del Hub. */
 @source inline("icon-[tabler--adjustments] icon-[tabler--bell] icon-[tabler--briefcase] icon-[tabler--building] icon-[tabler--bus] icon-[tabler--calendar-check] icon-[tabler--calendar-event] icon-[tabler--cash] icon-[tabler--chart-bar] icon-[tabler--chart-pie] icon-[tabler--clipboard-list] icon-[tabler--coins] icon-[tabler--credit-card] icon-[tabler--database] icon-[tabler--file] icon-[tabler--file-description] icon-[tabler--file-invoice] icon-[tabler--file-plus] icon-[tabler--help-circle] icon-[tabler--home] icon-[tabler--id-badge-2] icon-[tabler--key] icon-[tabler--layout-grid] icon-[tabler--list-details] icon-[tabler--lock] icon-[tabler--mail] icon-[tabler--map-pin] icon-[tabler--map-route] icon-[tabler--moon] icon-[tabler--notes] icon-[tabler--plane] icon-[tabler--point] icon-[tabler--receipt-2] icon-[tabler--report-money] icon-[tabler--route] icon-[tabler--school] icon-[tabler--settings] icon-[tabler--shield-lock] icon-[tabler--shopping-cart] icon-[tabler--sun] icon-[tabler--tools] icon-[tabler--user] icon-[tabler--user-cog] icon-[tabler--user-plus] icon-[tabler--users] icon-[tabler--users-group] icon-[tabler--world]");
 
 /* Fuente única de valores visuales; PrimeNG consume estas mismas variables. */
