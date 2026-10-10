@@ -47,7 +47,10 @@ Resources:
             Condition:
               StringEquals:
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
-                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOwner}/${GitHubRepository}:ref:refs/heads/main
+              StringLike:
+                # GitHub cambia el subject según el disparador o si luego se usa un environment.
+                # El rol sigue limitado exclusivamente a este repositorio.
+                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOwner}/${GitHubRepository}:*
       Policies:
         - PolicyName: deploy-spa-dev
           PolicyDocument:
