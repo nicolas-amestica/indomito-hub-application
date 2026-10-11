@@ -39,6 +39,7 @@
 <p-dialog [visible]="dialogVisible()" (visibleChange)="dialogVisible.set($event)" [modal]="true"
   [header]="selected() ? 'Editar reunión' : 'Nueva reunión'" [style]="{width:'min(95vw, 34rem)'}">
   <form class="grid gap-4 pt-2" (ngSubmit)="save()">
+    @if (error()) { <p-message severity="error">{{ error() }}</p-message> }
     <label class="grid gap-1 text-sm">Título <input pInputText name="title" [(ngModel)]="form.title" required /></label>
     <label class="grid gap-1 text-sm">Fecha <input pInputText type="date" name="date" [(ngModel)]="form.date" required /></label>
     <label class="grid gap-1 text-sm">Hora de inicio <input pInputText type="time" name="startTime" [(ngModel)]="form.startTime" required /></label>
