@@ -238,6 +238,7 @@
             severity="secondary"
             outlined
             [disabled]="busy() || !!pending"
+            [loading]="busy()"
             (click)="selected.set(null)"
           >
             Cancelar

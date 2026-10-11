@@ -58,8 +58,9 @@
         type="button"
         severity="secondary"
         outlined
-        [disabled]="!configuration()"
-        (click)="template.download(configuration()?.countries ?? [])"
+        [disabled]="!configuration() || templateDownloading()"
+        [loading]="templateDownloading()"
+        (click)="downloadTemplate()"
       >
         Descargar plantilla Excel
       </button>
@@ -81,6 +82,7 @@
         severity="secondary"
         outlined
         [disabled]="busy()"
+        [loading]="busy()"
         (click)="preview()"
       >
         {{
@@ -351,6 +353,7 @@
                 type="button"
                 size="small"
                 [disabled]="busy()"
+                [loading]="busy()"
                 (click)="changeStatus('PENDING_APPROVAL')"
               >
                 Enviar a aprobación
@@ -364,6 +367,7 @@
                 severity="danger"
                 outlined
                 [disabled]="busy()"
+                [loading]="busy()"
                 (click)="changeStatus('REJECTED')"
               >
                 Rechazar
@@ -375,6 +379,7 @@
                 type="button"
                 size="small"
                 [disabled]="busy()"
+                [loading]="busy()"
                 (click)="changeStatus('DRAFT')"
               >
                 Corregir como borrador
@@ -388,6 +393,7 @@
                 severity="secondary"
                 text
                 [disabled]="busy()"
+                [loading]="busy()"
                 (click)="changeStatus('CANCELLED')"
               >
                 Cancelar contrato

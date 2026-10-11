@@ -47,6 +47,8 @@
           track item.id
         ) {
           <button
+            pButton
+            [unstyled]="true"
             type="button"
             class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition"
             [class.bg-surface]="tab() === item.id"
@@ -67,6 +69,8 @@
             (ngModelChange)="search.set($event)"
             placeholder="Buscar" /></label
         ><button
+          pButton
+          [unstyled]="true"
           type="button"
           class="rounded-xl bg-brand px-4 py-2.5 text-sm font-bold text-night transition hover:brightness-95"
           (click)="openCreate()"
@@ -120,21 +124,33 @@
                   </td>
                   <td class="px-5 py-4">
                     <button
+                      pButton
+                      [unstyled]="true"
                       class="rounded-full px-3 py-1 text-xs font-bold"
                       [class.bg-emerald-100]="item.active"
                       [class.text-emerald-800]="item.active"
                       [class.bg-black/5]="!item.active"
+                      [loading]="saving()"
                       (click)="toggleUser(item)"
                     >
                       {{ item.active ? 'Activo' : 'Inactivo' }}
                     </button>
                   </td>
                   <td class="px-5 py-4 text-right">
-                    <button class="iam-action" title="Editar" (click)="editUser(item)">
+                    <button
+                      pButton
+                      [unstyled]="true"
+                      class="iam-action"
+                      title="Editar"
+                      (click)="editUser(item)"
+                    >
                       <i class="icon-[tabler--pencil]"></i></button
                     ><button
+                      pButton
+                      [unstyled]="true"
                       class="iam-action text-red-600"
                       title="Eliminar"
+                      [loading]="saving()"
                       (click)="removeUser(item)"
                     >
                       <i class="icon-[tabler--trash]"></i>
@@ -161,16 +177,28 @@
                   </td>
                   <td class="px-5 py-4 text-right">
                     <button
+                      pButton
+                      [unstyled]="true"
                       class="iam-action text-blue-700"
                       title="Gestionar permisos"
+                      [loading]="saving()"
                       (click)="managePermissions(item)"
                     >
                       <i class="icon-[tabler--key]"></i></button
-                    ><button class="iam-action" title="Editar" (click)="editProfile(item)">
+                    ><button
+                      pButton
+                      [unstyled]="true"
+                      class="iam-action"
+                      title="Editar"
+                      (click)="editProfile(item)"
+                    >
                       <i class="icon-[tabler--pencil]"></i></button
                     ><button
+                      pButton
+                      [unstyled]="true"
                       class="iam-action text-red-600"
                       title="Eliminar"
+                      [loading]="saving()"
                       (click)="removeProfile(item)"
                     >
                       <i class="icon-[tabler--trash]"></i>
@@ -203,11 +231,20 @@
                   <td class="px-5 py-4 font-mono text-xs text-muted">{{ item.path }}</td>
                   <td class="px-5 py-4">{{ item.active ? 'Activo' : 'Inactivo' }}</td>
                   <td class="px-5 py-4 text-right">
-                    <button class="iam-action" title="Editar" (click)="editModule(item)">
+                    <button
+                      pButton
+                      [unstyled]="true"
+                      class="iam-action"
+                      title="Editar"
+                      (click)="editModule(item)"
+                    >
                       <i class="icon-[tabler--pencil]"></i></button
                     ><button
+                      pButton
+                      [unstyled]="true"
                       class="iam-action text-red-600"
                       title="Eliminar"
+                      [loading]="saving()"
                       (click)="removeModule(item)"
                     >
                       <i class="icon-[tabler--trash]"></i>
@@ -249,7 +286,7 @@
               }}
             </h2>
           </div>
-          <button class="iam-action shrink-0" (click)="closeDialog()">
+          <button pButton [unstyled]="true" class="iam-action shrink-0" (click)="closeDialog()">
             <i class="icon-[tabler--x]"></i>
           </button>
         </header>
@@ -468,13 +505,18 @@
           class="sticky bottom-0 flex justify-end gap-2 border-t border-line bg-surface/95 px-6 py-4 backdrop-blur"
         >
           <button
+            pButton
+            [unstyled]="true"
             class="rounded-xl px-4 py-2.5 text-sm font-semibold text-muted"
             (click)="closeDialog()"
           >
             Cancelar</button
           ><button
+            pButton
+            [unstyled]="true"
             class="rounded-xl bg-brand px-5 py-2.5 text-sm font-bold text-night disabled:opacity-50"
             [disabled]="saving()"
+            [loading]="saving()"
             (click)="
               dialog() === 'permissions'
                 ? saveMatrix()

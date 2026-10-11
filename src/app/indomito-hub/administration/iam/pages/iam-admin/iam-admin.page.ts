@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
+import { ButtonDirective } from 'primeng/button';
 import { IamAllowance, IamModule, IamProfile, IamUser } from '../../interfaces/iam.interface';
 import { IamAdminService } from '../../services/iam-admin.service';
 import { AuthService } from '../../../../../core/auth/auth.service';
@@ -15,7 +16,7 @@ import type { IamAdminDialog, IamAdminTab } from '../../types/iam-admin.types';
 
 @Component({
   selector: 'app-iam-admin',
-  imports: [FormsModule],
+  imports: [ButtonDirective, FormsModule],
   templateUrl: './iam-admin.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

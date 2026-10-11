@@ -62,8 +62,10 @@
         Las cotizaciones ya guardadas conservan sus porcentajes y montos históricos.
       </p>
       <button
+        pButton
         class="rounded-xl bg-brand px-6 py-3 font-bold text-night transition hover:brightness-95 disabled:opacity-50"
         [disabled]="saving()"
+        [loading]="saving()"
       >
         {{ saving() ? 'Guardando…' : 'Guardar configuración' }}
       </button>
@@ -117,6 +119,7 @@
         severity="danger"
         outlined
         [disabled]="masterBusy() || !masterAccess()?.active"
+        [loading]="masterBusy()"
         (click)="revokeMasterAccess()"
       >
         Revocar

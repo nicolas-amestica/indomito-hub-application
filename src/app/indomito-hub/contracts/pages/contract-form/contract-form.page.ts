@@ -106,6 +106,7 @@ export class ContractFormPage {
   private readonly documentPreview = inject(DocumentPreviewService);
   protected readonly busy = signal(false);
   protected readonly importing = signal(false);
+  protected readonly templateDownloading = signal(false);
   protected readonly contractId = signal<string | null>(null);
   protected readonly version = signal(0);
   protected readonly status = signal<ContractStatus>('DRAFT');
@@ -137,6 +138,16 @@ export class ContractFormPage {
     listContainer: { class: 'border-line/55!' },
   } as const;
   private readonly programReference = signal<ContractProgramReference | null>(null);
+
+  protected async downloadTemplate(): Promise<void> {
+    if (this.templateDownloading()) return;
+    this.templateDownloading.set(true);
+    try {
+      await this.template.download(this.configuration()?.countries ?? []);
+    } finally {
+      this.templateDownloading.set(false);
+    }
+  }
 
   protected readonly form = this.fb.group({
     programId: ['', Validators.required],

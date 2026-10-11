@@ -74,6 +74,7 @@
             severity="danger"
             outlined
             [disabled]="catalogStore.loading()"
+            [loading]="catalogStore.loading()"
             (click)="catalogStore.retry()"
           >
             Reintentar catálogos
@@ -95,6 +96,7 @@
             severity="warn"
             outlined
             [disabled]="serviceCatalogStore.loading()"
+            [loading]="serviceCatalogStore.loading()"
             (click)="serviceCatalogStore.retry()"
           >
             Reintentar servicios
@@ -171,6 +173,7 @@
                 type="button"
                 severity="danger"
                 outlined
+                [loading]="exchangeRateStore.loading()"
                 (click)="exchangeRateStore.retry()"
               >
                 Reintentar tasas
@@ -216,6 +219,7 @@
               outlined
               class="self-start"
               [disabled]="exchangeRateStore.loading()"
+              [loading]="exchangeRateStore.loading()"
               (click)="exchangeRateStore.retry()"
             >
               Reintentar tasas del día
@@ -309,6 +313,7 @@
           pButton
           type="button"
           [disabled]="!programFormStore.canPreview() || actionBusy()"
+          [loading]="actionBusy()"
           (click)="openPreview()"
         >
           Previsualizar

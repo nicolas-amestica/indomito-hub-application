@@ -71,6 +71,7 @@
             pButton
             type="button"
             [disabled]="busy() || current.status === 'REVOKED'"
+            [loading]="busy()"
             (click)="change('rotate')"
           >
             Rotar código</button
@@ -80,6 +81,7 @@
             severity="danger"
             outlined
             [disabled]="busy() || current.status === 'REVOKED'"
+            [loading]="busy()"
             (click)="change('revoke')"
           >
             Revocar acceso

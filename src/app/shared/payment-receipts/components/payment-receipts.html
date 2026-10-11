@@ -3,7 +3,7 @@
     <p class="text-sm text-muted">
       Documentos de pagos recibidos. No son boletas ni facturas del SII.
     </p>
-    <button pButton type="button" (click)="load()" [disabled]="view().busy">
+    <button pButton type="button" (click)="load()" [disabled]="view().busy" [loading]="view().busy">
       Consultar comprobantes
     </button>
     @if (view().error) {
@@ -31,6 +31,7 @@
           outlined
           (click)="download(receipt.id)"
           [disabled]="view().busy"
+          [loading]="view().busy"
         >
           Preparar descarga PDF
         </button>
@@ -43,6 +44,7 @@
           outlined
           (click)="selectResend(receipt.id)"
           [disabled]="delivery().busy || !!delivery().request"
+          [loading]="delivery().busy"
         >
           Reenviar este comprobante
         </button>
@@ -103,7 +105,13 @@
       >
     }
     @if (view().cursor) {
-      <button pButton type="button" (click)="load(true)" [disabled]="view().busy">
+      <button
+        pButton
+        type="button"
+        (click)="load(true)"
+        [disabled]="view().busy"
+        [loading]="view().busy"
+      >
         Ver más comprobantes
       </button>
     }

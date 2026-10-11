@@ -34,6 +34,7 @@
       severity="secondary"
       outlined
       [disabled]="busy()"
+      [loading]="busy()"
       (click)="load(false)"
     >
       Actualizar
@@ -93,6 +94,7 @@
                 severity="secondary"
                 outlined
                 [disabled]="busy()"
+                [loading]="busy()"
                 (click)="download(item)"
               >
                 Descargar PDF
@@ -116,6 +118,7 @@
       outlined
       class="self-start"
       [disabled]="busy()"
+      [loading]="busy()"
       (click)="load(true)"
     >
       Cargar más
@@ -187,6 +190,7 @@
             severity="secondary"
             outlined
             [disabled]="busy()"
+            [loading]="busy()"
             (click)="cancel()"
           >
             Cancelar

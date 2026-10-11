@@ -60,6 +60,8 @@
           <p class="text-xs text-white/55">{{ auth.user()?.profileCode }}</p>
         </div>
         <button
+          pButton
+          [unstyled]="true"
           type="button"
           class="rounded-xl px-2 py-2 text-sm text-white/70 hover:bg-white/10 hover:text-white sm:px-3"
           (click)="auth.logout()"

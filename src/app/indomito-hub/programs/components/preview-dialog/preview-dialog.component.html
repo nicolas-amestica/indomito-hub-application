@@ -354,6 +354,7 @@
         severity="secondary"
         outlined
         [disabled]="busy()"
+        [loading]="busy()"
         (click)="visible.set(false)"
       >
         Cerrar
@@ -364,6 +365,7 @@
           type="button"
           severity="secondary"
           [disabled]="busy()"
+          [loading]="busy()"
           (click)="excelRequested.emit()"
         >
           Exportar a Excel
@@ -373,6 +375,7 @@
           type="button"
           severity="secondary"
           [disabled]="busy()"
+          [loading]="busy()"
           (click)="pdfRequested.emit()"
         >
           Exportar presupuesto
@@ -381,6 +384,7 @@
           pButton
           type="button"
           [disabled]="busy() || !favoriteAvailable()"
+          [loading]="busy()"
           [title]="
             favoriteAvailable() ? 'Guardar cotización' : 'Guardado no disponible en este ambiente'
           "

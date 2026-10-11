@@ -53,6 +53,8 @@
         >
           @for (category of categories(); track category) {
             <button
+              pButton
+              [unstyled]="true"
               type="button"
               class="shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors"
               [class.border-ink]="selectedCategory() === category"
@@ -82,14 +84,12 @@
             >
               <span
                 class="grid size-8 shrink-0 place-items-center rounded-lg bg-canvas text-ink transition-colors group-hover:bg-night group-hover:text-brand"
-                ><i
-                  [class]="moduleIcon(module)"
-                  class="size-4"
-                  aria-hidden="true"
-                ></i
+                ><i [class]="moduleIcon(module)" class="size-4" aria-hidden="true"></i
               ></span>
               <span class="min-w-0 flex-1"
-                ><strong class="block truncate text-xs font-semibold text-ink">{{ module.title }}</strong
+                ><strong class="block truncate text-xs font-semibold text-ink">{{
+                  module.title
+                }}</strong
                 ><small class="mt-0.5 block truncate text-[10px] font-normal text-muted">{{
                   module.category || 'General'
                 }}</small></span
@@ -107,7 +107,9 @@
         </div>
       </nav>
 
-      <footer class="border-t border-line/70 bg-canvas/70 px-4 py-2.5 text-[11px] text-muted sm:px-6">
+      <footer
+        class="border-t border-line/70 bg-canvas/70 px-4 py-2.5 text-[11px] text-muted sm:px-6"
+      >
         Sólo se muestran los módulos habilitados para tu perfil.
       </footer>
     </div>

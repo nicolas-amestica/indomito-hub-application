@@ -37,6 +37,7 @@
       severity="secondary"
       outlined
       [disabled]="busy()"
+      [loading]="busy()"
       (click)="load(false)"
     >
       Consultar
@@ -88,6 +89,7 @@
       outlined
       class="self-start"
       [disabled]="busy()"
+      [loading]="busy()"
       (click)="load(true)"
     >
       Cargar siguiente página

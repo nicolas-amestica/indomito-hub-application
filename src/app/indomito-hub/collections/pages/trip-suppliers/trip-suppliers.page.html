@@ -208,6 +208,7 @@
             severity="secondary"
             outlined
             [disabled]="busy() || !!pending"
+            [loading]="busy()"
             (click)="cancel()"
           >
             Cancelar
