@@ -22,6 +22,7 @@ const ERROR_MESSAGES: Readonly<Record<string, string>> = {
   VALIDATION_ERROR: APP_MESSAGES.http.validationError,
   REQUIRED_FIELD_MISSING: APP_MESSAGES.http.requiredFieldMissing,
   RESOURCE_NOT_FOUND: APP_MESSAGES.http.resourceNotFound,
+  CALENDAR_OAUTH_NOT_CONFIGURED: APP_MESSAGES.http.calendarOAuthNotConfigured,
 };
 
 /** Mensaje para un `code` fuera del mapa, o para una respuesta sin envelope de error. */
@@ -58,4 +59,11 @@ function extractErrorCode(error: HttpErrorResponse): string | undefined {
 function messageForCode(code: string | undefined): string {
   if (!code) return FALLBACK_MESSAGE;
   return ERROR_MESSAGES[code] ?? FALLBACK_MESSAGE;
+}
+
+/** Resuelve mensajes conocidos para estados de error locales sin mostrar detalle interno. */
+export function messageForHttpError(error: unknown, fallback: string): string {
+  if (!(error instanceof HttpErrorResponse)) return fallback;
+  const code = extractErrorCode(error);
+  return code ? (ERROR_MESSAGES[code] ?? fallback) : fallback;
 }

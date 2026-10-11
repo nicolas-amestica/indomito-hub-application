@@ -6,6 +6,7 @@ export const APP_MESSAGES = {
     warn: 'Advertencia',
   },
   http: {
+    calendarOAuthNotConfigured: 'La conexión con Google Calendar no está configurada. Comunícate con el administrador para habilitarla.',
     upstreamServiceError:
       'No se pudieron obtener los tipos de cambio. Intenta nuevamente en unos minutos.',
     validationError: 'Hay datos de la cotización que no son válidos. Revisa el formulario.',

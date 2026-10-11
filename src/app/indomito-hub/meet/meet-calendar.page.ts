@@ -8,6 +8,7 @@ import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
 import { Skeleton } from 'primeng/skeleton';
 import { MeetService, type MeetEvent, type MeetRequest } from './meet.service';
+import { messageForHttpError } from '../../core/http/error.interceptor';
 import { AuthService } from '../../core/auth/auth.service';
 
 interface DayCell { date: string; number: number; current: boolean; events: MeetEvent[] }
@@ -72,7 +73,7 @@ export class MeetCalendarPage {
       finalize(() => { if (requestId === this.requestSequence) this.loading.set(false); }),
     ).subscribe({
       next: data => { if (requestId === this.requestSequence) this.events.set(data); },
-      error: () => { if (requestId === this.requestSequence) this.error.set('No fue posible consultar Google Calendar. Comprueba la integración del backend.'); },
+      error: error => { if (requestId === this.requestSequence) this.error.set(messageForHttpError(error, 'No fue posible consultar Google Calendar. Intenta nuevamente.')); },
     });
   }
 
