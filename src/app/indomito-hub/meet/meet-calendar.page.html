@@ -42,6 +42,7 @@
     <label class="grid gap-1 text-sm">Título <input pInputText name="title" [(ngModel)]="form.title" required /></label>
     <label class="grid gap-1 text-sm">Fecha <input pInputText type="date" name="date" [(ngModel)]="form.date" required /></label>
     <label class="grid gap-1 text-sm">Hora de inicio <input pInputText type="time" name="startTime" [(ngModel)]="form.startTime" required /></label>
+    <label class="grid gap-1 text-sm">Hora de término <input pInputText type="time" name="endTime" [(ngModel)]="form.endTime" required /></label>
     <label class="grid gap-1 text-sm">Descripción <textarea class="rounded border border-surface-300 p-2" name="description" [(ngModel)]="form.description" rows="3"></textarea></label>
     <label class="grid gap-1 text-sm">Invitados (correos separados por coma) <textarea class="rounded border border-surface-300 p-2" name="guests" [ngModel]="guestsText()" (ngModelChange)="guestsText.set($event)" rows="2"></textarea></label>
     @if (selected()?.googleMeetLink) {
@@ -51,7 +52,7 @@
       @if (selected()) { <p-button type="button" label="Eliminar" severity="danger" [outlined]="true" [loading]="saving()" (onClick)="remove()" /> }
       <div class="ml-auto flex gap-2">
         <p-button type="button" label="Cancelar" severity="secondary" [text]="true" (onClick)="dialogVisible.set(false)" />
-        <p-button type="submit" label="Guardar" icon="pi pi-check" [loading]="saving()" [disabled]="!form.title.trim() || !form.date || !form.startTime" />
+        <p-button type="submit" label="Guardar" icon="pi pi-check" [loading]="saving()" [disabled]="!form.title.trim() || !form.date || !form.startTime || !form.endTime" />
       </div>
     </div>
   </form>
