@@ -29,6 +29,46 @@
     </button>
   }
 
+  @if (loading() && !view()) {
+    <div role="status" aria-live="polite" class="contents">
+      <span class="sr-only">Cargando resumen anual…</span>
+
+      <section aria-hidden="true" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        @for (item of [1, 2, 3, 4]; track item) {
+          <article class="app-panel p-5">
+            <p-skeleton width="62%" height="0.875rem" />
+            <p-skeleton width="45%" height="2.25rem" styleClass="mt-3" />
+            <p-skeleton width="35%" height="0.75rem" styleClass="mt-2" />
+          </article>
+        }
+      </section>
+
+      <section aria-hidden="true" class="grid gap-6 lg:grid-cols-2">
+        @for (item of [1, 2]; track item) {
+          <article class="app-panel min-w-0 p-5">
+            <p-skeleton width="11rem" height="1rem" />
+            <div class="mt-6 grid h-68 place-items-center">
+              <p-skeleton shape="circle" size="12rem" />
+            </div>
+          </article>
+        }
+      </section>
+
+      <section aria-hidden="true" class="grid gap-6 lg:grid-cols-2">
+        @for (item of [1, 2]; track item) {
+          <article class="app-panel p-5">
+            <p-skeleton width="10rem" height="1rem" />
+            <div class="mt-5 grid gap-3">
+              <p-skeleton width="80%" height="1.25rem" />
+              <p-skeleton width="64%" height="1.25rem" />
+              <p-skeleton width="72%" height="1.25rem" />
+            </div>
+          </article>
+        }
+      </section>
+    </div>
+  }
+
   @if (view(); as data) {
     <section aria-label="Indicadores principales" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <article class="app-panel p-5">

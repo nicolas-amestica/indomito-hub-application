@@ -14,6 +14,7 @@ import { ButtonDirective } from 'primeng/button';
 import { ChartModule } from 'primeng/chart';
 import { Message } from 'primeng/message';
 import { Select } from 'primeng/select';
+import { Skeleton } from 'primeng/skeleton';
 import { finalize } from 'rxjs';
 import { todayDateOnly } from '../../../../shared/date-only/date-only';
 import type { DashboardView } from '../../interfaces/dashboard.interface';
@@ -21,7 +22,16 @@ import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
   selector: 'app-dashboard-page',
-  imports: [ButtonDirective, ChartModule, CurrencyPipe, FormsModule, Message, RouterLink, Select],
+  imports: [
+    ButtonDirective,
+    ChartModule,
+    CurrencyPipe,
+    FormsModule,
+    Message,
+    RouterLink,
+    Select,
+    Skeleton,
+  ],
   templateUrl: './dashboard.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
