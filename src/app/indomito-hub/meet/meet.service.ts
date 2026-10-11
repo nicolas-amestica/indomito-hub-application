@@ -12,6 +12,7 @@ export interface MeetEvent {
   description: string;
   guests: string[];
   googleMeetLink: string | null;
+  meetingCode?: string | null;
   createdAt: string;
   hostSk: string | null;
   hostName: string | null;
