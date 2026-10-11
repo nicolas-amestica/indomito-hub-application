@@ -8,6 +8,7 @@ import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
 import { Skeleton } from 'primeng/skeleton';
 import { MeetService, type MeetEvent, type MeetRequest } from './meet.service';
+import { AuthService } from '../../core/auth/auth.service';
 
 interface DayCell { date: string; number: number; current: boolean; events: MeetEvent[] }
 
@@ -20,6 +21,10 @@ interface DayCell { date: string; number: number; current: boolean; events: Meet
 })
 export class MeetCalendarPage {
   private readonly api = inject(MeetService);
+  private readonly auth = inject(AuthService);
+  readonly canCreate = computed(() => this.auth.permissions().some(p => p.module.code === "MEET_AGENDA" && p.allowances.includes("c")));
+  readonly canUpdate = computed(() => this.auth.permissions().some(p => p.module.code === "MEET_AGENDA" && p.allowances.includes("u")));
+  readonly canDelete = computed(() => this.auth.permissions().some(p => p.module.code === "MEET_AGENDA" && p.allowances.includes("d")));
   private readonly destroyRef = inject(DestroyRef);
   private readonly now = new Date();
   readonly year = signal(this.now.getFullYear());
@@ -85,6 +90,7 @@ export class MeetCalendarPage {
   }
 
   open(date?: string, event?: MeetEvent): void {
+    if (event ? !this.canUpdate() : !this.canCreate()) return;
     this.selected.set(event ?? null);
     Object.assign(this.form, this.emptyForm(), event ? {
       title: event.title, date: event.date, startTime: event.startTime, endTime: event.endTime,
@@ -96,7 +102,7 @@ export class MeetCalendarPage {
   }
 
   save(): void {
-    if (this.saving() || !this.form.title.trim() || !this.form.date || !this.form.startTime || !this.form.endTime) return;
+    if ((this.selected() ? !this.canUpdate() : !this.canCreate()) || this.saving() || !this.form.title.trim() || !this.form.date || !this.form.startTime || !this.form.endTime) return;
     this.form.guests = [...new Set(this.guestsText().split(/[;,\n]/).map(x => x.trim()).filter(Boolean))];
     this.saving.set(true);
     this.error.set('');
@@ -112,7 +118,7 @@ export class MeetCalendarPage {
 
   remove(): void {
     const current = this.selected();
-    if (!current || this.saving() || !window.confirm('¿Eliminar esta reunión de Google Calendar?')) return;
+    if (!current || !this.canDelete() || this.saving() || !window.confirm('¿Eliminar esta reunión de Google Calendar?')) return;
     this.saving.set(true);
     this.api.remove(current.id).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.saving.set(false)))
       .subscribe({
