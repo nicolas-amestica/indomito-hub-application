@@ -36,7 +36,15 @@
       </dl>
       @if (current.tripCode) {
         <div class="mt-5 flex flex-wrap gap-3">
-          <button pButton type="button" severity="secondary" outlined (click)="copyCode()">
+          <button
+            pButton
+            type="button"
+            severity="secondary"
+            outlined
+            [disabled]="copying()"
+            [loading]="copying()"
+            (click)="copyCode()"
+          >
             Copiar código</button
           ><a
             pButton

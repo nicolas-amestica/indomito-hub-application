@@ -35,10 +35,10 @@ describe('AuthService', () => {
 
     expect(JSON.parse(sessionStorage.getItem(STORAGE_KEY)!)).toEqual(session);
     expect(service.authenticated()).toBe(true);
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/cotizaciones');
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/inicio');
   });
 
-  it('navega al primer modulo LV2 legible y no al contenedor LV1', async () => {
+  it('navega siempre al dashboard después de autenticar', async () => {
     const service = TestBed.inject(AuthService);
     const http = TestBed.inject(HttpTestingController);
     const session = authSession(jwtExpiringIn(3_600));
@@ -64,7 +64,7 @@ describe('AuthService', () => {
     http.expectOne(`${environment.apiUrl}/auth/login`).flush({ data: session });
     await login;
 
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/cotizaciones');
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/inicio');
   });
 
   it('restaura una sesión almacenada cuyo JWT sigue vigente', () => {

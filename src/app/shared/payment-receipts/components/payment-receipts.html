@@ -89,7 +89,12 @@
             entrega.</p-message
           >
         }
-        <button pButton type="submit" [disabled]="delivery().busy || delivery().queued">
+        <button
+          pButton
+          type="submit"
+          [disabled]="delivery().busy || delivery().queued"
+          [loading]="delivery().busy"
+        >
           {{ delivery().request ? 'Reintentar mismo reenvío' : 'Solicitar reenvío' }}
         </button>
       </form>

@@ -47,8 +47,7 @@ export class AuthService {
         .pipe(map((x) => x.data)),
     );
     this.setSession(session);
-    const firstAccessibleModule = this.modules().find((module) => module.level === 'LV2');
-    await this.router.navigateByUrl(firstAccessibleModule?.path || '/cotizaciones');
+    await this.router.navigateByUrl('/inicio');
   }
   async requestPasswordReset(email: string): Promise<void> {
     await firstValueFrom(

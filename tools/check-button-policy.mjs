@@ -21,7 +21,8 @@ for (const file of htmlFiles(templatesRoot)) {
     const line = source.slice(0, match.index).split('\n').length;
     const location = `${relative(process.cwd(), file)}:${line}`;
     if (!/\bpButton\b/.test(button)) violations.push(`${location}: falta pButton`);
-    if (/\(click\)=/.test(button) && inFlightState.test(button) && !/\[loading\]=/.test(button)) {
+    const triggersAction = /\(click\)=/.test(button) || /type="submit"/.test(button);
+    if (triggersAction && inFlightState.test(button) && !/\[loading\]=/.test(button)) {
       violations.push(`${location}: falta [loading] para el estado en curso`);
     }
   }

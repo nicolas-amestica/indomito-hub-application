@@ -25,6 +25,7 @@ export class TripAccessPage {
   protected readonly tripId = this.route.snapshot.paramMap.get('id') ?? '';
   protected readonly access = signal<TripAccessView | null>(null);
   protected readonly busy = signal(false);
+  protected readonly copying = signal(false);
   protected readonly error = signal('');
   protected readonly success = signal('');
   private pending: { action: 'rotate' | 'revoke'; request: TripAccessRequest } | null = null;
@@ -41,7 +42,8 @@ export class TripAccessPage {
   }
   protected async copyCode(): Promise<void> {
     const code = this.access()?.tripCode;
-    if (!code) return;
+    if (!code || this.copying()) return;
+    this.copying.set(true);
     try {
       await navigator.clipboard.writeText(code);
       this.success.set('Código copiado. Compártelo solo con las personas autorizadas del grupo.');
@@ -49,6 +51,8 @@ export class TripAccessPage {
       this.error.set(
         'No fue posible copiar automáticamente. Selecciona el código y cópialo manualmente.',
       );
+    } finally {
+      this.copying.set(false);
     }
   }
   protected change(action: 'rotate' | 'revoke'): void {
