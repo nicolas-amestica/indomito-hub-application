@@ -24,6 +24,7 @@ export interface MeetRequest {
   title: string;
   date: string;
   startTime: string;
+  endTime: string;
   description: string;
   guests: string[];
   hostSk: string | null;
