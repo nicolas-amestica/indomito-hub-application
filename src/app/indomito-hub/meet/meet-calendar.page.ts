@@ -26,6 +26,7 @@ export class MeetCalendarPage {
   readonly month = signal(this.now.getMonth());
   readonly events = signal<MeetEvent[]>([]);
   readonly loading = signal(false);
+  private requestSequence = 0;
   readonly saving = signal(false);
   readonly error = signal('');
   readonly dialogVisible = signal(false);
@@ -58,15 +59,15 @@ export class MeetCalendarPage {
   }
 
   refresh(): void {
-    if (this.loading()) return;
     this.loading.set(true);
     this.error.set('');
+    const requestId = ++this.requestSequence;
     this.api.list(this.year(), this.month() + 1).pipe(
       takeUntilDestroyed(this.destroyRef),
-      finalize(() => this.loading.set(false)),
+      finalize(() => { if (requestId === this.requestSequence) this.loading.set(false); }),
     ).subscribe({
-      next: data => this.events.set(data),
-      error: () => this.error.set('No fue posible consultar Google Calendar. Comprueba la integración del backend.'),
+      next: data => { if (requestId === this.requestSequence) this.events.set(data); },
+      error: () => { if (requestId === this.requestSequence) this.error.set('No fue posible consultar Google Calendar. Comprueba la integración del backend.'); },
     });
   }
 
