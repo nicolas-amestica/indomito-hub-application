@@ -38,6 +38,7 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./indomito-hub/collections/collections.routes').then((m) => m.COLLECTIONS_ROUTES),
       },
+      { path: 'agenda/videollamadas', title: 'Agenda de Videollamadas', loadComponent: () => import('./indomito-hub/meet/meet-calendar.page').then(m => m.MeetCalendarPage) },
       { path: '', pathMatch: 'full', redirectTo: 'inicio' },
       {
         path: 'cotizaciones',
