@@ -55,7 +55,7 @@ export class MeetCalendarPage {
   constructor() { this.refresh(); }
 
   private emptyForm(): MeetRequest {
-    return { title: '', date: '', startTime: '10:00', description: '', guests: [], hostSk: null, hostName: null, hostColor: null };
+    return { title: '', date: '', startTime: '10:00', endTime: '11:00', description: '', guests: [], hostSk: null, hostName: null, hostColor: null };
   }
 
   refresh(): void {
@@ -87,7 +87,7 @@ export class MeetCalendarPage {
   open(date?: string, event?: MeetEvent): void {
     this.selected.set(event ?? null);
     Object.assign(this.form, this.emptyForm(), event ? {
-      title: event.title, date: event.date, startTime: event.startTime,
+      title: event.title, date: event.date, startTime: event.startTime, endTime: event.endTime,
       description: event.description, guests: [...event.guests],
       hostSk: event.hostSk, hostName: event.hostName, hostColor: event.hostColor,
     } : { date: date ?? '' });
@@ -96,7 +96,7 @@ export class MeetCalendarPage {
   }
 
   save(): void {
-    if (this.saving() || !this.form.title.trim() || !this.form.date || !this.form.startTime) return;
+    if (this.saving() || !this.form.title.trim() || !this.form.date || !this.form.startTime || !this.form.endTime) return;
     this.form.guests = [...new Set(this.guestsText().split(/[;,\n]/).map(x => x.trim()).filter(Boolean))];
     this.saving.set(true);
     this.error.set('');
