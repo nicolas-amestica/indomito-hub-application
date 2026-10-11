@@ -25,9 +25,9 @@
         @for (day of days(); track day.date) {
           <div class="min-h-24 border-b border-r border-surface-200 p-1.5 dark:border-surface-700 md:min-h-32"
                [class.opacity-40]="!day.current">
-            <button class="mb-1 rounded px-1 text-sm hover:bg-surface-100" type="button" (click)="open(day.date)" [disabled]="!canCreate()">{{ day.number }}</button>
+            <button pButton class="mb-1 rounded px-1 text-sm hover:bg-surface-100" type="button" (click)="open(day.date)" [disabled]="!canCreate()">{{ day.number }}</button>
             @for (event of day.events; track event.id) {
-              <button type="button" class="mb-1 block w-full truncate rounded bg-primary-100 px-1.5 py-1 text-left text-xs text-primary-800 dark:bg-primary-900 dark:text-primary-100"
+              <button pButton type="button" class="mb-1 block w-full truncate rounded bg-primary-100 px-1.5 py-1 text-left text-xs text-primary-800 dark:bg-primary-900 dark:text-primary-100"
                 [title]="event.title" (click)="open(day.date, event)" [disabled]="!canUpdate()">{{ event.startTime }} {{ event.title }}</button>
             }
           </div>
