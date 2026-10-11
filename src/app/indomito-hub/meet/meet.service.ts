@@ -30,6 +30,9 @@ export interface MeetRequest {
   hostSk: string | null;
   hostName: string | null;
   hostColor: string | null;
+  agent?: boolean;
+  phoneNumber?: string | null;
+  idempotencyKey?: string;
 }
 
 @Injectable({ providedIn: 'root' })
