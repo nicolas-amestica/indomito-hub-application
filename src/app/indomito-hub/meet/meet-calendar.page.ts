@@ -91,6 +91,7 @@ export class MeetCalendarPage {
 
   open(date?: string, event?: MeetEvent): void {
     if (event ? !this.canUpdate() : !this.canCreate()) return;
+    this.error.set("");
     this.selected.set(event ?? null);
     Object.assign(this.form, this.emptyForm(), event ? {
       title: event.title, date: event.date, startTime: event.startTime, endTime: event.endTime,
