@@ -43,6 +43,8 @@
     <label class="grid gap-1 text-sm">Fecha <input pInputText type="date" name="date" [(ngModel)]="form.date" required /></label>
     <label class="grid gap-1 text-sm">Hora de inicio <input pInputText type="time" name="startTime" [(ngModel)]="form.startTime" required /></label>
     <label class="grid gap-1 text-sm">Hora de término <input pInputText type="time" name="endTime" [(ngModel)]="form.endTime" required /></label>
+    <label class="grid gap-1 text-sm">Teléfono de contacto (opcional) <input pInputText type="tel" name="phoneNumber" [(ngModel)]="form.phoneNumber" /></label>
+    <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="agent" [(ngModel)]="form.agent" /> Reunión con agente</label>
     <label class="grid gap-1 text-sm">Descripción <textarea class="rounded border border-surface-300 p-2" name="description" [(ngModel)]="form.description" rows="3"></textarea></label>
     <label class="grid gap-1 text-sm">Invitados (correos separados por coma) <textarea class="rounded border border-surface-300 p-2" name="guests" [ngModel]="guestsText()" (ngModelChange)="guestsText.set($event)" rows="2"></textarea></label>
     @if (selected()?.googleMeetLink) {
