@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signa
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
-import { Button } from 'primeng/button';
+import { Button, ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
@@ -15,7 +15,7 @@ interface DayCell { date: string; number: number; current: boolean; events: Meet
 @Component({
   selector: 'app-meet-calendar',
   standalone: true,
-  imports: [FormsModule, Button, Dialog, InputText, Message, Skeleton],
+  imports: [FormsModule, Button, ButtonDirective, Dialog, InputText, Message, Skeleton],
   templateUrl: './meet-calendar.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
