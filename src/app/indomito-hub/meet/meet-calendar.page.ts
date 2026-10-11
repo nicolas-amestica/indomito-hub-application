@@ -60,7 +60,7 @@ export class MeetCalendarPage {
   constructor() { this.refresh(); }
 
   private emptyForm(): MeetRequest {
-    return { title: '', date: '', startTime: '10:00', endTime: '11:00', description: '', guests: [], hostSk: null, hostName: null, hostColor: null };
+    return { title: '', date: '', startTime: '10:00', endTime: '11:00', description: '', guests: [], hostSk: null, hostName: null, hostColor: null, agent: false, phoneNumber: null, idempotencyKey: crypto.randomUUID() };
   }
 
   refresh(): void {
@@ -96,6 +96,7 @@ export class MeetCalendarPage {
       title: event.title, date: event.date, startTime: event.startTime, endTime: event.endTime,
       description: event.description, guests: [...event.guests],
       hostSk: event.hostSk, hostName: event.hostName, hostColor: event.hostColor,
+      agent: event.agent ?? false, phoneNumber: event.phoneNumber ?? null,
     } : { date: date ?? '' });
     this.guestsText.set(this.form.guests.join(', '));
     this.dialogVisible.set(true);
