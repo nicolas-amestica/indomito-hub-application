@@ -52,19 +52,19 @@
         </dd>
         <p class="mt-2 text-sm text-white/70">Abonos bancarios menos pagos realizados.</p>
       </div>
-      <div class="border-b border-line p-5">
+      <div class="border-b border-line/75 dark:border-line/55 p-5">
         <dt>Clientes todavía nos deben</dt>
         <dd class="mt-2 text-2xl font-semibold">
           {{ data.cash.receivables | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}
         </dd>
       </div>
-      <div class="border-b border-line p-5">
+      <div class="border-b border-line/75 dark:border-line/55 p-5">
         <dt>Nosotros debemos pagar</dt>
         <dd class="mt-2 text-2xl font-semibold">
           {{ data.cash.payables | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}
         </dd>
       </div>
-      <div class="border-b border-line p-5">
+      <div class="border-b border-line/75 dark:border-line/55 p-5">
         <dt>Pagos por llegar al banco</dt>
         <dd class="mt-2 text-2xl font-semibold">
           {{ data.cash.inTransit | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}
@@ -235,7 +235,7 @@
         efectiva del proveedor.
       </p>
       @for (payment of unsettled(); track payment.id) {
-        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line py-4">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line/75 dark:border-line/55 py-4">
           <p>
             {{ payment.amount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }} bruto ·
             {{ payment.fee | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }} comisión estimada
@@ -256,7 +256,7 @@
     </p-panel>
     <p-panel header="Bandeja de comprobantes de prueba" [toggleable]="true">
       @for (mail of data.mail; track mail.id) {
-        <article class="border-b border-line py-3">
+        <article class="border-b border-line/75 dark:border-line/55 py-3">
           <h2 class="font-semibold">{{ mail.subject }}</h2>
           <p class="break-words text-sm">{{ mail.body }}</p>
           <p class="text-sm text-muted">Capturado localmente; no enviado a un correo real.</p>

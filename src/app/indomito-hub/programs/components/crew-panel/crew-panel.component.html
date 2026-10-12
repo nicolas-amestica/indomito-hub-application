@@ -3,14 +3,14 @@
   [class]="
     embedded()
       ? 'overflow-hidden bg-surface'
-      : 'overflow-hidden rounded-2xl border border-line border-t-4 border-t-graphite bg-surface shadow-sm'
+      : 'overflow-hidden rounded-2xl border border-line/75 dark:border-line/55 border-t-4 border-t-graphite bg-surface shadow-sm'
   "
 >
   <div
     [class]="
       embedded()
-        ? 'flex justify-end border-b border-line px-5 py-3 sm:px-6'
-        : 'border-b border-line bg-canvas/70 px-5 py-4 sm:px-6'
+        ? 'flex justify-end border-b border-line/75 dark:border-line/55 px-5 py-3 sm:px-6'
+        : 'border-b border-line/75 dark:border-line/55 bg-canvas/70 px-5 py-4 sm:px-6'
     "
   >
     <div class="flex w-full flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -57,7 +57,7 @@
 
   <div class="flex flex-col gap-4 p-5 sm:p-6" [attr.data-revision]="revision()">
     @for (row of crews().controls; track row.controls.id.value; let index = $index) {
-      <article [formGroup]="row" class="rounded-xl border border-line bg-canvas/50 p-4">
+      <article [formGroup]="row" class="rounded-xl border border-line/75 dark:border-line/55 bg-canvas/50 p-4">
         <div class="mb-4 flex items-center justify-between gap-3">
           <h3 class="text-sm font-semibold text-ink">Tripulante {{ index + 1 }}</h3>
           <button

@@ -8,7 +8,7 @@
   </header>
 
   <form
-    class="rounded-2xl border border-line bg-surface p-5 sm:p-6"
+    class="rounded-2xl border border-line/75 dark:border-line/55 bg-surface p-5 sm:p-6"
     [formGroup]="form"
     (ngSubmit)="save()"
   >
@@ -57,14 +57,14 @@
         <span class="text-sm font-semibold text-ink">Descripción</span>
         <input pInputText fluid formControlName="description" maxlength="300" />
       </label>
-      <label class="flex items-center gap-3 rounded-xl border border-line px-4 py-3">
+      <label class="flex items-center gap-3 rounded-xl border border-line/75 dark:border-line/55 px-4 py-3">
         <p-toggleswitch formControlName="active" />
         <span
           ><strong class="block text-sm text-ink">Activo</strong
           ><small class="text-muted">Disponible en búsquedas</small></span
         >
       </label>
-      <label class="flex items-center gap-3 rounded-xl border border-line px-4 py-3">
+      <label class="flex items-center gap-3 rounded-xl border border-line/75 dark:border-line/55 px-4 py-3">
         <p-toggleswitch formControlName="default" />
         <span
           ><strong class="block text-sm text-ink">Precargado</strong
@@ -72,7 +72,7 @@
         >
       </label>
     </div>
-    <div class="mt-5 flex justify-end border-t border-line pt-5">
+    <div class="mt-5 flex justify-end border-t border-line/75 dark:border-line/55 pt-5">
       <button pButton type="submit" [loading]="saving()" [disabled]="saving()">
         {{ saving() ? 'Guardando…' : editingId() ? 'Guardar cambios' : 'Crear servicio' }}
       </button>
@@ -80,10 +80,10 @@
   </form>
 
   <section
-    class="overflow-hidden rounded-2xl border border-line bg-surface"
+    class="overflow-hidden rounded-2xl border border-line/75 dark:border-line/55 bg-surface"
     aria-labelledby="catalog-list-title"
   >
-    <div class="border-b border-line px-5 py-4">
+    <div class="border-b border-line/75 dark:border-line/55 px-5 py-4">
       <h2 id="catalog-list-title" class="text-xl font-semibold text-ink">Servicios configurados</h2>
     </div>
     <p-table

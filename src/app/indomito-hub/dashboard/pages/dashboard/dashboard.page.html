@@ -135,7 +135,7 @@
           @for (group of upcomingTrips(); track group.tripId) {
             <a
               [routerLink]="['/cobranza/giras', group.tripId, 'tesoreria']"
-              class="rounded-xl border border-line p-3 hover:border-brand-active"
+              class="rounded-xl border border-line/75 dark:border-line/55 p-3 hover:border-brand-active"
               ><span class="font-semibold">{{ group.institutionName }}</span
               ><span class="mt-1 block text-sm text-muted"
                 >{{ group.destination }} · {{ group.departureDate || 'Fecha por definir' }}</span

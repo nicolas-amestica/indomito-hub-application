@@ -20,9 +20,9 @@
     <div class="flex flex-col gap-6 p-5 sm:p-6">
       <section
         aria-labelledby="preview-general-heading"
-        class="rounded-xl border border-line bg-surface p-4"
+        class="rounded-xl border border-line/75 dark:border-line/55 bg-surface p-4"
       >
-        <div class="flex flex-col gap-1 border-b border-line pb-3">
+        <div class="flex flex-col gap-1 border-b border-line/75 dark:border-line/55 pb-3">
           <p class="text-xs font-semibold uppercase tracking-[0.16em] text-graphite">Cotización</p>
           <h2 id="preview-general-heading" class="text-xl font-semibold text-ink">
             {{ program().generals.name }}
@@ -61,7 +61,7 @@
       <div class="grid gap-4 lg:grid-cols-2">
         <section
           aria-labelledby="preview-schedule-heading"
-          class="rounded-xl border border-line bg-surface p-4"
+          class="rounded-xl border border-line/75 dark:border-line/55 bg-surface p-4"
         >
           <h2 id="preview-schedule-heading" class="font-semibold text-ink">
             Duración y cantidades
@@ -97,7 +97,7 @@
 
         <section
           aria-labelledby="preview-pricing-heading"
-          class="rounded-xl border border-line bg-surface p-4"
+          class="rounded-xl border border-line/75 dark:border-line/55 bg-surface p-4"
         >
           <h2 id="preview-pricing-heading" class="font-semibold text-ink">Parámetros de precio</h2>
           <dl class="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
@@ -150,13 +150,13 @@
 
       <section
         aria-labelledby="preview-crew-heading"
-        class="rounded-xl border border-line bg-surface p-4"
+        class="rounded-xl border border-line/75 dark:border-line/55 bg-surface p-4"
       >
         <h2 id="preview-crew-heading" class="font-semibold text-ink">Tripulación</h2>
         <div class="app-table-viewport mt-3">
           <table class="w-full min-w-[44rem] border-collapse text-sm">
             <thead>
-              <tr class="border-b border-line text-left text-xs uppercase tracking-wide text-muted">
+              <tr class="border-b border-line/75 dark:border-line/55 text-left text-xs uppercase tracking-wide text-muted">
                 <th scope="col" class="px-3 py-2 font-semibold">Nombre</th>
                 <th scope="col" class="px-3 py-2 font-semibold">Documento</th>
                 <th scope="col" class="px-3 py-2 text-right font-semibold">Precio diario</th>
@@ -166,7 +166,7 @@
             </thead>
             <tbody>
               @for (crew of program().crews; track $index) {
-                <tr class="border-b border-line last:border-b-0">
+                <tr class="border-b border-line/75 dark:border-line/55 last:border-b-0">
                   <td class="px-3 py-2.5 font-medium text-ink">{{ crew.name }}</td>
                   <td class="px-3 py-2.5 text-graphite">{{ crew.documentId }}</td>
                   <td class="px-3 py-2.5 text-right tabular-nums text-graphite">
@@ -195,13 +195,13 @@
 
       <section
         aria-labelledby="preview-services-heading"
-        class="rounded-xl border border-line bg-surface p-4"
+        class="rounded-xl border border-line/75 dark:border-line/55 bg-surface p-4"
       >
         <h2 id="preview-services-heading" class="font-semibold text-ink">Servicios</h2>
         <div class="app-table-viewport mt-3">
           <table class="w-full min-w-[48rem] border-collapse text-sm">
             <thead>
-              <tr class="border-b border-line text-left text-xs uppercase tracking-wide text-muted">
+              <tr class="border-b border-line/75 dark:border-line/55 text-left text-xs uppercase tracking-wide text-muted">
                 <th scope="col" class="px-3 py-2 font-semibold">Nombre</th>
                 <th scope="col" class="px-3 py-2 font-semibold">Tipo</th>
                 <th scope="col" class="px-3 py-2 text-right font-semibold">Precio unitario</th>
@@ -211,7 +211,7 @@
             </thead>
             <tbody>
               @for (service of program().services; track $index) {
-                <tr class="border-b border-line last:border-b-0">
+                <tr class="border-b border-line/75 dark:border-line/55 last:border-b-0">
                   <td class="px-3 py-2.5 font-medium text-ink">{{ service.name }}</td>
                   <td class="px-3 py-2.5 text-graphite">
                     {{ chargeTypeLabels[service.chargeType] }}
@@ -242,7 +242,7 @@
 
       <section
         aria-labelledby="preview-totals-heading"
-        class="rounded-xl border border-line bg-canvas p-4"
+        class="rounded-xl border border-line/75 dark:border-line/55 bg-canvas p-4"
       >
         <h2 id="preview-totals-heading" class="font-semibold text-graphite">Totales</h2>
         <dl
@@ -333,7 +333,7 @@
         <div
           role="status"
           aria-live="polite"
-          class="flex items-center justify-center gap-3 rounded-xl border border-line bg-canvas px-4 py-3 text-sm font-medium text-graphite"
+          class="flex items-center justify-center gap-3 rounded-xl border border-line/75 dark:border-line/55 bg-canvas px-4 py-3 text-sm font-medium text-graphite"
         >
           <p-progress-spinner
             ariaLabel="Procesando acción"

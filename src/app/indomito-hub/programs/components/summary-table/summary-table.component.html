@@ -4,10 +4,10 @@
     [class]="
       embedded()
         ? 'w-0 min-w-full max-w-full overflow-hidden bg-surface'
-        : 'w-0 min-w-full max-w-full overflow-hidden rounded-2xl border border-line border-t-4 border-t-graphite bg-surface shadow-sm'
+        : 'w-0 min-w-full max-w-full overflow-hidden rounded-2xl border border-line/75 dark:border-line/55 border-t-4 border-t-graphite bg-surface shadow-sm'
     "
   >
-    <div class="border-b border-line bg-canvas/70 px-5 py-4 sm:px-6">
+    <div class="border-b border-line/75 dark:border-line/55 bg-canvas/70 px-5 py-4 sm:px-6">
       <div class="flex min-w-0 flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         @if (embedded()) {
           <h2 id="summary-heading" class="sr-only">Resumen de la cotización</h2>
@@ -89,25 +89,25 @@
 
     <div class="flex w-0 min-w-full max-w-full flex-col gap-4 p-5 sm:p-6">
       <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Tipos de cambio usados">
-        <div class="rounded-xl border border-line bg-canvas px-4 py-3">
+        <div class="rounded-xl border border-line/75 dark:border-line/55 bg-canvas px-4 py-3">
           <p class="text-xs font-semibold uppercase tracking-wide text-muted">Snapshot</p>
           <p class="mt-1 font-medium text-ink">
             {{ snapshotDate() | date: 'longDate' : 'UTC' }}
           </p>
         </div>
-        <div class="rounded-xl border border-line bg-canvas px-4 py-3">
+        <div class="rounded-xl border border-line/75 dark:border-line/55 bg-canvas px-4 py-3">
           <p class="text-xs font-semibold uppercase tracking-wide text-muted">Origen</p>
           <p class="mt-1 font-semibold text-ink">
             {{ exchangeRateOriginLabel(snapshotSource(), snapshotIsFallback()) }}
           </p>
         </div>
-        <div class="rounded-xl border border-line bg-canvas px-4 py-3">
+        <div class="rounded-xl border border-line/75 dark:border-line/55 bg-canvas px-4 py-3">
           <p class="text-xs font-semibold uppercase tracking-wide text-graphite">USD efectivo</p>
           <p class="mt-1 font-semibold tabular-nums text-graphite">
             1 USD = {{ effectiveRates().USD | clpAmount }} CLP
           </p>
         </div>
-        <div class="rounded-xl border border-line bg-canvas px-4 py-3">
+        <div class="rounded-xl border border-line/75 dark:border-line/55 bg-canvas px-4 py-3">
           <p class="text-xs font-semibold uppercase tracking-wide text-graphite">BRL efectivo</p>
           <p class="mt-1 font-semibold tabular-nums text-graphite">
             1 BRL = {{ effectiveRates().BRL | clpAmount }} CLP
@@ -138,7 +138,7 @@
         <strong class="font-semibold text-ink">{{ totalRowCount() }}</strong> filas.
       </p>
 
-      <div class="app-table-viewport rounded-xl border border-line">
+      <div class="app-table-viewport rounded-xl border border-line/75 dark:border-line/55">
         @if (totalRowCount() >= virtualScrollThreshold) {
           <p-table
             dataKey="key"
@@ -156,7 +156,7 @@
             <ng-template #body let-row>
               <tr
                 data-summary-row
-                class="h-[61px] border-t border-line bg-surface hover:bg-canvas/70"
+                class="h-[61px] border-t border-line/75 dark:border-line/55 bg-surface hover:bg-canvas/70"
               >
                 <ng-container
                   [ngTemplateOutlet]="rowCells"
@@ -183,7 +183,7 @@
               @for (row of rows(); track row.key) {
                 <tr
                   data-summary-row
-                  class="h-[61px] border-t border-line bg-surface hover:bg-canvas/70"
+                  class="h-[61px] border-t border-line/75 dark:border-line/55 bg-surface hover:bg-canvas/70"
                 >
                   <ng-container
                     [ngTemplateOutlet]="rowCells"
@@ -298,7 +298,7 @@
 </ng-template>
 
 <ng-template #totalsRow>
-  <tr class="border-t-2 border-line bg-canvas/70">
+  <tr class="border-t-2 border-line/75 dark:border-line/55 bg-canvas/70">
     <td colspan="7" class="px-4 py-4">
       <div
         class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"

@@ -26,7 +26,7 @@ export class SideDrawerComponent {
 
   protected readonly panelClasses = computed(() =>
     this.collapsed()
-      ? 'fixed inset-y-0 right-0 z-40 flex w-[min(24rem,calc(100vw-2rem))] flex-col overflow-hidden border-l border-line bg-surface shadow-2xl md:w-20'
-      : 'fixed inset-y-0 right-0 z-40 flex w-[min(24rem,calc(100vw-2rem))] flex-col overflow-hidden border-l border-line bg-surface shadow-2xl md:w-96',
+      ? 'fixed inset-y-0 right-0 z-40 flex w-[min(24rem,calc(100vw-2rem))] flex-col overflow-hidden border-l border-line/75 dark:border-line/55 bg-surface shadow-2xl md:w-20'
+      : 'fixed inset-y-0 right-0 z-40 flex w-[min(24rem,calc(100vw-2rem))] flex-col overflow-hidden border-l border-line/75 dark:border-line/55 bg-surface shadow-2xl md:w-96',
   );
 }

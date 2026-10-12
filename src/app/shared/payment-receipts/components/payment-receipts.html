@@ -13,7 +13,7 @@
       <p>No hay comprobantes registrados.</p>
     }
     @for (receipt of view().items; track receipt.id) {
-      <article class="flex flex-col gap-2 border-t border-line pt-3">
+      <article class="flex flex-col gap-2 border-t border-line/75 dark:border-line/55 pt-3">
         <p class="font-semibold">
           {{ receipt.amount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }} ·
           {{ receipt.effectiveDate | date: 'dd/MM/yyyy' : 'UTC' }}
@@ -54,7 +54,7 @@
       <form
         [formGroup]="emailForm()"
         (ngSubmit)="resend()"
-        class="flex min-w-0 flex-col gap-3 border-t border-line pt-4"
+        class="flex min-w-0 flex-col gap-3 border-t border-line/75 dark:border-line/55 pt-4"
         [attr.aria-busy]="delivery().busy"
       >
         <p class="break-all text-sm">Reenviar comprobante {{ delivery().receiptId }}</p>

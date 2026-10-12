@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, type NgForm } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { Button, ButtonDirective } from 'primeng/button';
@@ -104,8 +104,12 @@ export class MeetCalendarPage {
     this.dialogVisible.set(true);
   }
 
-  save(): void {
-    if ((this.selected() ? !this.canUpdate() : !this.canCreate()) || this.saving() || !this.form.title.trim() || !this.form.date || !this.form.startTime || !this.form.endTime) return;
+  save(meetingForm: NgForm): void {
+    if (meetingForm.invalid || !this.form.title.trim()) {
+      meetingForm.form.markAllAsTouched();
+      return;
+    }
+    if ((this.selected() ? !this.canUpdate() : !this.canCreate()) || this.saving()) return;
     this.form.guests = [...new Set(this.guestsText().split(/[;,\n]/).map(x => x.trim()).filter(Boolean))];
     this.saving.set(true);
     this.error.set('');

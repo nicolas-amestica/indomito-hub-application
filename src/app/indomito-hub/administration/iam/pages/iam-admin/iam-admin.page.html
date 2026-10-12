@@ -33,9 +33,9 @@
     </div>
   }
 
-  <section class="mt-6 overflow-hidden rounded-3xl border border-line bg-surface shadow-panel">
+  <section class="mt-6 overflow-hidden rounded-3xl border border-line/75 dark:border-line/55 bg-surface shadow-panel">
     <div
-      class="flex flex-col gap-4 border-b border-line p-4 md:flex-row md:items-center md:justify-between md:p-5"
+      class="flex flex-col gap-4 border-b border-line/75 dark:border-line/55 p-4 md:flex-row md:items-center md:justify-between md:p-5"
     >
       <nav class="flex gap-1 rounded-2xl bg-canvas p-1" aria-label="Secciones IAM">
         @for (
@@ -89,7 +89,7 @@
         <table class="w-full min-w-190 text-left text-sm">
           <thead>
             <tr
-              class="border-b border-line bg-canvas text-[10px] font-bold uppercase tracking-[.13em] text-muted"
+              class="border-b border-line/75 dark:border-line/55 bg-canvas text-[10px] font-bold uppercase tracking-[.13em] text-muted"
             >
               @if (tab() === 'users') {
                 <th class="px-5 py-3">Usuario</th>
@@ -111,7 +111,7 @@
           <tbody>
             @if (tab() === 'users') {
               @for (item of visibleUsers(); track item.id) {
-                <tr class="border-b border-line last:border-0 hover:bg-canvas">
+                <tr class="border-b border-line/75 dark:border-line/55 last:border-0 hover:bg-canvas">
                   <td class="px-5 py-4">
                     <strong class="block">{{ item.name }}</strong
                     ><span class="text-xs text-muted">{{ item.email }}</span>
@@ -160,7 +160,7 @@
               }
             } @else if (tab() === 'profiles') {
               @for (item of visibleProfiles(); track item.code) {
-                <tr class="border-b border-line last:border-0 hover:bg-canvas">
+                <tr class="border-b border-line/75 dark:border-line/55 last:border-0 hover:bg-canvas">
                   <td class="px-5 py-4">
                     <strong class="block">{{ item.title }}</strong
                     ><span class="font-mono text-xs text-muted"
@@ -208,7 +208,7 @@
               }
             } @else {
               @for (item of visibleModules(); track item.code) {
-                <tr class="border-b border-line last:border-0 hover:bg-canvas">
+                <tr class="border-b border-line/75 dark:border-line/55 last:border-0 hover:bg-canvas">
                   <td class="px-5 py-4">
                     <div class="flex items-center gap-3">
                       <span class="grid size-9 place-items-center rounded-xl bg-night text-brand"
@@ -270,7 +270,7 @@
         (click)="$event.stopPropagation()"
       >
         <header
-          class="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line bg-surface/95 px-4 py-4 backdrop-blur sm:px-6 sm:py-5"
+          class="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line/75 dark:border-line/55 bg-surface/95 px-4 py-4 backdrop-blur sm:px-6 sm:py-5"
         >
           <div class="min-w-0">
             <p class="text-[10px] font-bold uppercase tracking-[.18em] text-muted">
@@ -302,7 +302,7 @@
                 }
               </div>
               @for (root of rootModules(); track root.code) {
-                <div class="mb-3 overflow-hidden rounded-2xl border border-line">
+                <div class="mb-3 overflow-hidden rounded-2xl border border-line/75 dark:border-line/55">
                   <div
                     class="grid grid-cols-[1fr_repeat(4,4.5rem)] items-center gap-2 bg-canvas px-4 py-3"
                   >
@@ -322,7 +322,7 @@
                   </div>
                   @for (child of children(root.code); track child.code) {
                     <div
-                      class="grid grid-cols-[1fr_repeat(4,4.5rem)] items-center gap-2 border-t border-line px-4 py-3"
+                      class="grid grid-cols-[1fr_repeat(4,4.5rem)] items-center gap-2 border-t border-line/75 dark:border-line/55 px-4 py-3"
                     >
                       <span class="pl-5 text-sm"
                         ><i class="icon-[tabler--corner-down-right] mr-2 text-muted"></i
@@ -502,7 +502,7 @@
           </form>
         }
         <footer
-          class="sticky bottom-0 flex justify-end gap-2 border-t border-line bg-surface/95 px-6 py-4 backdrop-blur"
+          class="sticky bottom-0 flex justify-end gap-2 border-t border-line/75 dark:border-line/55 bg-surface/95 px-6 py-4 backdrop-blur"
         >
           <button
             pButton

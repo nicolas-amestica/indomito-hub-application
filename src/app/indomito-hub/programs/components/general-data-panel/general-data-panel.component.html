@@ -3,13 +3,13 @@
   [class]="
     embedded()
       ? 'overflow-hidden bg-surface'
-      : 'overflow-hidden rounded-2xl border border-line border-t-4 border-t-graphite bg-surface shadow-sm'
+      : 'overflow-hidden rounded-2xl border border-line/75 dark:border-line/55 border-t-4 border-t-graphite bg-surface shadow-sm'
   "
 >
   @if (embedded()) {
     <h2 id="general-data-heading" class="sr-only">Datos generales</h2>
   } @else {
-    <div class="border-b border-line bg-canvas/70 px-5 py-4 sm:px-6">
+    <div class="border-b border-line/75 dark:border-line/55 bg-canvas/70 px-5 py-4 sm:px-6">
       <div class="flex items-start gap-3">
         <span
           aria-hidden="true"

@@ -79,7 +79,7 @@
           @for (module of filteredModules(); track module.code) {
             <a
               [routerLink]="module.path"
-              class="group flex min-h-13 min-w-0 items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-left transition-colors hover:border-line hover:bg-canvas focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-active"
+              class="group flex min-h-13 min-w-0 items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-left transition-colors hover:border-line/75 hover:bg-canvas focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-active dark:hover:border-line/55"
               (click)="close()"
             >
               <span

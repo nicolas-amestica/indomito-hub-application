@@ -3,13 +3,13 @@
   [class]="
     embedded()
       ? 'overflow-hidden bg-surface'
-      : 'overflow-hidden rounded-2xl border border-line border-t-4 border-t-amber-500 bg-surface shadow-sm'
+      : 'overflow-hidden rounded-2xl border border-line/75 dark:border-line/55 border-t-4 border-t-amber-500 bg-surface shadow-sm'
   "
 >
   @if (embedded()) {
     <h2 id="pricing-heading" class="sr-only">Parámetros de precio</h2>
   } @else {
-    <div class="border-b border-line bg-canvas/70 px-5 py-4 sm:px-6">
+    <div class="border-b border-line/75 dark:border-line/55 bg-canvas/70 px-5 py-4 sm:px-6">
       <div class="flex items-start gap-3">
         <span
           aria-hidden="true"
@@ -28,7 +28,7 @@
   }
 
   <div [formGroup]="group()" class="grid gap-5 p-5 sm:p-6 lg:grid-cols-2">
-    <article class="rounded-xl border border-line bg-canvas/60 p-4">
+    <article class="rounded-xl border border-line/75 dark:border-line/55 bg-canvas/60 p-4">
       <div class="mb-4 flex items-center justify-between gap-3">
         <div>
           <p class="text-xs font-semibold uppercase tracking-wider text-muted">
@@ -74,7 +74,7 @@
       </div>
 
       <dl
-        class="mt-4 grid grid-cols-3 divide-x divide-slate-200 rounded-lg border border-line bg-surface py-3 text-center"
+        class="mt-4 grid grid-cols-3 divide-x divide-line/75 dark:divide-line/55 rounded-lg border border-line/75 dark:border-line/55 bg-surface py-3 text-center"
       >
         <div class="px-2">
           <dt class="text-xs text-muted">Tasa del día</dt>
@@ -111,7 +111,7 @@
       </dl>
     </article>
 
-    <article class="rounded-xl border border-line bg-canvas/60 p-4">
+    <article class="rounded-xl border border-line/75 dark:border-line/55 bg-canvas/60 p-4">
       <div class="mb-4 flex items-center justify-between gap-3">
         <div>
           <p class="text-xs font-semibold uppercase tracking-wider text-muted">Real brasileño</p>
@@ -153,7 +153,7 @@
       </div>
 
       <dl
-        class="mt-4 grid grid-cols-3 divide-x divide-slate-200 rounded-lg border border-line bg-surface py-3 text-center"
+        class="mt-4 grid grid-cols-3 divide-x divide-line/75 dark:divide-line/55 rounded-lg border border-line/75 dark:border-line/55 bg-surface py-3 text-center"
       >
         <div class="px-2">
           <dt class="text-xs text-muted">Tasa del día</dt>

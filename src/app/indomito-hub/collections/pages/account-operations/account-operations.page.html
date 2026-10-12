@@ -62,7 +62,7 @@
     </p-panel>
     <p-panel header="Cuotas">
       @for (q of quotas(); track q.id) {
-        <div class="flex flex-wrap justify-between gap-3 border-b border-line py-3">
+        <div class="flex flex-wrap justify-between gap-3 border-b border-line/75 dark:border-line/55 py-3">
           <p>{{ q.label }}</p>
           <p>
             Pendiente: {{ q.outstanding | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }} · Pagado:
@@ -90,7 +90,7 @@
         }
         @for (attempt of attempts(); track attempt.id) {
           <article
-            class="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3"
+            class="flex flex-wrap items-center justify-between gap-3 border-t border-line/75 dark:border-line/55 pt-3"
           >
             <div>
               <p class="font-semibold">
