@@ -33,7 +33,9 @@
     </div>
   }
 
-  <section class="mt-6 overflow-hidden rounded-3xl border border-line/75 dark:border-line/55 bg-surface shadow-panel">
+  <section
+    class="mt-6 overflow-hidden rounded-3xl border border-line/75 dark:border-line/55 bg-surface shadow-panel"
+  >
     <div
       class="flex flex-col gap-4 border-b border-line/75 dark:border-line/55 p-4 md:flex-row md:items-center md:justify-between md:p-5"
     >
@@ -101,7 +103,7 @@
                 <th class="px-5 py-3 text-center">Usuarios</th>
               } @else {
                 <th class="px-5 py-3">Módulo</th>
-                <th class="px-5 py-3">Jerarquía</th>
+                <th class="px-5 py-3 text-center">Submódulos</th>
                 <th class="px-5 py-3">Ruta</th>
               }
               <th class="px-5 py-3">Estado</th>
@@ -111,7 +113,9 @@
           <tbody>
             @if (tab() === 'users') {
               @for (item of visibleUsers(); track item.id) {
-                <tr class="border-b border-line/75 dark:border-line/55 last:border-0 hover:bg-canvas">
+                <tr
+                  class="border-b border-line/75 dark:border-line/55 last:border-0 hover:bg-canvas"
+                >
                   <td class="px-5 py-4">
                     <strong class="block">{{ item.name }}</strong
                     ><span class="text-xs text-muted">{{ item.email }}</span>
@@ -140,7 +144,7 @@
                     <button
                       pButton
                       [unstyled]="true"
-                      class="iam-action"
+                      class="iam-action cursor-pointer"
                       title="Editar"
                       (click)="editUser(item)"
                     >
@@ -148,7 +152,7 @@
                     ><button
                       pButton
                       [unstyled]="true"
-                      class="iam-action text-red-600"
+                      class="iam-action cursor-pointer text-red-600"
                       title="Eliminar"
                       [loading]="saving()"
                       (click)="removeUser(item)"
@@ -160,7 +164,9 @@
               }
             } @else if (tab() === 'profiles') {
               @for (item of visibleProfiles(); track item.code) {
-                <tr class="border-b border-line/75 dark:border-line/55 last:border-0 hover:bg-canvas">
+                <tr
+                  class="border-b border-line/75 dark:border-line/55 last:border-0 hover:bg-canvas"
+                >
                   <td class="px-5 py-4">
                     <strong class="block">{{ item.title }}</strong
                     ><span class="font-mono text-xs text-muted"
@@ -208,25 +214,32 @@
               }
             } @else {
               @for (item of visibleModules(); track item.code) {
-                <tr class="border-b border-line/75 dark:border-line/55 last:border-0 hover:bg-canvas">
+                <tr
+                  class="cursor-pointer border-b border-line/75 transition-colors last:border-0 hover:bg-canvas dark:border-line/55"
+                  (click)="openSubmodules(item)"
+                >
                   <td class="px-5 py-4">
-                    <div class="flex items-center gap-3">
+                    <button
+                      pButton
+                      [unstyled]="true"
+                      type="button"
+                      class="flex w-full items-center gap-3 rounded-lg text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-active"
+                      [attr.aria-label]="'Ver submódulos de ' + item.title"
+                      (click)="$event.stopPropagation(); openSubmodules(item)"
+                    >
                       <span class="grid size-9 place-items-center rounded-xl bg-night text-brand"
-                        ><i [class]="item.icon"></i
+                        ><i [class]="moduleIcon(item)" aria-hidden="true"></i
                       ></span>
                       <div>
                         <strong class="block">{{ item.title }}</strong
                         ><span class="font-mono text-xs text-muted">{{ item.code }}</span>
                       </div>
-                    </div>
+                    </button>
                   </td>
-                  <td class="px-5 py-4">
-                    <span
-                      class="rounded-full px-3 py-1 text-xs font-bold"
-                      [class.bg-brand/25]="item.level === 'LV1'"
-                      [class.bg-black/5]="item.level === 'LV2'"
-                      >{{ item.level }}{{ item.parentCode ? ' · ' + item.parentCode : '' }}</span
-                    >
+                  <td class="px-5 py-4 text-center">
+                    <span class="rounded-full bg-brand/20 px-3 py-1 text-xs font-bold text-ink">
+                      {{ childCount(item.code) }}
+                    </span>
                   </td>
                   <td class="px-5 py-4 font-mono text-xs text-muted">{{ item.path }}</td>
                   <td class="px-5 py-4">{{ item.active ? 'Activo' : 'Inactivo' }}</td>
@@ -236,7 +249,8 @@
                       [unstyled]="true"
                       class="iam-action"
                       title="Editar"
-                      (click)="editModule(item)"
+                      aria-label="Editar módulo"
+                      (click)="$event.stopPropagation(); editModule(item)"
                     >
                       <i class="icon-[tabler--pencil]"></i></button
                     ><button
@@ -244,8 +258,9 @@
                       [unstyled]="true"
                       class="iam-action text-red-600"
                       title="Eliminar"
+                      aria-label="Eliminar módulo"
                       [loading]="saving()"
-                      (click)="removeModule(item)"
+                      (click)="$event.stopPropagation(); removeModule(item)"
                     >
                       <i class="icon-[tabler--trash]"></i>
                     </button>
@@ -258,6 +273,79 @@
       </div>
     }
   </section>
+
+  <p-dialog
+    [visible]="!!selectedRootModule()"
+    (visibleChange)="$event ? null : closeSubmodules()"
+    [modal]="true"
+    [dismissableMask]="true"
+    [header]="'Submódulos de ' + (selectedRootModule()?.title ?? '')"
+    [style]="{ width: 'min(95vw, 56rem)' }"
+    styleClass="border-line/75! dark:border-line/55!"
+  >
+    <p class="mb-4 text-sm text-muted">
+      Selecciona la acción de un módulo de nivel 2 para modificar su configuración.
+    </p>
+    <p-table
+      [value]="selectedChildModules()"
+      dataKey="code"
+      [scrollable]="true"
+      [tableStyle]="{ 'min-width': '42rem' }"
+    >
+      <ng-template #header>
+        <tr>
+          <th class="border-line/75! dark:border-line/55!">Módulo</th>
+          <th class="border-line/75! dark:border-line/55!">Ruta</th>
+          <th class="border-line/75! dark:border-line/55!">Estado</th>
+          <th class="w-24 border-line/75! text-center dark:border-line/55!">Acción</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-item>
+        <tr>
+          <td class="border-line/75! dark:border-line/55!">
+            <div class="flex items-center gap-3">
+              <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-night text-brand">
+                <i [class]="moduleIcon(item)" aria-hidden="true"></i>
+              </span>
+              <span class="min-w-0">
+                <strong class="block truncate">{{ item.title }}</strong>
+                <small class="font-mono text-muted">{{ item.code }}</small>
+              </span>
+            </div>
+          </td>
+          <td class="border-line/75! font-mono text-xs text-muted dark:border-line/55!">
+            {{ item.path }}
+          </td>
+          <td class="border-line/75! dark:border-line/55!">
+            {{ item.active ? 'Activo' : 'Inactivo' }}
+          </td>
+          <td class="border-line/75! text-center dark:border-line/55!">
+            <button
+              pButton
+              [unstyled]="true"
+              type="button"
+              class="iam-action cursor-pointer"
+              title="Editar"
+              [attr.aria-label]="'Editar ' + item.title"
+              (click)="editSubmodule(item)"
+            >
+              <i class="icon-[tabler--pencil]" aria-hidden="true"></i>
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td
+            colspan="4"
+            class="border-line/75! py-8 text-center text-sm text-muted dark:border-line/55!"
+          >
+            Este módulo no tiene submódulos de nivel 2.
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-dialog>
 
   @if (dialog()) {
     <div
@@ -302,7 +390,9 @@
                 }
               </div>
               @for (root of rootModules(); track root.code) {
-                <div class="mb-3 overflow-hidden rounded-2xl border border-line/75 dark:border-line/55">
+                <div
+                  class="mb-3 overflow-hidden rounded-2xl border border-line/75 dark:border-line/55"
+                >
                   <div
                     class="grid grid-cols-[1fr_repeat(4,4.5rem)] items-center gap-2 bg-canvas px-4 py-3"
                   >

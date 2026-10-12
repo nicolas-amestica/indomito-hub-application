@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { ButtonDirective } from 'primeng/button';
+import { Dialog } from 'primeng/dialog';
+import { TableModule } from 'primeng/table';
 import { IamAllowance, IamModule, IamProfile, IamUser } from '../../interfaces/iam.interface';
 import { IamAdminService } from '../../services/iam-admin.service';
 import { AuthService } from '../../../../../core/auth/auth.service';
@@ -12,11 +14,12 @@ import {
   createEmptyIamProfile,
   createEmptyIamUser,
 } from '../../fn/fn-create-empty-iam-forms';
+import { filterRootIamModules, resolveIamModuleIcon } from '../../fn/fn-iam-module-view';
 import type { IamAdminDialog, IamAdminTab } from '../../types/iam-admin.types';
 
 @Component({
   selector: 'app-iam-admin',
-  imports: [ButtonDirective, FormsModule],
+  imports: [ButtonDirective, Dialog, FormsModule, TableModule],
   templateUrl: './iam-admin.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -33,6 +36,7 @@ export class IamAdminPage {
   readonly message = signal('');
   readonly search = signal('');
   readonly selectedProfile = signal<IamProfile | null>(null);
+  readonly selectedRootModule = signal<IamModule | null>(null);
   readonly grants = signal<Record<string, IamAllowance[]>>({});
   readonly editingProfileCode = signal('');
   readonly editingModuleCode = signal('');
@@ -51,11 +55,13 @@ export class IamAdminPage {
     const q = this.search().toLowerCase().trim();
     return this.profiles().filter((p) => !q || `${p.code} ${p.title}`.toLowerCase().includes(q));
   });
-  readonly visibleModules = computed(() => {
-    const q = this.search().toLowerCase().trim();
-    return this.modules().filter(
-      (m) => !q || `${m.code} ${m.title} ${m.path}`.toLowerCase().includes(q),
-    );
+  readonly visibleModules = computed(() => filterRootIamModules(this.modules(), this.search()));
+  readonly selectedChildModules = computed(() => {
+    const root = this.selectedRootModule();
+    if (!root) return [];
+    return this.modules()
+      .filter((module) => module.level === 'LV2' && module.parentCode === root.code)
+      .sort((left, right) => left.order - right.order);
   });
 
   constructor() {
@@ -111,6 +117,16 @@ export class IamAdminPage {
     this.editingModuleCode.set(item.code);
     Object.assign(this.module, item, { endpoints: item.endpoints.join(', ') });
     this.dialog.set('module');
+  }
+  openSubmodules(item: IamModule) {
+    this.selectedRootModule.set(item);
+  }
+  closeSubmodules() {
+    this.selectedRootModule.set(null);
+  }
+  editSubmodule(item: IamModule) {
+    this.closeSubmodules();
+    this.editModule(item);
   }
   closeDialog() {
     if (!this.saving()) this.dialog.set(null);
@@ -219,6 +235,12 @@ export class IamAdminPage {
   }
   children(parent: string) {
     return this.modules().filter((m) => m.parentCode === parent);
+  }
+  childCount(parent: string) {
+    return this.modules().filter((module) => module.parentCode === parent).length;
+  }
+  moduleIcon(item: IamModule) {
+    return resolveIamModuleIcon(item);
   }
   profileTitle(code: string) {
     return this.profiles().find((p) => p.code === code)?.title ?? code;
