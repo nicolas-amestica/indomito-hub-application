@@ -46,7 +46,8 @@
 </section>
 
 <p-dialog [visible]="dialogVisible()" (visibleChange)="dialogVisible.set($event)" [modal]="true"
-  [header]="selected() ? 'Editar anfitrión' : 'Nuevo anfitrión'" [style]="{ width: 'min(95vw, 34rem)' }">
+  [header]="selected() ? 'Editar anfitrión' : 'Nuevo anfitrión'" [style]="{ width: 'min(95vw, 34rem)' }"
+  styleClass="dark:border-line/55!">
   <form class="grid gap-4 pt-2" [formGroup]="form" (ngSubmit)="save()">
     <label class="grid gap-1 text-sm">
       <span>Nombre <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></span>
