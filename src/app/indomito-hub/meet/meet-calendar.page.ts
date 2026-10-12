@@ -7,22 +7,26 @@ import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
 import { Skeleton } from 'primeng/skeleton';
+import { Select } from 'primeng/select';
 import { MeetService, type MeetEvent, type MeetRequest } from './meet.service';
 import { messageForHttpError } from '../../core/http/error.interceptor';
 import { AuthService } from '../../core/auth/auth.service';
+import type { MeetingHost } from '../../core/configuration/meeting-host.interface';
+import { MeetingHostService } from '../../core/configuration/meeting-host.service';
 
 interface DayCell { date: string; number: number; current: boolean; events: MeetEvent[] }
 
 @Component({
   selector: 'app-meet-calendar',
   standalone: true,
-  imports: [FormsModule, Button, ButtonDirective, Dialog, InputText, Message, Skeleton],
+  imports: [FormsModule, Button, ButtonDirective, Dialog, InputText, Message, Select, Skeleton],
   templateUrl: './meet-calendar.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MeetCalendarPage {
   private readonly api = inject(MeetService);
   private readonly auth = inject(AuthService);
+  private readonly hostApi = inject(MeetingHostService);
   readonly canCreate = computed(() => this.auth.permissions().some(p => p.module.code === "MEET_AGENDA" && p.allowances.includes("c")));
   readonly canUpdate = computed(() => this.auth.permissions().some(p => p.module.code === "MEET_AGENDA" && p.allowances.includes("u")));
   readonly canDelete = computed(() => this.auth.permissions().some(p => p.module.code === "MEET_AGENDA" && p.allowances.includes("d")));
@@ -31,6 +35,13 @@ export class MeetCalendarPage {
   readonly year = signal(this.now.getFullYear());
   readonly month = signal(this.now.getMonth());
   readonly events = signal<MeetEvent[]>([]);
+  readonly hosts = signal<MeetingHost[]>([]);
+  readonly hostsLoading = signal(false);
+  readonly hostsError = signal('');
+  readonly availableHosts = computed(() => {
+    const currentID = this.selected()?.hostSk;
+    return this.hosts().filter(host => host.active || host.sk === currentID);
+  });
   readonly loading = signal(false);
   private requestSequence = 0;
   readonly saving = signal(false);
@@ -58,7 +69,10 @@ export class MeetCalendarPage {
     });
   });
 
-  constructor() { this.refresh(); }
+  constructor() {
+    this.refresh();
+    this.loadHosts();
+  }
 
   private emptyForm(): MeetRequest {
     return { title: '', date: '', startTime: '10:00', endTime: '11:00', description: '', guests: [], hostSk: null, hostName: null, hostColor: null, agent: false, phoneNumber: null, idempotencyKey: crypto.randomUUID() };
@@ -74,6 +88,21 @@ export class MeetCalendarPage {
     ).subscribe({
       next: data => { if (requestId === this.requestSequence) this.events.set(data); },
       error: error => { if (requestId === this.requestSequence) this.error.set(messageForHttpError(error, 'No fue posible consultar Google Calendar. Intenta nuevamente.')); },
+    });
+  }
+
+  loadHosts(): void {
+    this.hostsLoading.set(true);
+    this.hostsError.set('');
+    this.hostApi.listOptions().pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.hostsLoading.set(false)),
+    ).subscribe({
+      next: hosts => {
+        this.hosts.set(hosts);
+        if (this.dialogVisible() && !this.selected() && !this.form.hostSk) this.applyDefaultHost();
+      },
+      error: () => this.hostsError.set('No fue posible consultar los anfitriones configurados.'),
     });
   }
 
@@ -99,13 +128,30 @@ export class MeetCalendarPage {
       description: event.description, guests: [...event.guests],
       hostSk: event.hostSk, hostName: event.hostName, hostColor: event.hostColor,
       agent: event.agent ?? false, phoneNumber: event.phoneNumber ?? null,
-    } : { date: date ?? '' });
+    } : {
+      date: date ?? '',
+    });
+    if (!event) this.applyDefaultHost();
     this.guestsText.set(this.form.guests.join(', '));
     this.dialogVisible.set(true);
   }
 
+  onHostChange(hostID: string | null): void {
+    const host = this.hosts().find(item => item.sk === hostID);
+    this.form.hostSk = host?.sk ?? null;
+    this.form.hostName = host?.name ?? null;
+    this.form.hostColor = host?.color ?? null;
+  }
+
+  private applyDefaultHost(): void {
+    const host = this.hosts().find(item => item.active && item.isDefault);
+    this.form.hostSk = host?.sk ?? null;
+    this.form.hostName = host?.name ?? null;
+    this.form.hostColor = host?.color ?? null;
+  }
+
   save(meetingForm: NgForm): void {
-    if (meetingForm.invalid || !this.form.title.trim()) {
+    if (meetingForm.invalid || !this.form.title.trim() || !this.form.hostSk) {
       meetingForm.form.markAllAsTouched();
       return;
     }

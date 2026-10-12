@@ -1,0 +1,87 @@
+<section class="mt-6 grid gap-5 rounded-3xl border border-line/75 bg-surface p-6 shadow-sm dark:border-line/55">
+  <div class="flex flex-wrap items-start justify-between gap-3">
+    <div>
+      <h2 class="text-xl font-semibold text-ink">Anfitriones de videollamadas</h2>
+      <p class="mt-2 text-sm text-muted">
+        Administra las personas disponibles para conducir reuniones y define una como predeterminada.
+      </p>
+    </div>
+    <p-button label="Agregar anfitrión" icon="pi pi-plus" (onClick)="open()" />
+  </div>
+
+  @if (error()) {
+    <p-message severity="error">{{ error() }}</p-message>
+  }
+
+  <p-table [value]="hosts()" [loading]="loading()" [scrollable]="true" [tableStyle]="{ 'min-width': '42rem' }">
+    <ng-template #header>
+      <tr>
+        <th class="border-b border-line/75 dark:border-line/55">Nombre</th>
+        <th class="border-b border-line/75 dark:border-line/55">Descripción</th>
+        <th class="border-b border-line/75 dark:border-line/55">Estado</th>
+        <th class="border-b border-line/75 dark:border-line/55">Predeterminado</th>
+        <th class="border-b border-line/75 text-right dark:border-line/55">Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-host>
+      <tr>
+        <td class="border-b border-line/75 dark:border-line/55">
+          <span class="mr-2 inline-block size-3 rounded-full" [style.background-color]="host.color"></span>{{ host.name }}
+        </td>
+        <td class="border-b border-line/75 text-muted dark:border-line/55">{{ host.description || '—' }}</td>
+        <td class="border-b border-line/75 dark:border-line/55">{{ host.active ? 'Activo' : 'Inactivo' }}</td>
+        <td class="border-b border-line/75 dark:border-line/55">{{ host.isDefault ? 'Sí' : 'No' }}</td>
+        <td class="border-b border-line/75 text-right dark:border-line/55">
+          <div class="flex justify-end gap-1">
+            <p-button ariaLabel="Editar anfitrión" icon="pi pi-pencil" [text]="true" severity="secondary" (onClick)="open(host)" />
+            <p-button ariaLabel="Eliminar anfitrión" icon="pi pi-trash" [text]="true" severity="danger" (onClick)="remove(host)" />
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr><td colspan="5" class="py-8 text-center text-muted">Todavía no hay anfitriones configurados.</td></tr>
+    </ng-template>
+  </p-table>
+</section>
+
+<p-dialog [visible]="dialogVisible()" (visibleChange)="dialogVisible.set($event)" [modal]="true"
+  [header]="selected() ? 'Editar anfitrión' : 'Nuevo anfitrión'" [style]="{ width: 'min(95vw, 34rem)' }">
+  <form class="grid gap-4 pt-2" [formGroup]="form" (ngSubmit)="save()">
+    <label class="grid gap-1 text-sm">
+      <span>Nombre <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></span>
+      <input pInputText formControlName="name" maxlength="120" />
+      @if (form.controls.name.invalid && form.controls.name.touched) {
+        <small class="text-red-600 dark:text-red-400">Ingresa el nombre del anfitrión.</small>
+      }
+    </label>
+    <label class="grid gap-1 text-sm">
+      <span>Descripción</span>
+      <textarea pTextarea formControlName="description" maxlength="300" rows="3"></textarea>
+    </label>
+    <label class="grid gap-1 text-sm">
+      <span>Color <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></span>
+      <div class="flex items-center gap-3">
+        <p-colorpicker formControlName="color" format="hex" />
+        <input pInputText formControlName="color" maxlength="7" class="w-32 uppercase" />
+      </div>
+    </label>
+    <div class="grid gap-3 rounded-xl border border-line/75 p-4 dark:border-line/55">
+      <div class="flex items-center gap-2">
+        <p-checkbox inputId="meeting-host-active" formControlName="active" [binary]="true"
+          (onChange)="onActiveChange($event.checked)" />
+        <label for="meeting-host-active">Anfitrión activo</label>
+      </div>
+      <div class="flex items-center gap-2">
+        <p-checkbox inputId="meeting-host-default" formControlName="isDefault" [binary]="true"
+          (onChange)="onDefaultChange($event.checked)" />
+        <label for="meeting-host-default">Seleccionar por defecto en nuevas reuniones</label>
+      </div>
+      <p class="text-xs text-muted">Al marcarlo, reemplazará al anfitrión predeterminado actual.</p>
+    </div>
+    <div class="flex justify-end gap-2 border-t border-line/75 pt-4 dark:border-line/55">
+      <p-button type="button" label="Cancelar" severity="secondary" [text]="true" (onClick)="dialogVisible.set(false)" />
+      <p-button type="submit" label="Guardar" icon="pi pi-check" [loading]="saving()" [disabled]="saving()" />
+    </div>
+  </form>
+</p-dialog>

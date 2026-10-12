@@ -15,10 +15,11 @@ import { Message } from 'primeng/message';
 import { AppConfigurationService } from '../../../../../core/configuration/app-configuration.service';
 import { MasterAccessService } from '../../services/master-access.service';
 import type { MasterAccess } from '../../interfaces/master-access.interface';
+import { MeetingHostsComponent } from '../../components/meeting-hosts/meeting-hosts.component';
 
 @Component({
   selector: 'app-configuration',
-  imports: [FormsModule, ButtonDirective, InputText, Message],
+  imports: [FormsModule, ButtonDirective, InputText, Message, MeetingHostsComponent],
   templateUrl: './configuration.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

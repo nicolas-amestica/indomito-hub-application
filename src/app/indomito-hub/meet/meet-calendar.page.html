@@ -76,6 +76,30 @@
         <small id="meeting-end-time-error" class="text-red-600 dark:text-red-400" aria-live="polite">Selecciona una hora de término.</small>
       }
     </label>
+    <label class="grid gap-1 text-sm">
+      <span>Anfitrión <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></span>
+      <p-select #hostControl="ngModel" name="hostSk" [(ngModel)]="form.hostSk"
+        [options]="availableHosts()" optionLabel="name" optionValue="sk" placeholder="Selecciona un anfitrión"
+        [loading]="hostsLoading()" [disabled]="hostsLoading()" [fluid]="true" appendTo="body" required
+        aria-required="true" (ngModelChange)="onHostChange($event)"
+        [attr.aria-invalid]="hostControl.invalid && (hostControl.touched || meetingForm.submitted)"
+        [attr.aria-describedby]="hostControl.invalid && (hostControl.touched || meetingForm.submitted) ? 'meeting-host-error' : null">
+        <ng-template #selectedItem let-host>
+          <span class="flex items-center gap-2"><span class="size-3 rounded-full" [style.background-color]="host.color"></span>{{ host.name }}</span>
+        </ng-template>
+        <ng-template #item let-host>
+          <span class="flex items-center gap-2"><span class="size-3 rounded-full" [style.background-color]="host.color"></span>{{ host.name }}</span>
+        </ng-template>
+      </p-select>
+      @if (hostControl.invalid && (hostControl.touched || meetingForm.submitted)) {
+        <small id="meeting-host-error" class="text-red-600 dark:text-red-400" aria-live="polite">Selecciona un anfitrión.</small>
+      }
+      @if (hostsError()) {
+        <small class="text-red-600 dark:text-red-400">{{ hostsError() }}</small>
+      } @else if (!hostsLoading() && availableHosts().length === 0) {
+        <small class="text-muted">No hay anfitriones activos. Configúralos en Configuración de la aplicación.</small>
+      }
+    </label>
     <label class="grid gap-1 text-sm">Teléfono de contacto (opcional) <input pInputText type="tel" name="phoneNumber" [(ngModel)]="form.phoneNumber" /></label>
     <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="agent" [(ngModel)]="form.agent" /> Reunión con agente</label>
     <label class="grid gap-1 text-sm">Descripción <textarea class="rounded border border-line/75 p-2 dark:border-line/55" name="description" [(ngModel)]="form.description" rows="3"></textarea></label>
