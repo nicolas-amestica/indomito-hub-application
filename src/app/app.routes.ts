@@ -53,6 +53,13 @@ export const routes: Routes = [
           import('./indomito-hub/contracts/contracts.routes').then((m) => m.CONTRACTS_ROUTES),
       },
       {
+        path: 'comunicaciones/conversaciones',
+        data: { module: 'INBOX' },
+        canActivate: [moduleGuard],
+        loadChildren: () =>
+          import('./indomito-hub/inbox/inbox.routes').then((m) => m.INBOX_ROUTES),
+      },
+      {
         path: '',
         loadChildren: () =>
           import('./indomito-hub/administration/administration.routes').then(

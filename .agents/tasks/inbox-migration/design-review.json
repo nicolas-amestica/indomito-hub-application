@@ -1,0 +1,76 @@
+{
+  "verdict": "CHANGES_REQUESTED",
+  "findings": [
+    {
+      "id": 1,
+      "severity": "HIGH",
+      "location": "IAM funcional y authorizer > Corrección del Lambda Authorizer",
+      "problem": "El diseño corrige el matching de rutas, pero no elimina allowUnsignedFallback: el authorizer REQUEST real acepta un JWT sin firma válida si el body decodificado trae allowances y username/professionalRun.",
+      "fix": "Eliminar allowUnsignedFallback y exigir jwt.verify en todas las vías JWT; agregar tests Deny para alg none, firma aleatoria, payload modificado y token legacy solo decodificable."
+    },
+    {
+      "id": 2,
+      "severity": "HIGH",
+      "location": "Contratos HTTP frontend/backend, eventos y contract tests",
+      "problem": "Faltan schemas completos de lista, detalle, paginación/delta, presign, mutaciones, operaciones masivas y eventos realtime; los archivos OpenAPI y AsyncAPI declarados como canónicos todavía no existen.",
+      "fix": "Crear primero los contratos canónicos, fijar request/response/status/error de cada operación y los payloads de los ocho eventos, y comparar sus copias publicadas por SHA-256 en CI."
+    },
+    {
+      "id": 3,
+      "severity": "HIGH",
+      "location": "GET /conversaciones y búsqueda exacta sin n-gramas",
+      "problem": "Después de agotar 16 shards y ordenar todos los matches, el cursor descrito solo conserva shards ya agotados y no los candidatos restantes; no puede garantizar páginas globalmente ordenadas, estables y sin duplicados.",
+      "fix": "Materializar por dos minutos un snapshot paginado de IDs ligado a userId/query, y firmar un cursor con sessionId y offset; definir TTL, cuotas, costo y pruebas de estabilidad."
+    },
+    {
+      "id": 4,
+      "severity": "HIGH",
+      "location": "PATCH marcar-leidas y recalcular-no-leidas",
+      "problem": "Las operaciones permanecen síncronas pese a admitir 20000 conversaciones; faltan checkpoint, límites, conteos atómicos y continuación ante timeout o fallo parcial.",
+      "fix": "Modelarlas como operaciones bulk 202 con operationId, workers paginados, checkpoint/idempotencia, GET de estado, evento final y pruebas con 20000 ítems."
+    },
+    {
+      "id": 5,
+      "severity": "MEDIUM",
+      "location": "Persistencia DynamoDB, TTL y ticket realtime",
+      "problem": "No se define la retención de escrituras posteriores al corte y la tabla usa TTL expiresAt mientras el ticket guarda expiresAtEpoch; tampoco hay expiraciones cerradas para varios ítems efímeros.",
+      "fix": "Unificar el atributo numérico expiresAt y documentar/testear la matriz de retención y renovación para mensajes, metadata, search, WAMID, META_MSG, tickets, uploads, conexiones, SEND y OUTBOX."
+    },
+    {
+      "id": 6,
+      "severity": "MEDIUM",
+      "location": "gsi-migracion-actualizacion-index y rollback",
+      "problem": "El GSI sparse por run no especifica cómo indexan las escrituras normales y conversaciones nuevas posteriores al cutover, por lo que el delta target-to-legacy puede omitirlas.",
+      "fix": "Actualizar META en cada mutación con una PK de delta constante y SK updatedAt#phone#generation, o usar un change log inmutable; probar todos los tipos de escritura post-cutover."
+    },
+    {
+      "id": 7,
+      "severity": "MEDIUM",
+      "location": "Variables environments/.env.dev y obtención desde legacy",
+      "problem": "agent-config, asset-config y meeting-config carecen de campos, tipos, defaults, validación y origen exacto campo a campo; no queda resuelto el calendar-id String frente a la regla SecureString.",
+      "fix": "Añadir JSON schemas y una tabla de trazabilidad hacia serverless.yml, gemini-agent.js, agent-debounce.js, ejecutar-agente-v1.js, buscar-presupuestos.js, send-certificado-sernatur.js y meeting-scheduling-rules.js; validar antes del put-parameter."
+    },
+    {
+      "id": 8,
+      "severity": "MEDIUM",
+      "location": "Preparación, CORS y confirmación de adjuntos",
+      "problem": "UPLOAD no queda ligado obligatoriamente a userId y phone, preparar no recibe teléfono, CORS no enumera headers firmados y caption no tiene límite.",
+      "fix": "Persistir ownerUserId y phone y exigir coincidencia al consumir; definir caption 0..4096 y permitir en CORS Content-Type, x-amz-meta-client-message-id y x-amz-checksum-sha256 para orígenes Hub."
+    },
+    {
+      "id": 9,
+      "severity": "MEDIUM",
+      "location": "UI/UX equivalente, composer y carga incremental",
+      "problem": "Se omiten los 40 emojis/caret/foco y se alteran selector MIME, concurrencia, fallback WebM y tamaño de carga adicional 20, sin declararlos como desviaciones aprobadas.",
+      "fix": "Especificar y probar los comportamientos legacy exactos; mantener audio solo para recorder y revelar de 20 en 20 desde la página backend cacheada de 200, o conseguir aprobación explícita para cada desviación."
+    },
+    {
+      "id": 10,
+      "severity": "MEDIUM",
+      "location": "Composer, SendState y detalle de conversación",
+      "problem": "Un envío recovering/uncertain solo puede consultarse con un clientMessageId guardado en memoria; tras reload desaparece la burbuja y no existe forma de descubrir envíos no terminales por conversación.",
+      "fix": "Incluir nonTerminalSends en el detalle o crear un endpoint de envíos no terminales por teléfono, reconstruir burbujas al abrir y probar reload en provider_pending, recovering y uncertain."
+    }
+  ],
+  "reviewDoc": "/Users/nicoamestica/Documents/Desarrollo/giras-indomito/ind-hub-app-ngx-pri-gh/.agents/tasks/inbox-migration/design-review.md"
+}

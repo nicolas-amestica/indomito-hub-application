@@ -7,7 +7,7 @@ export function createEmptyIamUser(): IamUserForm {
     email: '',
     rut: '',
     password: '',
-    profileCode: 'ADMIN',
+    profileCode: 'ADM',
     active: true,
   };
 }

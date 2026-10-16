@@ -4,7 +4,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { firstValueFrom, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ApiEnvelope, AuthPermission, AuthSession } from './auth.models';
+import { ApiEnvelope, AuthAllowance, AuthPermission, AuthSession } from './auth.models';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private static readonly storageKey = 'indomito.auth.session';
@@ -69,7 +69,23 @@ export class AuthService {
     return this.state()?.token ?? null;
   }
   canAccess(code: string): boolean {
-    return this.modules().some((module) => module.code === code);
+    return this.canPerform(code, 'r');
+  }
+  canPerform(code: string, allowance: AuthAllowance): boolean {
+    const permission = this.permissions().find(
+      (candidate) => candidate.module.code === code && candidate.module.active,
+    );
+    if (!permission?.allowances.includes(allowance)) return false;
+    if (permission.module.level !== 'LV2') return true;
+
+    const parentCode = permission.module.parentCode;
+    return !!parentCode && this.permissions().some(
+      (candidate) =>
+        candidate.module.code === parentCode &&
+        candidate.module.active &&
+        candidate.module.level === 'LV1' &&
+        candidate.allowances.includes('r'),
+    );
   }
   async refreshPermissions(): Promise<void> {
     const current = this.state();

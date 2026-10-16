@@ -112,6 +112,45 @@ describe('AuthService', () => {
     expect(service.modules().map((module) => module.code)).not.toContain('PROGRAMS');
   });
 
+  it('autoriza una acción solo cuando el módulo activo contiene el allowance', () => {
+    const session = authSession(jwtExpiringIn(3_600));
+    session.permissions[0].allowances = ['r', 'u'];
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+
+    const service = TestBed.inject(AuthService);
+
+    expect(service.canPerform('PROGRAMS', 'r')).toBe(true);
+    expect(service.canPerform('PROGRAMS', 'u')).toBe(true);
+    expect(service.canPerform('PROGRAMS', 'c')).toBe(false);
+    expect(service.canPerform('UNKNOWN', 'r')).toBe(false);
+  });
+
+  it('exige lectura del padre activo para cualquier acción de un LV2', () => {
+    const session = authSession(jwtExpiringIn(3_600));
+    session.permissions.unshift({
+      module: {
+        code: 'COM',
+        title: 'Comunicaciones',
+        category: 'Comunicaciones',
+        path: '/comunicaciones',
+        icon: 'icon-[tabler--messages]',
+        order: 50,
+        active: true,
+        endpoints: [],
+        level: 'LV1',
+      },
+      allowances: [],
+    });
+    session.permissions[1].module.level = 'LV2';
+    session.permissions[1].module.parentCode = 'COM';
+    session.permissions[1].allowances = ['c', 'r', 'u', 'd'];
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+
+    const service = TestBed.inject(AuthService);
+
+    expect(service.canPerform('PROGRAMS', 'c')).toBe(false);
+  });
+
   it('elimina la sesión almacenada al cerrar sesión', () => {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(authSession(jwtExpiringIn(3_600))));
     const service = TestBed.inject(AuthService);

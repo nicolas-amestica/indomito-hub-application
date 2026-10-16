@@ -1,0 +1,136 @@
+<section class="mx-auto h-[calc(100dvh-64px)] max-w-[1500px] overflow-hidden bg-canvas" aria-label="Bandeja de conversaciones">
+  <div class="flex h-full min-w-0 overflow-hidden border-x border-line/75 dark:border-line/55">
+    <aside class="min-w-0 flex-col border-r border-line/75 bg-surface-0 dark:border-line/55 dark:bg-surface-950 md:flex md:w-96 md:shrink-0" [class.flex]="store.selectedPhone() === null" [class.hidden]="store.selectedPhone() !== null">
+      <header class="flex shrink-0 items-center justify-between bg-green-700 px-4 py-3 text-white dark:bg-surface-800">
+        <div class="flex items-center gap-3">
+          <span class="flex size-10 items-center justify-center rounded-full bg-white/15"><span class="icon-[tabler--inbox] size-5" aria-hidden="true"></span></span>
+          <div><h1 class="text-sm font-semibold">WhatsApp Cloud</h1><p class="text-xs text-white/75">{{ store.unreadTotal() }} sin leer</p></div>
+        </div>
+        <button pButton type="button" text rounded iconOnly severity="secondary" class="text-white!" aria-label="Recargar conversaciones" pTooltip="Recargar conversaciones" (click)="store.load()">
+          <span class="icon-[tabler--refresh] size-5" aria-hidden="true"></span>
+        </button>
+        <button *appHasPermission="{ module: 'INBOX', allowance: 'u' }" pButton type="button" text rounded iconOnly severity="secondary" class="text-white!" aria-label="Marcar todas como leídas" pTooltip="Marcar todas como leídas" (click)="bulkDialogVisible.set(true)"><span class="icon-[tabler--checks] size-5" aria-hidden="true"></span></button>
+      </header>
+
+      <form class="flex shrink-0 items-center gap-2 border-b border-line/75 p-3 dark:border-line/55" (submit)="$event.preventDefault(); submitSearch()">
+        <div class="relative min-w-0 flex-1">
+          <span class="icon-[tabler--search] pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted" aria-hidden="true"></span>
+          <input pInputText class="w-full pl-9!" type="search" aria-label="Buscar conversación" placeholder="Buscar conversación..." [value]="search()" (input)="searchChanged($any($event.target).value)" />
+        </div>
+        <button pButton type="button" outlined iconOnly [severity]="store.filter() === 'unread' ? 'success' : 'secondary'" [attr.aria-pressed]="store.filter() === 'unread'" [attr.aria-label]="store.filter() === 'unread' ? 'Mostrar todas' : 'Mostrar solo no leídas'" (click)="store.setFilter(store.filter() === 'all' ? 'unread' : 'all')">
+          <span [class]="(store.filter() === 'unread' ? 'icon-[tabler--filter-filled]' : 'icon-[tabler--filter]') + ' size-5'" aria-hidden="true"></span>
+        </button>
+      </form>
+
+      <div class="min-h-0 flex-1 overflow-y-auto" aria-live="polite">
+        @if (store.bulkOperation(); as operation) {
+          <div class="border-b border-line/75 bg-blue-50 px-4 py-2 text-xs text-blue-900 dark:border-line/55 dark:bg-blue-950 dark:text-blue-100" role="status">
+            @if (operation.state === 'failed') {
+              No fue posible completar el marcado masivo.
+            } @else if (operation.state === 'committed') {
+              Marcado masivo completado.
+            } @else {
+              Marcando conversaciones: {{ operation.processed }} / {{ operation.targetCount || '…' }}
+            }
+          </div>
+        }
+        @if (store.loading() && store.conversations().length === 0) {
+          @for (item of [1, 2, 3, 4, 5]; track item) {
+            <div class="flex items-center gap-3 border-b border-line/75 px-4 py-3 dark:border-line/55"><p-skeleton shape="circle" size="3rem" /><div class="flex-1"><p-skeleton width="70%" /><p-skeleton width="45%" height="0.75rem" styleClass="mt-2" /></div></div>
+          }
+        } @else if (store.error() && store.conversations().length === 0) {
+          <div class="flex h-full flex-col items-center justify-center gap-3 p-6 text-center"><span class="icon-[tabler--alert-circle] size-9 text-red-500" aria-hidden="true"></span><p class="text-sm text-muted">{{ store.error() }}</p><button pButton type="button" outlined severity="secondary" (click)="store.load()">Reintentar</button></div>
+        } @else {
+          @for (conversation of store.visibleConversations(); track conversation.phone) {
+            <app-conversation-list-item [conversation]="conversation" [selected]="store.selectedPhone() === conversation.phone" (selectedConversation)="store.select($event)" />
+          } @empty {
+            <div class="flex h-full flex-col items-center justify-center gap-2 p-6 text-center"><span class="icon-[tabler--message-circle-off] size-10 text-muted" aria-hidden="true"></span><p class="text-sm text-muted">Sin conversaciones</p></div>
+          }
+          @if (store.hasMore()) {
+            <div class="p-3"><button pButton type="button" outlined severity="secondary" class="w-full" [loading]="store.loadingMore()" (click)="store.loadMore()">Cargar más</button></div>
+          }
+        }
+      </div>
+    </aside>
+
+    <main class="min-w-0 flex-1 flex-col bg-surface-50 dark:bg-surface-950 md:flex" [class.flex]="store.selectedPhone() !== null" [class.hidden]="store.selectedPhone() === null">
+      @if (store.selectedPhone() === null) {
+        <div class="flex h-full flex-col items-center justify-center gap-4 p-8 text-center"><span class="flex size-24 items-center justify-center rounded-full bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300"><span class="icon-[tabler--messages] size-12" aria-hidden="true"></span></span><div><h2 class="text-xl font-medium text-ink">Todas las conversaciones</h2><p class="mt-2 max-w-lg text-sm text-muted">Selecciona un chat para ver el historial completo del cliente, agente IA y equipo.</p></div></div>
+      } @else {
+        <header class="flex shrink-0 items-center gap-3 border-b border-line/75 bg-surface-0 px-3 py-3 dark:border-line/55 dark:bg-surface-900">
+          <button pButton type="button" text rounded iconOnly severity="secondary" class="md:hidden" aria-label="Volver a conversaciones" (click)="store.clearSelection()"><span class="icon-[tabler--arrow-left] size-5" aria-hidden="true"></span></button>
+          <div class="min-w-0 flex-1"><h2 class="truncate text-sm font-semibold text-ink">{{ store.detail()?.conversation?.alias || store.selectedPhone() }}</h2><p class="truncate text-xs text-muted">{{ store.selectedPhone() }}</p></div>
+          <button *appHasPermission="{ module: 'INBOX', allowance: 'u' }" pButton type="button" text rounded iconOnly severity="secondary" aria-label="Editar alias" pTooltip="Editar alias" (click)="openAliasDialog()"><span class="icon-[tabler--pencil] size-5" aria-hidden="true"></span></button>
+          <button *appHasPermission="{ module: 'INBOX', allowance: 'u' }" pButton type="button" text rounded iconOnly severity="secondary" aria-label="Marcar como no leída" pTooltip="Marcar como no leída" [loading]="store.mutating()" (click)="store.markUnread()"><span class="icon-[tabler--circle-filled] size-4 text-green-500" aria-hidden="true"></span></button>
+          <button *appHasPermission="{ module: 'INBOX', allowance: 'd' }" pButton type="button" text rounded iconOnly severity="danger" aria-label="Eliminar conversación" pTooltip="Eliminar conversación" (click)="deleteDialogVisible.set(true)"><span class="icon-[tabler--trash] size-5" aria-hidden="true"></span></button>
+        </header>
+        <div class="min-h-0 flex-1 overflow-y-auto p-3 sm:p-5" aria-live="polite">
+          @if (!store.detail() && !store.error()) {
+            <div class="space-y-3"><p-skeleton width="45%" height="3rem" /><p-skeleton width="55%" height="3rem" styleClass="ml-auto" /><p-skeleton width="38%" height="3rem" /></div>
+          } @else if (store.error()) {
+            <p class="text-center text-sm text-red-600 dark:text-red-300">{{ store.error() }}</p>
+          } @else {
+            <div class="mx-auto flex max-w-4xl flex-col gap-2">
+              @for (message of store.messages(); track message.id) {
+                <article class="max-w-[85%] rounded-2xl px-3 py-2 shadow-sm sm:max-w-[75%]" [class.self-start]="message.type === 'customer'" [class.bg-surface-0]="message.type === 'customer'" [class.dark:bg-surface-800]="message.type === 'customer'" [class.self-end]="message.type !== 'customer'" [class.bg-green-100]="message.type !== 'customer'" [class.dark:bg-green-950]="message.type !== 'customer'">
+                  @if (message.content) { <p class="break-words whitespace-pre-wrap text-sm text-ink">{{ message.content }}</p> }
+                  <span class="mt-1 flex items-center justify-end gap-1 text-[11px] text-muted"><time [attr.datetime]="message.createdAt">{{ message.createdAt | date:'shortTime' }}</time>@if (message.deliveryStatus === 'failed') { <span class="icon-[tabler--alert-circle] size-3 text-red-500" aria-label="Envío fallido"></span> } @else if (message.type !== 'customer') { <span class="icon-[tabler--checks] size-3" aria-label="Mensaje enviado"></span> }</span>
+                </article>
+              } @empty { <p class="py-12 text-center text-sm text-muted">Aún no hay mensajes en esta conversación.</p> }
+              @for (send of store.sendStates(); track send.clientMessageId) {
+                <article class="self-end rounded-xl border border-line/75 bg-surface-0 px-3 py-2 text-sm dark:border-line/55 dark:bg-surface-800" aria-live="polite">
+                  <p class="max-w-72 truncate text-ink">{{ send.preview || send.attachment?.fileName || 'Envío pendiente' }}</p>
+                  <div class="mt-1 flex items-center justify-end gap-2 text-xs text-muted">
+                    @switch (send.state) {
+                      @case ('reserved') { <span>Preparando envío</span> }
+                      @case ('provider_pending') { <span>Enviando…</span> }
+                      @case ('recovering') { <span>Confirmando entrega…</span> }
+                      @case ('uncertain') { <span>Entrega por confirmar</span> }
+                      @case ('failed_retryable') {
+                        <span class="text-red-600 dark:text-red-300">{{ send.error }}</span>
+                        <button *appHasPermission="{ module: 'INBOX', allowance: 'c' }" pButton type="button" text severity="danger" size="small" [loading]="store.sending()" (click)="store.retrySend(send.clientMessageId)">Reintentar</button>
+                      }
+                    }
+                  </div>
+                </article>
+              }
+            </div>
+          }
+        </div>
+        <form *appHasPermission="{ module: 'INBOX', allowance: 'c' }" class="shrink-0 border-t border-line/75 bg-surface-0 p-3 dark:border-line/55 dark:bg-surface-900" (submit)="$event.preventDefault(); sendReply()">
+          @if (selectedFiles().length > 0) {
+            <div class="mb-2 flex max-h-24 flex-wrap gap-2 overflow-y-auto" aria-label="Archivos seleccionados">
+              @for (file of selectedFiles(); track file.name + file.size; let index = $index) {
+                <span class="flex max-w-56 items-center gap-2 rounded-lg border border-line/75 px-2 py-1 text-xs dark:border-line/55"><span class="truncate">{{ file.name }}</span><button pButton type="button" text rounded iconOnly severity="secondary" class="size-6!" [attr.aria-label]="'Quitar ' + file.name" (click)="removeFile(index)"><span class="icon-[tabler--x] size-4" aria-hidden="true"></span></button></span>
+              }
+            </div>
+          }
+          @if (attachmentError()) { <p class="mb-2 text-sm text-red-600 dark:text-red-300" role="alert">{{ attachmentError() }}</p> }
+          <div class="flex items-end gap-2">
+            <p-fileupload #attachmentUpload mode="basic" name="attachments" [multiple]="true" accept="application/pdf,image/jpeg,image/png,image/gif,image/webp,audio/ogg,audio/webm" chooseLabel="" chooseIcon="icon-[tabler--paperclip]" [auto]="true" [customUpload]="true" [fileLimit]="20" [maxFileSize]="7340032" [disabled]="store.sending()" (uploadHandler)="selectFiles($event, attachmentUpload)" />
+            <button pButton type="button" rounded iconOnly [severity]="recording() ? 'danger' : 'secondary'" [outlined]="!recording()" [attr.aria-label]="recording() ? 'Detener grabación' : 'Grabar audio'" [attr.aria-pressed]="recording()" [pTooltip]="recording() ? 'Detener grabación' : 'Grabar audio'" (click)="toggleRecording()"><span [class]="(recording() ? 'icon-[tabler--player-stop-filled]' : 'icon-[tabler--microphone]') + ' size-5'" aria-hidden="true"></span></button>
+            @if (recording()) { <span class="min-w-10 text-xs font-semibold tabular-nums text-red-600 dark:text-red-300" aria-live="polite">{{ recordingSeconds() }} s</span> }
+            <textarea pTextarea rows="1" autoResize class="max-h-32 min-h-10 flex-1 resize-none" maxlength="4096" aria-label="Escribir respuesta" placeholder="Escribe un mensaje" [value]="reply()" (input)="reply.set($any($event.target).value)" (keydown.control.enter)="sendReply()"></textarea>
+            <button pButton type="submit" rounded iconOnly severity="success" [loading]="store.sending()" [disabled]="!reply().trim() && selectedFiles().length === 0" aria-label="Enviar mensaje"><span class="icon-[tabler--send] size-5" aria-hidden="true"></span></button>
+          </div>
+        </form>
+      }
+    </main>
+  </div>
+</section>
+
+<p-dialog header="Editar alias" [visible]="aliasDialogVisible()" (visibleChange)="aliasDialogVisible.set($event)" [modal]="true" [draggable]="false" [resizable]="false" [style]="{ width: 'min(22rem, calc(100vw - 2rem))' }">
+  <label for="inbox-alias" class="mb-2 block text-sm font-medium text-ink">Nombre o alias</label>
+  <input pInputText id="inbox-alias" class="w-full" maxlength="100" [value]="alias()" (input)="alias.set($any($event.target).value)" (keydown.enter)="saveAlias()" />
+  <ng-template #footer><button pButton type="button" outlined severity="secondary" (click)="aliasDialogVisible.set(false)">Cancelar</button><button pButton type="button" [loading]="store.mutating()" [disabled]="!alias().trim()" (click)="saveAlias()">Guardar</button></ng-template>
+</p-dialog>
+
+<p-dialog header="Eliminar conversación" [visible]="deleteDialogVisible()" (visibleChange)="deleteDialogVisible.set($event)" [modal]="true" [draggable]="false" [resizable]="false" [style]="{ width: 'min(26rem, calc(100vw - 2rem))' }">
+  <p class="text-sm text-muted">La conversación desaparecerá de la bandeja. Esta acción no se puede deshacer desde la interfaz.</p>
+  <ng-template #footer><button pButton type="button" outlined severity="secondary" (click)="deleteDialogVisible.set(false)">Cancelar</button><button pButton type="button" severity="danger" [loading]="store.mutating()" (click)="confirmDelete()">Eliminar</button></ng-template>
+</p-dialog>
+
+<p-dialog header="Marcar todo como leído" [visible]="bulkDialogVisible()" (visibleChange)="bulkDialogVisible.set($event)" [modal]="true" [draggable]="false" [resizable]="false" [style]="{ width: 'min(28rem, calc(100vw - 2rem))' }">
+  <p class="text-sm text-muted">Se marcarán como leídas todas las conversaciones incluidas en la operación.</p>
+  <ng-template #footer><button pButton type="button" outlined severity="secondary" (click)="bulkDialogVisible.set(false)">Cancelar</button><button pButton type="button" severity="success" [loading]="store.mutating()" (click)="confirmMarkAllRead()">Marcar todas</button></ng-template>
+</p-dialog>

@@ -22,6 +22,7 @@ export interface AuthPermission {
   module: AuthModule;
   allowances: string[];
 }
+export type AuthAllowance = 'c' | 'r' | 'u' | 'd';
 export interface AuthSession {
   token: string;
   expiresIn: number;
