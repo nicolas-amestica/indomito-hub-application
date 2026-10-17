@@ -4,6 +4,7 @@ import { of } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CollectionTripAccess } from '../../services/collection-trip-access';
 import { TripAccessPage } from './trip-access.page';
+import { environment } from '../../../../../environments/environment';
 
 describe('TripAccessPage', () => {
   const api = { get: vi.fn(), change: vi.fn() };
@@ -48,5 +49,8 @@ describe('TripAccessPage', () => {
     expect(api.change).toHaveBeenCalledOnce();
     expect(fixture.nativeElement.textContent).toContain('ABC234');
     expect(fixture.nativeElement.textContent).toContain('Código rotado');
+    expect(fixture.nativeElement.querySelector('a[target="_blank"]').href).toBe(
+      `${environment.paymentPortalUrl}/`,
+    );
   });
 });

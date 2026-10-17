@@ -11,6 +11,7 @@ import { finalize } from 'rxjs';
 import { newUlid } from '../../../../shared/fn/new-ulid';
 import type { TripAccessRequest, TripAccessView } from '../../interfaces/trip-access.interface';
 import { CollectionTripAccess } from '../../services/collection-trip-access';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-trip-access',
@@ -23,6 +24,7 @@ export class TripAccessPage {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly tripId = this.route.snapshot.paramMap.get('id') ?? '';
+  protected readonly paymentPortalUrl = environment.paymentPortalUrl;
   protected readonly access = signal<TripAccessView | null>(null);
   protected readonly busy = signal(false);
   protected readonly copying = signal(false);
