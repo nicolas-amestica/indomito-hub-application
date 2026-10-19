@@ -2,18 +2,18 @@
   <header class="flex flex-wrap items-center justify-between gap-3">
     <div><h1 class="text-2xl font-semibold">Agenda de Videollamadas</h1>
       <p class="text-sm text-surface-500">Reuniones de Google Calendar y Google Meet</p></div>
-    @if (canCreate()) { <p-button label="Nueva reunión" icon="pi pi-plus" (onClick)="open()" /> }
+    @if (canCreate()) { <p-button label="Nueva reunión" icon="icon-[tabler--plus] size-4" (onClick)="open()" /> }
   </header>
   @if (error()) { <p-message severity="error">{{ error() }}</p-message> }
   <div class="rounded-xl border border-line/75 bg-surface-0 p-4 dark:border-line/55 dark:bg-surface-900">
     <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-2">
-        <p-button icon="pi pi-chevron-left" [text]="true" severity="secondary" (onClick)="navigate(-1)" />
+        <p-button ariaLabel="Mes anterior" icon="icon-[tabler--chevron-left] size-5" [text]="true" severity="secondary" (onClick)="navigate(-1)" />
         <h2 class="min-w-40 text-center font-semibold capitalize">{{ monthLabel() }}</h2>
-        <p-button icon="pi pi-chevron-right" [text]="true" severity="secondary" (onClick)="navigate(1)" />
+        <p-button ariaLabel="Mes siguiente" icon="icon-[tabler--chevron-right] size-5" [text]="true" severity="secondary" (onClick)="navigate(1)" />
         <p-button label="Hoy" [outlined]="true" severity="secondary" (onClick)="today()" />
       </div>
-      <p-button label="Refrescar" icon="pi pi-refresh" [outlined]="true" severity="secondary" [loading]="loading()" (onClick)="refresh()" />
+      <p-button type="button" label="Refrescar" icon="icon-[tabler--refresh] size-4" [outlined]="true" severity="secondary" [loading]="loading()" (onClick)="refresh()" />
     </div>
     @if (loading()) {
       <div class="grid grid-cols-7 gap-2">@for (i of placeholders; track i) { <p-skeleton height="7rem" /> }</div>
@@ -111,7 +111,7 @@
       @if (selected() && canDelete()) { <p-button type="button" label="Eliminar" severity="danger" [outlined]="true" [loading]="saving()" (onClick)="remove()" /> }
       <div class="ml-auto flex gap-2">
         <p-button type="button" label="Cancelar" severity="secondary" [text]="true" (onClick)="dialogVisible.set(false)" />
-        <p-button type="submit" label="Guardar" icon="pi pi-check" [loading]="saving()" [disabled]="saving()" />
+        <p-button type="submit" label="Guardar" icon="icon-[tabler--check] size-4" [loading]="saving()" [disabled]="saving()" />
       </div>
     </div>
   </form>

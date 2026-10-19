@@ -60,6 +60,7 @@
             [min]="1"
             [max]="1000000000000"
             [maxFractionDigits]="0"
+            placeholder="Ej. 150.000"
             fluid
           />
           @if (form.controls.amount.touched && form.controls.amount.hasError('required')) {
@@ -80,6 +81,7 @@
             [showIcon]="true"
             [maxDate]="maxEffectiveDate"
             [appendTo]="'body'"
+            panelStyleClass="border! border-line/75! dark:border-line/55!"
             fluid
           />
           @if (
@@ -124,6 +126,7 @@
           formControlName="email"
           maxlength="254"
           autocomplete="email"
+          placeholder="Ej. nombre@correo.cl"
         />
         @if (form.controls.email.touched && form.controls.email.hasError('required')) {
           <small role="alert" class="text-red-700 dark:text-red-400"
@@ -140,6 +143,7 @@
           formControlName="reason"
           rows="3"
           maxlength="500"
+          placeholder="Ej. Transferencia verificada en la cartola del banco"
         ></textarea>
         @if (form.controls.reason.touched && form.controls.reason.hasError('required')) {
           <small role="alert" class="text-red-700 dark:text-red-400"

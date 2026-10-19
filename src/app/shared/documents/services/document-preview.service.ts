@@ -12,13 +12,14 @@ export class DocumentPreviewService {
       data: options,
       modal: true,
       showHeader: false,
+      styleClass: 'border! border-line/75! dark:border-line/55!',
       closable: false,
       closeOnEscape: true,
       focusOnShow: false,
       dismissableMask: false,
-      width: 'min(1200px, 96vw)',
+      width: 'min(1200px, 95vw)',
       contentStyle: { padding: '0', overflow: 'hidden' },
-      breakpoints: { '960px': '96vw', '640px': '100vw' },
+      breakpoints: { '960px': '95vw', '640px': '95vw' },
     })!;
   }
 }

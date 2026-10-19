@@ -619,7 +619,7 @@ export class ContractFormPage {
                 ? {
                     id: 'approve',
                     label: 'Aprobar contrato',
-                    icon: 'pi pi-check-circle',
+                    icon: 'icon-[tabler--circle-check] size-4',
                     severity: 'success',
                     confirmationMessage:
                       'El PDF se guardará como definitivo y el contrato ya no podrá modificarse.',

@@ -6,7 +6,7 @@
         Administra las personas disponibles para conducir reuniones y define una como predeterminada.
       </p>
     </div>
-    <p-button label="Agregar anfitrión" icon="pi pi-plus" (onClick)="open()" />
+    <p-button label="Agregar anfitrión" icon="icon-[tabler--plus] size-4" (onClick)="open()" />
   </div>
 
   @if (error()) {
@@ -33,8 +33,8 @@
         <td class="border-b border-line/75 dark:border-line/55">{{ host.isDefault ? 'Sí' : 'No' }}</td>
         <td class="border-b border-line/75 text-right dark:border-line/55">
           <div class="flex justify-end gap-1">
-            <p-button ariaLabel="Editar anfitrión" icon="pi pi-pencil" [text]="true" severity="secondary" (onClick)="open(host)" />
-            <p-button ariaLabel="Eliminar anfitrión" icon="pi pi-trash" [text]="true" severity="danger" (onClick)="remove(host)" />
+            <p-button ariaLabel="Editar anfitrión" icon="icon-[tabler--pencil] size-4" [outlined]="true" size="small" severity="secondary" (onClick)="open(host)" />
+            <p-button ariaLabel="Eliminar anfitrión" icon="icon-[tabler--trash] size-4" [outlined]="true" size="small" severity="danger" (onClick)="remove(host)" />
           </div>
         </td>
       </tr>
@@ -64,7 +64,7 @@
       <span>Color <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></span>
       <div class="flex items-center gap-3">
         <p-colorpicker formControlName="color" format="hex" />
-        <input pInputText formControlName="color" maxlength="7" class="w-32 uppercase" />
+        <input pInputText formControlName="color" maxlength="7" class="w-32" />
       </div>
     </label>
     <div class="grid gap-3 rounded-xl border border-line/75 p-4 dark:border-line/55">
@@ -82,7 +82,7 @@
     </div>
     <div class="flex justify-end gap-2 border-t border-line/75 pt-4 dark:border-line/55">
       <p-button type="button" label="Cancelar" severity="secondary" [text]="true" (onClick)="dialogVisible.set(false)" />
-      <p-button type="submit" label="Guardar" icon="pi pi-check" [loading]="saving()" [disabled]="saving()" />
+      <p-button type="submit" label="Guardar" icon="icon-[tabler--check] size-4" [loading]="saving()" [disabled]="saving()" />
     </div>
   </form>
 </p-dialog>

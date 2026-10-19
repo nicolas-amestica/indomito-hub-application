@@ -1,0 +1,38 @@
+{
+  "verdict": "APPROVED",
+  "findings": [
+    {
+      "id": 1,
+      "blocking": false,
+      "confidence": "confirmed",
+      "title": "primaryAction.icon con un icono `pi` inerte",
+      "location": "src/app/indomito-hub/contracts/pages/contract-form/contract-form.page.ts:622",
+      "detail": "Pasa icon: 'pi pi-check-circle' como primaryAction, que document-preview-dialog.component.html renderiza como <span [class]> dentro del boton 'Aprobar contrato'. No renderiza y aporta el hueco flex de gap, junto a 'Descargar' y 'Cerrar', cuyos iconos si se migraron en esta tanda. Preexistente (commit 89802c6, septiembre), fuera del diff y diferido por decision del usuario; conviene migrarlo con el resto de la deuda para que la fila del visor quede coherente."
+    },
+    {
+      "id": 2,
+      "blocking": false,
+      "confidence": "confirmed",
+      "title": "La linea base del verificador describe mal esa entrada",
+      "location": "tools/check-button-policy.mjs (LEGACY_PI_ICONS)",
+      "detail": "Anota contract-form.page.ts como 'icon del confirmDialog de aprobacion' cuando en realidad es el icono del boton primario del visor de documentos. El comentario es codigo de esta tanda y despista a quien triague la deuda despues. Corregir el texto."
+    },
+    {
+      "id": 3,
+      "blocking": false,
+      "confidence": "confirmed",
+      "title": "Sin red empirico para las dos extensiones nuevas del verificador",
+      "location": ".agents/tasks/indomito-comprobantes-ui-fixes/verification.md seccion 1",
+      "detail": "El red registrado dispara con los cuatro <button pButton> vacios y los label=/icon= inertes, pero no con un <a pButton> vacio ni con una plantilla inline de .ts. El barrido de archivos .ts esta probado de rebote por la linea base de R7, que cuenta referencias dentro de .ts; la ruta templateRegions queda verificada solo por lectura del codigo. Agregar los dos casos al red cerraria el hueco de evidencia."
+    },
+    {
+      "id": 4,
+      "blocking": false,
+      "confidence": "confirmed",
+      "title": "Borde de outlined-secondary en claro a 1.28:1",
+      "location": "src/styles.css (variante outlined-secondary, modo claro)",
+      "detail": "Por debajo del 3:1 que exige WCAG 1.4.11 para el limite de un componente. No lo introdujo esta tanda, el usuario eligio explicitamente la opcion B y las pestanas del visor ya reciben un arreglo por instancia. Registrado como deuda en verification.md seccion 15."
+    }
+  ],
+  "reviewDoc": "/Users/nicoamestica/Documents/Desarrollo/giras-indomito/ind-hub-app-ngx-pri-gh/.agents/tasks/indomito-comprobantes-ui-fixes/review.md"
+}

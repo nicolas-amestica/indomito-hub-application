@@ -41,6 +41,23 @@
   }
 }
 
+/* Aura resuelve el borde de `outlined contrast` en claro con {surface.700}, que
+   nuestro preset mapea a var(--color-graphite) = #3A3A3A: 11.37:1 sobre el
+   blanco del panel. Es casi negro, muy por encima del 3:1 que exige WCAG
+   1.4.11 para el limite de un componente, y compite visualmente con el
+   contenido. Lo bajamos al token semantico de borde de control (#858585,
+   3.69:1), que deja el contorno perceptible pero discreto. El texto NO se
+   toca: sigue en var(--color-ink) con 17.04:1.
+
+   Solo se declara la variante `contrast`, la que introdujo esta tanda. Las
+   variantes `secondary`, `danger` y `primary` quedan como estaban. El bloque va
+   sin @layer a proposito: una declaracion sin capa gana a la capa `primeng`
+   que PrimeNG inyecta en runtime, que es el mismo mecanismo por el que
+   funcionan los overrides del bloque `.dark` de abajo. */
+:root {
+  --p-button-outlined-contrast-border-color: var(--color-control-border);
+}
+
 .dark {
   --color-ink: #f4f4f5;
   --color-graphite: #d4d4d8;
@@ -99,6 +116,18 @@
   --p-button-outlined-secondary-border-color: #71717a;
   --p-button-outlined-secondary-hover-background: #34353a;
   --p-button-outlined-secondary-active-background: #3f4046;
+  /* Aura resuelve la severity `contrast` con light-dark(): en oscuro el texto
+     cae en {surface.0}, que nuestro preset mapea a var(--color-surface), el
+     mismo color del panel (1.00:1, etiqueta invisible), y el fondo de hover cae
+     en {surface.800} = var(--color-graphite), casi blanco. Fijamos aquí el lado
+     oscuro, igual que con outlined-secondary. */
+  --p-button-outlined-contrast-color: #f4f4f5;
+  --p-button-outlined-contrast-border-color: #71717a;
+  --p-button-outlined-contrast-hover-background: #34353a;
+  --p-button-outlined-contrast-active-background: #3f4046;
+  --p-button-text-contrast-color: #f4f4f5;
+  --p-button-text-contrast-hover-background: #34353a;
+  --p-button-text-contrast-active-background: #3f4046;
   --p-fileupload-background: #1b1c1f;
   --p-fileupload-color: #f4f4f5;
 }
@@ -125,8 +154,15 @@ html.dark {
    * PrimeNG 22 no longer renders a spinner for the pButton directive: its
    * `loading` input only adds `.p-button-loading`. Render the visual indicator
    * centrally so every directive button keeps the same loading contract.
+   *
+   * El `:not([data-p])` acota la regla a la directiva. El <button> interno del
+   * componente <p-button> siempre expone `data-p` (y su valor incluye el
+   * término `loading` cuando está cargando), mientras que la directiva solo
+   * aplica clases en su host y nunca emite ese atributo. Sin este acotamiento
+   * el componente mostraría dos indicadores: su propio
+   * `svg[data-p-icon="spinner"]` más este `::before`.
    */
-  button.p-button-loading::before {
+  button.p-button-loading:not([data-p])::before {
     box-sizing: border-box;
     width: 1rem;
     height: 1rem;
@@ -138,7 +174,7 @@ html.dark {
     animation: indomito-button-spin 0.7s linear infinite;
   }
 
-  button.p-button-loading.p-button-icon-only > * {
+  button.p-button-loading:not([data-p]).p-button-icon-only > * {
     display: none;
   }
 

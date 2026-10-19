@@ -69,7 +69,7 @@
         mode="basic"
         name="contractTemplate"
         accept=".xlsx"
-        chooseIcon="pi pi-upload"
+        chooseIcon="icon-[tabler--upload] size-4"
         [chooseLabel]="importing() ? 'Importando…' : 'Cargar Excel'"
         [auto]="true"
         [customUpload]="true"
@@ -109,7 +109,7 @@
     <div
       class="mb-6 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900"
     >
-      <span class="pi pi-lock mr-2" aria-hidden="true"></span>
+      <span class="icon-[tabler--lock] mr-2 size-4 align-text-bottom" aria-hidden="true"></span>
       @if (status() === 'APPROVED') {
         Este contrato está aprobado. El PDF definitivo quedó protegido y disponible en “Vista previa
         PDF”.
@@ -161,7 +161,7 @@
               [disabled]="signedUploadBusy()"
               (click)="viewSignedDocument()"
             >
-              <span class="pi pi-file-pdf" aria-hidden="true"></span>
+              <span class="icon-[tabler--file-type-pdf] size-4" aria-hidden="true"></span>
               Ver copia firmada vigente
             </button>
             <label class="flex flex-col gap-2" for="signed-replacement-reason">
@@ -197,7 +197,7 @@
             mode="basic"
             name="signedContract"
             accept="application/pdf,.pdf"
-            chooseIcon="pi pi-upload"
+            chooseIcon="icon-[tabler--upload] size-4"
             [chooseLabel]="
               signedUploadBusy()
                 ? 'Publicando…'
@@ -230,12 +230,13 @@
                   class="mt-3 w-full"
                   pButton
                   type="button"
-                  severity="secondary"
+                  severity="contrast"
                   outlined
                   [loading]="signedUploadBusy()"
                   [disabled]="signedUploadBusy()"
                   (click)="viewSignedDocument(document)"
                 >
+                  <span class="icon-[tabler--file-type-pdf] size-4" aria-hidden="true"></span>
                   Ver PDF
                 </button>
               </article>
@@ -253,27 +254,29 @@
             >
               <ng-template #header>
                 <tr>
-                  <th>Fecha</th>
-                  <th>Responsable</th>
-                  <th>Motivo</th>
-                  <th aria-label="Acciones"></th>
+                  <th class="border-line/75! dark:border-line/55!">Fecha</th>
+                  <th class="border-line/75! dark:border-line/55!">Responsable</th>
+                  <th class="border-line/75! dark:border-line/55!">Motivo</th>
+                  <th aria-label="Acciones" class="border-line/75! dark:border-line/55!"></th>
                 </tr>
               </ng-template>
               <ng-template #body let-document>
                 <tr>
-                  <td>{{ document.uploadedAt | date: 'dd/MM/yyyy HH:mm' }}</td>
-                  <td>{{ document.uploadedBy }}</td>
-                  <td>{{ document.replacementReason || 'Primera carga' }}</td>
-                  <td class="text-right">
+                  <td class="border-line/75! dark:border-line/55!">{{ document.uploadedAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+                  <td class="border-line/75! dark:border-line/55!">{{ document.uploadedBy }}</td>
+                  <td class="border-line/75! dark:border-line/55!">{{ document.replacementReason || 'Primera carga' }}</td>
+                  <td class="text-right border-line/75! dark:border-line/55!">
                     <button
                       pButton
                       type="button"
                       size="small"
-                      text
+                      severity="contrast"
+                      outlined
                       [loading]="signedUploadBusy()"
                       [disabled]="signedUploadBusy()"
                       (click)="viewSignedDocument(document)"
                     >
+                      <span class="icon-[tabler--file-type-pdf] size-4" aria-hidden="true"></span>
                       Ver PDF
                     </button>
                   </td>
@@ -281,7 +284,7 @@
               </ng-template>
               <ng-template #emptymessage>
                 <tr>
-                  <td colspan="4" class="py-8 text-center text-sm text-muted">
+                  <td colspan="4" class="border-line/75! dark:border-line/55! py-8 text-center text-sm text-muted">
                     Todavía no se ha publicado una copia firmada.
                   </td>
                 </tr>
@@ -504,7 +507,6 @@
         <button
           pButton
           type="button"
-          icon="pi pi-plus"
           severity="secondary"
           outlined
           (click)="addRepresentative()"
@@ -532,7 +534,6 @@
                 type="button"
                 severity="danger"
                 outlined
-                icon="pi pi-trash"
                 [attr.aria-label]="'Quitar representante ' + (i + 1)"
                 (click)="remove(representatives, i)"
               >
@@ -550,7 +551,6 @@
         <button
           pButton
           type="button"
-          icon="pi pi-plus"
           severity="secondary"
           outlined
           (click)="addRepresentative(true)"
@@ -581,7 +581,6 @@
                 type="button"
                 severity="danger"
                 outlined
-                icon="pi pi-trash"
                 [attr.aria-label]="'Quitar representante del cliente ' + (i + 1)"
                 (click)="remove(clientRepresentatives, i)"
               >
@@ -608,7 +607,6 @@
         <button
           pButton
           type="button"
-          icon="pi pi-plus"
           severity="secondary"
           outlined
           (click)="addService()"
@@ -632,7 +630,6 @@
               type="button"
               severity="danger"
               outlined
-              icon="pi pi-trash"
               [attr.aria-label]="'Quitar servicio ' + (i + 1)"
               (click)="remove(services, i)"
             >
@@ -954,7 +951,6 @@
         <button
           pButton
           type="button"
-          icon="pi pi-plus"
           severity="secondary"
           outlined
           (click)="addPassenger()"
@@ -1067,7 +1063,6 @@
                   type="button"
                   severity="danger"
                   outlined
-                  icon="pi pi-trash"
                   size="small"
                   [attr.aria-label]="'Quitar pasajero ' + (i + 1)"
                   (click)="remove(passengers, i)"
