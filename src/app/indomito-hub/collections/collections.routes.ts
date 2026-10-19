@@ -2,6 +2,13 @@ import type { Routes } from '@angular/router';
 import { moduleGuard } from '../../core/auth/auth.guard';
 export const COLLECTIONS_ROUTES: Routes = [
   {
+    path: 'tesoreria/rendiciones',
+    title: 'Rendiciones Khipu',
+    data: { module: 'PAYMENT_OPERATIONS' },
+    canActivate: [moduleGuard],
+    loadComponent: () => import('./pages/renditions/renditions.page').then((m) => m.RenditionsPage),
+  },
+  {
     path: 'documentos-tributarios',
     title: 'Boletas pendientes de emisión',
     data: { module: 'PAYMENT_OPERATIONS' },

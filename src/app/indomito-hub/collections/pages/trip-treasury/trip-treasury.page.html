@@ -5,6 +5,9 @@
       <h1 class="mt-2 text-3xl font-semibold text-ink">Caja y liquidaciones bancarias</h1>
     </div>
     <div class="flex flex-wrap gap-3">
+      <a pButton severity="secondary" outlined routerLink="/cobranza/tesoreria/rendiciones"
+        >Rendiciones Khipu</a
+      >
       <a pButton severity="secondary" outlined routerLink="/cobranza/tesoreria">Caja consolidada</a
       ><a
         pButton
@@ -28,8 +31,10 @@
     </div>
   </header>
   <p-message severity="info"
-    >Un pago confirmado por Khipu permanece “en tránsito” hasta conciliarlo contra la cartola. La
-    comisión se registra por su valor real; el sistema no la estima.</p-message
+    >Un pago confirmado por Khipu permanece “en tránsito” hasta registrar su liquidación. Las
+    rendiciones automáticas conservan la evidencia del proveedor; la conciliación manual requiere
+    revisar la cartola. Las comisiones se registran por su valor informado, sin
+    estimarlas.</p-message
   >
   @if (success()) {
     <p-message severity="success">{{ success() }}</p-message>

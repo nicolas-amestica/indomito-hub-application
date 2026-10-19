@@ -1,0 +1,163 @@
+<main
+  class="mx-auto flex min-w-0 max-w-6xl flex-col gap-6 px-4 py-8 sm:px-8"
+  [attr.aria-busy]="busy()"
+>
+  <header class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <p class="text-sm text-muted">Tesorería</p>
+      <h1 class="mt-2 text-3xl font-semibold text-ink">Rendiciones Khipu</h1>
+    </div>
+    <a pButton severity="secondary" outlined routerLink="/cobranza/tesoreria">Caja consolidada</a>
+  </header>
+  <p-message severity="info"
+    >En observación, los reportes se comparan sin modificar caja. Una rendición informada por Khipu
+    no equivale a una verificación independiente de la cartola bancaria.</p-message
+  >
+  @if (error()) {
+    <p-message severity="error">{{ error() }}</p-message>
+  }
+  <p-panel header="Mes de recepción">
+    <form
+      (submit)="$event.preventDefault(); load()"
+      class="flex flex-col gap-4 sm:flex-row sm:items-end"
+    >
+      <div class="flex min-w-0 flex-col gap-2">
+        <label for="rendition-month">Mes (AAAA-MM, UTC)</label>
+        <input
+          pInputText
+          id="rendition-month"
+          [formControl]="month"
+          maxlength="7"
+          placeholder="2026-10"
+          [attr.aria-invalid]="month.touched && month.invalid"
+          aria-describedby="rendition-month-error"
+        />
+        @if (month.touched && month.invalid) {
+          <p id="rendition-month-error" class="text-sm text-red-600 dark:text-red-400">
+            Ingresa un mes válido, por ejemplo 2026-10.
+          </p>
+        }
+      </div>
+      <button pButton type="submit" [loading]="busy()" [disabled]="busy()">Actualizar</button>
+    </form>
+  </p-panel>
+  <section
+    aria-label="Rendiciones recibidas"
+    class="grid min-w-0 gap-4 md:grid-cols-2"
+    aria-live="polite"
+  >
+    @for (report of reports(); track report.id) {
+      <p-panel [header]="'Rendición ' + report.providerId">
+        <div class="flex min-w-0 flex-col gap-3">
+          <p class="text-sm text-muted">
+            Recibida: {{ report.receivedAt | date: 'dd-MM-yyyy HH:mm' }}
+          </p>
+          <p class="font-medium text-ink">{{ labels[report.status] || report.status }}</p>
+          <p class="text-sm text-muted">
+            {{ report.processed }} de {{ report.total }} pagos revisados ·
+            {{ report.applied }} aplicados · {{ report.review }} con diferencias
+          </p>
+          <p class="text-sm text-muted">
+            Modo: {{ report.policy.mode === 'OBSERVE' ? 'Observación' : 'Aplicación automática' }}
+          </p>
+          @if (report.lastError) {
+            <p-message severity="warn"
+              >El lote tuvo un fallo de procesamiento. Revisa su progreso antes de registrar
+              movimientos manuales.</p-message
+            >
+          }
+          <button
+            pButton
+            type="button"
+            severity="secondary"
+            outlined
+            [disabled]="busy()"
+            (click)="detail(report)"
+            [attr.aria-label]="'Ver pagos de la rendición ' + report.providerId"
+          >
+            Ver pagos
+          </button>
+        </div>
+      </p-panel>
+    } @empty {
+      @if (!busy()) {
+        <p class="text-muted">No hay rendiciones recibidas en este mes.</p>
+      }
+    }
+  </section>
+  @if (next()) {
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      outlined
+      [disabled]="busy()"
+      (click)="load(true)"
+    >
+      Cargar más rendiciones
+    </button>
+  }
+  @if (selected(); as report) {
+    <p-panel [header]="'Pagos de la rendición ' + report.providerId">
+      <div class="flex flex-col gap-4">
+        <p class="text-sm text-muted">
+          {{ labels[report.status] || report.status }} · {{ report.processed }} de
+          {{ report.total }} pagos revisados.
+        </p>
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          outlined
+          [disabled]="busy()"
+          (click)="detail(report)"
+        >
+          Actualizar detalle
+        </button>
+        @for (item of items(); track item.paymentId) {
+          <article
+            class="grid min-w-0 gap-3 border-t border-line/75 pt-4 dark:border-line/55 sm:grid-cols-2"
+          >
+            <div>
+              <h2 class="break-all font-medium text-ink">{{ item.paymentId }}</h2>
+              <p class="text-sm text-muted">{{ labels[item.status] || item.status }}</p>
+            </div>
+            <dl class="grid grid-cols-2 gap-2 text-sm">
+              <dt>Monto</dt>
+              <dd>{{ item.gross | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</dd>
+              <dt>Comisión informada</dt>
+              <dd>{{ item.fee | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</dd>
+              <dt>Fin del reporte</dt>
+              <dd>{{ item.renditionDate | date: 'dd-MM-yyyy' : 'UTC' }}</dd>
+            </dl>
+            @if (item.feeScheme) { <p class="break-words text-sm text-muted">Esquema informado: {{ item.feeScheme }}</p> }
+            @if (item.feeTreatment === 'DEFERRED') { <p class="text-sm text-muted">Comisión cobrada por separado. El cero informado no significa que el servicio sea gratuito.</p> }
+            @if (item.tripId) {
+              <a
+                pButton
+                severity="secondary"
+                outlined
+                [routerLink]="['/cobranza/giras', item.tripId, 'tesoreria']"
+                >Ver caja de la gira</a
+              >
+            }
+          </article>
+        } @empty {
+          <p class="text-muted">Todavía no hay resultados de pagos para mostrar.</p>
+        }
+        @if (detailNext()) {
+          <button
+            pButton
+            type="button"
+            severity="secondary"
+            outlined
+            [disabled]="busy()"
+            (click)="detail(report, true)"
+          >
+            Cargar más pagos
+          </button>
+        }
+      </div>
+    </p-panel>
+  }
+</main>

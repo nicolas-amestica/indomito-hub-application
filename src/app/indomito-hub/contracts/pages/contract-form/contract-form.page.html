@@ -222,8 +222,8 @@
             @for (document of signedDocuments(); track document.id) {
               <article class="min-w-0 rounded-xl border border-line/75 dark:border-line/55 p-4">
                 <p class="font-semibold">{{ document.uploadedAt | date: 'dd-MM-yyyy HH:mm' }}</p>
-                <p class="mt-1 break-words text-sm text-muted">{{ document.uploadedBy }}</p>
-                <p class="mt-2 break-words text-sm">
+                <p class="mt-1 wrap-break-word text-sm text-muted">{{ document.uploadedBy }}</p>
+                <p class="mt-2 wrap-break-word text-sm">
                   {{ document.replacementReason || 'Primera carga' }}
                 </p>
                 <button
