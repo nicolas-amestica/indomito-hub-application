@@ -13,26 +13,40 @@ import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { FileUpload, type FileUploadHandlerEvent } from 'primeng/fileupload';
 import { Popover } from 'primeng/popover';
+import { ProgressSpinner } from 'primeng/progressspinner';
 import { Slider } from 'primeng/slider';
 import { Tooltip } from 'primeng/tooltip';
 
 import { AuthService } from '../../../../core/auth/auth.service';
 import { NotificationService } from '../../../../core/notifications/notification.service';
+import {
+  ALLOWED_PHOTO_TYPES,
+  MAX_SOURCE_PHOTO_SIZE,
+} from '../../constants/profile-photo.constants';
+import { prepareProfileImage } from '../../fn/prepare-profile-image';
 import { ProfilePhotoService } from '../../services/profile-photo.service';
-
-const MAX_PHOTO_SIZE = 2 * 1024 * 1024;
-const ALLOWED_PHOTO_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
 @Component({
   selector: 'app-user-profile-menu',
-  imports: [ButtonDirective, Dialog, FileUpload, FormsModule, Popover, Slider, Tooltip],
+  imports: [
+    ButtonDirective,
+    Dialog,
+    FileUpload,
+    FormsModule,
+    Popover,
+    ProgressSpinner,
+    Slider,
+    Tooltip,
+  ],
   templateUrl: './user-profile-menu.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserProfileMenuComponent {
   readonly auth = inject(AuthService);
   readonly photos = inject(ProfilePhotoService);
+  readonly maxSourcePhotoSize = MAX_SOURCE_PHOTO_SIZE;
   readonly saving = signal(false);
+  readonly preparing = signal(false);
   readonly deleting = signal(false);
   readonly cropVisible = signal(false);
   readonly cropX = signal(50);
@@ -48,30 +62,48 @@ export class UserProfileMenuComponent {
     effect(() => this.photos.initialize(this.auth.user()?.profilePhoto));
   }
 
-  selectPhoto(event: FileUploadHandlerEvent, uploader: FileUpload, profilePanel: Popover): void {
+  async selectPhoto(
+    event: FileUploadHandlerEvent,
+    uploader: FileUpload,
+    profilePanel: Popover,
+  ): Promise<void> {
     const file = event.files[0];
     uploader.clear();
-    if (!file || !ALLOWED_PHOTO_TYPES.has(file.type) || file.size > MAX_PHOTO_SIZE) {
-      this.notifications.error('Selecciona una imagen JPEG, PNG o WebP de máximo 2 MB.');
+    if (!file || !ALLOWED_PHOTO_TYPES.has(file.type) || file.size > MAX_SOURCE_PHOTO_SIZE) {
+      this.notifications.error('Selecciona una imagen JPEG, PNG o WebP de máximo 50 MB.');
       return;
     }
-    this.releaseSourceImage();
-    this.sourceUrl = URL.createObjectURL(file);
-    const image = new Image();
-    image.onload = () => {
-      this.sourceImage = image;
+
+    this.preparing.set(true);
+    try {
+      const preparedPhoto = await prepareProfileImage(file, this.document);
+      this.releaseSourceImage();
+      this.sourceUrl = URL.createObjectURL(preparedPhoto);
+      await this.loadSourceImage(this.sourceUrl);
       this.cropX.set(50);
       this.cropY.set(50);
       this.cropZoom.set(1);
       profilePanel.hide();
       this.cropVisible.set(true);
       this.document.defaultView?.requestAnimationFrame(() => this.renderCrop());
-    };
-    image.onerror = () => {
+    } catch {
       this.releaseSourceImage();
       this.notifications.error('No fue posible leer la imagen seleccionada.');
-    };
-    image.src = this.sourceUrl;
+    } finally {
+      this.preparing.set(false);
+    }
+  }
+
+  private loadSourceImage(url: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => {
+        this.sourceImage = image;
+        resolve();
+      };
+      image.onerror = () => reject(new Error('No fue posible cargar la imagen preparada'));
+      image.src = url;
+    });
   }
 
   renderCrop(): void {

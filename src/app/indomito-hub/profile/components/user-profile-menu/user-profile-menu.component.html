@@ -47,11 +47,24 @@
         } @else {
           <span class="icon-[tabler--user] size-8 text-muted" aria-hidden="true"></span>
         }
-        <span
-          class="pointer-events-none absolute inset-x-0 bottom-0 flex h-6 items-center justify-center bg-night/80 text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
-        >
-          <span class="icon-[tabler--camera] size-4" aria-hidden="true"></span>
-        </span>
+        @if (preparing()) {
+          <span
+            class="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-night/70"
+            aria-label="Optimizando imagen"
+          >
+            <p-progress-spinner
+              ariaLabel="Optimizando imagen"
+              strokeWidth="5"
+              [style]="{ width: '1.5rem', height: '1.5rem' }"
+            />
+          </span>
+        } @else {
+          <span
+            class="pointer-events-none absolute inset-x-0 bottom-0 flex h-6 items-center justify-center bg-night/80 text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+          >
+            <span class="icon-[tabler--camera] size-4" aria-hidden="true"></span>
+          </span>
+        }
         <p-fileupload
           #photoUpload
           mode="basic"
@@ -63,8 +76,10 @@
           chooseStyleClass="absolute inset-0 size-full! cursor-pointer! rounded-full! border-0! bg-transparent! p-0! text-transparent! shadow-none! focus-visible:outline-2! focus-visible:outline-offset-2! focus-visible:outline-brand!"
           [auto]="true"
           [customUpload]="true"
-          [maxFileSize]="2097152"
-          [disabled]="saving()"
+          [maxFileSize]="maxSourcePhotoSize"
+          invalidFileSizeMessageSummary="La imagen supera el máximo de 50 MB."
+          invalidFileSizeMessageDetail=""
+          [disabled]="saving() || preparing()"
           (uploadHandler)="selectPhoto($event, photoUpload, profilePanel)"
         />
       </div>
@@ -179,7 +194,8 @@
       </label>
     </div>
     <p class="text-center text-xs text-muted">
-      Todo lo que quede dentro del círculo será tu nueva foto.
+      Las imágenes grandes se optimizan automáticamente. Todo lo que quede dentro del círculo será
+      tu nueva foto.
     </p>
   </div>
   <ng-template #footer>
