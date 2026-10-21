@@ -1,0 +1,200 @@
+<button
+  pButton
+  [unstyled]="true"
+  type="button"
+  class="group flex min-h-11 items-center gap-2 rounded-xl px-1.5 py-1 text-left text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand dark:hover:bg-white/15 sm:px-2"
+  aria-label="Abrir opciones de la cuenta"
+  aria-haspopup="menu"
+  [attr.aria-expanded]="profilePanel.overlayVisible()"
+  (click)="profilePanel.toggle($event)"
+>
+  <span
+    class="relative flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/25 bg-white/10"
+  >
+    @if (photos.photoUrl(); as photoUrl) {
+      <img [src]="photoUrl" alt="Foto de perfil" class="size-full object-cover" />
+    } @else {
+      <span class="icon-[tabler--user] size-5 text-white/80" aria-hidden="true"></span>
+    }
+  </span>
+  <span class="hidden min-w-0 md:block">
+    <span class="block max-w-40 truncate text-sm font-semibold">{{ auth.user()?.name }}</span>
+    <span class="block text-xs text-white/65">{{ auth.user()?.profileCode }}</span>
+  </span>
+  <span
+    class="icon-[tabler--chevron-down] hidden size-4 text-white/65 transition-transform group-aria-expanded:rotate-180 sm:block"
+    aria-hidden="true"
+  ></span>
+</button>
+
+<p-popover
+  #profilePanel
+  styleClass="w-[min(22rem,calc(100vw-1rem))] border-line/75! shadow-md! dark:border-line/55! dark:shadow-black/20!"
+>
+  <section class="overflow-hidden" aria-label="Opciones de la cuenta">
+    <div class="flex items-center gap-3 border-b border-line/75 pb-4 dark:border-line/55">
+      <div
+        class="group relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-line/75 bg-surface-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand dark:border-line/55 dark:bg-surface-800"
+        pTooltip="Cambiar foto"
+        tooltipPosition="bottom"
+      >
+        @if (photos.photoUrl(); as photoUrl) {
+          <img
+            [src]="photoUrl"
+            alt="Foto de perfil de {{ auth.user()?.name }}"
+            class="size-full object-cover"
+          />
+        } @else {
+          <span class="icon-[tabler--user] size-8 text-muted" aria-hidden="true"></span>
+        }
+        <span
+          class="pointer-events-none absolute inset-x-0 bottom-0 flex h-6 items-center justify-center bg-night/80 text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+        >
+          <span class="icon-[tabler--camera] size-4" aria-hidden="true"></span>
+        </span>
+        <p-fileupload
+          #photoUpload
+          mode="basic"
+          name="profilePhoto"
+          accept="image/jpeg,image/png,image/webp"
+          chooseLabel="Cambiar foto de perfil"
+          chooseIcon=""
+          styleClass="absolute inset-0 z-10 size-full"
+          chooseStyleClass="absolute inset-0 size-full! cursor-pointer! rounded-full! border-0! bg-transparent! p-0! text-transparent! shadow-none! focus-visible:outline-2! focus-visible:outline-offset-2! focus-visible:outline-brand!"
+          [auto]="true"
+          [customUpload]="true"
+          [maxFileSize]="2097152"
+          [disabled]="saving()"
+          (uploadHandler)="selectPhoto($event, photoUpload, profilePanel)"
+        />
+      </div>
+      <div class="min-w-0 flex-1">
+        <h2 class="truncate text-base font-semibold text-ink">{{ auth.user()?.name }}</h2>
+        <p class="truncate text-sm text-muted">{{ auth.user()?.email }}</p>
+        <p class="mt-1 text-xs text-muted">
+          RUT {{ auth.user()?.rut }} · Perfil {{ auth.user()?.profileCode }}
+        </p>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1 py-3">
+      <button
+        pButton
+        type="button"
+        text
+        severity="secondary"
+        class="w-full justify-start!"
+        disabled
+      >
+        <span class="icon-[tabler--help-circle] size-5" aria-hidden="true"></span>
+        <span>Ayuda</span>
+        <span class="ml-auto text-xs text-muted">Próximamente</span>
+      </button>
+      @if (photos.photoUrl()) {
+        <button
+          pButton
+          type="button"
+          text
+          severity="secondary"
+          class="w-full justify-start!"
+          [loading]="deleting()"
+          (click)="deletePhoto()"
+        >
+          <span class="icon-[tabler--photo-off] size-5" aria-hidden="true"></span>
+          <span>Eliminar foto</span>
+        </button>
+      }
+    </div>
+
+    <div class="border-t border-line/75 pt-3 dark:border-line/55">
+      <button
+        pButton
+        type="button"
+        severity="danger"
+        class="w-full justify-center!"
+        (click)="auth.logout()"
+      >
+        <span class="icon-[tabler--logout-2] size-5" aria-hidden="true"></span>
+        <span>Cerrar sesión</span>
+      </button>
+    </div>
+  </section>
+</p-popover>
+
+<p-dialog
+  header="Ajustar foto de perfil"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!saving()"
+  [visible]="cropVisible()"
+  appendTo="body"
+  [baseZIndex]="1200"
+  [style]="{ width: 'min(32rem, calc(100vw - 1rem))' }"
+  (visibleChange)="$event ? cropVisible.set(true) : cancelCrop()"
+>
+  <div class="flex flex-col items-center gap-5">
+    <div
+      class="rounded-full border-4 border-brand bg-surface-100 p-1 shadow-lg dark:bg-surface-900"
+      aria-label="Vista previa del recorte circular"
+    >
+      <canvas
+        #cropCanvas
+        width="512"
+        height="512"
+        class="block size-56 rounded-full sm:size-64"
+      ></canvas>
+    </div>
+    <div class="grid w-full gap-4">
+      <label class="grid gap-2 text-sm font-medium text-ink"
+        >Posición horizontal
+        <p-slider
+          [ngModel]="cropX()"
+          (ngModelChange)="cropX.set($event); renderCrop()"
+          [min]="0"
+          [max]="100"
+          ariaLabel="Posición horizontal del recorte"
+        />
+      </label>
+      <label class="grid gap-2 text-sm font-medium text-ink"
+        >Posición vertical
+        <p-slider
+          [ngModel]="cropY()"
+          (ngModelChange)="cropY.set($event); renderCrop()"
+          [min]="0"
+          [max]="100"
+          ariaLabel="Posición vertical del recorte"
+        />
+      </label>
+      <label class="grid gap-2 text-sm font-medium text-ink"
+        >Acercamiento
+        <p-slider
+          [ngModel]="cropZoom()"
+          (ngModelChange)="cropZoom.set($event); renderCrop()"
+          [min]="1"
+          [max]="3"
+          [step]="0.05"
+          ariaLabel="Acercamiento del recorte"
+        />
+      </label>
+    </div>
+    <p class="text-center text-xs text-muted">
+      Todo lo que quede dentro del círculo será tu nueva foto.
+    </p>
+  </div>
+  <ng-template #footer>
+    <button
+      pButton
+      type="button"
+      text
+      severity="secondary"
+      [disabled]="saving()"
+      (click)="cancelCrop()"
+    >
+      Cancelar
+    </button>
+    <button pButton type="button" [loading]="saving()" (click)="saveCrop()">
+      <span class="icon-[tabler--crop] size-5" aria-hidden="true"></span><span>Guardar foto</span>
+    </button>
+  </ng-template>
+</p-dialog>

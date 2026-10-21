@@ -5,6 +5,7 @@ export interface AuthUser {
   rut: string;
   profileCode: string;
   active: boolean;
+  profilePhoto?: string;
 }
 export interface AuthModule {
   code: string;

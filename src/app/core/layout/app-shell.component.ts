@@ -5,6 +5,7 @@ import { Tooltip } from 'primeng/tooltip';
 import { AuthService } from '../auth/auth.service';
 import { ThemeService } from '../theme/theme.service';
 import { AppMegaMenuComponent } from './app-mega-menu/app-mega-menu.component';
+import { UserProfileMenuComponent } from '../../indomito-hub/profile/components/user-profile-menu/user-profile-menu.component';
 import type { AuthModule } from '../auth/auth.models';
 
 const HOME_MODULE: AuthModule = {
@@ -21,7 +22,14 @@ const HOME_MODULE: AuthModule = {
 
 @Component({
   selector: 'app-shell',
-  imports: [AppMegaMenuComponent, ButtonDirective, RouterOutlet, RouterLink, Tooltip],
+  imports: [
+    AppMegaMenuComponent,
+    ButtonDirective,
+    RouterOutlet,
+    RouterLink,
+    Tooltip,
+    UserProfileMenuComponent,
+  ],
   templateUrl: './app-shell.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
