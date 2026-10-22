@@ -43,7 +43,7 @@
 - **Variables de entorno**: unicamente via AWS SSM Parameter Store tipo **SecureString**. Prohibido usar variables de entorno planas (no encriptadas), archivos `.env` en producción, u otro servicio distinto de SSM SecureString para este fin.
 - IDs: ULIDs
 - Configuraciones dinámicas: en BD (DynamoDB), no hardcodeadas en frontend
-- Email: Nodemailer (no SES)
+- Email: SMTP desde Go con `github.com/wneessen/go-mail` en el backend Hub (no SES). TLS obligatorio, certificados verificados y credenciales en SSM SecureString. No incorporar un runtime Node solo para enviar correos; esta regla no exige migrar los sistemas legacy.
 
 ## Infraestructura AWS — Reglas No Negociables
 

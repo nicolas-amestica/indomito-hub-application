@@ -16,6 +16,9 @@
   @if (error()) {
     <p-message severity="error">{{ error() }}</p-message>
   }
+  @if (notice()) {
+    <p-message severity="success" aria-live="polite">{{ notice() }}</p-message>
+  }
   <p-panel header="Mes de recepción">
     <form
       (submit)="$event.preventDefault(); load()"
@@ -77,6 +80,22 @@
           >
             Ver pagos
           </button>
+          @if (
+            auth.canPerform('PAYMENT_OPERATIONS', 'c') &&
+            (report.status === 'OBSERVED' || report.status === 'REVIEW_REQUIRED')
+          ) {
+            <button
+              pButton
+              type="button"
+              severity="secondary"
+              outlined
+              [disabled]="busy()"
+              (click)="requestReplay(report)"
+              [attr.aria-label]="'Reprocesar rendición ' + report.providerId"
+            >
+              Reprocesar
+            </button>
+          }
         </div>
       </p-panel>
     } @empty {
@@ -130,8 +149,15 @@
               <dt>Fin del reporte</dt>
               <dd>{{ item.renditionDate | date: 'dd-MM-yyyy' : 'UTC' }}</dd>
             </dl>
-            @if (item.feeScheme) { <p class="break-words text-sm text-muted">Esquema informado: {{ item.feeScheme }}</p> }
-            @if (item.feeTreatment === 'DEFERRED') { <p class="text-sm text-muted">Comisión cobrada por separado. El cero informado no significa que el servicio sea gratuito.</p> }
+            @if (item.feeScheme) {
+              <p class="break-words text-sm text-muted">Esquema informado: {{ item.feeScheme }}</p>
+            }
+            @if (item.feeTreatment === 'DEFERRED') {
+              <p class="text-sm text-muted">
+                Comisión cobrada por separado. El cero informado no significa que el servicio sea
+                gratuito.
+              </p>
+            }
             @if (item.tripId) {
               <a
                 pButton
@@ -161,3 +187,46 @@
     </p-panel>
   }
 </main>
+<p-dialog
+  header="Confirmar reprocesamiento"
+  [visible]="replayTarget() !== null"
+  (visibleChange)="!$event && replayTarget.set(null)"
+  [modal]="true"
+  [closable]="!busy()"
+  [closeOnEscape]="!busy()"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="w-[calc(100vw-2rem)] max-w-lg"
+>
+  @if (replayTarget(); as report) {
+    <div class="flex min-w-0 flex-col gap-4">
+      <p>
+        Se volverá a revisar la rendición {{ report.providerId }} con la política vigente del
+        servidor.
+      </p>
+      <p-message severity="warn"
+        >Si la política vigente es APPLY, puede registrar liquidaciones en caja. No cambia la
+        política, no cobra nuevamente y no verifica la cartola bancaria.</p-message
+      >
+      <p>
+        Revisa y corrige la causa de la excepción antes de continuar. Los movimientos ya aplicados
+        no se vuelven a registrar.
+      </p>
+      <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          outlined
+          [disabled]="busy()"
+          (click)="replayTarget.set(null)"
+        >
+          Cancelar
+        </button>
+        <button pButton type="button" [loading]="busy()" [disabled]="busy()" (click)="replay()">
+          Confirmar reprocesamiento
+        </button>
+      </div>
+    </div>
+  }
+</p-dialog>

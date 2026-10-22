@@ -14,6 +14,16 @@ export class CollectionRenditions {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/pagos/tesoreria/rendiciones`;
 
+  /** Encola una revisión con la política vigente; no confirma su aplicación. */
+  replay(id: string) {
+    return this.http
+      .post<ApiSuccessEnvelope<{ status: 'PENDING' }>>(
+        `${this.base}/${encodeURIComponent(id)}/reintentos`,
+        {},
+      )
+      .pipe(map(({ data }) => data));
+  }
+
   /** Consulta rendiciones por mes UTC de recepción. */
   list(month: string, cursor = '') {
     const params = new HttpParams().set('month', month).set('cursor', cursor);

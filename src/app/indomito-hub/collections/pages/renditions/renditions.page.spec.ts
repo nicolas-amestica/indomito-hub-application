@@ -1,9 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CollectionRenditions } from '../../services/collection-renditions';
 import { RenditionsPage } from './renditions.page';
+import { AuthService } from '../../../../core/auth/auth.service';
 
 describe('RenditionsPage', () => {
   const report = {
@@ -19,9 +20,12 @@ describe('RenditionsPage', () => {
     retries: 0,
     policy: { mode: 'OBSERVE', revision: '' },
   };
-  const api = { list: vi.fn(), detail: vi.fn() };
+  const api = { list: vi.fn(), detail: vi.fn(), replay: vi.fn() };
+  const auth = { canPerform: vi.fn() };
   beforeEach(() => {
     vi.resetAllMocks();
+    auth.canPerform.mockReturnValue(true);
+    api.replay.mockReturnValue(of({ status: 'PENDING' }));
     api.list.mockReturnValue(of({ items: [report] }));
     api.detail.mockReturnValue(
       of({
@@ -40,11 +44,25 @@ describe('RenditionsPage', () => {
     );
     TestBed.configureTestingModule({
       imports: [RenditionsPage],
-      providers: [provideRouter([]), { provide: CollectionRenditions, useValue: api }],
+      providers: [
+        provideRouter([]),
+        { provide: CollectionRenditions, useValue: api },
+        { provide: AuthService, useValue: auth },
+      ],
     });
   });
 
-  it('muestra observación y detalle sin ofrecer acciones que modifiquen caja', async () => {
+  it('oculta reprocesamiento para usuarios sin permiso de escritura', async () => {
+    auth.canPerform.mockReturnValue(false);
+    const fixture = TestBed.createComponent(RenditionsPage);
+    await fixture.whenStable();
+    expect(
+      fixture.nativeElement.querySelector('button[aria-label="Reprocesar rendición 42"]'),
+    ).toBeNull();
+    expect(api.replay).not.toHaveBeenCalled();
+  });
+
+  it('muestra observación y detalle sin cambiar la política desde la pantalla', async () => {
     const fixture = TestBed.createComponent(RenditionsPage);
     await fixture.whenStable();
     fixture.detectChanges();
@@ -59,6 +77,64 @@ describe('RenditionsPage', () => {
     expect(root.textContent).toContain('Comisión informada');
     expect(root.querySelector('a[href="/cobranza/giras/trip/tesoreria"]')).not.toBeNull();
     expect(root.textContent).not.toContain('Aplicar a caja');
+  });
+
+  it('solicita confirmación, evita doble envío y anuncia PENDING sin afirmar aplicación', async () => {
+    const pending = new Subject<{ status: string }>();
+    api.replay.mockReturnValue(pending);
+    const fixture = TestBed.createComponent(RenditionsPage);
+    await fixture.whenStable();
+    const root: HTMLElement = fixture.nativeElement;
+    root.querySelector<HTMLButtonElement>('button[aria-label="Reprocesar rendición 42"]')!.click();
+    await fixture.whenStable();
+    expect(api.replay).not.toHaveBeenCalled();
+    const confirm = [...root.querySelectorAll<HTMLButtonElement>('button')].find(
+      (b) => b.textContent?.trim() === 'Confirmar reprocesamiento',
+    )!;
+    expect(root.textContent).toContain('política vigente');
+    confirm.click();
+    await fixture.whenStable();
+    expect(confirm.disabled).toBe(true);
+    confirm.click();
+    expect(api.replay).toHaveBeenCalledTimes(1);
+    expect(api.replay).toHaveBeenCalledWith('report');
+    pending.next({ status: 'PENDING' });
+    pending.complete();
+    await fixture.whenStable();
+    expect(root.textContent).toContain('Todavía no confirma una liquidación');
+    expect(root.querySelector('button[aria-label="Reprocesar rendición 42"]')).toBeNull();
+  });
+
+  it.each(['PENDING', 'COMPLETED'])('no ofrece reprocesar %s', async (status) => {
+    api.list.mockReturnValue(of({ items: [{ ...report, status }] }));
+    const fixture = TestBed.createComponent(RenditionsPage);
+    await fixture.whenStable();
+    expect(
+      fixture.nativeElement.querySelector('button[aria-label="Reprocesar rendición 42"]'),
+    ).toBeNull();
+  });
+
+  it('permite cancelar sin enviar y maneja errores sin reintento automático', async () => {
+    const fixture = TestBed.createComponent(RenditionsPage);
+    await fixture.whenStable();
+    const root: HTMLElement = fixture.nativeElement;
+    const clickText = (label: string) =>
+      [...root.querySelectorAll<HTMLButtonElement>('button')]
+        .find((b) => b.textContent?.trim() === label)!
+        .click();
+    clickText('Reprocesar');
+    await fixture.whenStable();
+    clickText('Cancelar');
+    await fixture.whenStable();
+    expect(api.replay).not.toHaveBeenCalled();
+    api.replay.mockReturnValue(throwError(() => new Error('private')));
+    clickText('Reprocesar');
+    await fixture.whenStable();
+    clickText('Confirmar reprocesamiento');
+    await fixture.whenStable();
+    expect(root.textContent).toContain('Actualiza el listado antes');
+    expect(root.textContent).not.toContain('private');
+    expect(api.replay).toHaveBeenCalledTimes(1);
   });
 
   it('valida el mes y actualiza desde el formulario visible', async () => {

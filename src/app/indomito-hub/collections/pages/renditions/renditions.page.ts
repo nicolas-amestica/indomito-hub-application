@@ -7,6 +7,8 @@ import { ButtonDirective } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
 import { Panel } from 'primeng/panel';
+import { Dialog } from 'primeng/dialog';
+import { AuthService } from '../../../../core/auth/auth.service';
 import { finalize } from 'rxjs';
 import { RENDITION_LABELS } from '../../constants/rendition-labels.constant';
 import type {
@@ -26,12 +28,14 @@ import { CollectionRenditions } from '../../services/collection-renditions';
     InputText,
     Message,
     Panel,
+    Dialog,
   ],
   templateUrl: './renditions.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RenditionsPage {
   private readonly api = inject(CollectionRenditions);
+  protected readonly auth = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly labels = RENDITION_LABELS;
   protected readonly month = new FormControl(new Date().toISOString().slice(0, 7), {
@@ -40,6 +44,8 @@ export class RenditionsPage {
   });
   protected readonly busy = signal(false);
   protected readonly error = signal('');
+  protected readonly notice = signal('');
+  protected readonly replayTarget = signal<CollectionRendition | null>(null);
   protected readonly reports = signal<CollectionRendition[]>([]);
   protected readonly selected = signal<CollectionRendition | null>(null);
   protected readonly items = signal<CollectionRenditionItem[]>([]);
@@ -49,6 +55,51 @@ export class RenditionsPage {
 
   constructor() {
     this.load();
+  }
+
+  protected requestReplay(report: CollectionRendition): void {
+    if (
+      this.busy() ||
+      !this.auth.canPerform('PAYMENT_OPERATIONS', 'c') ||
+      !['OBSERVED', 'REVIEW_REQUIRED'].includes(report.status)
+    )
+      return;
+    this.replayTarget.set(report);
+  }
+
+  protected replay(): void {
+    const report = this.replayTarget();
+    if (!report || this.busy() || !this.auth.canPerform('PAYMENT_OPERATIONS', 'c')) return;
+    this.busy.set(true);
+    this.error.set('');
+    this.notice.set('');
+    this.api
+      .replay(report.id)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.busy.set(false)),
+      )
+      .subscribe({
+        next: () => {
+          this.replayTarget.set(null);
+          this.reports.update((rows) =>
+            rows.map((row) => (row.id === report.id ? { ...row, status: 'PENDING' } : row)),
+          );
+          if (this.selected()?.id === report.id) {
+            this.selected.set(null);
+            this.items.set([]);
+          }
+          this.notice.set(
+            'Reprocesamiento solicitado. Todavía no confirma una liquidación: actualiza el listado para consultar el resultado.',
+          );
+        },
+        error: () => {
+          this.replayTarget.set(null);
+          this.error.set(
+            'No se pudo confirmar el reprocesamiento. Actualiza el listado antes de volver a intentarlo; el lote podría estar en curso.',
+          );
+        },
+      });
   }
 
   protected load(more = false): void {
