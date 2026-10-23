@@ -61,6 +61,9 @@
           <button pButton type="button" text rounded iconOnly severity="secondary" class="md:hidden" aria-label="Volver a conversaciones" (click)="store.clearSelection()"><span class="icon-[tabler--arrow-left] size-5" aria-hidden="true"></span></button>
           <div class="min-w-0 flex-1"><h2 class="truncate text-sm font-semibold text-ink">{{ store.detail()?.conversation?.alias || store.selectedPhone() }}</h2><p class="truncate text-xs text-muted">{{ store.selectedPhone() }}</p></div>
           <button *appHasPermission="{ module: 'INBOX', allowance: 'u' }" pButton type="button" text rounded iconOnly severity="secondary" aria-label="Editar alias" pTooltip="Editar alias" (click)="openAliasDialog()"><span class="icon-[tabler--pencil] size-5" aria-hidden="true"></span></button>
+          @if (store.detail()?.conversation?.status === 'derived') {
+            <button *appHasPermission="{ module: 'INBOX', allowance: 'u' }" pButton type="button" text rounded iconOnly severity="secondary" aria-label="Reactivar agente IA" pTooltip="Reactivar agente IA" [loading]="store.mutating()" (click)="reactivateDialogVisible.set(true)"><span class="icon-[tabler--robot] size-5" aria-hidden="true"></span></button>
+          }
           <button *appHasPermission="{ module: 'INBOX', allowance: 'u' }" pButton type="button" text rounded iconOnly severity="secondary" aria-label="Marcar como no leída" pTooltip="Marcar como no leída" [loading]="store.mutating()" (click)="store.markUnread()"><span class="icon-[tabler--circle-filled] size-4 text-green-500" aria-hidden="true"></span></button>
           <button *appHasPermission="{ module: 'INBOX', allowance: 'd' }" pButton type="button" text rounded iconOnly severity="danger" aria-label="Eliminar conversación" pTooltip="Eliminar conversación" (click)="deleteDialogVisible.set(true)"><span class="icon-[tabler--trash] size-5" aria-hidden="true"></span></button>
         </header>
@@ -93,6 +96,12 @@
                     }
                   </div>
                 </article>
+              }
+              @if (store.agentProcessing()) {
+                <div class="flex max-w-[85%] self-start items-center gap-2 rounded-2xl bg-surface-0 px-3 py-2 text-sm text-muted shadow-sm dark:bg-surface-800" role="status" aria-live="polite">
+                  <span class="icon-[tabler--message-dots] size-5 animate-pulse motion-reduce:animate-none" aria-hidden="true"></span>
+                  <span>El agente IA está preparando una respuesta</span>
+                </div>
               }
             </div>
           }
@@ -133,4 +142,9 @@
 <p-dialog header="Marcar todo como leído" [visible]="bulkDialogVisible()" (visibleChange)="bulkDialogVisible.set($event)" [modal]="true" [draggable]="false" [resizable]="false" [style]="{ width: 'min(28rem, calc(100vw - 2rem))' }">
   <p class="text-sm text-muted">Se marcarán como leídas todas las conversaciones incluidas en la operación.</p>
   <ng-template #footer><button pButton type="button" outlined severity="secondary" (click)="bulkDialogVisible.set(false)">Cancelar</button><button pButton type="button" severity="success" [loading]="store.mutating()" (click)="confirmMarkAllRead()">Marcar todas</button></ng-template>
+</p-dialog>
+
+<p-dialog header="Reactivar agente IA" [visible]="reactivateDialogVisible()" (visibleChange)="reactivateDialogVisible.set($event)" [modal]="true" [draggable]="false" [resizable]="false" [style]="{ width: 'min(28rem, calc(100vw - 2rem))' }">
+  <p class="text-sm text-muted">El agente IA volverá a responder automáticamente los próximos mensajes de esta conversación.</p>
+  <ng-template #footer><button pButton type="button" outlined severity="secondary" (click)="reactivateDialogVisible.set(false)">Cancelar</button><button pButton type="button" severity="success" [loading]="store.mutating()" (click)="confirmReactivateAgent()">Reactivar</button></ng-template>
 </p-dialog>

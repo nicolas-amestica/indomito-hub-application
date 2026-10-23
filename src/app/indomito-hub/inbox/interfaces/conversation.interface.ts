@@ -20,8 +20,10 @@ export interface ConversationSummary {
   readonly alias: string;
   readonly channel: 'whatsapp';
   readonly status: ConversationStatus;
-  readonly reason: 'sin_presupuesto' | 'sin_respuesta' | 'error_gemini' | null;
+  readonly reason: string | null;
   readonly reasonLabel: string | null;
+  readonly agentProcessing: boolean;
+  readonly agentProcessingUntil: string | null;
   readonly unreadCount: number;
   readonly lastMessagePreview: string | null;
   readonly lastMessageAt: string | null;

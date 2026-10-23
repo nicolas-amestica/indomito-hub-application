@@ -102,6 +102,13 @@ export class InboxApiService {
     );
   }
 
+  reactivateAgent(phone: string): Observable<{ data: ConversationSummary }> {
+    return this.http.patch<{ data: ConversationSummary }>(
+      `${this.baseUrl}/${phone}/estado-agente`,
+      { status: 'bot' },
+    );
+  }
+
   deleteConversation(phone: string): Observable<{ data: { deleted: boolean } }> {
     return this.http.delete<{ data: { deleted: boolean } }>(`${this.baseUrl}/${phone}`);
   }

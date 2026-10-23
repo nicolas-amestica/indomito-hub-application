@@ -41,6 +41,7 @@ export class InboxStore {
   private sendPollingAttempt = 0;
   private bulkPollingTimer: ReturnType<typeof setTimeout> | null = null;
   private bulkPollingAttempt = 0;
+  private agentProcessingTimer: ReturnType<typeof setTimeout> | null = null;
   private listRealtimeSubscription: Subscription | null = null;
   private detailRealtimeSubscription: Subscription | null = null;
   private listSequence = 0;
@@ -60,6 +61,7 @@ export class InboxStore {
   readonly sendStates = this.sendStatesState.asReadonly();
   readonly mutating = this.mutatingState.asReadonly();
   readonly bulkOperations = this.bulkStatesState.asReadonly();
+  readonly agentProcessing = computed(() => this.detailState()?.conversation?.agentProcessing ?? false);
   readonly bulkOperation = computed(() =>
     this.bulkStatesState().find((operation) => operation.kind === 'mark_all_read') ?? null,
   );
@@ -79,6 +81,7 @@ export class InboxStore {
     this.destroyRef.onDestroy(() => {
       this.stopSendPolling();
       this.stopBulkPolling();
+      this.stopAgentProcessingTimer();
       this.listRealtimeSubscription?.unsubscribe();
       this.detailRealtimeSubscription?.unsubscribe();
     });
@@ -138,18 +141,30 @@ export class InboxStore {
     }
   }
 
-  async select(phone: string): Promise<void> {
+  async select(phone: string, preserveCurrent = false): Promise<void> {
     const sequence = ++this.detailRequestSequence;
+    if (this.selectedPhoneState() !== phone) {
+      this.detailSequence = 0;
+      this.stopAgentProcessingTimer();
+    }
     this.selectedPhoneState.set(phone);
-    this.detailState.set(null);
-    this.optimisticMessagesState.set([]);
+    if (!preserveCurrent) {
+      this.detailState.set(null);
+      this.optimisticMessagesState.set([]);
+    }
     this.errorState.set(null);
     try {
       const response = await firstValueFrom(this.api.detail(phone));
-      if (sequence === this.detailRequestSequence && this.selectedPhoneState() === phone) {
-        this.detailState.set(response);
+      if (
+        sequence === this.detailRequestSequence &&
+        this.selectedPhoneState() === phone &&
+        response.watermark.sequence >= this.detailSequence
+      ) {
+        const normalized = normalizeAgentProcessing(response);
+        this.detailState.set(normalized);
         this.sendStatesState.set(response.nonTerminalSends);
         this.detailSequence = response.watermark.sequence;
+        this.scheduleAgentProcessingExpiry(normalized.conversation);
         this.connectDetailRealtime(phone);
         this.sendPollingAttempt = 0;
         this.startSendPolling();
@@ -167,6 +182,7 @@ export class InboxStore {
     this.detailState.set(null);
     this.optimisticMessagesState.set([]);
     this.sendStatesState.set([]);
+    this.stopAgentProcessingTimer();
     this.stopSendPolling();
     this.detailRealtimeSubscription?.unsubscribe();
     this.detailRealtimeSubscription = null;
@@ -247,7 +263,7 @@ export class InboxStore {
           await firstValueFrom(this.api.sendAttachment(phone, upload, index === 0 ? caption.trim() : ''));
         }),
       );
-      await this.select(phone);
+      await this.select(phone, true);
       return true;
     } catch {
       this.errorState.set('No fue posible enviar los archivos adjuntos.');
@@ -304,6 +320,22 @@ export class InboxStore {
       if (wasUnread === 0 && data.unreadCount > 0) this.unreadTotalState.update((value) => value + 1);
     } catch {
       this.errorState.set('No fue posible marcar la conversación como no leída.');
+    } finally {
+      this.mutatingState.set(false);
+    }
+  }
+
+  async reactivateAgent(): Promise<boolean> {
+    const phone = this.selectedPhoneState();
+    if (!phone || this.mutatingState()) return false;
+    this.mutatingState.set(true);
+    try {
+      const { data } = await firstValueFrom(this.api.reactivateAgent(phone));
+      this.mergeConversation(data);
+      return true;
+    } catch {
+      this.errorState.set('No fue posible reactivar el agente IA.');
+      return false;
     } finally {
       this.mutatingState.set(false);
     }
@@ -367,7 +399,7 @@ export class InboxStore {
     }));
     if (terminalObserved) {
       const phone = this.selectedPhoneState();
-      if (phone) await this.select(phone);
+      if (phone) await this.select(phone, true);
       return;
     }
     this.sendPollingAttempt += 1;
@@ -474,17 +506,79 @@ export class InboxStore {
     this.realtimePhone = phone;
     this.detailRealtimeSubscription = this.realtime.connect('detail', phone).subscribe((notification) => {
       if (notification.kind === 'reconcile') {
-        if (this.selectedPhoneState() === phone) void this.select(phone);
+        if (this.selectedPhoneState() === phone) void this.select(phone, true);
         return;
       }
       const { envelope } = notification;
       if (envelope.sequence !== this.detailSequence + 1) {
-        if (this.selectedPhoneState() === phone) void this.select(phone);
+        if (this.selectedPhoneState() === phone) void this.select(phone, true);
         return;
       }
       this.detailSequence = envelope.sequence;
-      if (this.selectedPhoneState() === phone) void this.select(phone);
+      if (this.selectedPhoneState() !== phone) return;
+      if (envelope.type === 'agent_processing') {
+        const { active, expiresAt } = envelope.payload;
+        this.detailState.update((detail) => detail?.conversation
+          ? {
+              ...detail,
+              conversation: { ...detail.conversation, agentProcessing: active, agentProcessingUntil: expiresAt },
+            }
+          : detail);
+        this.conversationState.update((items) => items.map((item) => item.phone === phone
+          ? { ...item, agentProcessing: active, agentProcessingUntil: expiresAt }
+          : item));
+        this.scheduleAgentProcessingExpiry(this.detailState()?.conversation ?? null);
+        return;
+      }
+      void this.select(phone, true);
     });
+  }
+
+  private mergeConversation(conversation: ConversationSummary): void {
+    this.conversationState.update((items) => items.map((item) =>
+      item.phone === conversation.phone ? conversation : item,
+    ));
+    this.detailState.update((detail) => detail?.conversation?.phone === conversation.phone
+      ? { ...detail, conversation }
+      : detail);
+    this.scheduleAgentProcessingExpiry(conversation);
+  }
+
+  private scheduleAgentProcessingExpiry(conversation: ConversationSummary | null): void {
+    this.stopAgentProcessingTimer();
+    if (!conversation?.agentProcessing || !conversation.agentProcessingUntil) return;
+    const expectedUntil = conversation.agentProcessingUntil;
+    const expiresAt = Date.parse(expectedUntil);
+    const remaining = expiresAt - Date.now();
+    if (!Number.isFinite(expiresAt) || remaining <= 0) {
+      this.clearExpiredAgentProcessing(conversation.phone, expectedUntil);
+      return;
+    }
+    this.agentProcessingTimer = setTimeout(() => {
+      this.agentProcessingTimer = null;
+      this.clearExpiredAgentProcessing(conversation.phone, expectedUntil);
+    }, remaining);
+  }
+
+  private clearExpiredAgentProcessing(phone: string, expectedUntil: string): void {
+    this.detailState.update((detail) =>
+      detail?.conversation?.phone === phone && detail.conversation.agentProcessingUntil === expectedUntil
+        ? {
+            ...detail,
+            conversation: { ...detail.conversation, agentProcessing: false, agentProcessingUntil: null },
+          }
+        : detail,
+    );
+    this.conversationState.update((items) => items.map((item) =>
+      item.phone === phone && item.agentProcessingUntil === expectedUntil
+        ? { ...item, agentProcessing: false, agentProcessingUntil: null }
+        : item,
+    ));
+  }
+
+  private stopAgentProcessingTimer(): void {
+    if (this.agentProcessingTimer !== null) clearTimeout(this.agentProcessingTimer);
+    this.agentProcessingTimer = null;
   }
 }
 
@@ -506,4 +600,17 @@ function messageFromSendState(message: InboxMessage, state: SendState): InboxMes
     return { ...message, deliveryStatus: 'failed', deliveryError: state.error };
   }
   return message;
+}
+
+function normalizeAgentProcessing(detail: ConversationDetailResponse): ConversationDetailResponse {
+  const conversation = detail.conversation;
+  if (!conversation?.agentProcessing) return detail;
+  const expiresAt = conversation.agentProcessingUntil
+    ? Date.parse(conversation.agentProcessingUntil)
+    : Number.NaN;
+  if (Number.isFinite(expiresAt) && expiresAt > Date.now()) return detail;
+  return {
+    ...detail,
+    conversation: { ...conversation, agentProcessing: false, agentProcessingUntil: null },
+  };
 }

@@ -32,6 +32,7 @@ export class InboxShellPage implements OnInit {
   readonly aliasDialogVisible = signal(false);
   readonly deleteDialogVisible = signal(false);
   readonly bulkDialogVisible = signal(false);
+  readonly reactivateDialogVisible = signal(false);
   readonly alias = signal('');
   private readonly audioRecorder = inject(InboxAudioRecorderService);
   private readonly destroyRef = inject(DestroyRef);
@@ -149,6 +150,10 @@ export class InboxShellPage implements OnInit {
   async confirmMarkAllRead(): Promise<void> {
     this.bulkDialogVisible.set(false);
     await this.store.markAllRead();
+  }
+
+  async confirmReactivateAgent(): Promise<void> {
+    if (await this.store.reactivateAgent()) this.reactivateDialogVisible.set(false);
   }
 
   private cancelSearchTimer(): void {

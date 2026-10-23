@@ -118,6 +118,18 @@ describe('InboxApiService', () => {
     request.flush({});
   });
 
+  it('reactiva explícitamente el agente IA de una conversación', () => {
+    const service = TestBed.inject(InboxApiService);
+    const http = TestBed.inject(HttpTestingController);
+
+    service.reactivateAgent('56912345678').subscribe();
+
+    const request = http.expectOne(`${environment.apiUrl}/conversaciones/56912345678/estado-agente`);
+    expect(request.request.method).toBe('PATCH');
+    expect(request.request.body).toEqual({ status: 'bot' });
+    request.flush({});
+  });
+
   it('consulta la operación masiva activa por tipo', () => {
     const service = TestBed.inject(InboxApiService);
     const http = TestBed.inject(HttpTestingController);

@@ -6,7 +6,7 @@ import { InboxApiService } from './inbox-api.service';
 
 const EVENT_TYPES = new Set([
   'conversation.updated', 'conversation.deleted', 'message.created',
-  'message.delivery.updated', 'bulk.updated', 'resync_required',
+  'message.delivery.updated', 'agent_processing', 'bulk.updated', 'resync_required',
 ]);
 const EVENT_ID_PATTERN = /^[0-9A-HJKMNP-TV-Z]{26}$/;
 const STREAM_PATTERN = /^(list|detail:[0-9]{8,15})$/;
@@ -86,8 +86,20 @@ export function parseRealtimeEnvelope(value: unknown): RealtimeEnvelope | null {
       parsed['payload'] === null ||
       typeof parsed['payload'] !== 'object' || Array.isArray(parsed['payload'])
     ) return null;
+    if (parsed['type'] === 'agent_processing' && !isAgentProcessingEnvelope(parsed)) return null;
     return parsed as unknown as RealtimeEnvelope;
   } catch {
     return null;
   }
+}
+
+function isAgentProcessingEnvelope(parsed: Record<string, unknown>): boolean {
+  if (typeof parsed['stream'] !== 'string' || !parsed['stream'].startsWith('detail:')) return false;
+  const payload = parsed['payload'] as Record<string, unknown>;
+  const expiresAt = payload['expiresAt'];
+  return typeof payload['phone'] === 'string' &&
+    /^[0-9]{8,15}$/.test(payload['phone']) &&
+    parsed['stream'] === `detail:${payload['phone']}` &&
+    typeof payload['active'] === 'boolean' &&
+    (expiresAt === null || (typeof expiresAt === 'string' && !Number.isNaN(Date.parse(expiresAt))));
 }
