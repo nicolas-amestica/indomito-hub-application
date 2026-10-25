@@ -12,8 +12,8 @@ import type {
 } from '../interfaces/conversation.interface';
 import { InboxApiService } from '../services/inbox-api.service';
 import { sha256Base64 } from '../fn/sha256-base64';
+import { getInboxAttachmentMimeType } from '../fn/is-allowed-inbox-attachment';
 import { InboxRealtimeService } from '../services/inbox-realtime.service';
-import type { InboxMimeType } from '../types/inbox.types';
 import type { ConversationFilter } from '../types/inbox.types';
 import { buildMessageDateLabels } from '../fn/build-message-date-labels';
 import { buildMessageGroupContinuations } from '../fn/build-message-group-continuations';
@@ -374,13 +374,17 @@ export class InboxStore {
     this.errorState.set(null);
     try {
       const items = await Promise.all(
-        files.map(async (file) => ({
-          clientMessageId: crypto.randomUUID(),
-          fileName: file.name,
-          mimeType: file.type as InboxMimeType,
-          size: file.size,
-          checksumSha256: await sha256Base64(file),
-        })),
+        files.map(async (file) => {
+          const mimeType = getInboxAttachmentMimeType(file);
+          if (!mimeType) throw new Error('Unsupported attachment MIME type');
+          return {
+            clientMessageId: crypto.randomUUID(),
+            fileName: file.name,
+            mimeType,
+            size: file.size,
+            checksumSha256: await sha256Base64(file),
+          };
+        }),
       );
       const batchId = crypto.randomUUID();
       const { data } = await firstValueFrom(this.api.prepareAttachments(phone, batchId, items));
