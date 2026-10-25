@@ -7,10 +7,12 @@ describe('selectRecordingMimeType', () => {
     );
   });
 
-  it('usa WebM Opus como alternativa compatible', () => {
-    expect(selectRecordingMimeType((type) => type === 'audio/webm;codecs=opus')).toBe(
-      'audio/webm;codecs=opus',
-    );
+  it('usa audio MP4 como alternativa admitida por Meta', () => {
+    expect(selectRecordingMimeType((type) => type === 'audio/mp4')).toBe('audio/mp4');
+  });
+
+  it('rechaza WebM porque Meta no lo admite como audio saliente', () => {
+    expect(selectRecordingMimeType((type) => type === 'audio/webm;codecs=opus')).toBeNull();
   });
 
   it('informa ausencia de un codec permitido', () => {

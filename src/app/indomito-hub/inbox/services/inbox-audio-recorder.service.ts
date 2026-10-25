@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-const AUDIO_TYPES = ['audio/ogg;codecs=opus', 'audio/webm;codecs=opus', 'audio/webm'] as const;
+const AUDIO_TYPES = ['audio/ogg;codecs=opus', 'audio/mp4'] as const;
 
 export function selectRecordingMimeType(
   supported: (mimeType: string) => boolean,
@@ -42,7 +42,7 @@ export class InboxAudioRecorderService {
       }, { once: true });
       recorder.addEventListener('stop', () => {
         const mimeType = normalizeRecordedMimeType(recorder.mimeType);
-        const extension = mimeType === 'audio/ogg' ? 'ogg' : 'webm';
+        const extension = mimeType === 'audio/ogg' ? 'ogg' : 'm4a';
         const file = new File(this.chunks, `audio-${Date.now()}.${extension}`, { type: mimeType });
         this.release();
         resolve(file);
@@ -64,6 +64,6 @@ export class InboxAudioRecorderService {
   }
 }
 
-function normalizeRecordedMimeType(value: string): 'audio/ogg' | 'audio/webm' {
-  return value.toLowerCase().startsWith('audio/ogg') ? 'audio/ogg' : 'audio/webm';
+function normalizeRecordedMimeType(value: string): 'audio/ogg' | 'audio/mp4' {
+  return value.toLowerCase().startsWith('audio/ogg') ? 'audio/ogg' : 'audio/mp4';
 }

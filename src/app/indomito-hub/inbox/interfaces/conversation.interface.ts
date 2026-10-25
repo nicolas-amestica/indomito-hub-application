@@ -27,6 +27,7 @@ export interface ConversationSummary {
   readonly unreadCount: number;
   readonly lastMessagePreview: string | null;
   readonly lastMessageAt: string | null;
+  readonly serviceWindowExpiresAt: string | null;
   readonly createdAt: string | null;
   readonly updatedAt: string | null;
   readonly generation: number;
@@ -88,6 +89,41 @@ export interface InboxMessage {
   readonly deliveryStatus: DeliveryStatus | null;
   readonly deliveryError: string | null;
   readonly attachments: readonly MessageAttachment[];
+  readonly replyTo: MessageReference | null;
+  readonly reactions?: readonly MessageReaction[];
+  readonly rich?: MessageRichContent;
+}
+
+export interface MessageLocation { readonly latitude: number; readonly longitude: number; readonly name: string; readonly address: string; }
+export interface MessageContact { readonly name: string; readonly phone: string; readonly email: string; readonly company: string; }
+export interface MessageInteractiveReply { readonly kind: 'button_reply' | 'list_reply'; readonly id: string; readonly title: string; readonly description: string; }
+export interface MessageInteractiveOption { readonly id: string; readonly title: string; readonly description: string; }
+export interface MessageInteractive { readonly kind: 'button' | 'list'; readonly body: string; readonly footer: string; readonly button: string; readonly options: readonly MessageInteractiveOption[]; }
+export interface MessageRichContent {
+  readonly kind: 'location' | 'contacts' | 'sticker' | 'interactive_reply' | 'interactive';
+  readonly location?: MessageLocation;
+  readonly contacts?: readonly MessageContact[];
+  readonly interactiveReply?: MessageInteractiveReply;
+  readonly interactive?: MessageInteractive;
+}
+
+export interface MessageReaction { readonly emoji: string; readonly actor: 'customer' | 'team'; readonly updatedAt: string; }
+
+export interface MessageReference {
+  readonly id: string;
+  readonly type: MessageType;
+  readonly content: string | null;
+  readonly whatsappMessageId: string;
+}
+
+export interface WhatsAppTemplate {
+  readonly name: string;
+  readonly language: string;
+  readonly category: string;
+  readonly status: 'APPROVED';
+  readonly body: string;
+  readonly parameterCount: number;
+  readonly supported: boolean;
 }
 
 export interface ConversationListResponse {

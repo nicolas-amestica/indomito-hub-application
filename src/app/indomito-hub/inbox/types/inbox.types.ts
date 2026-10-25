@@ -1,5 +1,6 @@
 export type ConversationFilter = 'all' | 'unread';
 export type ConversationStatus = 'bot' | 'derived';
+export type ServiceWindowState = 'open' | 'closed' | 'unknown';
 export type MessageType = 'customer' | 'ai_agent' | 'team';
 export type DeliveryStatus = 'sent' | 'delivered' | 'read' | 'failed';
 export type InboxMimeType =
@@ -9,7 +10,14 @@ export type InboxMimeType =
   | 'image/gif'
   | 'image/webp'
   | 'audio/ogg'
-  | 'audio/webm';
+  | 'audio/webm'
+  | 'audio/aac'
+  | 'audio/mpeg'
+  | 'audio/mp4'
+  | 'audio/wav'
+  | 'audio/flac'
+  | 'audio/amr'
+  | 'video/mp4';
 
 export type ListWatermark = { readonly stream: 'list'; readonly sequence: number };
 export type DetailWatermark = {
@@ -22,6 +30,7 @@ export type RealtimeEventType =
   | 'conversation.deleted'
   | 'message.created'
   | 'message.delivery.updated'
+  | 'message.reactions.updated'
   | 'agent_processing'
   | 'bulk.updated'
   | 'resync_required';

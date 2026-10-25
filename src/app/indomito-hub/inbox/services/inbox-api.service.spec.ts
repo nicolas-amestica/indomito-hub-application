@@ -57,6 +57,58 @@ describe('InboxApiService', () => {
     request.flush({});
   });
 
+  it('incluye el mensaje citado al enviar una respuesta contextual', () => {
+    const service = TestBed.inject(InboxApiService);
+    const http = TestBed.inject(HttpTestingController);
+
+    service.sendReply('56912345678', 'Hola', '8cf45157-b5dd-40f1-9443-61b80f1c2635', '01KABCDEF0123456789ABCDEFA').subscribe();
+
+    const request = http.expectOne(`${environment.apiUrl}/conversaciones/56912345678/respuestas`);
+    expect(request.request.body.replyToMessageId).toBe('01KABCDEF0123456789ABCDEFA');
+    request.flush({});
+  });
+
+  it('consulta plantillas y envía una aprobada con sus variables', () => {
+    const service = TestBed.inject(InboxApiService);
+    const http = TestBed.inject(HttpTestingController);
+    service.listTemplates().subscribe();
+    http.expectOne(`${environment.apiUrl}/plantillas-whatsapp`).flush({ data: [] });
+
+    service.sendTemplate('56912345678', '8cf45157-b5dd-40f1-9443-61b80f1c2635', {
+      name: 'recordatorio_viaje', language: 'es_CL', category: 'UTILITY', status: 'APPROVED', body: 'Hola {{1}}', parameterCount: 1, supported: true,
+    }, ['Nico']).subscribe();
+    const request = http.expectOne(`${environment.apiUrl}/conversaciones/56912345678/plantillas`);
+    expect(request.request.body).toEqual({ clientMessageId: '8cf45157-b5dd-40f1-9443-61b80f1c2635', name: 'recordatorio_viaje', language: 'es_CL', parameters: ['Nico'] });
+    request.flush({});
+  });
+
+  it('actualiza una reacción por mensaje local', () => {
+    const service = TestBed.inject(InboxApiService);
+    const http = TestBed.inject(HttpTestingController);
+    service.setReaction('56912345678', '01KABCDEF0123456789ABCDEFA', '👍').subscribe();
+    const request = http.expectOne(`${environment.apiUrl}/conversaciones/56912345678/reacciones`);
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body).toEqual({ messageId: '01KABCDEF0123456789ABCDEFA', emoji: '👍' });
+    request.flush({});
+  });
+
+  it('envía una ubicación estructurada con idempotencia', () => {
+    const service = TestBed.inject(InboxApiService);
+    const http = TestBed.inject(HttpTestingController);
+    service.sendRichMessage('56912345678', '8cf45157-b5dd-40f1-9443-61b80f1c2635', {
+      kind: 'location',
+      location: { latitude: -33.4, longitude: -70.6, name: 'Oficina', address: 'Santiago' },
+    }).subscribe();
+    const request = http.expectOne(`${environment.apiUrl}/conversaciones/56912345678/mensajes-enriquecidos`);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({
+      clientMessageId: '8cf45157-b5dd-40f1-9443-61b80f1c2635',
+      kind: 'location',
+      location: { latitude: -33.4, longitude: -70.6, name: 'Oficina', address: 'Santiago' },
+    });
+    request.flush({});
+  });
+
   it('prepara el lote de adjuntos sin alterar checksum ni clientMessageId', () => {
     const service = TestBed.inject(InboxApiService);
     const http = TestBed.inject(HttpTestingController);

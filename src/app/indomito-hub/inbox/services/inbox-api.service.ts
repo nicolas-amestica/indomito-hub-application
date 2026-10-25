@@ -12,6 +12,8 @@ import type {
   BulkOperation,
   ConversationSummary,
   SendState,
+  WhatsAppTemplate,
+  MessageRichContent,
 } from '../interfaces/conversation.interface';
 
 export interface ConversationListQuery {
@@ -29,6 +31,7 @@ export interface ConversationDetailQuery {
 @Injectable({ providedIn: 'root' })
 export class InboxApiService {
   private readonly http = inject(HttpClient);
+  private readonly apiRoot = environment.apiUrl;
   private readonly baseUrl = `${environment.apiUrl}/conversaciones`;
 
   list(query: ConversationListQuery = {}): Observable<ConversationListResponse> {
@@ -45,10 +48,35 @@ export class InboxApiService {
     return this.http.get<ConversationDetailResponse>(`${this.baseUrl}/${phone}`, { params });
   }
 
-  sendReply(phone: string, content: string, clientMessageId: string): Observable<{ data: SendState }> {
+  sendReply(phone: string, content: string, clientMessageId: string, replyToMessageId?: string): Observable<{ data: SendState }> {
     return this.http.post<{ data: SendState }>(`${this.baseUrl}/${phone}/respuestas`, {
       content,
       clientMessageId,
+      ...(replyToMessageId ? { replyToMessageId } : {}),
+    });
+  }
+
+  listTemplates(): Observable<{ data: readonly WhatsAppTemplate[] }> {
+    return this.http.get<{ data: readonly WhatsAppTemplate[] }>(`${this.apiRoot}/plantillas-whatsapp`);
+  }
+
+  sendTemplate(phone: string, clientMessageId: string, template: WhatsAppTemplate, parameters: readonly string[]): Observable<{ data: SendState }> {
+    return this.http.post<{ data: SendState }>(`${this.baseUrl}/${phone}/plantillas`, {
+      clientMessageId,
+      name: template.name,
+      language: template.language,
+      parameters,
+    });
+  }
+
+  setReaction(phone: string, messageId: string, emoji: string): Observable<{ data: { messageId: string; emoji: string } }> {
+    return this.http.put<{ data: { messageId: string; emoji: string } }>(`${this.baseUrl}/${phone}/reacciones`, { messageId, emoji });
+  }
+
+  sendRichMessage(phone: string, clientMessageId: string, rich: Pick<MessageRichContent, 'kind' | 'location' | 'contacts' | 'interactive'>): Observable<{ data: SendState }> {
+    return this.http.post<{ data: SendState }>(`${this.baseUrl}/${phone}/mensajes-enriquecidos`, {
+      clientMessageId,
+      ...rich,
     });
   }
 
@@ -68,12 +96,13 @@ export class InboxApiService {
     if (!response.ok) throw new Error(`Attachment upload failed with status ${response.status}`);
   }
 
-  sendAttachment(phone: string, upload: PreparedAttachmentUpload, caption: string): Observable<{ data: SendState }> {
+  sendAttachment(phone: string, upload: PreparedAttachmentUpload, caption: string, kind?: 'sticker'): Observable<{ data: SendState }> {
     return this.http.post<{ data: SendState }>(`${this.baseUrl}/${phone}/adjuntos`, {
       uploadId: upload.uploadId,
       key: upload.key,
       caption,
       clientMessageId: upload.clientMessageId,
+      ...(kind ? { kind } : {}),
     });
   }
 

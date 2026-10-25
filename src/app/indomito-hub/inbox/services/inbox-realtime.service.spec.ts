@@ -1,4 +1,39 @@
-import { parseRealtimeEnvelope } from './inbox-realtime.service';
+import { TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
+
+import { InboxApiService } from './inbox-api.service';
+import { InboxRealtimeService, parseRealtimeEnvelope } from './inbox-realtime.service';
+
+class FakeWebSocket {
+  static readonly instances: FakeWebSocket[] = [];
+  private readonly listeners = new Map<string, Array<(event: MessageEvent) => void>>();
+
+  constructor(readonly url: string) {
+    FakeWebSocket.instances.push(this);
+  }
+
+  addEventListener(type: string, listener: (event: MessageEvent) => void): void {
+    const listeners = this.listeners.get(type) ?? [];
+    listeners.push(listener);
+    this.listeners.set(type, listeners);
+  }
+
+  close(): void {
+    this.emit('close');
+  }
+
+  emit(type: string, data?: string): void {
+    for (const listener of this.listeners.get(type) ?? []) {
+      listener({ data } as MessageEvent);
+    }
+  }
+}
+
+afterEach(() => {
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
+  FakeWebSocket.instances.length = 0;
+});
 
 describe('parseRealtimeEnvelope', () => {
   it('acepta un envelope secuenciado válido', () => {
@@ -58,5 +93,37 @@ describe('parseRealtimeEnvelope', () => {
       ...base,
       payload: { phone: '56912345678', active: 'yes', expiresAt: null },
     }))).toBeNull();
+  });
+});
+
+describe('InboxRealtimeService', () => {
+  it('reconecta con backoff y solicita reconciliación antes y después de recuperar conexión', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    vi.stubGlobal('WebSocket', FakeWebSocket);
+    const api = {
+      subscription: vi.fn().mockReturnValue(of({
+        data: { url: 'wss://inbox.example.test', ticket: 'ticket-1', expiresAt: '2026-10-24T01:00:00Z' },
+      })),
+    };
+    TestBed.configureTestingModule({
+      providers: [InboxRealtimeService, { provide: InboxApiService, useValue: api }],
+    });
+    const notifications: string[] = [];
+    const subscription = TestBed.inject(InboxRealtimeService).connect('list').subscribe((notification) => {
+      notifications.push(notification.kind);
+    });
+
+    await vi.waitFor(() => expect(FakeWebSocket.instances).toHaveLength(1));
+    FakeWebSocket.instances[0]?.emit('open');
+    FakeWebSocket.instances[0]?.emit('close');
+    expect(notifications).toEqual(['reconcile']);
+
+    await vi.advanceTimersByTimeAsync(1_000);
+    await vi.waitFor(() => expect(FakeWebSocket.instances).toHaveLength(2));
+    FakeWebSocket.instances[1]?.emit('open');
+
+    expect(api.subscription).toHaveBeenCalledTimes(2);
+    expect(notifications).toEqual(['reconcile', 'reconcile']);
+    subscription.unsubscribe();
   });
 });

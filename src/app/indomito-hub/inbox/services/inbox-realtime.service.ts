@@ -6,7 +6,7 @@ import { InboxApiService } from './inbox-api.service';
 
 const EVENT_TYPES = new Set([
   'conversation.updated', 'conversation.deleted', 'message.created',
-  'message.delivery.updated', 'agent_processing', 'bulk.updated', 'resync_required',
+  'message.delivery.updated', 'message.reactions.updated', 'agent_processing', 'bulk.updated', 'resync_required',
 ]);
 const EVENT_ID_PATTERN = /^[0-9A-HJKMNP-TV-Z]{26}$/;
 const STREAM_PATTERN = /^(list|detail:[0-9]{8,15})$/;

@@ -7,12 +7,18 @@ import type {
   ConversationSummary,
   SendState,
   BulkOperation,
+  WhatsAppTemplate,
+  MessageRichContent,
 } from '../interfaces/conversation.interface';
 import { InboxApiService } from '../services/inbox-api.service';
 import { sha256Base64 } from '../fn/sha256-base64';
 import { InboxRealtimeService } from '../services/inbox-realtime.service';
 import type { InboxMimeType } from '../types/inbox.types';
 import type { ConversationFilter } from '../types/inbox.types';
+import { buildMessageDateLabels } from '../fn/build-message-date-labels';
+import { buildMessageGroupContinuations } from '../fn/build-message-group-continuations';
+import { buildSafeLinkPreview } from '../fn/build-safe-link-preview';
+import { classifyRealtimeSequence } from '../fn/classify-realtime-sequence';
 
 @Injectable()
 export class InboxStore {
@@ -24,14 +30,17 @@ export class InboxStore {
   private readonly filterState = signal<ConversationFilter>('all');
   private readonly loadingState = signal(false);
   private readonly loadingMoreState = signal(false);
+  private readonly loadingOlderState = signal(false);
   private readonly errorState = signal<string | null>(null);
   private readonly nextCursorState = signal<string | null>(null);
+  private readonly historyCursorState = signal<string | null>(null);
   private readonly unreadTotalState = signal(0);
   private readonly optimisticMessagesState = signal<readonly InboxMessage[]>([]);
   private readonly sendingState = signal(false);
   private readonly sendStatesState = signal<readonly SendState[]>([]);
   private readonly mutatingState = signal(false);
   private readonly bulkStatesState = signal<readonly BulkOperation[]>([]);
+  private readonly templatesState = signal<readonly WhatsAppTemplate[]>([]);
   private readonly destroyRef = inject(DestroyRef);
   private readonly realtime = inject(InboxRealtimeService);
   private nextPage = 2;
@@ -55,12 +64,14 @@ export class InboxStore {
   readonly filter = this.filterState.asReadonly();
   readonly loading = this.loadingState.asReadonly();
   readonly loadingMore = this.loadingMoreState.asReadonly();
+  readonly loadingOlder = this.loadingOlderState.asReadonly();
   readonly error = this.errorState.asReadonly();
   readonly unreadTotal = this.unreadTotalState.asReadonly();
   readonly sending = this.sendingState.asReadonly();
   readonly sendStates = this.sendStatesState.asReadonly();
   readonly mutating = this.mutatingState.asReadonly();
   readonly bulkOperations = this.bulkStatesState.asReadonly();
+  readonly templates = this.templatesState.asReadonly();
   readonly agentProcessing = computed(() => this.detailState()?.conversation?.agentProcessing ?? false);
   readonly bulkOperation = computed(() =>
     this.bulkStatesState().find((operation) => operation.kind === 'mark_all_read') ?? null,
@@ -69,7 +80,15 @@ export class InboxStore {
     ...(this.detailState()?.messages ?? []),
     ...this.optimisticMessagesState(),
   ]);
+  readonly messageDateLabels = computed(() => buildMessageDateLabels(this.messages()));
+  readonly messageGroupContinuations = computed(() => buildMessageGroupContinuations(this.messages()));
+  readonly messageLinkPreviews = computed(() => new Map(
+    this.messages()
+      .map((message) => [message.id, buildSafeLinkPreview(message.content)] as const)
+      .filter((entry): entry is readonly [string, NonNullable<(typeof entry)[1]>] => entry[1] !== null),
+  ));
   readonly hasMore = computed(() => this.nextCursorState() !== null);
+  readonly hasOlderMessages = computed(() => this.historyCursorState() !== null);
   readonly visibleConversations = computed(() => {
     const conversations = this.conversationState();
     return this.filterState() === 'unread'
@@ -151,6 +170,7 @@ export class InboxStore {
     if (!preserveCurrent) {
       this.detailState.set(null);
       this.optimisticMessagesState.set([]);
+      this.historyCursorState.set(null);
     }
     this.errorState.set(null);
     try {
@@ -161,7 +181,15 @@ export class InboxStore {
         response.watermark.sequence >= this.detailSequence
       ) {
         const normalized = normalizeAgentProcessing(response);
-        this.detailState.set(normalized);
+        const current = this.detailState();
+        this.detailState.set(
+          preserveCurrent && current
+            ? mergeConversationDetail(current, normalized)
+            : normalized,
+        );
+        if (!preserveCurrent || this.historyCursorState() === null) {
+          this.historyCursorState.set(response.nextCursor);
+        }
         this.sendStatesState.set(response.nonTerminalSends);
         this.detailSequence = response.watermark.sequence;
         this.scheduleAgentProcessingExpiry(normalized.conversation);
@@ -182,6 +210,7 @@ export class InboxStore {
     this.detailState.set(null);
     this.optimisticMessagesState.set([]);
     this.sendStatesState.set([]);
+    this.historyCursorState.set(null);
     this.stopAgentProcessingTimer();
     this.stopSendPolling();
     this.detailRealtimeSubscription?.unsubscribe();
@@ -189,7 +218,37 @@ export class InboxStore {
     this.realtimePhone = null;
   }
 
-  async sendReply(content: string): Promise<boolean> {
+  async loadOlderMessages(): Promise<boolean> {
+    const phone = this.selectedPhoneState();
+    const cursor = this.historyCursorState();
+    if (!phone || !cursor || this.loadingOlderState()) return false;
+    this.loadingOlderState.set(true);
+    try {
+      const response = await firstValueFrom(this.api.detail(phone, { before: cursor }));
+      if (this.selectedPhoneState() !== phone) return false;
+      const current = this.detailState();
+      if (!current) return false;
+      const known = new Set(current.messages.map((message) => message.id));
+      this.detailState.set({
+        ...current,
+        messages: [
+          ...response.messages.filter((message) => !known.has(message.id)),
+          ...current.messages,
+        ],
+        hasMore: response.hasMore,
+        nextCursor: response.nextCursor,
+      });
+      this.historyCursorState.set(response.nextCursor);
+      return true;
+    } catch {
+      this.errorState.set('No fue posible cargar mensajes anteriores.');
+      return false;
+    } finally {
+      this.loadingOlderState.set(false);
+    }
+  }
+
+  async sendReply(content: string, replyTo: InboxMessage | null = null): Promise<boolean> {
     const phone = this.selectedPhoneState();
     const normalized = content.trim();
     if (!phone || !normalized || normalized.length > 4_096 || this.sendingState()) return false;
@@ -207,12 +266,18 @@ export class InboxStore {
       deliveryStatus: null,
       deliveryError: null,
       attachments: [],
+      replyTo: replyTo?.whatsappMessageId ? {
+        id: replyTo.id,
+        type: replyTo.type,
+        content: replyTo.content,
+        whatsappMessageId: replyTo.whatsappMessageId,
+      } : null,
     };
     this.optimisticMessagesState.update((messages) => [...messages, optimistic]);
     this.sendingState.set(true);
     this.errorState.set(null);
     try {
-      const { data } = await firstValueFrom(this.api.sendReply(phone, normalized, clientMessageId));
+      const { data } = await firstValueFrom(this.api.sendReply(phone, normalized, clientMessageId, replyTo?.id));
       this.optimisticMessagesState.update((messages) =>
         messages.map((message) =>
           message.id === clientMessageId ? messageFromSendState(message, data) : message,
@@ -227,6 +292,73 @@ export class InboxStore {
             : message,
         ),
       );
+      return false;
+    } finally {
+      this.sendingState.set(false);
+    }
+  }
+
+  async loadTemplates(): Promise<boolean> {
+    this.errorState.set(null);
+    try {
+      const { data } = await firstValueFrom(this.api.listTemplates());
+      this.templatesState.set(data.filter((template) => template.supported));
+      return true;
+    } catch {
+      this.errorState.set('No fue posible cargar las plantillas aprobadas de WhatsApp.');
+      return false;
+    }
+  }
+
+  async sendTemplate(template: WhatsAppTemplate, parameters: readonly string[]): Promise<boolean> {
+    const phone = this.selectedPhoneState();
+    if (!phone || this.sendingState()) return false;
+    const clientMessageId = crypto.randomUUID();
+    const createdAt = new Date().toISOString();
+    const optimistic: InboxMessage = { id: clientMessageId, msgSk: `LOCAL#${clientMessageId}`, phone, type: 'team', content: `[Plantilla] ${template.name}`, createdAt, whatsappMessageId: null, deliveryStatus: null, deliveryError: null, attachments: [], replyTo: null };
+    this.optimisticMessagesState.update((messages) => [...messages, optimistic]);
+    this.sendingState.set(true);
+    try {
+      const { data } = await firstValueFrom(this.api.sendTemplate(phone, clientMessageId, template, parameters));
+      this.optimisticMessagesState.update((messages) => messages.map((message) => message.id === clientMessageId ? messageFromSendState(message, data) : message));
+      return data.state !== 'failed';
+    } catch {
+      this.optimisticMessagesState.update((messages) => messages.map((message) => message.id === clientMessageId ? { ...message, deliveryStatus: 'failed', deliveryError: 'No fue posible enviar la plantilla.' } : message));
+      return false;
+    } finally { this.sendingState.set(false); }
+  }
+
+  async setReaction(message: InboxMessage, emoji: string): Promise<boolean> {
+    const phone = this.selectedPhoneState();
+    if (!phone || !message.whatsappMessageId || this.mutatingState()) return false;
+    this.mutatingState.set(true);
+    try {
+      await firstValueFrom(this.api.setReaction(phone, message.id, emoji));
+      const updatedAt = new Date().toISOString();
+      const update = (item: InboxMessage): InboxMessage => item.id !== message.id ? item : { ...item, reactions: [...(item.reactions ?? []).filter((reaction) => reaction.actor !== 'team'), ...(emoji ? [{ emoji, actor: 'team' as const, updatedAt }] : [])] };
+      this.detailState.update((detail) => detail ? { ...detail, messages: detail.messages.map(update) } : detail);
+      this.optimisticMessagesState.update((messages) => messages.map(update));
+      return true;
+    } catch { this.errorState.set('No fue posible actualizar la reacción.'); return false; }
+    finally { this.mutatingState.set(false); }
+  }
+
+  async sendRichMessage(rich: Pick<MessageRichContent, 'kind' | 'location' | 'contacts' | 'interactive'>): Promise<boolean> {
+    const phone = this.selectedPhoneState();
+    if (!phone || this.sendingState()) return false;
+    const clientMessageId = crypto.randomUUID();
+    const createdAt = new Date().toISOString();
+    const content = rich.kind === 'location' ? `[Ubicación] ${rich.location?.name ?? ''}`.trim() : rich.kind === 'contacts' ? `[Contacto] ${rich.contacts?.[0]?.name ?? ''}`.trim() : rich.interactive?.body ?? '[Mensaje interactivo]';
+    const optimistic: InboxMessage = { id: clientMessageId, msgSk: `LOCAL#${clientMessageId}`, phone, type: 'team', content, createdAt, whatsappMessageId: null, deliveryStatus: null, deliveryError: null, attachments: [], replyTo: null, rich: rich as MessageRichContent };
+    this.optimisticMessagesState.update((messages) => [...messages, optimistic]);
+    this.sendingState.set(true);
+    this.errorState.set(null);
+    try {
+      const { data } = await firstValueFrom(this.api.sendRichMessage(phone, clientMessageId, rich));
+      this.optimisticMessagesState.update((messages) => messages.map((message) => message.id === clientMessageId ? messageFromSendState(message, data) : message));
+      return data.state !== 'failed';
+    } catch {
+      this.optimisticMessagesState.update((messages) => messages.map((message) => message.id === clientMessageId ? { ...message, deliveryStatus: 'failed', deliveryError: 'No fue posible enviar el mensaje enriquecido.' } : message));
       return false;
     } finally {
       this.sendingState.set(false);
@@ -267,6 +399,28 @@ export class InboxStore {
       return true;
     } catch {
       this.errorState.set('No fue posible enviar los archivos adjuntos.');
+      return false;
+    } finally {
+      this.sendingState.set(false);
+    }
+  }
+
+  async sendSticker(file: File): Promise<boolean> {
+    const phone = this.selectedPhoneState();
+    if (!phone || file.type !== 'image/webp' || file.size < 1 || file.size > 500 * 1024 || this.sendingState()) return false;
+    this.sendingState.set(true);
+    this.errorState.set(null);
+    try {
+      const item = { clientMessageId: crypto.randomUUID(), fileName: file.name, mimeType: 'image/webp' as const, size: file.size, checksumSha256: await sha256Base64(file) };
+      const { data } = await firstValueFrom(this.api.prepareAttachments(phone, crypto.randomUUID(), [item]));
+      const upload = data.uploads[0];
+      if (!upload) throw new Error('Sticker upload was not prepared');
+      await this.api.uploadPrepared(file, upload);
+      await firstValueFrom(this.api.sendAttachment(phone, upload, '', 'sticker'));
+      await this.select(phone, true);
+      return true;
+    } catch {
+      this.errorState.set('No fue posible enviar el sticker WebP.');
       return false;
     } finally {
       this.sendingState.set(false);
@@ -491,7 +645,9 @@ export class InboxStore {
         return;
       }
       const { envelope } = notification;
-      if (envelope.sequence !== this.listSequence + 1) {
+      const sequenceAction = classifyRealtimeSequence(this.listSequence, envelope.sequence);
+      if (sequenceAction === 'ignore') return;
+      if (sequenceAction === 'reconcile') {
         void this.load();
         return;
       }
@@ -510,7 +666,9 @@ export class InboxStore {
         return;
       }
       const { envelope } = notification;
-      if (envelope.sequence !== this.detailSequence + 1) {
+      const sequenceAction = classifyRealtimeSequence(this.detailSequence, envelope.sequence);
+      if (sequenceAction === 'ignore') return;
+      if (sequenceAction === 'reconcile') {
         if (this.selectedPhoneState() === phone) void this.select(phone, true);
         return;
       }
@@ -612,5 +770,21 @@ function normalizeAgentProcessing(detail: ConversationDetailResponse): Conversat
   return {
     ...detail,
     conversation: { ...conversation, agentProcessing: false, agentProcessingUntil: null },
+  };
+}
+
+function mergeConversationDetail(
+  current: ConversationDetailResponse,
+  incoming: ConversationDetailResponse,
+): ConversationDetailResponse {
+  const byID = new Map(current.messages.map((message) => [message.id, message]));
+  for (const message of incoming.messages) byID.set(message.id, message);
+  return {
+    ...incoming,
+    messages: [...byID.values()].sort(
+      (left, right) => Date.parse(left.createdAt) - Date.parse(right.createdAt),
+    ),
+    hasMore: current.hasMore,
+    nextCursor: current.nextCursor,
   };
 }
