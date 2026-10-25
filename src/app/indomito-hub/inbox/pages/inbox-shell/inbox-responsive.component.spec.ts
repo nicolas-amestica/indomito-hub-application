@@ -73,6 +73,7 @@ const createStoreMock = (): InboxStore => {
     sendStates: emptyList,
     mutating: falseState,
     templates: emptyList,
+    realtimeConnection: signal<'connected' | 'reconnecting'>('connected'),
     agentProcessing: falseState,
     bulkOperation: nullState,
     messages: computed(() => detail()?.messages ?? []),

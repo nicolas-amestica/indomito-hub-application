@@ -110,20 +110,20 @@ describe('InboxRealtimeService', () => {
     });
     const notifications: string[] = [];
     const subscription = TestBed.inject(InboxRealtimeService).connect('list').subscribe((notification) => {
-      notifications.push(notification.kind);
+      notifications.push(notification.kind === 'connection' ? notification.state : notification.kind);
     });
 
     await vi.waitFor(() => expect(FakeWebSocket.instances).toHaveLength(1));
     FakeWebSocket.instances[0]?.emit('open');
     FakeWebSocket.instances[0]?.emit('close');
-    expect(notifications).toEqual(['reconcile']);
+    expect(notifications).toEqual(['connected', 'reconnecting', 'reconcile']);
 
     await vi.advanceTimersByTimeAsync(1_000);
     await vi.waitFor(() => expect(FakeWebSocket.instances).toHaveLength(2));
     FakeWebSocket.instances[1]?.emit('open');
 
     expect(api.subscription).toHaveBeenCalledTimes(2);
-    expect(notifications).toEqual(['reconcile', 'reconcile']);
+    expect(notifications).toEqual(['connected', 'reconnecting', 'reconcile', 'connected', 'reconcile']);
     subscription.unsubscribe();
   });
 });

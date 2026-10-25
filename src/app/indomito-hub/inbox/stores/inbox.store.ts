@@ -41,6 +41,7 @@ export class InboxStore {
   private readonly mutatingState = signal(false);
   private readonly bulkStatesState = signal<readonly BulkOperation[]>([]);
   private readonly templatesState = signal<readonly WhatsAppTemplate[]>([]);
+  private readonly realtimeConnectionState = signal<'connected' | 'reconnecting'>('connected');
   private readonly destroyRef = inject(DestroyRef);
   private readonly realtime = inject(InboxRealtimeService);
   private nextPage = 2;
@@ -72,6 +73,7 @@ export class InboxStore {
   readonly mutating = this.mutatingState.asReadonly();
   readonly bulkOperations = this.bulkStatesState.asReadonly();
   readonly templates = this.templatesState.asReadonly();
+  readonly realtimeConnection = this.realtimeConnectionState.asReadonly();
   readonly agentProcessing = computed(() => this.detailState()?.conversation?.agentProcessing ?? false);
   readonly bulkOperation = computed(() =>
     this.bulkStatesState().find((operation) => operation.kind === 'mark_all_read') ?? null,
@@ -640,6 +642,10 @@ export class InboxStore {
   private connectListRealtime(): void {
     if (this.listRealtimeSubscription) return;
     this.listRealtimeSubscription = this.realtime.connect('list').subscribe((notification) => {
+      if (notification.kind === 'connection') {
+        this.realtimeConnectionState.set(notification.state);
+        return;
+      }
       if (notification.kind === 'reconcile') {
         void this.load();
         return;
@@ -661,6 +667,7 @@ export class InboxStore {
     this.detailRealtimeSubscription?.unsubscribe();
     this.realtimePhone = phone;
     this.detailRealtimeSubscription = this.realtime.connect('detail', phone).subscribe((notification) => {
+      if (notification.kind === 'connection') return;
       if (notification.kind === 'reconcile') {
         if (this.selectedPhoneState() === phone) void this.select(phone, true);
         return;

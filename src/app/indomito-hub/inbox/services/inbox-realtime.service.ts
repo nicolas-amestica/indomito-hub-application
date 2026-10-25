@@ -13,7 +13,8 @@ const STREAM_PATTERN = /^(list|detail:[0-9]{8,15})$/;
 
 export type RealtimeNotification =
   | { readonly kind: 'event'; readonly envelope: RealtimeEnvelope }
-  | { readonly kind: 'reconcile' };
+  | { readonly kind: 'reconcile' }
+  | { readonly kind: 'connection'; readonly state: 'connected' | 'reconnecting' };
 
 @Injectable()
 export class InboxRealtimeService {
@@ -36,6 +37,7 @@ export class InboxRealtimeService {
           socket = new WebSocket(url);
           socket.addEventListener('open', () => {
             attempt = 0;
+            subscriber.next({ kind: 'connection', state: 'connected' });
             if (opened) subscriber.next({ kind: 'reconcile' });
             opened = true;
           });
@@ -53,6 +55,7 @@ export class InboxRealtimeService {
 
       const scheduleReconnect = (): void => {
         if (closed || reconnectTimer !== null) return;
+        subscriber.next({ kind: 'connection', state: 'reconnecting' });
         subscriber.next({ kind: 'reconcile' });
         const delays = [1, 2, 4, 8, 15];
         const delay = delays[attempt] ?? 15;
