@@ -27,11 +27,14 @@ describe('InboxApiService', () => {
     request.flush({});
   });
 
-  it('no mezcla before y since cuando el caller solicita historial anterior', () => {
+  it('desenvuelve el detalle y no mezcla before y since al solicitar historial anterior', () => {
     const service = TestBed.inject(InboxApiService);
     const http = TestBed.inject(HttpTestingController);
+    let receivedMode: string | undefined;
 
-    service.detail('56912345678', { before: 'cursor-opaco' }).subscribe();
+    service.detail('56912345678', { before: 'cursor-opaco' }).subscribe((response) => {
+      receivedMode = response.mode;
+    });
 
     const request = http.expectOne(
       (candidate) => candidate.url === `${environment.apiUrl}/conversaciones/56912345678`,
@@ -39,7 +42,17 @@ describe('InboxApiService', () => {
     expect(request.request.params.get('before')).toBe('cursor-opaco');
     expect(request.request.params.has('since')).toBe(false);
     expect(request.request.params.get('pageSize')).toBe('50');
-    request.flush({});
+    request.flush({ data: {
+      mode: 'before',
+      conversation: null,
+      messages: [],
+      hasMore: false,
+      nextCursor: null,
+      nonTerminalSends: [],
+      watermark: { stream: 'detail:56912345678', sequence: 1 },
+      requestedBefore: 'cursor-opaco',
+    } });
+    expect(receivedMode).toBe('before');
   });
 
   it('envía una respuesta con idempotencia explícita en el body', () => {

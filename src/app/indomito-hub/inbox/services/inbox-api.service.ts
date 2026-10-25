@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import type {
@@ -45,7 +45,9 @@ export class InboxApiService {
     let params = new HttpParams().set('pageSize', query.pageSize ?? 50);
     if (query.before) params = params.set('before', query.before);
     if (query.since) params = params.set('since', query.since);
-    return this.http.get<ConversationDetailResponse>(`${this.baseUrl}/${phone}`, { params });
+    return this.http.get<{ data: ConversationDetailResponse }>(`${this.baseUrl}/${phone}`, { params }).pipe(
+      map(({ data }) => data),
+    );
   }
 
   sendReply(phone: string, content: string, clientMessageId: string, replyToMessageId?: string): Observable<{ data: SendState }> {
