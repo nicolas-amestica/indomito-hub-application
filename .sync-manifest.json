@@ -175,6 +175,14 @@
     },
     {
       "sourcePaths": [
+        "ai/source/skills/jira-task-close.md"
+      ],
+      "outputPath": "ai/generated/app-ngx-hub/skills/codex/jira-task-close/SKILL.md",
+      "targetPath": ".agents/skills/jira-task-close/SKILL.md",
+      "checksum": "sha256:f6cee3e9cb59ac52686a0dd726965180cf8a45d4bbeef755baa74b8df6d96e34"
+    },
+    {
+      "sourcePaths": [
         "ai/source/skills/angular-best-practices.md"
       ],
       "outputPath": "ai/generated/app-ngx-hub/skills/kiro/angular-best-practices.md",
@@ -208,6 +216,6 @@
   ],
   "managedBy": "indomito-context-compiler",
   "artifactFormatVersion": 1,
-  "sourceCommit": "0666a494a1c8b94e141106fe37a33f078f2ee04b",
+  "sourceCommit": "310658bdfc2f77bc3532780e2a5f9b0ecc189a05",
   "sourceDirty": true
 }
