@@ -36,6 +36,7 @@ describe('ConversationListItemComponent accessibility', () => {
     expect(button.getAttribute('aria-pressed')).toBe('true');
     expect(button.textContent).toContain('Ana Pérez');
     expect(unread).toBeTruthy();
+    expect([...fixture.nativeElement.querySelectorAll('span')].some((element: Element) => element.className.includes('tabler--user'))).toBe(true);
 
     button.focus();
     expect(document.activeElement).toBe(button);

@@ -15,9 +15,5 @@ export class ConversationListItemComponent {
   readonly conversation = input.required<ConversationSummary>();
   readonly selected = input(false);
   readonly selectedConversation = output<string>();
-  readonly initials = computed(() => {
-    const label = this.conversation().alias || this.conversation().phone;
-    return label.split(/\s+/u).slice(0, 2).map((part) => part[0]).join('').toUpperCase();
-  });
   readonly time = computed(() => formatInboxTime(this.conversation().lastMessageAt));
 }

@@ -133,6 +133,13 @@ export class InboxApiService {
     );
   }
 
+  markRead(phone: string): Observable<{ data: ConversationSummary }> {
+    return this.http.patch<{ data: ConversationSummary }>(
+      `${this.baseUrl}/${phone}/estado-lectura`,
+      { unread: false },
+    );
+  }
+
   reactivateAgent(phone: string): Observable<{ data: ConversationSummary }> {
     return this.http.patch<{ data: ConversationSummary }>(
       `${this.baseUrl}/${phone}/estado-agente`,

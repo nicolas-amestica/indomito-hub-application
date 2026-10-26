@@ -5,14 +5,14 @@
   severity="secondary"
   class="group flex min-h-19 w-full min-w-0 items-center gap-3 border-b border-line/75 px-4 py-3 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-green-600 dark:border-line/55"
   [class.bg-surface-100]="selected()"
-  [class.dark:bg-surface-800]="selected()"
+  [class.dark:bg-white/10]="selected()"
   [class.hover:bg-surface-50]="!selected()"
-  [class.dark:hover:bg-surface-900]="!selected()"
+  [class.dark:hover:bg-white/5]="!selected()"
   [attr.aria-pressed]="selected()"
   (click)="selectedConversation.emit(conversation().phone)"
 >
-  <span class="flex size-12 shrink-0 items-center justify-center rounded-full bg-surface-200 text-sm font-semibold text-surface-700 dark:bg-surface-700 dark:text-surface-100">
-    {{ initials() }}
+  <span class="flex size-12 shrink-0 items-center justify-center rounded-full bg-surface-200 text-surface-700 dark:bg-white/10 dark:text-zinc-100">
+    <span class="icon-[tabler--user] size-6" aria-hidden="true"></span>
   </span>
   <span class="min-w-0 flex-1">
     <span class="flex items-center justify-between gap-2">

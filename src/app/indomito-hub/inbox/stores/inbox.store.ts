@@ -199,6 +199,9 @@ export class InboxStore {
         this.connectDetailRealtime(phone);
         this.sendPollingAttempt = 0;
         this.startSendPolling();
+        if ((normalized.conversation?.unreadCount ?? 0) > 0) {
+          await this.markReadAfterOpen(phone);
+        }
       }
     } catch {
       if (this.selectedPhoneState() === phone) {
@@ -483,6 +486,17 @@ export class InboxStore {
       this.errorState.set('No fue posible marcar la conversación como no leída.');
     } finally {
       this.mutatingState.set(false);
+    }
+  }
+
+  private async markReadAfterOpen(phone: string): Promise<void> {
+    try {
+      const { data } = await firstValueFrom(this.api.markRead(phone));
+      const wasUnread = this.conversationState().find((item) => item.phone === phone)?.unreadCount ?? 0;
+      this.mergeConversation(data);
+      if (wasUnread > 0) this.unreadTotalState.update((value) => Math.max(0, value - wasUnread));
+    } catch {
+      this.errorState.set('No fue posible marcar la conversación como leída.');
     }
   }
 

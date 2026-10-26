@@ -171,6 +171,18 @@ describe('InboxApiService', () => {
     request.flush({});
   });
 
+  it('marca una conversación como leída al abrirla', () => {
+    const service = TestBed.inject(InboxApiService);
+    const http = TestBed.inject(HttpTestingController);
+
+    service.markRead('56912345678').subscribe();
+
+    const request = http.expectOne(`${environment.apiUrl}/conversaciones/56912345678/estado-lectura`);
+    expect(request.request.method).toBe('PATCH');
+    expect(request.request.body).toEqual({ unread: false });
+    request.flush({ data: {} });
+  });
+
   it('elimina una conversación sin enviar body', () => {
     const service = TestBed.inject(InboxApiService);
     const http = TestBed.inject(HttpTestingController);

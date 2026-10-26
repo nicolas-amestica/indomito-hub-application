@@ -67,6 +67,7 @@ export class InboxShellPage implements OnInit {
   readonly fileChooseButtonProps: ButtonDirectiveOptions = {
     iconOnly: true,
     outlined: true,
+    rounded: true,
     severity: 'secondary',
   };
   readonly selectedTemplate = computed(() => this.store.templates().find((template) => `${template.name}:${template.language}` === this.selectedTemplateName()) ?? null);
