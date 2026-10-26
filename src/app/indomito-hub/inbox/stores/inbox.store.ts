@@ -13,6 +13,7 @@ import type {
 import { InboxApiService } from '../services/inbox-api.service';
 import { sha256Base64 } from '../fn/sha256-base64';
 import { getInboxAttachmentMimeType } from '../fn/is-allowed-inbox-attachment';
+import { isNonTerminalSend } from '../fn/is-non-terminal-send';
 import { InboxRealtimeService } from '../services/inbox-realtime.service';
 import type { ConversationFilter } from '../types/inbox.types';
 import { buildMessageDateLabels } from '../fn/build-message-date-labels';
@@ -192,7 +193,7 @@ export class InboxStore {
         if (!preserveCurrent || this.historyCursorState() === null) {
           this.historyCursorState.set(response.nextCursor);
         }
-        this.sendStatesState.set(response.nonTerminalSends);
+        this.sendStatesState.set(response.nonTerminalSends.filter(isNonTerminalSend));
         this.detailSequence = response.watermark.sequence;
         this.scheduleAgentProcessingExpiry(normalized.conversation);
         this.connectDetailRealtime(phone);
