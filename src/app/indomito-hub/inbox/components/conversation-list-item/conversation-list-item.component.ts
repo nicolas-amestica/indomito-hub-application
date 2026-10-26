@@ -9,7 +9,7 @@ import type { ConversationSummary } from '../../interfaces/conversation.interfac
   templateUrl: './conversation-list-item.component.html',
   imports: [ButtonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'block' },
+  host: { class: 'block w-full min-w-0' },
 })
 export class ConversationListItemComponent {
   readonly conversation = input.required<ConversationSummary>();

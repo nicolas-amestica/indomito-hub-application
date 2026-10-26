@@ -154,6 +154,13 @@ describe('InboxShellPage responsive layout', () => {
       fixture.detectChanges();
       expect(root.scrollWidth, `${width}px no debe desbordar horizontalmente`).toBeLessThanOrEqual(width);
       expect(getComputedStyle(aside).display, `${width}px debe mostrar la lista inicial`).not.toBe('none');
+      const viewport = root.querySelector<HTMLElement>('cdk-virtual-scroll-viewport')!;
+      const conversationButton = root.querySelector<HTMLButtonElement>('app-conversation-list-item button')!;
+      const unreadBadge = root.querySelector<HTMLElement>('[aria-label="2 mensajes no leídos"]')!;
+      expect(aside.getBoundingClientRect().width, `${width}px debe usar todo el ancho móvil disponible`).toBeGreaterThanOrEqual(width < 768 ? width - 2 : 380);
+      expect(viewport.scrollWidth, `${width}px la lista no debe tener scroll horizontal`).toBeLessThanOrEqual(viewport.clientWidth);
+      expect(conversationButton.getBoundingClientRect().right, `${width}px debe mostrar la fila completa`).toBeLessThanOrEqual(viewport.getBoundingClientRect().right);
+      expect(unreadBadge.getBoundingClientRect().right, `${width}px debe mostrar el contador de no leídos`).toBeLessThanOrEqual(viewport.getBoundingClientRect().right);
       await expectNoAccessibilityViolations(`${width}px lista`);
       await page.screenshot({
         path: `../../../../../../artifacts/p3-responsive/inbox-${width}-list.png`,

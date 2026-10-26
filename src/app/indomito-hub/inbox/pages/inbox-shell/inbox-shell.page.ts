@@ -64,7 +64,11 @@ export class InboxShellPage implements OnInit {
   readonly templateParameters = signal<readonly string[]>([]);
   readonly reactionTargetId = signal<string | null>(null);
   readonly reactionOptions = ['👍', '❤️', '😂', '😮', '😢', '🙏'] as const;
-  readonly fileChooseButtonProps: ButtonDirectiveOptions = { iconOnly: true };
+  readonly fileChooseButtonProps: ButtonDirectiveOptions = {
+    iconOnly: true,
+    outlined: true,
+    severity: 'secondary',
+  };
   readonly selectedTemplate = computed(() => this.store.templates().find((template) => `${template.name}:${template.language}` === this.selectedTemplateName()) ?? null);
   readonly templateOptions = computed(() => this.store.templates().map((template) => ({ label: `${template.name} · ${template.language}`, value: `${template.name}:${template.language}` })));
   readonly alias = signal('');

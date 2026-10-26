@@ -1,7 +1,7 @@
 <section class="mx-auto h-[calc(100dvh-64px)] max-w-[1500px] overflow-hidden bg-canvas" aria-label="Bandeja de conversaciones">
   <a class="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50 focus:rounded-md focus:bg-surface-0 focus:px-3 focus:py-2 focus:text-ink focus:shadow-lg" href="#inbox-content">Saltar al contenido de la conversación</a>
   <div class="flex h-full min-w-0 overflow-hidden border-x border-line/75 dark:border-line/55">
-    <aside class="min-w-0 flex-col border-r border-line/75 bg-surface-0 dark:border-line/55 dark:bg-surface-950 md:flex md:w-96 md:shrink-0" [class.flex]="store.selectedPhone() === null" [class.hidden]="store.selectedPhone() !== null">
+    <aside class="min-w-0 w-full flex-1 flex-col border-r border-line/75 bg-surface-0 dark:border-line/55 dark:bg-surface-950 md:flex md:w-96 md:flex-none" [class.flex]="store.selectedPhone() === null" [class.hidden]="store.selectedPhone() !== null">
       <header class="flex shrink-0 items-center justify-between bg-green-700 px-4 py-3 text-white dark:bg-surface-800">
         <div class="flex items-center gap-3">
           <span class="flex size-10 items-center justify-center rounded-full bg-white/15"><span class="icon-[tabler--inbox] size-5" aria-hidden="true"></span></span>
@@ -49,7 +49,7 @@
           <div class="flex h-full flex-col items-center justify-center gap-3 p-6 text-center"><span class="icon-[tabler--alert-circle] size-9 text-red-500" aria-hidden="true"></span><p class="text-sm text-muted">{{ store.error() }}</p><button pButton type="button" outlined severity="secondary" (click)="store.load()">Reintentar</button></div>
         } @else {
           @if (store.visibleConversations().length > 0) {
-            <cdk-virtual-scroll-viewport class="min-h-0 flex-1" [itemSize]="76" [minBufferPx]="760" [maxBufferPx]="1520" aria-label="Conversaciones">
+            <cdk-virtual-scroll-viewport class="min-h-0 min-w-0 flex-1 overflow-x-hidden [&_.cdk-virtual-scroll-content-wrapper]:w-full [&_.cdk-virtual-scroll-content-wrapper]:max-w-full" [itemSize]="76" [minBufferPx]="760" [maxBufferPx]="1520" aria-label="Conversaciones">
               <app-conversation-list-item *cdkVirtualFor="let conversation of store.visibleConversations(); trackBy: trackConversation" [conversation]="conversation" [selected]="store.selectedPhone() === conversation.phone" (selectedConversation)="selectConversation($event)" />
             </cdk-virtual-scroll-viewport>
           } @else {
@@ -279,7 +279,7 @@
 <p-dialog header="Editar alias" [visible]="aliasDialogVisible()" (visibleChange)="aliasDialogVisible.set($event)" [modal]="true" [draggable]="false" [resizable]="false" [style]="{ width: 'min(22rem, calc(100vw - 2rem))' }">
   <label for="inbox-alias" class="mb-2 block text-sm font-medium text-ink">Nombre o alias</label>
   <input pInputText id="inbox-alias" class="w-full" name="conversation-alias" autocomplete="off" maxlength="100" [value]="alias()" (input)="alias.set($any($event.target).value)" (keydown.enter)="saveAlias()" />
-  <ng-template #footer><button pButton type="button" outlined severity="secondary" (click)="aliasDialogVisible.set(false)">Cancelar</button><button pButton type="button" [loading]="store.mutating()" [disabled]="!alias().trim()" (click)="saveAlias()">Guardar</button></ng-template>
+  <ng-template #footer><button pButton type="button" outlined severity="secondary" (click)="aliasDialogVisible.set(false)">Cancelar</button><button pButton type="button" severity="success" [loading]="store.mutating()" [disabled]="!alias().trim()" (click)="saveAlias()">Guardar</button></ng-template>
 </p-dialog>
 
 <p-dialog header="Enviar mensaje interactivo" [visible]="interactiveDialogVisible()" (visibleChange)="interactiveDialogVisible.set($event)" [modal]="true" [draggable]="false" [resizable]="false" [style]="{ width: 'min(34rem, calc(100vw - 2rem))' }">
