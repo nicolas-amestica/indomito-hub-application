@@ -16,4 +16,5 @@ export class AgentManagementService {
   restore(version: string) { return this.http.post<ApiSuccessEnvelope<AgentConfigRevision>>(`${this.url}/restauraciones`, { version }).pipe(map(({ data }) => data)); }
   prepareProgramUpload(file: File) { return this.http.post<ApiSuccessEnvelope<{ key: string; uploadUrl: string; expiresAt: string }>>(`${this.url}/programas/cargas`, { fileName: file.name, size: file.size }).pipe(map(({ data }) => data)); }
   uploadProgram(url: string, file: File) { return this.http.put(url, file, { headers: { 'Content-Type': 'application/pdf' }, responseType: 'text' }); }
+  prepareProgramDownload(documentKey: string, fileName: string) { return this.http.get<ApiSuccessEnvelope<{ downloadUrl: string; expiresAt: string }>>(`${this.url}/programas/descargas`, { params: { documentKey, fileName } }).pipe(map(({ data }) => data)); }
 }

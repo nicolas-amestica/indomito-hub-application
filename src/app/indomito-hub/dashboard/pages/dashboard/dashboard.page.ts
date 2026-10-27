@@ -1,4 +1,4 @@
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -13,12 +13,19 @@ import { RouterLink } from '@angular/router';
 import { ButtonDirective } from 'primeng/button';
 import { ChartModule } from 'primeng/chart';
 import { Message } from 'primeng/message';
+import { ProgressBar } from 'primeng/progressbar';
 import { Select } from 'primeng/select';
 import { Skeleton } from 'primeng/skeleton';
+import { Tag } from 'primeng/tag';
 import { finalize } from 'rxjs';
 import { todayDateOnly } from '../../../../shared/date-only/date-only';
 import type { DashboardView } from '../../interfaces/dashboard.interface';
 import { DashboardService } from '../../services/dashboard.service';
+import type {
+  FreeTierMetric,
+  OperationalMetrics,
+} from '../../../../shared/operational-metrics/interfaces/operational-metrics.interface';
+import { OperationalMetricsService } from '../../../../shared/operational-metrics/services/operational-metrics.service';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -26,17 +33,22 @@ import { DashboardService } from '../../services/dashboard.service';
     ButtonDirective,
     ChartModule,
     CurrencyPipe,
+    DatePipe,
+    DecimalPipe,
     FormsModule,
     Message,
+    ProgressBar,
     RouterLink,
     Select,
     Skeleton,
+    Tag,
   ],
   templateUrl: './dashboard.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardPage {
   private readonly api = inject(DashboardService);
+  private readonly metricsApi = inject(OperationalMetricsService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly currentYear = new Date().getFullYear();
   protected readonly years = Array.from({ length: 6 }, (_, index) => this.currentYear - 2 + index);
@@ -44,6 +56,9 @@ export class DashboardPage {
   protected readonly loading = signal(false);
   protected readonly error = signal('');
   protected readonly view = signal<DashboardView | null>(null);
+  protected readonly operationalMetrics = signal<OperationalMetrics | null>(null);
+  protected readonly operationalLoading = signal(true);
+  protected readonly operationalError = signal('');
   protected readonly approved = computed(
     () => this.view()?.contracts.filter(({ status }) => status === 'APPROVED').length ?? 0,
   );
@@ -108,6 +123,27 @@ export class DashboardPage {
 
   constructor() {
     this.load(this.currentYear);
+    this.loadOperationalMetrics();
+  }
+
+  protected loadOperationalMetrics(): void {
+    if (this.operationalLoading() && this.operationalMetrics()) return;
+    this.operationalLoading.set(true);
+    this.operationalError.set('');
+    this.metricsApi
+      .get()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.operationalLoading.set(false)),
+      )
+      .subscribe({
+        next: (metrics) => this.operationalMetrics.set(metrics),
+        error: () => this.operationalError.set('No fue posible cargar las métricas operacionales.'),
+      });
+  }
+
+  protected freeTierValue(metric: FreeTierMetric): number {
+    return Math.min(100, Math.max(metric.utilization, metric.forecastUtilization));
   }
 
   protected changeYear(year: number): void {

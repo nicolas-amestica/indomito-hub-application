@@ -1,4 +1,7 @@
-<section class="mt-6 overflow-hidden rounded-3xl border border-line/75 bg-surface shadow-sm dark:border-line/55" aria-labelledby="agent-management-title">
+<section
+  class="mt-6 overflow-hidden rounded-3xl border border-line/75 bg-surface shadow-sm dark:border-line/55"
+  aria-labelledby="agent-management-title"
+>
   <header class="bg-night px-4 py-5 text-white sm:px-6">
     <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
       <div class="min-w-0">
@@ -6,69 +9,237 @@
           <span class="icon-[tabler--message-chatbot] size-7 text-brand" aria-hidden="true"></span>
           <div>
             <p class="text-xs font-bold uppercase tracking-[.18em] text-brand">WhatsApp</p>
-            <h2 id="agent-management-title" class="text-xl font-semibold text-white sm:text-2xl">Comportamiento del Agente IA</h2>
+            <h2 id="agent-management-title" class="text-xl font-semibold text-white sm:text-2xl">
+              Comportamiento del Agente IA
+            </h2>
           </div>
         </div>
-        <p class="mt-2 max-w-3xl text-sm text-white/75">Administra personalidad, respuestas, programas y parámetros operativos. Guardar crea un borrador; publicar activa los cambios.</p>
+        <p class="mt-2 max-w-3xl text-sm text-white/75">
+          Administra personalidad, respuestas, programas y parámetros operativos. Guardar crea un
+          borrador; publicar activa los cambios.
+        </p>
       </div>
       <div class="flex flex-wrap gap-2">
-        <button pButton type="button" severity="secondary" outlined [disabled]="loading() || !form() || saving()" [loading]="saving()" (click)="save()"><span class="icon-[tabler--device-floppy]" aria-hidden="true"></span>Guardar borrador</button>
-        <button pButton type="button" class="bg-brand! text-night!" [disabled]="loading() || !form() || publishing()" [loading]="publishing()" (click)="publish()"><span class="icon-[tabler--rocket]" aria-hidden="true"></span>Publicar</button>
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          outlined
+          [disabled]="loading() || !form() || saving()"
+          [loading]="saving()"
+          (click)="save()"
+        >
+          <span class="icon-[tabler--device-floppy]" aria-hidden="true"></span>Guardar borrador
+        </button>
+        <button
+          pButton
+          type="button"
+          class="bg-brand! text-night!"
+          [disabled]="loading() || !form() || publishing()"
+          [loading]="publishing()"
+          (click)="publish()"
+        >
+          <span class="icon-[tabler--rocket]" aria-hidden="true"></span>Publicar
+        </button>
       </div>
     </div>
   </header>
 
   @if (error()) {
-    <div class="p-4 sm:p-6"><p-message severity="error" closable (onClose)="error.set('')">{{ error() }}</p-message></div>
+    <div class="p-4 sm:p-6">
+      <p-message severity="error" closable (onClose)="error.set('')">{{ error() }}</p-message>
+    </div>
   }
 
   @if (loading()) {
-    <div class="grid gap-4 p-6"><p-progressbar mode="indeterminate" [style]="{ height: '6px' }" /><p class="text-sm text-muted">Cargando configuración…</p></div>
+    <div class="grid gap-4 p-6">
+      <p-progressbar mode="indeterminate" [style]="{ height: '6px' }" />
+      <p class="text-sm text-muted">Cargando configuración…</p>
+    </div>
   } @else if (form(); as config) {
-    <div class="grid gap-4 border-b border-line/75 bg-canvas/70 p-4 dark:border-line/55 sm:grid-cols-3 sm:p-6">
+    <div
+      class="grid gap-4 border-b border-line/75 bg-canvas p-4 text-ink dark:border-line/55 sm:grid-cols-2 sm:p-6 xl:grid-cols-4"
+    >
       <p-card>
-        <div class="flex items-center justify-between gap-3"><div><p class="text-xs font-semibold uppercase tracking-wide text-muted">Estado</p><p class="mt-1 font-semibold text-ink">{{ hasUnpublishedChanges() ? 'Cambios sin publicar' : 'Sincronizado' }}</p></div><p-tag [severity]="hasUnpublishedChanges() ? 'warn' : 'success'" [value]="hasUnpublishedChanges() ? 'Borrador' : 'Publicado'" /></div>
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wide text-muted">Estado</p>
+            <p class="mt-1 font-semibold text-ink">
+              {{ hasUnpublishedChanges() ? 'Cambios sin publicar' : 'Sincronizado' }}
+            </p>
+          </div>
+          <p-tag
+            [severity]="hasUnpublishedChanges() ? 'warn' : 'success'"
+            [value]="hasUnpublishedChanges() ? 'Borrador' : 'Publicado'"
+          />
+        </div>
       </p-card>
       <p-card>
-        <div class="flex items-center justify-between gap-3"><div><p class="text-xs font-semibold uppercase tracking-wide text-muted">Completitud</p><p class="mt-1 font-semibold text-ink">{{ completeness() }}% configurado</p></div><span class="text-2xl font-semibold text-ink">{{ completeness() }}%</span></div>
-        <p-progressbar class="mt-3 block" [value]="completeness()" [showValue]="false" [style]="{ height: '6px' }" />
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wide text-muted">Completitud</p>
+            <p class="mt-1 font-semibold text-ink">{{ completeness() }}% configurado</p>
+          </div>
+          <span class="text-2xl font-semibold text-ink">{{ completeness() }}%</span>
+        </div>
+        <p-progressbar
+          class="mt-3 block"
+          [value]="completeness()"
+          [showValue]="false"
+          [style]="{ height: '6px' }"
+        />
       </p-card>
       <p-card>
         <p class="text-xs font-semibold uppercase tracking-wide text-muted">Contenido activo</p>
-        <p class="mt-1 font-semibold text-ink">{{ config.knowledge.length }} respuestas · {{ config.programs.length }} programas</p>
-        <p class="mt-2 text-xs text-muted">Versión: {{ snapshot()?.published?.version || 'Aún no publicada' }}</p>
+        <p class="mt-1 font-semibold text-ink">
+          {{ config.knowledge.length }} respuestas · {{ config.programs.length }} programas
+        </p>
+        <p class="mt-2 text-xs text-muted">
+          Versión: {{ snapshot()?.published?.version || 'Aún no publicada' }}
+        </p>
+      </p-card>
+      <p-card>
+        <p class="text-xs font-semibold uppercase tracking-wide text-muted">Tokens del mes</p>
+        @if (metricsLoading()) {
+          <p-skeleton width="55%" height="1.5rem" styleClass="mt-2" />
+          <p-skeleton width="72%" height="0.75rem" styleClass="mt-2" />
+        } @else if (metrics(); as operational) {
+          <p class="mt-1 text-xl font-semibold text-ink">
+            {{ operational.agent.totalTokens | number }}
+          </p>
+          <p class="mt-2 text-xs text-muted">
+            {{ operational.agent.calls | number }} llamadas ·
+            {{ operational.agent.inputTokens | number }} entrada ·
+            {{ operational.agent.outputTokens | number }} salida
+          </p>
+        } @else {
+          <p class="mt-2 text-sm text-muted">Métrica no disponible.</p>
+        }
       </p-card>
     </div>
 
     <div class="p-3 sm:p-6">
-      @if (notice()) { <p-message severity="success" closable (onClose)="notice.set('')">{{ notice() }}</p-message> }
+      @if (notice()) {
+        <p-message severity="success" closable (onClose)="notice.set('')">{{ notice() }}</p-message>
+      }
 
       <p-tabs value="personality" scrollable>
         <p-tablist>
-          <p-tab value="personality"><span class="icon-[tabler--sparkles] mr-2" aria-hidden="true"></span>Personalidad</p-tab>
-          <p-tab value="knowledge"><span class="icon-[tabler--book-2] mr-2" aria-hidden="true"></span>Respuestas</p-tab>
-          <p-tab value="programs"><span class="icon-[tabler--file-description] mr-2" aria-hidden="true"></span>Programas</p-tab>
-          <p-tab value="operation"><span class="icon-[tabler--adjustments-horizontal] mr-2" aria-hidden="true"></span>Operación</p-tab>
-          <p-tab value="history"><span class="icon-[tabler--history] mr-2" aria-hidden="true"></span>Historial</p-tab>
+          <p-tab value="personality"
+            ><span class="icon-[tabler--sparkles] mr-2" aria-hidden="true"></span
+            >Personalidad</p-tab
+          >
+          <p-tab value="knowledge"
+            ><span class="icon-[tabler--book-2] mr-2" aria-hidden="true"></span>Respuestas</p-tab
+          >
+          <p-tab value="programs"
+            ><span class="icon-[tabler--file-description] mr-2" aria-hidden="true"></span
+            >Programas</p-tab
+          >
+          <p-tab value="operation"
+            ><span class="icon-[tabler--adjustments-horizontal] mr-2" aria-hidden="true"></span
+            >Operación</p-tab
+          >
+          <p-tab value="history"
+            ><span class="icon-[tabler--history] mr-2" aria-hidden="true"></span>Historial</p-tab
+          >
         </p-tablist>
         <p-tabpanels>
           <p-tabpanel value="personality">
             <div class="grid gap-5 pt-4 lg:grid-cols-2">
               <p-panel header="Identidad y tono">
                 <div class="grid gap-4">
-                  <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Nombre visible</span><input pInputText class="w-full" name="agentDisplayName" [(ngModel)]="config.personality.displayName" /></label>
-                  <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Rol</span><input pInputText class="w-full" name="agentRole" [(ngModel)]="config.personality.role" /></label>
-                  <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Tono</span><p-select class="w-full" name="agentTone" [options]="toneOptions" [(ngModel)]="config.personality.tone" /></label>
-                  <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Estilo de respuesta</span><input pInputText class="w-full" name="agentStyle" [(ngModel)]="config.personality.responseStyle" /></label>
-                  <div class="flex items-center justify-between rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55"><div><p class="font-semibold text-ink">Permitir emojis</p><p class="text-sm text-muted">Úsalos con moderación en las respuestas.</p></div><p-toggleswitch name="agentEmoji" [(ngModel)]="config.personality.useEmoji" /></div>
+                  <label class="grid gap-2"
+                    ><span class="text-sm font-semibold text-ink">Nombre visible</span
+                    ><input
+                      pInputText
+                      class="w-full"
+                      name="agentDisplayName"
+                      [(ngModel)]="config.personality.displayName"
+                  /></label>
+                  <label class="grid gap-2"
+                    ><span class="text-sm font-semibold text-ink">Rol</span
+                    ><input
+                      pInputText
+                      class="w-full"
+                      name="agentRole"
+                      [(ngModel)]="config.personality.role"
+                  /></label>
+                  <label class="grid gap-2"
+                    ><span class="text-sm font-semibold text-ink">Tono</span
+                    ><p-select
+                      class="w-full"
+                      name="agentTone"
+                      [options]="toneOptions"
+                      [(ngModel)]="config.personality.tone"
+                  /></label>
+                  <label class="grid gap-2"
+                    ><span class="text-sm font-semibold text-ink">Estilo de respuesta</span
+                    ><input
+                      pInputText
+                      class="w-full"
+                      name="agentStyle"
+                      [(ngModel)]="config.personality.responseStyle"
+                  /></label>
+                  <div
+                    class="flex items-center justify-between rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55"
+                  >
+                    <div>
+                      <p class="font-semibold text-ink">Permitir emojis</p>
+                      <p class="text-sm text-muted">Úsalos con moderación en las respuestas.</p>
+                    </div>
+                    <p-toggleswitch name="agentEmoji" [(ngModel)]="config.personality.useEmoji" />
+                  </div>
                 </div>
               </p-panel>
               <p-panel header="Mensajes y límites editoriales">
                 <div class="grid gap-4">
-                  <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Saludo inicial</span><textarea pTextarea rows="3" class="w-full" name="agentGreeting" [(ngModel)]="config.personality.greeting"></textarea></label>
-                  <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Cierre sugerido</span><textarea pTextarea rows="2" class="w-full" name="agentClosing" [(ngModel)]="config.personality.closing"></textarea></label>
-                  <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Frases prohibidas</span><input pInputText class="w-full" name="agentForbidden" [ngModel]="config.personality.forbiddenPhrases.join(', ')" (ngModelChange)="config.personality.forbiddenPhrases = toList($event)" /><span class="text-xs text-muted">Separadas por coma. Incluye afirmaciones comerciales que ya no aplican.</span></label>
-                  <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Instrucciones adicionales</span><textarea pTextarea rows="5" maxlength="6000" class="w-full" name="agentInstructions" [(ngModel)]="config.personality.additionalInstructions"></textarea><span class="text-right text-xs text-muted">{{ config.personality.additionalInstructions.length }}/6000</span></label>
+                  <label class="grid gap-2"
+                    ><span class="text-sm font-semibold text-ink">Saludo inicial</span
+                    ><textarea
+                      pTextarea
+                      rows="3"
+                      class="w-full"
+                      name="agentGreeting"
+                      [(ngModel)]="config.personality.greeting"
+                    ></textarea>
+                  </label>
+                  <label class="grid gap-2"
+                    ><span class="text-sm font-semibold text-ink">Cierre sugerido</span
+                    ><textarea
+                      pTextarea
+                      rows="2"
+                      class="w-full"
+                      name="agentClosing"
+                      [(ngModel)]="config.personality.closing"
+                    ></textarea>
+                  </label>
+                  <label class="grid gap-2"
+                    ><span class="text-sm font-semibold text-ink">Frases prohibidas</span
+                    ><input
+                      pInputText
+                      class="w-full"
+                      name="agentForbidden"
+                      [ngModel]="config.personality.forbiddenPhrases.join(', ')"
+                      (ngModelChange)="config.personality.forbiddenPhrases = toList($event)"
+                    /><span class="text-xs text-muted"
+                      >Separadas por coma. Incluye afirmaciones comerciales que ya no aplican.</span
+                    ></label
+                  >
+                  <label class="grid gap-2"
+                    ><span class="text-sm font-semibold text-ink">Instrucciones adicionales</span
+                    ><textarea
+                      pTextarea
+                      rows="5"
+                      maxlength="6000"
+                      class="w-full"
+                      name="agentInstructions"
+                      [(ngModel)]="config.personality.additionalInstructions"
+                    ></textarea
+                    ><span class="text-right text-xs text-muted"
+                      >{{ config.personality.additionalInstructions.length }}/6000</span
+                    ></label
+                  >
                 </div>
               </p-panel>
             </div>
@@ -76,28 +247,214 @@
 
           <p-tabpanel value="knowledge">
             <div class="pt-4">
-              <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h3 class="text-lg font-semibold text-ink">Base de respuestas</h3><p class="text-sm text-muted">Información confirmada que el agente puede utilizar al responder.</p></div><button pButton type="button" (click)="openKnowledge()"><span class="icon-[tabler--plus]" aria-hidden="true"></span>Nueva respuesta</button></div>
-              <p-table [value]="config.knowledge" dataKey="id" responsiveLayout="scroll" [rows]="8" [paginator]="config.knowledge.length > 8">
-                <ng-template #header><tr><th>Respuesta</th><th>Categoría</th><th>Prioridad</th><th>Estado</th><th class="w-28">Acciones</th></tr></ng-template>
-                <ng-template #body let-item><tr><td><p class="font-semibold text-ink">{{ item.title }}</p><p class="max-w-xl truncate text-sm text-muted">{{ item.answer }}</p></td><td>{{ item.category }}</td><td>{{ item.priority }}</td><td><p-tag [severity]="item.active ? 'success' : 'secondary'" [value]="item.active ? 'Activa' : 'Inactiva'" /></td><td><div class="flex gap-1"><button pButton type="button" text rounded severity="secondary" aria-label="Editar respuesta" (click)="openKnowledge(item)"><span class="icon-[tabler--edit]" aria-hidden="true"></span></button><button pButton type="button" text rounded severity="danger" aria-label="Eliminar respuesta" (click)="removeKnowledge(item.id)"><span class="icon-[tabler--trash]" aria-hidden="true"></span></button></div></td></tr></ng-template>
-                <ng-template #emptymessage><tr><td colspan="5"><div class="py-10 text-center text-muted"><span class="icon-[tabler--book-off] mx-auto mb-2 block size-8" aria-hidden="true"></span>No hay respuestas administradas.</div></td></tr></ng-template>
+              <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 class="text-lg font-semibold text-ink">Base de respuestas</h3>
+                  <p class="text-sm text-muted">
+                    Información confirmada que el agente puede utilizar al responder.
+                  </p>
+                </div>
+                <button pButton type="button" (click)="openKnowledge()">
+                  <span class="icon-[tabler--plus]" aria-hidden="true"></span>Nueva respuesta
+                </button>
+              </div>
+              <p-table
+                styleClass="border-line/75! dark:border-line/55!"
+                [value]="config.knowledge"
+                dataKey="id"
+                responsiveLayout="scroll"
+                [rows]="8"
+                [paginator]="config.knowledge.length > 8"
+              >
+                <ng-template #header
+                  ><tr>
+                    <th class="border-line/75! text-ink! dark:border-line/55!">Respuesta</th>
+                    <th class="border-line/75! text-ink! dark:border-line/55!">Categoría</th>
+                    <th class="border-line/75! text-ink! dark:border-line/55!">Prioridad</th>
+                    <th class="border-line/75! text-ink! dark:border-line/55!">Estado</th>
+                    <th class="w-28 border-line/75! text-ink! dark:border-line/55!">Acciones</th>
+                  </tr></ng-template
+                >
+                <ng-template #body let-item
+                  ><tr>
+                    <td class="border-line/75! dark:border-line/55!">
+                      <p class="font-semibold text-ink">{{ item.title }}</p>
+                      <p class="max-w-xl truncate text-sm text-muted">{{ item.answer }}</p>
+                    </td>
+                    <td class="border-line/75! text-ink! dark:border-line/55!">
+                      {{ item.category }}
+                    </td>
+                    <td class="border-line/75! text-ink! dark:border-line/55!">
+                      {{ item.priority }}
+                    </td>
+                    <td class="border-line/75! dark:border-line/55!">
+                      <p-tag
+                        [severity]="item.active ? 'success' : 'secondary'"
+                        [value]="item.active ? 'Activa' : 'Inactiva'"
+                      />
+                    </td>
+                    <td class="border-line/75! dark:border-line/55!">
+                      <div class="flex gap-1">
+                        <button
+                          pButton
+                          type="button"
+                          text
+                          rounded
+                          severity="secondary"
+                          aria-label="Editar respuesta"
+                          (click)="openKnowledge(item)"
+                        >
+                          <span class="icon-[tabler--edit]" aria-hidden="true"></span></button
+                        ><button
+                          pButton
+                          type="button"
+                          text
+                          rounded
+                          severity="danger"
+                          aria-label="Eliminar respuesta"
+                          (click)="removeKnowledge(item.id)"
+                        >
+                          <span class="icon-[tabler--trash]" aria-hidden="true"></span>
+                        </button>
+                      </div>
+                    </td></tr
+                ></ng-template>
+                <ng-template #emptymessage
+                  ><tr>
+                    <td colspan="5">
+                      <div class="py-10 text-center text-muted">
+                        <span
+                          class="icon-[tabler--book-off] mx-auto mb-2 block size-8"
+                          aria-hidden="true"
+                        ></span
+                        >No hay respuestas administradas.
+                      </div>
+                    </td>
+                  </tr></ng-template
+                >
               </p-table>
             </div>
           </p-tabpanel>
 
           <p-tabpanel value="programs">
             <div class="pt-4">
-              <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h3 class="text-lg font-semibold text-ink">Programas y cotizaciones</h3><p class="text-sm text-muted">Relaciona cada PDF con su destino, origen, descripción y actividades.</p></div><button pButton type="button" (click)="openProgram()"><span class="icon-[tabler--file-plus]" aria-hidden="true"></span>Nuevo programa</button></div>
-              <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                @for (program of config.programs; track program.id) {
-                  <p-card>
-                    <ng-template #header><div class="flex items-center justify-between border-b border-line/75 bg-canvas px-5 py-3 dark:border-line/55"><p-tag [severity]="program.active ? 'success' : 'secondary'" [value]="program.active ? 'Disponible' : 'Oculto'" /><span class="text-xs font-semibold text-muted">Orden {{ program.sortOrder }}</span></div></ng-template>
-                    <h4 class="text-lg font-semibold text-ink">{{ program.name }}</h4><p class="mt-1 text-sm font-medium text-muted">{{ program.destination }} · {{ program.durationDays }} días</p><p class="mt-3 line-clamp-3 text-sm text-ink/80">{{ program.description || 'Sin descripción para clientes.' }}</p>
-                    <div class="mt-4 flex items-center gap-2 rounded-xl bg-canvas p-3 text-sm text-muted"><span class="icon-[tabler--file-type-pdf] text-red-600 dark:text-red-400" aria-hidden="true"></span><span class="truncate">{{ program.fileName || 'PDF pendiente' }}</span></div>
-                    <div class="mt-4 flex justify-end gap-1"><button pButton type="button" text rounded severity="secondary" (click)="openProgram(program)" aria-label="Editar programa"><span class="icon-[tabler--edit]" aria-hidden="true"></span></button><button pButton type="button" text rounded severity="danger" (click)="removeProgram(program.id)" aria-label="Eliminar programa"><span class="icon-[tabler--trash]" aria-hidden="true"></span></button></div>
-                  </p-card>
-                } @empty { <div class="col-span-full rounded-2xl border border-dashed border-line/75 p-10 text-center text-muted dark:border-line/55">Agrega el primer programa para comenzar a centralizar las cotizaciones.</div> }
+              <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                  <h3 class="text-lg font-semibold text-ink">Programas y cotizaciones</h3>
+                  <p class="text-sm text-muted">
+                    Relaciona cada PDF con su destino, origen, descripción y actividades.
+                  </p>
+                </div>
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <label class="grid gap-1"
+                    ><span class="text-xs font-semibold text-muted">Buscar programa</span
+                    ><input
+                      pInputText
+                      class="w-full sm:w-72"
+                      name="programSearch"
+                      [ngModel]="programQuery()"
+                      (ngModelChange)="programQuery.set($event); programFirst.set(0)"
+                      placeholder="Destino, región, ciudad o archivo" /></label
+                  ><button pButton type="button" (click)="openProgram()">
+                    <span class="icon-[tabler--file-plus]" aria-hidden="true"></span>Nuevo programa
+                  </button>
+                </div>
               </div>
+              <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                @for (program of visiblePrograms(); track program.id) {
+                  <p-card>
+                    <ng-template #header
+                      ><div
+                        class="flex items-center justify-between border-b border-line/75 bg-canvas px-5 py-3 dark:border-line/55"
+                      >
+                        <p-tag
+                          [severity]="program.active ? 'success' : 'secondary'"
+                          [value]="program.active ? 'Disponible' : 'Oculto'"
+                        /><span class="text-xs font-semibold text-muted"
+                          >Orden {{ program.sortOrder }}</span
+                        >
+                      </div></ng-template
+                    >
+                    <h4 class="text-lg font-semibold text-ink">{{ program.name }}</h4>
+                    <p class="mt-1 text-sm font-medium text-muted">
+                      {{ program.destinations?.join(', ') || program.destination }} ·
+                      {{
+                        program.durationDays > 0
+                          ? program.durationDays + ' días'
+                          : 'Duración por completar'
+                      }}
+                    </p>
+                    <p class="mt-3 line-clamp-3 text-sm text-ink/80">
+                      {{ program.description || 'Sin descripción para clientes.' }}
+                    </p>
+                    <div
+                      class="mt-4 flex items-center gap-2 rounded-xl bg-canvas p-3 text-sm text-muted"
+                    >
+                      <span
+                        class="icon-[tabler--file-type-pdf] text-red-600 dark:text-red-400"
+                        aria-hidden="true"
+                      ></span
+                      ><span class="truncate">{{ program.fileName || 'PDF pendiente' }}</span>
+                    </div>
+                    <div class="mt-4 flex justify-end gap-1">
+                      <button
+                        pButton
+                        type="button"
+                        text
+                        rounded
+                        severity="secondary"
+                        [disabled]="!program.documentKey"
+                        (click)="downloadProgram(program)"
+                        aria-label="Descargar PDF"
+                      >
+                        <span class="icon-[tabler--download]" aria-hidden="true"></span></button
+                      ><button
+                        pButton
+                        type="button"
+                        text
+                        rounded
+                        severity="secondary"
+                        (click)="openProgram(program)"
+                        aria-label="Editar programa"
+                      >
+                        <span class="icon-[tabler--edit]" aria-hidden="true"></span></button
+                      ><button
+                        pButton
+                        type="button"
+                        text
+                        rounded
+                        severity="danger"
+                        (click)="removeProgram(program.id)"
+                        aria-label="Eliminar programa"
+                      >
+                        <span class="icon-[tabler--trash]" aria-hidden="true"></span>
+                      </button>
+                    </div>
+                  </p-card>
+                } @empty {
+                  <div
+                    class="col-span-full rounded-2xl border border-dashed border-line/75 p-10 text-center text-muted dark:border-line/55"
+                  >
+                    {{
+                      config.programs.length
+                        ? 'No hay programas que coincidan con la búsqueda.'
+                        : 'Agrega el primer programa para comenzar a centralizar las cotizaciones.'
+                    }}
+                  </div>
+                }
+              </div>
+              @if (filteredPrograms().length > programPageSize()) {
+                <p-paginator
+                  class="mt-5 block"
+                  [first]="programFirst()"
+                  [rows]="programPageSize()"
+                  [totalRecords]="filteredPrograms().length"
+                  [rowsPerPageOptions]="[12, 24, 48]"
+                  (onPageChange)="
+                    programFirst.set($event.first ?? 0); programPageSize.set($event.rows ?? 12)
+                  "
+                />
+              }
             </div>
           </p-tabpanel>
 
@@ -105,53 +462,402 @@
             <div class="grid gap-5 pt-4 xl:grid-cols-2">
               <p-panel header="Modelo y creatividad">
                 <div class="grid gap-5">
-                  <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Modelo aprobado</span><p-select class="w-full" [options]="modelOptions" name="agentModel" [(ngModel)]="config.generation.model" /></label>
-                  <label class="grid gap-3"><span class="flex justify-between text-sm font-semibold text-ink"><span>Creatividad</span><span>{{ config.generation.temperature | number:'1.1-1' }}</span></span><p-slider name="agentTemperature" [(ngModel)]="config.generation.temperature" [min]="0" [max]="1" [step]="0.1" /><span class="text-xs text-muted">Valores bajos priorizan respuestas estables y precisas.</span></label>
-                  <label class="grid gap-3"><span class="flex justify-between text-sm font-semibold text-ink"><span>Diversidad de respuesta</span><span>{{ config.generation.topP | number:'1.1-1' }}</span></span><p-slider name="agentTopP" [(ngModel)]="config.generation.topP" [min]="0" [max]="1" [step]="0.1" /></label>
+                  <label class="grid gap-2"
+                    ><span class="text-sm font-semibold text-ink">Modelo aprobado</span
+                    ><p-select
+                      class="w-full"
+                      [options]="modelOptions"
+                      name="agentModel"
+                      [(ngModel)]="config.generation.model"
+                  /></label>
+                  <label class="grid gap-3"
+                    ><span class="flex justify-between text-sm font-semibold text-ink"
+                      ><span>Creatividad</span
+                      ><span>{{ config.generation.temperature | number: '1.1-1' }}</span></span
+                    ><p-slider
+                      name="agentTemperature"
+                      [(ngModel)]="config.generation.temperature"
+                      [min]="0"
+                      [max]="1"
+                      [step]="0.1"
+                    /><span class="text-xs text-muted"
+                      >Valores bajos priorizan respuestas estables y precisas.</span
+                    ></label
+                  >
+                  <label class="grid gap-3"
+                    ><span class="flex justify-between text-sm font-semibold text-ink"
+                      ><span>Diversidad de respuesta</span
+                      ><span>{{ config.generation.topP | number: '1.1-1' }}</span></span
+                    ><p-slider
+                      name="agentTopP"
+                      [(ngModel)]="config.generation.topP"
+                      [min]="0"
+                      [max]="1"
+                      [step]="0.1"
+                  /></label>
                 </div>
               </p-panel>
               <p-panel header="Rendimiento y protección">
                 <div class="grid gap-4 sm:grid-cols-2">
-                  <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Máximo de caracteres</span><p-inputnumber class="w-full" name="maxLength" [(ngModel)]="config.generation.maxMessageLength" [min]="200" [max]="4000" /></label>
-                  <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Turnos de historial</span><p-inputnumber class="w-full" name="historyTurns" [(ngModel)]="config.generation.maxHistoryTurns" [min]="1" [max]="50" /></label>
-                  <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Espera para agrupar mensajes</span><p-inputnumber class="w-full" name="debounce" [(ngModel)]="config.generation.debounceMs" suffix=" ms" [min]="0" [max]="30000" /></label>
-                  <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Mensajes por ventana</span><p-inputnumber class="w-full" name="rateMax" [(ngModel)]="config.generation.rateLimitMax" [min]="1" [max]="100" /></label>
+                  <label class="grid gap-2"
+                    ><span class="text-sm font-semibold text-ink">Máximo de caracteres</span
+                    ><p-inputnumber
+                      class="w-full"
+                      name="maxLength"
+                      [(ngModel)]="config.generation.maxMessageLength"
+                      [min]="200"
+                      [max]="4000"
+                  /></label>
+                  <label class="grid gap-2"
+                    ><span class="text-sm font-semibold text-ink">Turnos de historial</span
+                    ><p-inputnumber
+                      class="w-full"
+                      name="historyTurns"
+                      [(ngModel)]="config.generation.maxHistoryTurns"
+                      [min]="1"
+                      [max]="50"
+                  /></label>
+                  <label class="grid gap-2"
+                    ><span class="text-sm font-semibold text-ink">Espera para agrupar mensajes</span
+                    ><p-inputnumber
+                      class="w-full"
+                      name="debounce"
+                      [(ngModel)]="config.generation.debounceMs"
+                      suffix=" ms"
+                      [min]="0"
+                      [max]="30000"
+                  /></label>
+                  <label class="grid gap-2"
+                    ><span class="text-sm font-semibold text-ink">Mensajes por ventana</span
+                    ><p-inputnumber
+                      class="w-full"
+                      name="rateMax"
+                      [(ngModel)]="config.generation.rateLimitMax"
+                      [min]="1"
+                      [max]="100"
+                  /></label>
                 </div>
               </p-panel>
-              <p-panel header="Políticas comerciales" styleClass="xl:col-span-2">
+              <p-panel
+                header="Políticas comerciales"
+                styleClass="xl:col-span-2 border-line/75! dark:border-line/55!"
+              >
+                <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <h4 class="font-semibold text-ink">Reglas administrables</h4>
+                    <p class="text-sm text-muted">
+                      Agrega instrucciones comerciales que el agente debe respetar al responder.
+                    </p>
+                  </div>
+                  <button
+                    pButton
+                    type="button"
+                    outlined
+                    severity="secondary"
+                    (click)="openPolicy()"
+                  >
+                    <span class="icon-[tabler--plus]" aria-hidden="true"></span>Nueva política
+                  </button>
+                </div>
+                <div class="mb-5 grid gap-3 md:grid-cols-2">
+                  @for (policy of config.commercialPolicies; track policy.id) {
+                    <article
+                      class="rounded-2xl border border-line/75 bg-surface p-4 dark:border-line/55"
+                    >
+                      <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                          <div class="flex flex-wrap items-center gap-2">
+                            <h5 class="font-semibold text-ink">{{ policy.title }}</h5>
+                            <p-tag
+                              [severity]="policy.active ? 'success' : 'secondary'"
+                              [value]="policy.active ? 'Activa' : 'Inactiva'"
+                            />
+                          </div>
+                          <p class="mt-2 line-clamp-3 text-sm text-muted">{{ policy.content }}</p>
+                        </div>
+                        <div class="flex shrink-0 gap-1">
+                          <button
+                            pButton
+                            type="button"
+                            text
+                            rounded
+                            severity="secondary"
+                            aria-label="Editar política"
+                            (click)="openPolicy(policy)"
+                          >
+                            <span class="icon-[tabler--edit]" aria-hidden="true"></span></button
+                          ><button
+                            pButton
+                            type="button"
+                            text
+                            rounded
+                            severity="danger"
+                            aria-label="Eliminar política"
+                            (click)="removePolicy(policy.id)"
+                          >
+                            <span class="icon-[tabler--trash]" aria-hidden="true"></span>
+                          </button>
+                        </div>
+                      </div>
+                    </article>
+                  } @empty {
+                    <div
+                      class="col-span-full rounded-2xl border border-dashed border-line/75 bg-canvas p-5 text-center text-sm text-muted dark:border-line/55"
+                    >
+                      Aún no hay políticas comerciales personalizadas.
+                    </div>
+                  }
+                </div>
+                <h4 class="mb-3 font-semibold text-ink">Capacidades operativas</h4>
                 <div class="grid gap-3 md:grid-cols-2">
-                  <label class="flex items-center justify-between gap-4 rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55"><span><span class="block font-semibold text-ink">Ofrecer reuniones</span><span class="text-sm text-muted">Solo cuando ayuden a una intención concreta.</span></span><p-toggleswitch name="offerMeetings" [(ngModel)]="config.policies.offerMeetings" /></label>
-                  <label class="flex items-center justify-between gap-4 rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55"><span><span class="block font-semibold text-ink">Derivación humana</span><span class="text-sm text-muted">Habilita el traspaso al equipo interno.</span></span><p-toggleswitch name="humanHandoff" [(ngModel)]="config.policies.humanHandoffEnabled" /></label>
-                  <label class="flex items-center justify-between gap-4 rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55"><span><span class="block font-semibold text-ink">Explicar diferencias</span><span class="text-sm text-muted">Aclara que actividades y valores varían por programa.</span></span><p-toggleswitch name="explainPrograms" [(ngModel)]="config.policies.explainProgramDifferences" /></label>
-                  <label class="flex items-center justify-between gap-4 rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55"><span><span class="block font-semibold text-ink">Adjuntar Sernatur</span><span class="text-sm text-muted">Incluye el certificado junto a cotizaciones.</span></span><p-toggleswitch name="sendSernatur" [(ngModel)]="config.policies.sendSernaturWithQuotations" /></label>
+                  <label
+                    class="flex items-center justify-between gap-4 rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55"
+                    ><span
+                      ><span class="block font-semibold text-ink">Ofrecer reuniones</span
+                      ><span class="text-sm text-muted"
+                        >Solo cuando ayuden a una intención concreta.</span
+                      ></span
+                    ><span class="flex shrink-0 items-center gap-2"
+                      ><p-tag
+                        [severity]="config.policies.offerMeetings ? 'success' : 'secondary'"
+                        [value]="
+                          config.policies.offerMeetings ? 'Activa' : 'Inactiva'
+                        " /><p-toggleswitch
+                        aria-label="Ofrecer reuniones"
+                        name="offerMeetings"
+                        [(ngModel)]="config.policies.offerMeetings" /></span
+                  ></label>
+                  <label
+                    class="flex items-center justify-between gap-4 rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55"
+                    ><span
+                      ><span class="block font-semibold text-ink">Derivación humana</span
+                      ><span class="text-sm text-muted"
+                        >Habilita el traspaso al equipo interno.</span
+                      ></span
+                    ><span class="flex shrink-0 items-center gap-2"
+                      ><p-tag
+                        [severity]="config.policies.humanHandoffEnabled ? 'success' : 'secondary'"
+                        [value]="
+                          config.policies.humanHandoffEnabled ? 'Activa' : 'Inactiva'
+                        " /><p-toggleswitch
+                        aria-label="Derivación humana"
+                        name="humanHandoff"
+                        [(ngModel)]="config.policies.humanHandoffEnabled" /></span
+                  ></label>
+                  <label
+                    class="flex items-center justify-between gap-4 rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55"
+                    ><span
+                      ><span class="block font-semibold text-ink">Explicar diferencias</span
+                      ><span class="text-sm text-muted"
+                        >Aclara que actividades y valores varían por programa.</span
+                      ></span
+                    ><span class="flex shrink-0 items-center gap-2"
+                      ><p-tag
+                        [severity]="
+                          config.policies.explainProgramDifferences ? 'success' : 'secondary'
+                        "
+                        [value]="
+                          config.policies.explainProgramDifferences ? 'Activa' : 'Inactiva'
+                        " /><p-toggleswitch
+                        aria-label="Explicar diferencias"
+                        name="explainPrograms"
+                        [(ngModel)]="config.policies.explainProgramDifferences" /></span
+                  ></label>
+                  <label
+                    class="flex items-center justify-between gap-4 rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55"
+                    ><span
+                      ><span class="block font-semibold text-ink">Adjuntar Sernatur</span
+                      ><span class="text-sm text-muted"
+                        >Incluye el certificado junto a cotizaciones.</span
+                      ></span
+                    ><span class="flex shrink-0 items-center gap-2"
+                      ><p-tag
+                        [severity]="
+                          config.policies.sendSernaturWithQuotations ? 'success' : 'secondary'
+                        "
+                        [value]="
+                          config.policies.sendSernaturWithQuotations ? 'Activa' : 'Inactiva'
+                        " /><p-toggleswitch
+                        aria-label="Adjuntar Sernatur"
+                        name="sendSernatur"
+                        [(ngModel)]="config.policies.sendSernaturWithQuotations" /></span
+                  ></label>
                 </div>
                 @if (config.policies.humanHandoffEnabled) {
-                  <div class="mt-4 rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55">
-                    <div class="mb-4"><h4 class="font-semibold text-ink">Notificaciones de derivación</h4><p class="text-sm text-muted">El agente notificará por los canales activos cuando un cliente solicite atención humana.</p></div>
+                  <div
+                    class="mt-4 rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55"
+                  >
+                    <div class="mb-4">
+                      <h4 class="font-semibold text-ink">Notificaciones de derivación</h4>
+                      <p class="text-sm text-muted">
+                        El agente notificará por los canales activos cuando un cliente solicite
+                        atención humana.
+                      </p>
+                    </div>
                     <div class="grid gap-4 lg:grid-cols-2">
-                      <div class="grid gap-3 rounded-xl border border-line/75 bg-surface p-4 dark:border-line/55">
-                        <label class="flex items-center justify-between gap-4"><span><span class="block font-semibold text-ink">WhatsApp interno</span><span class="text-sm text-muted">Envía la plantilla aprobada con el detalle.</span></span><p-toggleswitch name="handoffWhatsAppEnabled" [(ngModel)]="config.policies.handoffWhatsAppEnabled" /></label>
-                        <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Número de destino</span><input pInputText class="w-full" type="tel" inputmode="tel" autocomplete="tel" name="handoffPhone" [disabled]="!config.policies.handoffWhatsAppEnabled" [(ngModel)]="config.policies.handoffPhone" placeholder="56963552893" /><span class="text-xs text-muted">Código de país y número, con o sin signo +.</span></label>
+                      <div
+                        class="grid gap-3 rounded-xl border border-line/75 bg-surface p-4 dark:border-line/55"
+                      >
+                        <label class="flex items-center justify-between gap-4"
+                          ><span
+                            ><span class="block font-semibold text-ink">WhatsApp interno</span
+                            ><span class="text-sm text-muted"
+                              >Envía la plantilla aprobada con el detalle.</span
+                            ></span
+                          ><span class="flex shrink-0 items-center gap-2"
+                            ><p-tag
+                              [severity]="
+                                config.policies.handoffWhatsAppEnabled ? 'success' : 'secondary'
+                              "
+                              [value]="
+                                config.policies.handoffWhatsAppEnabled ? 'Activo' : 'Inactivo'
+                              " /><p-toggleswitch
+                              aria-label="Notificar por WhatsApp"
+                              name="handoffWhatsAppEnabled"
+                              [(ngModel)]="config.policies.handoffWhatsAppEnabled" /></span
+                        ></label>
+                        <label class="grid gap-2"
+                          ><span class="text-sm font-semibold text-ink">Número de destino</span
+                          ><input
+                            pInputText
+                            class="w-full"
+                            type="tel"
+                            inputmode="tel"
+                            autocomplete="tel"
+                            name="handoffPhone"
+                            [disabled]="!config.policies.handoffWhatsAppEnabled"
+                            [(ngModel)]="config.policies.handoffPhone"
+                            placeholder="56963552893"
+                          /><span class="text-xs text-muted"
+                            >Código de país y número, con o sin signo +.</span
+                          ></label
+                        >
                       </div>
-                      <div class="grid gap-3 rounded-xl border border-line/75 bg-surface p-4 dark:border-line/55">
-                        <label class="flex items-center justify-between gap-4"><span><span class="block font-semibold text-ink">Respaldo por correo</span><span class="text-sm text-muted">Utiliza el remitente seguro configurado.</span></span><p-toggleswitch name="handoffEmailEnabled" [(ngModel)]="config.policies.handoffEmailEnabled" /></label>
-                        <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Correo de destino</span><input pInputText class="w-full" type="email" autocomplete="email" name="handoffEmail" [disabled]="!config.policies.handoffEmailEnabled" [(ngModel)]="config.policies.handoffEmail" placeholder="info@girasindomito.cl" /></label>
+                      <div
+                        class="grid gap-3 rounded-xl border border-line/75 bg-surface p-4 dark:border-line/55"
+                      >
+                        <label class="flex items-center justify-between gap-4"
+                          ><span
+                            ><span class="block font-semibold text-ink">Respaldo por correo</span
+                            ><span class="text-sm text-muted"
+                              >Utiliza el remitente seguro configurado.</span
+                            ></span
+                          ><span class="flex shrink-0 items-center gap-2"
+                            ><p-tag
+                              [severity]="
+                                config.policies.handoffEmailEnabled ? 'success' : 'secondary'
+                              "
+                              [value]="
+                                config.policies.handoffEmailEnabled ? 'Activo' : 'Inactivo'
+                              " /><p-toggleswitch
+                              aria-label="Notificar por correo"
+                              name="handoffEmailEnabled"
+                              [(ngModel)]="config.policies.handoffEmailEnabled" /></span
+                        ></label>
+                        <label class="grid gap-2"
+                          ><span class="text-sm font-semibold text-ink">Correo de destino</span
+                          ><input
+                            pInputText
+                            class="w-full"
+                            type="email"
+                            autocomplete="email"
+                            name="handoffEmail"
+                            [disabled]="!config.policies.handoffEmailEnabled"
+                            [(ngModel)]="config.policies.handoffEmail"
+                            placeholder="info@girasindomito.cl"
+                        /></label>
                       </div>
                     </div>
-                    @if (!config.policies.handoffWhatsAppEnabled && !config.policies.handoffEmailEnabled) { <p-message class="mt-4 block" severity="warn">Activa al menos un canal para poder publicar la derivación humana.</p-message> }
+                    @if (
+                      !config.policies.handoffWhatsAppEnabled &&
+                      !config.policies.handoffEmailEnabled
+                    ) {
+                      <p-message class="mt-4 block" severity="warn"
+                        >Activa al menos un canal para poder publicar la derivación
+                        humana.</p-message
+                      >
+                    }
                   </div>
                 }
-                <div class="mt-4 grid gap-4 lg:grid-cols-2"><label class="grid gap-2"><span class="text-sm font-semibold text-ink">Confirmación de derivación</span><textarea pTextarea rows="3" class="w-full" name="handoffText" [(ngModel)]="config.policies.handoffConfirmation"></textarea></label><label class="grid gap-2"><span class="text-sm font-semibold text-ink">Respuesta de respaldo</span><textarea pTextarea rows="3" class="w-full" name="fallbackText" [(ngModel)]="config.policies.fallbackResponse"></textarea></label></div>
+                <div class="mt-4 grid gap-4 lg:grid-cols-2">
+                  <label class="grid gap-2"
+                    ><span class="text-sm font-semibold text-ink">Confirmación de derivación</span
+                    ><textarea
+                      pTextarea
+                      rows="3"
+                      class="w-full"
+                      name="handoffText"
+                      [(ngModel)]="config.policies.handoffConfirmation"
+                    ></textarea></label
+                  ><label class="grid gap-2"
+                    ><span class="text-sm font-semibold text-ink">Respuesta de respaldo</span
+                    ><textarea
+                      pTextarea
+                      rows="3"
+                      class="w-full"
+                      name="fallbackText"
+                      [(ngModel)]="config.policies.fallbackResponse"
+                    ></textarea>
+                  </label>
+                </div>
               </p-panel>
             </div>
           </p-tabpanel>
 
           <p-tabpanel value="history">
-            <div class="pt-4"><p-message severity="info">Restaurar publica inmediatamente esa versión. Los secretos y las reglas de seguridad no forman parte del historial editable.</p-message>
-              <p-table class="mt-4 block" [value]="snapshot()?.versions || []" responsiveLayout="scroll" [rows]="10" [paginator]="(snapshot()?.versions?.length || 0) > 10">
-                <ng-template #header><tr><th>Versión</th><th>Publicada</th><th>Contenido</th><th class="w-32">Acción</th></tr></ng-template>
-                <ng-template #body let-version><tr><td class="font-mono text-xs text-ink">{{ version.version }}</td><td class="text-muted">{{ version.publishedAt | date:'medium' }}</td><td class="text-muted">{{ version.config.knowledge.length }} respuestas · {{ version.config.programs.length }} programas</td><td><button pButton type="button" text [disabled]="publishing()" (click)="restore(version.version)">Restaurar</button></td></tr></ng-template>
-                <ng-template #emptymessage><tr><td colspan="4" class="py-8 text-center text-muted">Aún no hay versiones publicadas.</td></tr></ng-template>
+            <div class="pt-4">
+              <p-message severity="info"
+                >Restaurar publica inmediatamente esa versión. Los secretos y las reglas de
+                seguridad no forman parte del historial editable.</p-message
+              >
+              <p-table
+                class="mt-4 block"
+                styleClass="border-line/75! dark:border-line/55!"
+                [value]="snapshot()?.versions || []"
+                responsiveLayout="scroll"
+                [rows]="10"
+                [paginator]="(snapshot()?.versions?.length || 0) > 10"
+              >
+                <ng-template #header
+                  ><tr>
+                    <th class="border-line/75! text-ink! dark:border-line/55!">Versión</th>
+                    <th class="border-line/75! text-ink! dark:border-line/55!">Publicada</th>
+                    <th class="border-line/75! text-ink! dark:border-line/55!">Contenido</th>
+                    <th class="w-32 border-line/75! text-ink! dark:border-line/55!">Acción</th>
+                  </tr></ng-template
+                >
+                <ng-template #body let-version
+                  ><tr>
+                    <td class="border-line/75! font-mono text-xs text-ink dark:border-line/55!">
+                      {{ version.version }}
+                    </td>
+                    <td class="border-line/75! text-muted dark:border-line/55!">
+                      {{ version.publishedAt | date: 'medium' }}
+                    </td>
+                    <td class="border-line/75! text-muted dark:border-line/55!">
+                      {{ version.config.knowledge.length }} respuestas ·
+                      {{ version.config.programs.length }} programas
+                    </td>
+                    <td class="border-line/75! dark:border-line/55!">
+                      <button
+                        pButton
+                        type="button"
+                        text
+                        [disabled]="publishing()"
+                        (click)="restore(version.version)"
+                      >
+                        Restaurar
+                      </button>
+                    </td>
+                  </tr></ng-template
+                >
+                <ng-template #emptymessage
+                  ><tr>
+                    <td colspan="4" class="py-8 text-center text-muted">
+                      Aún no hay versiones publicadas.
+                    </td>
+                  </tr></ng-template
+                >
               </p-table>
             </div>
           </p-tabpanel>
@@ -161,32 +867,292 @@
   }
 </section>
 
-<p-dialog header="Respuesta administrada" [visible]="editor() === 'knowledge'" (visibleChange)="!$event && editor.set(null)" [modal]="true" [draggable]="false" [style]="{ width: 'min(42rem, calc(100vw - 2rem))' }">
+<p-dialog
+  header="Respuesta administrada"
+  [visible]="editor() === 'knowledge'"
+  (visibleChange)="!$event && editor.set(null)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: 'min(42rem, calc(100vw - 2rem))' }"
+>
   <div class="grid gap-4">
-    <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Título</span><input pInputText class="w-full" name="knowledgeTitle" [(ngModel)]="knowledgeDraft().title" /></label>
-    <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Categoría</span><input pInputText class="w-full" name="knowledgeCategory" [(ngModel)]="knowledgeDraft().category" /></label>
-    <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Preguntas o palabras clave</span><input pInputText class="w-full" name="knowledgeHints" [ngModel]="knowledgeDraft().questionHints.join(', ')" (ngModelChange)="knowledgeDraft().questionHints = toList($event)" /></label>
-    <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Respuesta confirmada</span><textarea pTextarea rows="6" class="w-full" name="knowledgeAnswer" [(ngModel)]="knowledgeDraft().answer"></textarea></label>
-    <label class="grid gap-3"><span class="flex justify-between text-sm font-semibold text-ink"><span>Prioridad</span><span>{{ knowledgeDraft().priority }}</span></span><p-slider name="knowledgePriority" [(ngModel)]="knowledgeDraft().priority" [min]="0" [max]="100" /></label>
-    <div class="grid gap-3 sm:grid-cols-2"><label class="flex items-center justify-between rounded-xl bg-canvas p-3 text-sm font-semibold text-ink">Respuesta activa<p-toggleswitch name="knowledgeActive" [(ngModel)]="knowledgeDraft().active" /></label><label class="flex items-center justify-between rounded-xl bg-canvas p-3 text-sm font-semibold text-ink">Requiere humano<p-toggleswitch name="knowledgeHuman" [(ngModel)]="knowledgeDraft().requiresHuman" /></label></div>
+    <label class="grid gap-2"
+      ><span class="text-sm font-semibold text-ink">Título</span
+      ><input pInputText class="w-full" name="knowledgeTitle" [(ngModel)]="knowledgeDraft().title"
+    /></label>
+    <label class="grid gap-2"
+      ><span class="text-sm font-semibold text-ink">Categoría</span
+      ><input
+        pInputText
+        class="w-full"
+        name="knowledgeCategory"
+        [(ngModel)]="knowledgeDraft().category"
+    /></label>
+    <label class="grid gap-2"
+      ><span class="text-sm font-semibold text-ink">Preguntas o palabras clave</span
+      ><input
+        pInputText
+        class="w-full"
+        name="knowledgeHints"
+        [ngModel]="knowledgeDraft().questionHints.join(', ')"
+        (ngModelChange)="knowledgeDraft().questionHints = toList($event)"
+    /></label>
+    <label class="grid gap-2"
+      ><span class="text-sm font-semibold text-ink">Respuesta confirmada</span
+      ><textarea
+        pTextarea
+        rows="6"
+        class="w-full"
+        name="knowledgeAnswer"
+        [(ngModel)]="knowledgeDraft().answer"
+      ></textarea>
+    </label>
+    <label class="grid gap-3"
+      ><span class="flex justify-between text-sm font-semibold text-ink"
+        ><span>Prioridad</span><span>{{ knowledgeDraft().priority }}</span></span
+      ><p-slider
+        name="knowledgePriority"
+        [(ngModel)]="knowledgeDraft().priority"
+        [min]="0"
+        [max]="100"
+    /></label>
+    <div class="grid gap-3 sm:grid-cols-2">
+      <label
+        class="flex items-center justify-between rounded-xl bg-canvas p-3 text-sm font-semibold text-ink"
+        >Respuesta activa<p-toggleswitch
+          name="knowledgeActive"
+          [(ngModel)]="knowledgeDraft().active" /></label
+      ><label
+        class="flex items-center justify-between rounded-xl bg-canvas p-3 text-sm font-semibold text-ink"
+        >Requiere humano<p-toggleswitch
+          name="knowledgeHuman"
+          [(ngModel)]="knowledgeDraft().requiresHuman"
+      /></label>
+    </div>
   </div>
-  <ng-template #footer><button pButton type="button" text severity="secondary" (click)="editor.set(null)">Cancelar</button><button pButton type="button" [disabled]="!knowledgeDraft().title.trim() || !knowledgeDraft().answer.trim()" (click)="saveKnowledge()">Agregar al borrador</button></ng-template>
+  <ng-template #footer
+    ><button pButton type="button" text severity="secondary" (click)="editor.set(null)">
+      Cancelar</button
+    ><button
+      pButton
+      type="button"
+      [disabled]="!knowledgeDraft().title.trim() || !knowledgeDraft().answer.trim()"
+      (click)="saveKnowledge()"
+    >
+      Agregar al borrador
+    </button></ng-template
+  >
 </p-dialog>
 
-<p-dialog header="Programa o cotización" [visible]="editor() === 'program'" (visibleChange)="!$event && editor.set(null)" [modal]="true" [draggable]="false" [style]="{ width: 'min(52rem, calc(100vw - 2rem))' }">
-  <div class="grid gap-4 sm:grid-cols-2">
-    <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Nombre</span><input pInputText class="w-full" name="programName" [(ngModel)]="programDraft().name" /></label>
-    <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Destino normalizado</span><input pInputText class="w-full" name="programDestination" [(ngModel)]="programDraft().destination" /></label>
-    <label class="grid gap-2"><span class="text-sm font-semibold text-ink">País</span><input pInputText class="w-full" name="programCountry" [(ngModel)]="programDraft().country" /></label>
-    <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Duración</span><p-inputnumber class="w-full" name="programDays" [(ngModel)]="programDraft().durationDays" suffix=" días" [min]="1" [max]="30" /></label>
-    <label class="grid gap-2 sm:col-span-2"><span class="text-sm font-semibold text-ink">Regiones de origen</span><p-multiselect class="w-full" name="programRegions" [options]="regionOptions" display="chip" [(ngModel)]="programDraft().originRegions" placeholder="Selecciona una o más regiones" /></label>
-    <label class="grid gap-2 sm:col-span-2"><span class="text-sm font-semibold text-ink">Ciudades excepcionales</span><input pInputText class="w-full" name="programCities" [ngModel]="programDraft().originCities.join(', ')" (ngModelChange)="programDraft().originCities = toList($event)" /></label>
-    <label class="grid gap-2 sm:col-span-2"><span class="text-sm font-semibold text-ink">Descripción para el cliente</span><textarea pTextarea rows="4" class="w-full" name="programDescription" [(ngModel)]="programDraft().description"></textarea></label>
-    <label class="grid gap-2 sm:col-span-2"><span class="text-sm font-semibold text-ink">Actividades destacadas</span><input pInputText class="w-full" name="programActivities" [ngModel]="programDraft().activities.join(', ')" (ngModelChange)="programDraft().activities = toList($event)" /></label>
-    <div class="grid gap-2 sm:col-span-2"><span class="text-sm font-semibold text-ink">PDF de programa o cotización</span><div class="flex flex-col gap-3 rounded-2xl border border-dashed border-line/75 bg-canvas p-4 dark:border-line/55 sm:flex-row sm:items-center sm:justify-between"><div class="min-w-0"><p class="truncate font-medium text-ink">{{ programDraft().fileName || 'Ningún PDF cargado' }}</p><p class="truncate text-xs text-muted">{{ programDraft().documentKey || 'Máximo 32 MB · almacenamiento privado' }}</p></div><p-fileupload mode="basic" name="agentProgram" accept="application/pdf,.pdf" chooseLabel="Seleccionar PDF" chooseIcon="icon-[tabler--upload]" [auto]="true" [customUpload]="true" [fileLimit]="1" [maxFileSize]="33554432" [disabled]="uploading()" (uploadHandler)="uploadProgram($event)" /></div></div>
-    <label class="grid gap-2"><span class="text-sm font-semibold text-ink">Orden</span><p-inputnumber class="w-full" name="programOrder" [(ngModel)]="programDraft().sortOrder" [min]="0" [max]="999" /></label>
-    <label class="flex items-center justify-between rounded-xl bg-canvas p-3 text-sm font-semibold text-ink">Programa disponible<p-toggleswitch name="programActive" [(ngModel)]="programDraft().active" /></label>
+<p-dialog
+  header="Política comercial"
+  [visible]="editor() === 'policy'"
+  (visibleChange)="!$event && editor.set(null)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: 'min(42rem, calc(100vw - 2rem))' }"
+>
+  <div class="grid gap-4 text-ink">
+    <label class="grid gap-2"
+      ><span class="text-sm font-semibold text-ink">Nombre</span
+      ><input
+        pInputText
+        class="w-full"
+        maxlength="120"
+        name="policyTitle"
+        [(ngModel)]="policyDraft().title"
+    /></label>
+    <label class="grid gap-2"
+      ><span class="text-sm font-semibold text-ink">Instrucción para el agente</span
+      ><textarea
+        pTextarea
+        rows="6"
+        maxlength="1000"
+        class="w-full"
+        name="policyContent"
+        [(ngModel)]="policyDraft().content"
+      ></textarea
+      ><span class="text-right text-xs text-muted"
+        >{{ policyDraft().content.length }}/1000</span
+      ></label
+    >
+    <div class="grid gap-3 sm:grid-cols-2">
+      <label class="grid gap-2"
+        ><span class="text-sm font-semibold text-ink">Orden</span
+        ><p-inputnumber
+          class="w-full"
+          name="policyOrder"
+          [(ngModel)]="policyDraft().sortOrder"
+          [min]="0"
+          [max]="999" /></label
+      ><label
+        class="flex items-center justify-between rounded-xl border border-line/75 bg-canvas p-3 text-sm font-semibold text-ink dark:border-line/55"
+        ><span>Política activa</span
+        ><span class="flex items-center gap-2"
+          ><p-tag
+            [severity]="policyDraft().active ? 'success' : 'secondary'"
+            [value]="policyDraft().active ? 'Activa' : 'Inactiva'" /><p-toggleswitch
+            aria-label="Política activa"
+            name="policyActive"
+            [(ngModel)]="policyDraft().active" /></span
+      ></label>
+    </div>
   </div>
-  <p-message class="mt-4 block" severity="secondary">La carga utiliza una URL firmada temporal y el PDF queda privado. Las credenciales nunca llegan al navegador.</p-message>
-  <ng-template #footer><button pButton type="button" text severity="secondary" (click)="editor.set(null)">Cancelar</button><button pButton type="button" [disabled]="!programDraft().name.trim() || !programDraft().destination.trim()" (click)="saveProgram()">Agregar al borrador</button></ng-template>
+  <ng-template #footer
+    ><button pButton type="button" text severity="secondary" (click)="editor.set(null)">
+      Cancelar</button
+    ><button
+      pButton
+      type="button"
+      [disabled]="!policyDraft().title.trim() || !policyDraft().content.trim()"
+      (click)="savePolicy()"
+    >
+      Agregar al borrador
+    </button></ng-template
+  >
+</p-dialog>
+
+<p-dialog
+  header="Programa o cotización"
+  [visible]="editor() === 'program'"
+  (visibleChange)="!$event && editor.set(null)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: 'min(52rem, calc(100vw - 2rem))' }"
+>
+  <div class="grid gap-4 sm:grid-cols-2">
+    <label class="grid gap-2"
+      ><span class="text-sm font-semibold text-ink">Nombre</span
+      ><input pInputText class="w-full" name="programName" [(ngModel)]="programDraft().name"
+    /></label>
+    <label class="grid gap-2 sm:col-span-2"
+      ><span class="text-sm font-semibold text-ink">Destinos</span
+      ><p-multiselect
+        class="w-full"
+        name="programDestinations"
+        [options]="destinationOptions"
+        display="chip"
+        [(ngModel)]="programDraft().destinations"
+        placeholder="Selecciona uno o más destinos"
+    /></label>
+    <label class="grid gap-2"
+      ><span class="text-sm font-semibold text-ink">País</span
+      ><input pInputText class="w-full" name="programCountry" [(ngModel)]="programDraft().country"
+    /></label>
+    <label class="grid gap-2"
+      ><span class="text-sm font-semibold text-ink">Duración</span
+      ><p-inputnumber
+        class="w-full"
+        name="programDays"
+        [(ngModel)]="programDraft().durationDays"
+        suffix=" días"
+        [min]="0"
+        [max]="30"
+      /><span class="text-xs text-muted">Usa 0 cuando esté pendiente de completar.</span></label
+    >
+    <label class="grid gap-2 sm:col-span-2"
+      ><span class="text-sm font-semibold text-ink">Regiones de origen</span
+      ><p-multiselect
+        class="w-full"
+        name="programRegions"
+        [options]="regionOptions"
+        display="chip"
+        [(ngModel)]="programDraft().originRegions"
+        placeholder="Selecciona una o más regiones"
+    /></label>
+    <label class="grid gap-2 sm:col-span-2"
+      ><span class="text-sm font-semibold text-ink">Ciudades excepcionales</span
+      ><input
+        pInputText
+        class="w-full"
+        name="programCities"
+        [ngModel]="programDraft().originCities.join(', ')"
+        (ngModelChange)="programDraft().originCities = toList($event)"
+      /><span class="text-xs text-muted"
+        >Debes indicar al menos una región o una ciudad excepcional para evitar cruces de
+        cotizaciones.</span
+      ></label
+    >
+    <label class="grid gap-2 sm:col-span-2"
+      ><span class="text-sm font-semibold text-ink">Descripción para el cliente</span
+      ><textarea
+        pTextarea
+        rows="4"
+        class="w-full"
+        name="programDescription"
+        [(ngModel)]="programDraft().description"
+      ></textarea>
+    </label>
+    <label class="grid gap-2 sm:col-span-2"
+      ><span class="text-sm font-semibold text-ink">Actividades destacadas</span
+      ><input
+        pInputText
+        class="w-full"
+        name="programActivities"
+        [ngModel]="programDraft().activities.join(', ')"
+        (ngModelChange)="programDraft().activities = toList($event)"
+    /></label>
+    <div class="grid gap-2 sm:col-span-2">
+      <span class="text-sm font-semibold text-ink">PDF de programa o cotización</span>
+      <div
+        class="flex flex-col gap-3 rounded-2xl border border-dashed border-line/75 bg-canvas p-4 dark:border-line/55 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div class="min-w-0">
+          <p class="truncate font-medium text-ink">
+            {{ programDraft().fileName || 'Ningún PDF cargado' }}
+          </p>
+          <p class="truncate text-xs text-muted">
+            {{ programDraft().documentKey || 'Máximo 32 MB · almacenamiento privado' }}
+          </p>
+        </div>
+        <p-fileupload
+          mode="basic"
+          name="agentProgram"
+          accept="application/pdf,.pdf"
+          chooseLabel="Seleccionar PDF"
+          chooseIcon="icon-[tabler--upload]"
+          [auto]="true"
+          [customUpload]="true"
+          [fileLimit]="1"
+          [maxFileSize]="33554432"
+          [disabled]="uploading()"
+          (uploadHandler)="uploadProgram($event)"
+        />
+      </div>
+    </div>
+    <label class="grid gap-2"
+      ><span class="text-sm font-semibold text-ink">Orden</span
+      ><p-inputnumber
+        class="w-full"
+        name="programOrder"
+        [(ngModel)]="programDraft().sortOrder"
+        [min]="0"
+        [max]="999"
+    /></label>
+    <label
+      class="flex items-center justify-between rounded-xl bg-canvas p-3 text-sm font-semibold text-ink"
+      >Programa disponible<p-toggleswitch name="programActive" [(ngModel)]="programDraft().active"
+    /></label>
+  </div>
+  <p-message class="mt-4 block" severity="secondary"
+    >La carga utiliza una URL firmada temporal y el PDF queda privado. Las credenciales nunca llegan
+    al navegador.</p-message
+  >
+  <ng-template #footer
+    ><button pButton type="button" text severity="secondary" (click)="editor.set(null)">
+      Cancelar</button
+    ><button
+      pButton
+      type="button"
+      [disabled]="
+        !programDraft().name.trim() ||
+        !programDraft().destinations?.length ||
+        (!programDraft().originRegions.length && !programDraft().originCities.length) ||
+        (programDraft().active && !programDraft().documentKey.trim())
+      "
+      (click)="saveProgram()"
+    >
+      Agregar al borrador
+    </button></ng-template
+  >
 </p-dialog>

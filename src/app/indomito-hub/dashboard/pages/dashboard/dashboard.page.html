@@ -148,4 +148,188 @@
       </article>
     </section>
   }
+
+  <section
+    aria-labelledby="operational-metrics-title"
+    [attr.aria-busy]="operationalLoading()"
+    class="grid gap-4"
+  >
+    <div>
+      <p class="text-xs font-bold uppercase tracking-[.18em] text-muted">Operación</p>
+      <h2 id="operational-metrics-title" class="mt-1 text-xl font-semibold">
+        Agente IA y consumo AWS
+      </h2>
+      <p class="mt-1 text-sm text-muted">
+        Consumo mensual del agente y estado de la cuenta AWS asociada al proyecto.
+      </p>
+    </div>
+
+    @if (operationalError()) {
+      <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+        <p-message severity="warn">{{ operationalError() }}</p-message>
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          outlined
+          (click)="loadOperationalMetrics()"
+        >
+          Reintentar
+        </button>
+      </div>
+    }
+
+    @if (operationalLoading() && !operationalMetrics()) {
+      <div role="status" aria-live="polite" class="contents">
+        <span class="sr-only">Cargando métricas operacionales…</span>
+        <div aria-hidden="true" class="grid gap-4 md:grid-cols-3">
+          @for (item of [1, 2, 3]; track item) {
+            <article class="app-panel p-5">
+              <p-skeleton width="58%" height="0.875rem" />
+              <p-skeleton width="44%" height="2.25rem" styleClass="mt-3" />
+              <p-skeleton width="74%" height="0.75rem" styleClass="mt-2" />
+            </article>
+          }
+        </div>
+        <article aria-hidden="true" class="app-panel p-5">
+          <p-skeleton width="12rem" height="1rem" />
+          <div class="mt-5 grid gap-4 md:grid-cols-2">
+            @for (item of [1, 2, 3, 4]; track item) {
+              <div>
+                <p-skeleton width="70%" height="0.875rem" /><p-skeleton
+                  width="100%"
+                  height="0.5rem"
+                  styleClass="mt-3"
+                />
+              </div>
+            }
+          </div>
+        </article>
+      </div>
+    } @else if (operationalMetrics(); as metrics) {
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="app-panel p-5">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-sm text-muted">Tokens del agente</p>
+              <p class="mt-2 text-3xl font-semibold">{{ metrics.agent.totalTokens | number }}</p>
+            </div>
+            <span
+              class="icon-[tabler--sparkles] size-7 text-brand-active"
+              aria-hidden="true"
+            ></span>
+          </div>
+          <p class="mt-2 text-xs text-muted">
+            {{ metrics.agent.calls | number }} llamadas ·
+            {{ metrics.agent.inputTokens | number }} entrada ·
+            {{ metrics.agent.outputTokens | number }} salida
+          </p>
+        </article>
+        <article class="app-panel p-5">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-sm text-muted">Costo AWS del mes</p>
+              <p class="mt-2 text-3xl font-semibold">
+                {{
+                  metrics.aws.cost.amount | currency: metrics.aws.cost.currency : 'symbol' : '1.2-4'
+                }}
+              </p>
+            </div>
+            <span
+              class="icon-[tabler--cloud-dollar] size-7 text-brand-active"
+              aria-hidden="true"
+            ></span>
+          </div>
+          <p class="mt-2 text-xs text-muted">
+            Cuenta AWS · {{ metrics.aws.cost.estimated ? 'Dato estimado' : 'Dato cerrado' }} ·
+            actualización diaria
+          </p>
+        </article>
+        <article class="app-panel p-5">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-sm text-muted">Estado Free Tier</p>
+              <p class="mt-2 text-3xl font-semibold">{{ metrics.aws.freeTier.length }}</p>
+            </div>
+            <span
+              class="icon-[tabler--shield-check] size-7 text-brand-active"
+              aria-hidden="true"
+            ></span>
+          </div>
+          <div class="mt-2 flex flex-wrap gap-2">
+            <p-tag severity="success" [value]="metrics.aws.safe + ' seguras'" /><p-tag
+              severity="warn"
+              [value]="metrics.aws.warning + ' en alerta'"
+            /><p-tag severity="danger" [value]="metrics.aws.exceeded + ' excedidas'" />
+          </div>
+        </article>
+      </div>
+
+      <article class="app-panel p-5">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h3 class="font-semibold">Detalle del Free Tier</h3>
+            <p class="mt-1 text-sm text-muted">
+              Se prioriza el mayor valor entre el consumo actual y el pronóstico mensual.
+            </p>
+          </div>
+          @if (metrics.aws.fetchedAt) {
+            <span class="text-xs text-muted"
+              >Actualizado {{ metrics.aws.fetchedAt | date: 'dd/MM/yyyy HH:mm' }}</span
+            >
+          }
+        </div>
+        @if (metrics.aws.warningText) {
+          <p-message styleClass="mt-4" severity="warn">{{ metrics.aws.warningText }}</p-message>
+        }
+        @if (!metrics.aws.available) {
+          <p class="mt-5 text-sm text-muted">
+            AWS no entregó datos de consumo en esta actualización.
+          </p>
+        } @else if (metrics.aws.freeTier.length === 0) {
+          <p class="mt-5 text-sm text-muted">
+            La cuenta no reporta ofertas Free Tier activas para este período.
+          </p>
+        } @else {
+          <div class="mt-5 grid gap-5 md:grid-cols-2">
+            @for (item of metrics.aws.freeTier; track item.service + item.usageType) {
+              <div class="min-w-0">
+                <div class="mb-2 flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="truncate text-sm font-semibold">{{ item.service }}</p>
+                    <p class="truncate text-xs text-muted">{{ item.usageType }}</p>
+                  </div>
+                  <p-tag
+                    [severity]="
+                      item.status === 'exceeded'
+                        ? 'danger'
+                        : item.status === 'warning'
+                          ? 'warn'
+                          : 'success'
+                    "
+                    [value]="
+                      item.status === 'exceeded'
+                        ? 'Excedido'
+                        : item.status === 'warning'
+                          ? 'Alerta'
+                          : 'Seguro'
+                    "
+                  />
+                </div>
+                <p-progressbar
+                  [value]="freeTierValue(item)"
+                  [showValue]="false"
+                  [style]="{ height: '7px' }"
+                />
+                <p class="mt-2 text-xs text-muted">
+                  {{ item.actual | number: '1.0-2' }} de {{ item.limit | number: '1.0-2' }}
+                  {{ item.unit }} · pronóstico {{ item.forecastUtilization | number: '1.0-1' }}%
+                </p>
+              </div>
+            }
+          </div>
+        }
+      </article>
+    }
+  </section>
 </main>

@@ -35,6 +35,14 @@ export interface AgentPolicies {
   fallbackResponse: string;
 }
 
+export interface AgentCommercialPolicy {
+  id: string;
+  title: string;
+  content: string;
+  active: boolean;
+  sortOrder: number;
+}
+
 export interface AgentKnowledgeEntry {
   id: string;
   title: string;
@@ -50,6 +58,7 @@ export interface AgentProgram {
   id: string;
   name: string;
   destination: string;
+  destinations?: string[];
   country: string;
   originRegions: string[];
   originCities: string[];
@@ -66,6 +75,7 @@ export interface AgentManagedConfig {
   personality: AgentPersonality;
   generation: AgentGenerationSettings;
   policies: AgentPolicies;
+  commercialPolicies: AgentCommercialPolicy[];
   knowledge: AgentKnowledgeEntry[];
   programs: AgentProgram[];
 }
