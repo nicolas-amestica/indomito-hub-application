@@ -12,11 +12,15 @@
         <p class="mt-2 max-w-3xl text-sm text-white/75">Administra personalidad, respuestas, programas y parámetros operativos. Guardar crea un borrador; publicar activa los cambios.</p>
       </div>
       <div class="flex flex-wrap gap-2">
-        <button pButton type="button" severity="secondary" outlined [disabled]="loading() || saving()" [loading]="saving()" (click)="save()"><span class="icon-[tabler--device-floppy]" aria-hidden="true"></span>Guardar borrador</button>
-        <button pButton type="button" class="bg-brand! text-night!" [disabled]="loading() || publishing()" [loading]="publishing()" (click)="publish()"><span class="icon-[tabler--rocket]" aria-hidden="true"></span>Publicar</button>
+        <button pButton type="button" severity="secondary" outlined [disabled]="loading() || !form() || saving()" [loading]="saving()" (click)="save()"><span class="icon-[tabler--device-floppy]" aria-hidden="true"></span>Guardar borrador</button>
+        <button pButton type="button" class="bg-brand! text-night!" [disabled]="loading() || !form() || publishing()" [loading]="publishing()" (click)="publish()"><span class="icon-[tabler--rocket]" aria-hidden="true"></span>Publicar</button>
       </div>
     </div>
   </header>
+
+  @if (error()) {
+    <div class="p-4 sm:p-6"><p-message severity="error" closable (onClose)="error.set('')">{{ error() }}</p-message></div>
+  }
 
   @if (loading()) {
     <div class="grid gap-4 p-6"><p-progressbar mode="indeterminate" [style]="{ height: '6px' }" /><p class="text-sm text-muted">Cargando configuración…</p></div>
@@ -37,7 +41,6 @@
     </div>
 
     <div class="p-3 sm:p-6">
-      @if (error()) { <p-message severity="error" closable (onClose)="error.set('')">{{ error() }}</p-message> }
       @if (notice()) { <p-message severity="success" closable (onClose)="notice.set('')">{{ notice() }}</p-message> }
 
       <p-tabs value="personality" scrollable>
