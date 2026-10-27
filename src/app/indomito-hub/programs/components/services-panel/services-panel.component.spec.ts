@@ -54,7 +54,6 @@ describe('ServicesPanelComponent', () => {
       id: services.at(0).controls.id.value,
       name: 'Hotel',
       chargeType: 'per_passenger_night',
-      onlyPayingPassengers: true,
       unitPrice: 42.5,
       currency: 'USD',
     });
@@ -108,36 +107,6 @@ describe('ServicesPanelComponent', () => {
     ]);
   });
 
-  it('ofrece solo pagantes marcado por defecto para cobros por pasajero', async () => {
-    const { fixture, services } = createPanel();
-    const row = services.at(0);
-    const component = fixture.componentInstance as unknown as {
-      syncOnlyPayingPassengers: (service: typeof row) => void;
-    };
-
-    expect(row.controls.onlyPayingPassengers.disabled).toBe(true);
-
-    row.controls.chargeType.setValue('per_passenger');
-    component.syncOnlyPayingPassengers(row);
-    fixture.detectChanges();
-    await fixture.whenStable();
-    const host = fixture.nativeElement as HTMLElement;
-    const checkbox = host.querySelector<HTMLInputElement>('#service-0-only-paying-passengers');
-
-    expect(row.controls.onlyPayingPassengers.value).toBe(true);
-    expect(row.controls.onlyPayingPassengers.enabled).toBe(true);
-    expect(checkbox?.checked).toBe(true);
-    expect(checkbox?.disabled).toBe(false);
-    expect(host.textContent).toContain('No considera pasajeros liberados en cobros por pasajero.');
-
-    row.controls.chargeType.setValue('fixed');
-    component.syncOnlyPayingPassengers(row);
-    fixture.detectChanges();
-    await fixture.whenStable();
-    expect(row.controls.onlyPayingPassengers.disabled).toBe(true);
-    expect(checkbox?.disabled).toBe(true);
-  });
-
   it('parchea los cuatro campos al elegir un servicio del catálogo', () => {
     const { fixture, services } = createPanel();
     const item = {
@@ -166,7 +135,6 @@ describe('ServicesPanelComponent', () => {
       currency: 'USD',
       chargeType: 'per_passenger_day',
     });
-    expect(services.at(0).controls.onlyPayingPassengers.enabled).toBe(true);
   });
 
   it('rechaza precios decimales en CLP y muestra un error asociado', async () => {

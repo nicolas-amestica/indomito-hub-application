@@ -30,14 +30,11 @@ export function favoriteContentFromProgram(program: Program): FavoriteContent {
       dailyPrice,
       currency,
     })),
-    services: program.services.map(
-      ({ name, chargeType, onlyPayingPassengers, unitPrice, currency }) => ({
-        name,
-        chargeType,
-        onlyPayingPassengers,
-        unitPrice,
-        currency,
-      }),
-    ),
+    services: program.services.map(({ name, chargeType, unitPrice, currency }) => ({
+      name,
+      chargeType,
+      unitPrice,
+      currency,
+    })),
   };
 }

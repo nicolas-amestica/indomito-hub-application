@@ -52,10 +52,7 @@ export interface FavoriteContent {
   /** Totales y porcentajes efectivos usados al guardar el programa. */
   totals?: ProgramTotals;
   crews: Pick<CrewMember, 'name' | 'documentId' | 'dailyPrice' | 'currency'>[];
-  services: Array<
-    Pick<ProgramService, 'name' | 'chargeType' | 'unitPrice' | 'currency'> &
-      Partial<Pick<ProgramService, 'onlyPayingPassengers'>>
-  >;
+  services: Pick<ProgramService, 'name' | 'chargeType' | 'unitPrice' | 'currency'>[];
 }
 
 /** Cuerpo compartido por la creación y la actualización de un favorito. */

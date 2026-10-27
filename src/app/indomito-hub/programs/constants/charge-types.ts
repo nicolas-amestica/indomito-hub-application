@@ -3,20 +3,7 @@
  * formulario y para `typeLabel` de `SummaryRow`. Las etiquetas son las del
  * Requirement 6.5, textuales.
  */
-import type { ChargeType, PassengerChargeType } from '../interfaces/program.interface';
-
-const PASSENGER_CHARGE_TYPES: readonly PassengerChargeType[] = [
-  'per_passenger',
-  'per_passenger_night',
-  'per_passenger_day',
-];
-
-/** Indica si un tipo de cobro utiliza una cantidad de pasajeros. */
-export function isPassengerChargeType(
-  chargeType: ChargeType | null,
-): chargeType is PassengerChargeType {
-  return chargeType !== null && PASSENGER_CHARGE_TYPES.includes(chargeType as PassengerChargeType);
-}
+import type { ChargeType } from '../interfaces/program.interface';
 
 /** Etiqueta en español de cada tipo de cobro. Requirement 6.5. */
 export const CHARGE_TYPE_LABELS: Record<ChargeType, string> = {

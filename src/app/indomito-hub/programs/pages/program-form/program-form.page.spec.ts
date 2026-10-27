@@ -762,7 +762,6 @@ function completeValidForm(store: ProgramFormStore, name = 'Brasil 2027'): void 
     id: service.controls.id.value,
     name: 'Hotel',
     chargeType: 'per_passenger_night',
-    onlyPayingPassengers: true,
     unitPrice: 55,
     currency: 'USD',
   });

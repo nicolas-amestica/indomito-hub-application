@@ -45,8 +45,6 @@ describe('buildProgramForm', () => {
     expect(form.controls.services.length).toBe(1);
     expect(form.controls.crews.at(0).controls.id.value).toBe('row-1');
     expect(form.controls.services.at(0).controls.id.value).toBe('row-2');
-    expect(form.controls.services.at(0).controls.onlyPayingPassengers.value).toBe(true);
-    expect(form.controls.services.at(0).controls.onlyPayingPassengers.disabled).toBe(true);
   });
 
   it('mantiene la descripción opcional', () => {

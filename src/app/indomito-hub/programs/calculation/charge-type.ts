@@ -12,6 +12,7 @@
  * Funciones puras, sin dependencias de Angular.
  */
 
+import type { ChargeType } from '../interfaces/program.interface';
 import type { CrewInput, ScheduleInput, ServiceInput } from '../types/calculation.types';
 
 /**
@@ -32,27 +33,23 @@ export function isCrewItem(item: ChargeableItem): item is CrewInput {
 /**
  * Multiplicador que cada tipo de cobro aplica sobre el precio unitario.
  *
- * Los tipos por pasajero usan pagantes o pasajeros totales según la decisión
- * explícita del servicio. Los tipos fijos y por día no dependen de esa opción.
+ * El multiplicador de pasajeros es `totalPassengers`, **con los liberados
+ * incluidos** (Requirement 6.15). Un pasajero liberado igual duerme en el hotel
+ * y entra al parque: lo que no hace es pagar, y de eso se ocupa el reparto por
+ * persona, no esta fórmula.
  */
-function serviceMultiplier(item: ServiceInput, schedule: ScheduleInput): number {
-  const passengerCount =
-    item.onlyPayingPassengers === true
-      ? Math.max(1, schedule.totalPassengers - schedule.freePassengers)
-      : schedule.totalPassengers;
-
-  const { chargeType } = item;
+function serviceMultiplier(chargeType: ChargeType, schedule: ScheduleInput): number {
   switch (chargeType) {
     case 'fixed':
       return 1;
     case 'per_day':
       return schedule.totalDays;
     case 'per_passenger':
-      return passengerCount;
+      return schedule.totalPassengers;
     case 'per_passenger_night':
-      return passengerCount * schedule.totalNights;
+      return schedule.totalPassengers * schedule.totalNights;
     case 'per_passenger_day':
-      return passengerCount * schedule.totalDays;
+      return schedule.totalPassengers * schedule.totalDays;
     default: {
       // Un sexto tipo de cobro deja de compilar acá hasta que se le dé fórmula.
       const unsupported: never = chargeType;
@@ -70,12 +67,9 @@ function serviceMultiplier(item: ServiceInput, schedule: ScheduleInput): number 
  * | Tripulante | `dailyPrice × totalDays` |
  * | `fixed` | `unitPrice` |
  * | `per_day` | `unitPrice × totalDays` |
- * | `per_passenger` | `unitPrice × passengerCount` |
- * | `per_passenger_night` | `unitPrice × passengerCount × totalNights` |
- * | `per_passenger_day` | `unitPrice × passengerCount × totalDays` |
- *
- * `passengerCount` usa solo pagantes cuando `onlyPayingPassengers` es verdadero;
- * en caso contrario conserva el total de pasajeros.
+ * | `per_passenger` | `unitPrice × totalPassengers` |
+ * | `per_passenger_night` | `unitPrice × totalPassengers × totalNights` |
+ * | `per_passenger_day` | `unitPrice × totalPassengers × totalDays` |
  *
  * Sin redondeo: el monto base conserva los decimales del precio unitario, porque
  * un servicio en USD se cotiza con centavos y redondear acá adelantaría una
@@ -94,5 +88,5 @@ export function baseAmount(item: ChargeableItem, schedule: ScheduleInput): numbe
     // Requirement 5.8: el tripulante cobra por día de programa, no por pasajero.
     return item.dailyPrice * schedule.totalDays;
   }
-  return item.unitPrice * serviceMultiplier(item, schedule);
+  return item.unitPrice * serviceMultiplier(item.chargeType, schedule);
 }

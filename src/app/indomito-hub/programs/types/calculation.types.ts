@@ -74,8 +74,6 @@ export interface CrewInput extends ItemIdentity {
 export interface ServiceInput extends ItemIdentity {
   name: string;
   chargeType: ChargeType;
-  /** El formulario nuevo lo envía verdadero; la omisión conserva el cálculo histórico. */
-  onlyPayingPassengers?: boolean;
   unitPrice: number;
   currency: CurrencyCode;
 }

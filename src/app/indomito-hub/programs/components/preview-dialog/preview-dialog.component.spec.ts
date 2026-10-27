@@ -55,7 +55,6 @@ const PROGRAM: Program = {
     {
       name: 'Hotel',
       chargeType: 'per_passenger_night',
-      onlyPayingPassengers: true,
       unitPrice: 55,
       currency: 'USD',
       baseAmount: 9_900,

@@ -13,11 +13,7 @@
  * Ver la sección "Motor de cálculo" de `design.md`.
  */
 
-import {
-  CHARGE_TYPE_LABELS,
-  CREW_TYPE_LABEL,
-  isPassengerChargeType,
-} from '../constants/charge-types';
+import { CHARGE_TYPE_LABELS, CREW_TYPE_LABEL } from '../constants/charge-types';
 import type {
   CurrencyCode,
   EffectiveRates,
@@ -281,11 +277,7 @@ function buildRow(
     : {
         kind: 'service' as const,
         chargeType: item.chargeType,
-        typeLabel: `${CHARGE_TYPE_LABELS[item.chargeType]}${
-          isPassengerChargeType(item.chargeType) && item.onlyPayingPassengers === true
-            ? ' · solo pagantes'
-            : ''
-        }`,
+        typeLabel: CHARGE_TYPE_LABELS[item.chargeType],
         unitPrice: item.unitPrice,
       };
 

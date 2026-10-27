@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
 import { ReactiveFormsModule, type AbstractControl } from '@angular/forms';
 import { ButtonDirective } from 'primeng/button';
-import { Checkbox } from 'primeng/checkbox';
 import { InputNumber } from 'primeng/inputnumber';
 import { Select } from 'primeng/select';
 import {
@@ -10,7 +9,7 @@ import {
   type AutoCompleteSelectEvent,
 } from 'primeng/autocomplete';
 
-import { CHARGE_TYPE_OPTIONS, isPassengerChargeType } from '../../constants/charge-types';
+import { CHARGE_TYPE_OPTIONS } from '../../constants/charge-types';
 import { CURRENCY_OPTIONS } from '../../constants/currency-options';
 import { FIELD_LIMITS } from '../../constants/field-limits';
 import {
@@ -24,7 +23,7 @@ import type { ServiceCatalogItem } from '../../../../shared/service-catalog/inte
 /** Panel presentacional de la lista dinámica de servicios. */
 @Component({
   selector: 'app-services-panel',
-  imports: [AutoComplete, ButtonDirective, Checkbox, InputNumber, ReactiveFormsModule, Select],
+  imports: [AutoComplete, ButtonDirective, InputNumber, ReactiveFormsModule, Select],
   templateUrl: './services-panel.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -68,17 +67,7 @@ export class ServicesPanelComponent {
       unitPrice: item.price,
       currency: item.currency,
     });
-    this.syncOnlyPayingPassengers(row);
     row.markAsDirty();
-  }
-
-  protected syncOnlyPayingPassengers(row: ServiceRowGroup): void {
-    if (isPassengerChargeType(row.controls.chargeType.value)) {
-      row.controls.onlyPayingPassengers.enable({ emitEvent: false });
-      return;
-    }
-
-    row.controls.onlyPayingPassengers.disable({ emitEvent: false });
   }
 
   protected priceInvalid(row: ServiceRowGroup): boolean {
