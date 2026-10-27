@@ -249,7 +249,7 @@
           <div class="flex items-start justify-between gap-3">
             <div>
               <p class="text-sm text-muted">Estado Free Tier</p>
-              <p class="mt-2 text-3xl font-semibold">{{ metrics.aws.freeTier.length }}</p>
+              <p class="mt-2 text-3xl font-semibold">{{ metrics.aws.freeTier?.length ?? 0 }}</p>
             </div>
             <span
               class="icon-[tabler--shield-check] size-7 text-brand-active"
@@ -286,13 +286,13 @@
           <p class="mt-5 text-sm text-muted">
             AWS no entregó datos de consumo en esta actualización.
           </p>
-        } @else if (metrics.aws.freeTier.length === 0) {
+        } @else if (!metrics.aws.freeTier?.length) {
           <p class="mt-5 text-sm text-muted">
             La cuenta no reporta ofertas Free Tier activas para este período.
           </p>
         } @else {
           <div class="mt-5 grid gap-5 md:grid-cols-2">
-            @for (item of metrics.aws.freeTier; track item.service + item.usageType) {
+            @for (item of metrics.aws.freeTier ?? []; track item.service + item.usageType) {
               <div class="min-w-0">
                 <div class="mb-2 flex items-start justify-between gap-3">
                   <div class="min-w-0">

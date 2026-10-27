@@ -25,6 +25,7 @@
           type="button"
           severity="secondary"
           outlined
+          class="border-white/30! text-white! hover:border-white/45! hover:bg-white/10!"
           [disabled]="loading() || !form() || saving()"
           [loading]="saving()"
           (click)="save()"
@@ -125,22 +126,22 @@
 
       <p-tabs value="personality" scrollable>
         <p-tablist>
-          <p-tab value="personality"
+          <p-tab value="personality" class="text-ink!"
             ><span class="icon-[tabler--sparkles] mr-2" aria-hidden="true"></span
             >Personalidad</p-tab
           >
-          <p-tab value="knowledge"
+          <p-tab value="knowledge" class="text-ink!"
             ><span class="icon-[tabler--book-2] mr-2" aria-hidden="true"></span>Respuestas</p-tab
           >
-          <p-tab value="programs"
+          <p-tab value="programs" class="text-ink!"
             ><span class="icon-[tabler--file-description] mr-2" aria-hidden="true"></span
             >Programas</p-tab
           >
-          <p-tab value="operation"
+          <p-tab value="operation" class="text-ink!"
             ><span class="icon-[tabler--adjustments-horizontal] mr-2" aria-hidden="true"></span
             >Operación</p-tab
           >
-          <p-tab value="history"
+          <p-tab value="history" class="text-ink!"
             ><span class="icon-[tabler--history] mr-2" aria-hidden="true"></span>Historial</p-tab
           >
         </p-tablist>
@@ -611,77 +612,57 @@
                 <h4 class="mb-3 font-semibold text-ink">Capacidades operativas</h4>
                 <div class="grid gap-3 md:grid-cols-2">
                   <label
-                    class="flex items-center justify-between gap-4 rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55"
-                    ><span
+                    class="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55"
+                    ><span class="min-w-0"
                       ><span class="block font-semibold text-ink">Ofrecer reuniones</span
                       ><span class="text-sm text-muted"
                         >Solo cuando ayuden a una intención concreta.</span
                       ></span
-                    ><span class="flex shrink-0 items-center gap-2"
-                      ><p-tag
-                        [severity]="config.policies.offerMeetings ? 'success' : 'secondary'"
-                        [value]="
-                          config.policies.offerMeetings ? 'Activa' : 'Inactiva'
-                        " /><p-toggleswitch
-                        aria-label="Ofrecer reuniones"
-                        name="offerMeetings"
-                        [(ngModel)]="config.policies.offerMeetings" /></span
-                  ></label>
+                    ><p-toggleswitch
+                      class="shrink-0"
+                      aria-label="Ofrecer reuniones"
+                      name="offerMeetings"
+                      [(ngModel)]="config.policies.offerMeetings"
+                  /></label>
                   <label
-                    class="flex items-center justify-between gap-4 rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55"
-                    ><span
+                    class="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55"
+                    ><span class="min-w-0"
                       ><span class="block font-semibold text-ink">Derivación humana</span
                       ><span class="text-sm text-muted"
                         >Habilita el traspaso al equipo interno.</span
                       ></span
-                    ><span class="flex shrink-0 items-center gap-2"
-                      ><p-tag
-                        [severity]="config.policies.humanHandoffEnabled ? 'success' : 'secondary'"
-                        [value]="
-                          config.policies.humanHandoffEnabled ? 'Activa' : 'Inactiva'
-                        " /><p-toggleswitch
-                        aria-label="Derivación humana"
-                        name="humanHandoff"
-                        [(ngModel)]="config.policies.humanHandoffEnabled" /></span
-                  ></label>
+                    ><p-toggleswitch
+                      class="shrink-0"
+                      aria-label="Derivación humana"
+                      name="humanHandoff"
+                      [(ngModel)]="config.policies.humanHandoffEnabled"
+                  /></label>
                   <label
-                    class="flex items-center justify-between gap-4 rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55"
-                    ><span
+                    class="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55"
+                    ><span class="min-w-0"
                       ><span class="block font-semibold text-ink">Explicar diferencias</span
                       ><span class="text-sm text-muted"
                         >Aclara que actividades y valores varían por programa.</span
                       ></span
-                    ><span class="flex shrink-0 items-center gap-2"
-                      ><p-tag
-                        [severity]="
-                          config.policies.explainProgramDifferences ? 'success' : 'secondary'
-                        "
-                        [value]="
-                          config.policies.explainProgramDifferences ? 'Activa' : 'Inactiva'
-                        " /><p-toggleswitch
-                        aria-label="Explicar diferencias"
-                        name="explainPrograms"
-                        [(ngModel)]="config.policies.explainProgramDifferences" /></span
-                  ></label>
+                    ><p-toggleswitch
+                      class="shrink-0"
+                      aria-label="Explicar diferencias"
+                      name="explainPrograms"
+                      [(ngModel)]="config.policies.explainProgramDifferences"
+                  /></label>
                   <label
-                    class="flex items-center justify-between gap-4 rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55"
-                    ><span
+                    class="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-line/75 bg-canvas p-4 dark:border-line/55"
+                    ><span class="min-w-0"
                       ><span class="block font-semibold text-ink">Adjuntar Sernatur</span
                       ><span class="text-sm text-muted"
                         >Incluye el certificado junto a cotizaciones.</span
                       ></span
-                    ><span class="flex shrink-0 items-center gap-2"
-                      ><p-tag
-                        [severity]="
-                          config.policies.sendSernaturWithQuotations ? 'success' : 'secondary'
-                        "
-                        [value]="
-                          config.policies.sendSernaturWithQuotations ? 'Activa' : 'Inactiva'
-                        " /><p-toggleswitch
-                        aria-label="Adjuntar Sernatur"
-                        name="sendSernatur"
-                        [(ngModel)]="config.policies.sendSernaturWithQuotations" /></span
-                  ></label>
+                    ><p-toggleswitch
+                      class="shrink-0"
+                      aria-label="Adjuntar Sernatur"
+                      name="sendSernatur"
+                      [(ngModel)]="config.policies.sendSernaturWithQuotations"
+                  /></label>
                 </div>
                 @if (config.policies.humanHandoffEnabled) {
                   <div
@@ -696,31 +677,26 @@
                     </div>
                     <div class="grid gap-4 lg:grid-cols-2">
                       <div
-                        class="grid gap-3 rounded-xl border border-line/75 bg-surface p-4 dark:border-line/55"
+                        class="grid min-w-0 gap-3 overflow-hidden rounded-xl border border-line/75 bg-surface p-4 dark:border-line/55"
                       >
-                        <label class="flex items-center justify-between gap-4"
-                          ><span
+                        <label
+                          class="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3"
+                          ><span class="min-w-0"
                             ><span class="block font-semibold text-ink">WhatsApp interno</span
                             ><span class="text-sm text-muted"
                               >Envía la plantilla aprobada con el detalle.</span
                             ></span
-                          ><span class="flex shrink-0 items-center gap-2"
-                            ><p-tag
-                              [severity]="
-                                config.policies.handoffWhatsAppEnabled ? 'success' : 'secondary'
-                              "
-                              [value]="
-                                config.policies.handoffWhatsAppEnabled ? 'Activo' : 'Inactivo'
-                              " /><p-toggleswitch
-                              aria-label="Notificar por WhatsApp"
-                              name="handoffWhatsAppEnabled"
-                              [(ngModel)]="config.policies.handoffWhatsAppEnabled" /></span
-                        ></label>
-                        <label class="grid gap-2"
+                          ><p-toggleswitch
+                            class="shrink-0"
+                            aria-label="Notificar por WhatsApp"
+                            name="handoffWhatsAppEnabled"
+                            [(ngModel)]="config.policies.handoffWhatsAppEnabled"
+                        /></label>
+                        <label class="grid min-w-0 gap-2"
                           ><span class="text-sm font-semibold text-ink">Número de destino</span
                           ><input
                             pInputText
-                            class="w-full"
+                            class="min-w-0 max-w-full w-full"
                             type="tel"
                             inputmode="tel"
                             autocomplete="tel"
@@ -734,31 +710,26 @@
                         >
                       </div>
                       <div
-                        class="grid gap-3 rounded-xl border border-line/75 bg-surface p-4 dark:border-line/55"
+                        class="grid min-w-0 gap-3 overflow-hidden rounded-xl border border-line/75 bg-surface p-4 dark:border-line/55"
                       >
-                        <label class="flex items-center justify-between gap-4"
-                          ><span
+                        <label
+                          class="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3"
+                          ><span class="min-w-0"
                             ><span class="block font-semibold text-ink">Respaldo por correo</span
                             ><span class="text-sm text-muted"
                               >Utiliza el remitente seguro configurado.</span
                             ></span
-                          ><span class="flex shrink-0 items-center gap-2"
-                            ><p-tag
-                              [severity]="
-                                config.policies.handoffEmailEnabled ? 'success' : 'secondary'
-                              "
-                              [value]="
-                                config.policies.handoffEmailEnabled ? 'Activo' : 'Inactivo'
-                              " /><p-toggleswitch
-                              aria-label="Notificar por correo"
-                              name="handoffEmailEnabled"
-                              [(ngModel)]="config.policies.handoffEmailEnabled" /></span
-                        ></label>
-                        <label class="grid gap-2"
+                          ><p-toggleswitch
+                            class="shrink-0"
+                            aria-label="Notificar por correo"
+                            name="handoffEmailEnabled"
+                            [(ngModel)]="config.policies.handoffEmailEnabled"
+                        /></label>
+                        <label class="grid min-w-0 gap-2"
                           ><span class="text-sm font-semibold text-ink">Correo de destino</span
                           ><input
                             pInputText
-                            class="w-full"
+                            class="min-w-0 max-w-full w-full"
                             type="email"
                             autocomplete="email"
                             name="handoffEmail"
@@ -842,7 +813,9 @@
                       <button
                         pButton
                         type="button"
-                        text
+                        outlined
+                        severity="contrast"
+                        class="border-line/75! text-ink! hover:bg-canvas! dark:border-line/55!"
                         [disabled]="publishing()"
                         (click)="restore(version.version)"
                       >
@@ -986,16 +959,14 @@
           [min]="0"
           [max]="999" /></label
       ><label
-        class="flex items-center justify-between rounded-xl border border-line/75 bg-canvas p-3 text-sm font-semibold text-ink dark:border-line/55"
+        class="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-line/75 bg-canvas p-3 text-sm font-semibold text-ink dark:border-line/55"
         ><span>Política activa</span
-        ><span class="flex items-center gap-2"
-          ><p-tag
-            [severity]="policyDraft().active ? 'success' : 'secondary'"
-            [value]="policyDraft().active ? 'Activa' : 'Inactiva'" /><p-toggleswitch
-            aria-label="Política activa"
-            name="policyActive"
-            [(ngModel)]="policyDraft().active" /></span
-      ></label>
+        ><p-toggleswitch
+          class="shrink-0"
+          aria-label="Política activa"
+          name="policyActive"
+          [(ngModel)]="policyDraft().active"
+      /></label>
     </div>
   </div>
   <ng-template #footer

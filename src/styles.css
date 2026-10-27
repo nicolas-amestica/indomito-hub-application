@@ -56,6 +56,13 @@
    funcionan los overrides del bloque `.dark` de abajo. */
 :root {
   --p-button-outlined-contrast-border-color: var(--color-control-border);
+  /* El amarillo institucional queda reservado al indicador activo. Los textos
+     de las pestañas usan el token semantico de tinta para conservar contraste
+     en superficies claras y oscuras. */
+  --p-tabs-tab-color: var(--color-ink);
+  --p-tabs-tab-hover-color: var(--color-ink);
+  --p-tabs-tab-active-color: var(--color-ink);
+  --p-tabs-active-bar-background: var(--color-brand-active);
 }
 
 .dark {

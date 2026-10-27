@@ -11,8 +11,14 @@ export class OperationalMetricsService {
   private readonly url = `${environment.apiUrl}/configuracion-agente/metricas`;
 
   get() {
-    return this.http
-      .get<ApiSuccessEnvelope<OperationalMetrics>>(this.url)
-      .pipe(map(({ data }) => data));
+    return this.http.get<ApiSuccessEnvelope<OperationalMetrics>>(this.url).pipe(
+      map(({ data }) => ({
+        ...data,
+        aws: {
+          ...data.aws,
+          freeTier: Array.isArray(data.aws.freeTier) ? data.aws.freeTier : [],
+        },
+      })),
+    );
   }
 }
