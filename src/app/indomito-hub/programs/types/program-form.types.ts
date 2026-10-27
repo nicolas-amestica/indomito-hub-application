@@ -101,6 +101,7 @@ export interface ServiceRowControls {
   id: FormControl<string>;
   name: FormControl<string>;
   chargeType: FormControl<ChargeType | null>;
+  onlyPayingPassengers: FormControl<boolean>;
   unitPrice: FormControl<number | null>;
   currency: FormControl<CurrencyCode | null>;
 }

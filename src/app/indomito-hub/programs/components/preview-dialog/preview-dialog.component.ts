@@ -5,7 +5,7 @@ import { Dialog } from 'primeng/dialog';
 import { ProgressSpinner } from 'primeng/progressspinner';
 
 import { ClpAmountPipe } from '../../../../shared/formatting/clp-amount.pipe';
-import { CHARGE_TYPE_LABELS } from '../../constants/charge-types';
+import { CHARGE_TYPE_LABELS, isPassengerChargeType } from '../../constants/charge-types';
 import { exchangeRateSourceLabel } from '../../fn/fn-exchange-rate-source';
 import type { EffectiveRates, Program } from '../../interfaces/program.interface';
 import { FallbackRatesNoticeComponent } from '../fallback-rates-notice/fallback-rates-notice.component';
@@ -38,5 +38,6 @@ export class PreviewDialogComponent {
   readonly favoriteRequested = output<void>();
 
   protected readonly chargeTypeLabels = CHARGE_TYPE_LABELS;
+  protected readonly isPassengerChargeType = isPassengerChargeType;
   protected readonly exchangeRateSourceLabel = exchangeRateSourceLabel;
 }

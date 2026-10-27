@@ -15,6 +15,12 @@ export type ChargeType =
   | 'per_day' // Valor por día, independiente de la cantidad de pasajeros
   | 'per_passenger_day'; // Valor por pasajero por día
 
+/** Verdadero para los tipos cuyo monto depende de una cantidad de pasajeros. */
+export type PassengerChargeType = Extract<
+  ChargeType,
+  'per_passenger' | 'per_passenger_night' | 'per_passenger_day'
+>;
+
 /** Monedas soportadas por el cálculo del programa. */
 export type CurrencyCode = 'CLP' | 'USD' | 'BRL';
 
@@ -103,6 +109,8 @@ export interface CrewMember {
 export interface ProgramService {
   name: string;
   chargeType: ChargeType;
+  /** Si es verdadero, los tipos por pasajero excluyen a los liberados. */
+  onlyPayingPassengers: boolean;
   unitPrice: number;
   currency: CurrencyCode;
   /** Derivado según `chargeType`, en su moneda. */

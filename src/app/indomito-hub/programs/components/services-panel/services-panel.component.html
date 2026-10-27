@@ -57,7 +57,10 @@
 
   <div class="flex flex-col gap-4 p-5 sm:p-6" [attr.data-revision]="revision()">
     @for (row of services().controls; track row.controls.id.value; let index = $index) {
-      <article [formGroup]="row" class="rounded-xl border border-line/75 dark:border-line/55 bg-canvas/50 p-4">
+      <article
+        [formGroup]="row"
+        class="rounded-xl border border-line/75 dark:border-line/55 bg-canvas/50 p-4"
+      >
         <div class="mb-4 flex items-center justify-between gap-3">
           <h3 class="text-sm font-semibold text-ink">Servicio {{ index + 1 }}</h3>
           <div class="flex items-center gap-1">
@@ -162,6 +165,7 @@
                 )
               "
               [ariaLabelledBy]="'service-' + index + '-charge-type-label'"
+              (onChange)="syncOnlyPayingPassengers(row)"
             />
             @if (row.controls.chargeType.touched && row.controls.chargeType.invalid) {
               <p [id]="'service-' + index + '-charge-type-error'" class="text-sm text-red-700">
@@ -234,6 +238,25 @@
                 Selecciona una moneda.
               </p>
             }
+          </div>
+
+          <div class="flex flex-col gap-2 sm:col-span-2 lg:col-span-12">
+            <div class="flex items-center gap-2">
+              <p-checkbox
+                [inputId]="'service-' + index + '-only-paying-passengers'"
+                formControlName="onlyPayingPassengers"
+                [binary]="true"
+              />
+              <label
+                [for]="'service-' + index + '-only-paying-passengers'"
+                class="text-sm font-medium text-ink"
+              >
+                Solo pagantes
+              </label>
+            </div>
+            <p class="text-xs text-muted">
+              No considera pasajeros liberados en cobros por pasajero.
+            </p>
           </div>
         </div>
       </article>

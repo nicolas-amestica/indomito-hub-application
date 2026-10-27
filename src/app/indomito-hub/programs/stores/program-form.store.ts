@@ -353,6 +353,7 @@ export class ProgramFormStore {
         return {
           name: service.name.trim(),
           chargeType: service.chargeType!,
+          onlyPayingPassengers: service.onlyPayingPassengers,
           unitPrice: service.unitPrice!,
           currency: service.currency!,
           baseAmount: row.baseAmount,
@@ -458,6 +459,7 @@ function serviceInputs(
         id: value.id,
         name: value.name,
         chargeType: value.chargeType,
+        onlyPayingPassengers: value.onlyPayingPassengers,
         unitPrice: value.unitPrice,
         currency: value.currency,
       },

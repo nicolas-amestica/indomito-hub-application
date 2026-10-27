@@ -8,6 +8,7 @@ import {
   type ValidatorFn,
 } from '@angular/forms';
 
+import { isPassengerChargeType } from '../constants/charge-types';
 import { FIELD_LIMITS } from '../constants/field-limits';
 import type { CatalogOption, DestinationOption } from '../interfaces/catalog.interface';
 import type { ChargeType, CurrencyCode } from '../interfaces/program.interface';
@@ -153,6 +154,13 @@ export function createServiceRow(
         validators: [Validators.required, trimmedRequiredValidator],
       }),
       chargeType: new FormControl<ChargeType | null>(seed.chargeType ?? null, Validators.required),
+      onlyPayingPassengers: new FormControl(
+        {
+          value: seed.onlyPayingPassengers ?? true,
+          disabled: !isPassengerChargeType(seed.chargeType ?? null),
+        },
+        { nonNullable: true },
+      ),
       unitPrice: new FormControl<number | null>(seed.unitPrice ?? null, [
         Validators.required,
         numericRangeValidator(FIELD_LIMITS.itemPrice),

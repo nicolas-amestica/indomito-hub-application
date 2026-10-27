@@ -164,6 +164,7 @@ function programFrom(
     })),
     services: input.services.map((service, index) => ({
       ...service,
+      onlyPayingPassengers: service.onlyPayingPassengers !== false,
       baseAmount: rows[input.crews.length + index].baseAmount,
       amountCLP: rows[input.crews.length + index].amountCLP,
     })),

@@ -63,6 +63,24 @@ describe('baseAmount', () => {
     expect(conLiberados).toBe(sinLiberados);
   });
 
+  it('excluye a los liberados cuando el servicio es solo para pagantes', () => {
+    const khipu = {
+      ...service('per_passenger', 1_000),
+      onlyPayingPassengers: true,
+    };
+
+    expect(baseAmount(khipu, schedule)).toBe(28_000);
+    expect(baseAmount({ ...khipu, onlyPayingPassengers: false }, schedule)).toBe(30_000);
+  });
+
+  it('no altera los tipos de cobro que no dependen de pasajeros', () => {
+    const fixed = service('fixed', 800_000);
+    const perDay = service('per_day', 20_000);
+
+    expect(baseAmount({ ...fixed, onlyPayingPassengers: true }, schedule)).toBe(800_000);
+    expect(baseAmount({ ...perDay, onlyPayingPassengers: true }, schedule)).toBe(100_000);
+  });
+
   it('anula los tipos que dependen de días cuando el rango está invertido', () => {
     const invertido: ScheduleInput = { ...schedule, totalDays: 0, totalNights: 0 };
     expect(baseAmount(crew(50_000), invertido)).toBe(0);

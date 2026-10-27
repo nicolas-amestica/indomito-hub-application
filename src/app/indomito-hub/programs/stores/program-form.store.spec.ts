@@ -97,6 +97,7 @@ function completeCalculationFields(store: ProgramFormStore): void {
     id: form.controls.services.at(0).controls.id.value,
     name: 'Hotel',
     chargeType: 'per_passenger_night',
+    onlyPayingPassengers: true,
     unitPrice: 55,
     currency: 'USD',
   });
@@ -191,7 +192,11 @@ describe('ProgramFormStore', () => {
       departureCity: 'Santiago',
     });
     expect(program?.crews[0]).toMatchObject({ name: 'Coordinador', baseAmount: 315_000 });
-    expect(program?.services[0]).toMatchObject({ name: 'Hotel', baseAmount: 8_250 });
+    expect(program?.services[0]).toMatchObject({
+      name: 'Hotel',
+      onlyPayingPassengers: true,
+      baseAmount: 7_700,
+    });
     expect(program?.totals).toBe(store.totals());
   });
 
