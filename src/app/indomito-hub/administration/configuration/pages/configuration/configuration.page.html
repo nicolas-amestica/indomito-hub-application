@@ -128,4 +128,8 @@
   </section>
 
   <app-meeting-hosts />
+
+  @if (auth.user()?.profileCode === 'ADM') {
+    <app-agent-management />
+  }
 </main>
