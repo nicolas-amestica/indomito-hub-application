@@ -5,8 +5,6 @@ const ALLOWED_ATTACHMENT_TYPES = new Set<InboxMimeType>([
   'application/pdf',
   'image/jpeg',
   'image/png',
-  'image/gif',
-  'image/webp',
   'audio/ogg',
   'audio/aac',
   'audio/mp4',

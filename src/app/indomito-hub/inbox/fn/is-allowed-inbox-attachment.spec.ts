@@ -3,6 +3,8 @@ import { getInboxAttachmentMimeType, isAllowedInboxAttachment } from './is-allow
 describe('isAllowedInboxAttachment', () => {
   it.each([
     { type: 'application/pdf', expected: true },
+    { type: 'image/gif', expected: false },
+    { type: 'image/webp', expected: false },
     { type: 'audio/ogg', expected: true },
     { type: 'audio/mp4', expected: true },
     { type: 'audio/webm', expected: false },

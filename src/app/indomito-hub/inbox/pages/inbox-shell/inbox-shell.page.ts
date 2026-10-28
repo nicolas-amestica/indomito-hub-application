@@ -318,7 +318,7 @@ export class InboxShellPage implements OnInit {
     this.selectedFiles.set(allowed);
     this.attachmentError.set(
       allowed.length !== combined.length
-        ? 'Puedes adjuntar hasta 20 archivos PDF, imágenes, audios o videos MP4 de máximo 7 MiB cada uno.'
+        ? 'Puedes adjuntar hasta 20 PDF, JPEG, PNG de 8 bits, audios compatibles o videos MP4 de máximo 7 MiB. Usa WebP solo como sticker; GIF no es compatible.'
         : '',
     );
   }
