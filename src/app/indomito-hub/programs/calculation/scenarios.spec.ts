@@ -33,6 +33,7 @@ describe('scenarios', () => {
       { totalPassengers: 25, freePassengers: 2, payingPassengers: 23 },
       { totalPassengers: 30, freePassengers: 2, payingPassengers: 28 },
       { totalPassengers: 35, freePassengers: 2, payingPassengers: 33 },
+      { totalPassengers: 40, freePassengers: 3, payingPassengers: 37 },
     ]);
   });
 
@@ -40,12 +41,13 @@ describe('scenarios', () => {
     expect(
       deriveScenarios(
         { ...INPUT.schedule, totalPassengers: 3, freePassengers: 0 },
-        [-10, -5, 0, 5],
+        [-10, -5, 0, 5, 10],
       ),
     ).toEqual([
       { totalPassengers: 1, freePassengers: 0, payingPassengers: 1 },
       { totalPassengers: 3, freePassengers: 0, payingPassengers: 3 },
       { totalPassengers: 8, freePassengers: 0, payingPassengers: 8 },
+      { totalPassengers: 13, freePassengers: 0, payingPassengers: 13 },
     ]);
   });
 

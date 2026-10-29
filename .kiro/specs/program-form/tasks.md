@@ -110,7 +110,7 @@ recuperarse entre los pasajeros pagantes.
   - [x] 2.2 Escribir las constantes de la feature
     - `constants/field-limits.ts`: `FIELD_LIMITS` como única fuente de rangos
     - `constants/charge-types.ts`: los cinco tipos con sus etiquetas en español
-    - `constants/scenario-defaults.ts`: `DEFAULT_SCENARIO_OFFSETS = [-10, -5, 0, 5]` y `MAX_SCENARIOS = 4`
+    - `constants/scenario-defaults.ts`: `DEFAULT_SCENARIO_OFFSETS = [-10, -5, 0, 5, 10]` y `MAX_SCENARIOS = 5`
     - _Requirements: 6.5, 13.3, 13.11_
 
 - [x] 3. Generadores de `fast-check` (repo: **app**)
@@ -466,7 +466,7 @@ recuperarse entre los pasajeros pagantes.
     - _Requirements: 13.10, 18.1_
 
   - [x]* 16.3 Implementar `fn-validate-request.go`
-    - Cuatro comprobaciones de forma: escenarios entre 1 y 4, precio por persona mayor que 0, al menos un pagante y `payingPassengers == totalPassengers − freePassengers`, y `budgetTemplateId` registrado
+    - Comprobaciones de forma: escenarios entre 1 y 5, precio por persona mayor que 0, al menos un pagante y `payingPassengers == totalPassengers − freePassengers`, y `budgetTemplateId` registrado
     - **El endpoint no recalcula precios.** Verifica que sean posibles, no que sean correctos
     - Log `warn` del rechazo con `reason` y `scenarioIndex`, sin los precios
     - _Requirements: 18.4, 18.5, 18.6, 18.7, 18.8_

@@ -25,7 +25,7 @@ describe('ProgramFormConfigurationService', () => {
         },
       },
       policy: { minUtilityRate: 10 },
-      scenarioOffsets: [-10, -5, 0, 5],
+      scenarioOffsets: [-10, -5, 0, 5, 10],
     };
     let received: ProgramFormConfiguration | undefined;
 

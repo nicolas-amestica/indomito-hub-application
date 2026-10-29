@@ -428,12 +428,11 @@ describe('ProgramFormPage', () => {
     expect(exportedRows.map((row) => row[0]?.value)).toEqual(store.rows().map((row) => row.name));
   });
 
-  it('deriva los escenarios configurados y descarga el presupuesto PDF', async () => {
+  it('deriva los cinco escenarios por defecto y descarga el presupuesto PDF', async () => {
     exchangeResponse$ = of(freshSnapshot());
     catalogResponse$ = of({
       ...emptyCatalog(),
     });
-    formConfiguration = { ...defaultFormConfiguration(), scenarioOffsets: [-10, 0, 5] };
     const pdf = new Blob(['presupuesto'], { type: 'application/pdf' });
     generateBudgetPdf.mockReturnValueOnce(of(pdf));
     const fixture = TestBed.createComponent(ProgramFormPage);
@@ -459,7 +458,9 @@ describe('ProgramFormPage', () => {
       totalNights: 6,
       serviceNames: ['Hotel'],
     });
-    expect(request.scenarios.map(({ totalPassengers }) => totalPassengers)).toEqual([20, 30, 35]);
+    expect(request.scenarios.map(({ totalPassengers }) => totalPassengers)).toEqual([
+      20, 25, 30, 35, 40,
+    ]);
     expect(request.scenarios.every(({ pricePerPassengerCLP }) => pricePerPassengerCLP > 0)).toBe(
       true,
     );
@@ -671,7 +672,7 @@ function defaultFormConfiguration(): ProgramFormConfiguration {
       },
     },
     policy: { minUtilityRate: 10 },
-    scenarioOffsets: [-10, -5, 0, 5],
+    scenarioOffsets: [-10, -5, 0, 5, 10],
   };
 }
 

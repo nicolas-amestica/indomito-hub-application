@@ -36,7 +36,7 @@ const CONFIGURATION: ProgramFormConfiguration = {
     },
   },
   policy: { minUtilityRate: 10 },
-  scenarioOffsets: [-10, -5, 0, 5],
+  scenarioOffsets: [-10, -5, 0, 5, 10],
 };
 
 function setup(responses: Subject<CatalogResponse>[]): {

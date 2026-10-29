@@ -807,10 +807,10 @@ las deriva del propio programa en cinco pasos, y el orden entre ellos importa:
 // constants/scenario-defaults.ts
 
 /** Requirement 13.3: respaldo cuando el catálogo no declara desplazamientos. */
-export const DEFAULT_SCENARIO_OFFSETS = [-10, -5, 0, 5] as const;
+export const DEFAULT_SCENARIO_OFFSETS = [-10, -5, 0, 5, 10] as const;
 
-/** Requirement 13.11: el endpoint acepta entre 1 y 4 escenarios. */
-export const MAX_SCENARIOS = 4;
+/** Requirement 13.11: el endpoint acepta entre 1 y 5 escenarios. */
+export const MAX_SCENARIOS = 5;
 ```
 
 ```ts
@@ -875,7 +875,7 @@ export function deriveScenarios(
 Ese segundo caso es el que justifica que el criterio 13.7 exista como criterio
 aparte: **el acotamiento es lo que crea los duplicados**, así que la deduplicación
 tiene que ocurrir después. Con los desplazamientos por defecto y un programa
-pequeño, la lista de cuatro escenarios se reduce sola:
+pequeño, la lista de cinco escenarios se reduce sola:
 
 | Programa | Offsets | Totales tras acotar | Escenarios finales |
 | --- | --- | --- | --- |
@@ -1240,7 +1240,7 @@ endpoint-per-function:
 | --- | --- | --- | --- |
 | `fn-obtener-tasas-cambio-v1` | 128 MB | 30 s | Dos llamadas externas con 3 reintentos y 10 s de límite cada una, más la escritura del snapshot de respaldo. El timeout debe cubrir el peor caso sin cortar antes que la política de reintentos |
 | `fn-obtener-catalogos-v1` | 128 MB | 6 s | Una sola consulta |
-| `fn-generar-presupuesto-v1` | 512 MB | 20 s | Hasta cuatro escenarios y composición del PDF en memoria. No calcula precios: los recibe |
+| `fn-generar-presupuesto-v1` | 512 MB | 20 s | Hasta cinco escenarios y composición del PDF en memoria. No calcula precios: los recibe |
 | Favoritos | 128 MB | 6 s | Lectura y escritura simples |
 
 ### Tipos de cambio y snapshot de respaldo
@@ -1496,7 +1496,7 @@ type BudgetRequest struct {
     TotalDays     int              `json:"totalDays"     validate:"required,min=1,max=100"`
     TotalNights   int              `json:"totalNights"   validate:"required,min=1,max=100"`
     ServiceNames  []string         `json:"serviceNames"  validate:"max=100,dive,required"`
-    Scenarios     []BudgetScenario `json:"scenarios"     validate:"required,min=1,max=4,dive"`
+    Scenarios     []BudgetScenario `json:"scenarios"     validate:"required,min=1,max=5,dive"`
 }
 
 // BudgetScenario es una columna del presupuesto.
@@ -1517,7 +1517,7 @@ Requirement 18:
 | Comprobación | Criterio | Código | Por qué es detectable sin calcular |
 | --- | --- | --- | --- |
 | Campos obligatorios presentes | 18.4 | `REQUIRED_FIELD_MISSING` | Es estructura del cuerpo |
-| Entre 1 y 4 escenarios | 18.5 | `VALIDATION_ERROR` | El PDF tiene cuatro columnas: cero no imprime nada y cinco no cabe |
+| Entre 1 y 5 escenarios | 18.5 | `VALIDATION_ERROR` | El PDF tiene cinco columnas: cero no imprime nada y seis no cabe |
 | Precio por persona mayor que 0 | 18.6 | `VALIDATION_ERROR` | Un precio negativo o cero no es un precio, independientemente de cómo se calculó |
 | Al menos un pagante por escenario | 18.7 | `VALIDATION_ERROR` | `payingPassengers ≥ 1` y `freePassengers < totalPassengers` son coherencia interna del escenario |
 | `budgetTemplateId` registrado | 18.8 | `VALIDATION_ERROR` | Se compara contra el registro de plantillas |
@@ -2205,7 +2205,7 @@ declarados, y *para toda* lista de desplazamientos, los escenarios derivados deb
 cumplir simultáneamente que: cada uno tenga al menos 1 pasajero total y al menos 1
 pasajero pagante; sus pasajeros liberados sean menores que sus pasajeros totales; no
 existan dos escenarios con la misma combinación de pasajeros totales y liberados; la
-cantidad de escenarios esté entre 1 y 4; y exista un escenario cuya cantidad de
+cantidad de escenarios esté entre 1 y 5; y exista un escenario cuya cantidad de
 pasajeros coincida con la del programa cuando la lista de desplazamientos incluye el
 cero.
 

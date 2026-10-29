@@ -5,7 +5,7 @@
  */
 
 /** Desplazamientos de pasajeros por defecto, si el catálogo no los declara. Requirement 13.3. */
-export const DEFAULT_SCENARIO_OFFSETS = [-10, -5, 0, 5] as const;
+export const DEFAULT_SCENARIO_OFFSETS = [-10, -5, 0, 5, 10] as const;
 
 /** Cantidad máxima de escenarios que acepta el Budget_Pdf_Endpoint. Requirement 13.11. */
-export const MAX_SCENARIOS = 4;
+export const MAX_SCENARIOS = 5;

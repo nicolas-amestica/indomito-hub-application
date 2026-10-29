@@ -20,7 +20,7 @@ El repositorio principal de esta spec es `ind-hub-app` porque el grueso del trab
 - Tabla de resumen reactiva con el detalle de tripulación y servicios.
 - Panel lateral de favoritos con guardar, seleccionar, visualizar y eliminar. **Es el único mecanismo de persistencia de la feature.**
 - Exportación del detalle del programa a Excel.
-- Exportación del presupuesto a PDF con hasta cuatro escenarios de pasajeros derivados del propio programa.
+- Exportación del presupuesto a PDF con hasta cinco escenarios de pasajeros derivados del propio programa.
 - Separación del backend en tres microservicios Go: `api-program`, `api-catalog` y `api-favorite`.
 
 **Dos consecuencias aceptadas**
@@ -231,7 +231,7 @@ interface CatalogSettings {
   /** Plan vigente que el formulario preselecciona. */
   defaultPlanId?: string;
   margin?: MarginDefaults;
-  /** Desplazamientos de pasajeros del presupuesto. Por defecto [-10, -5, 0, 5]. */
+  /** Desplazamientos de pasajeros del presupuesto. Por defecto [-10, -5, 0, 5, 10]. */
   scenarioOffsets?: number[];
 }
 ```
@@ -571,13 +571,13 @@ les corresponden. Una divergencia entre capas es un defecto.
 
 ### Requirement 13: Exportación del presupuesto a PDF con escenarios derivados
 
-**User Story:** Como cotizador, quiero un PDF de presupuesto con el precio por persona para varios tamaños de grupo cercanos al de mi programa, para presentar alternativas al colegio sin armar cuatro programas distintos.
+**User Story:** Como cotizador, quiero un PDF de presupuesto con el precio por persona para varios tamaños de grupo cercanos al de mi programa, para presentar alternativas al colegio sin armar cinco programas distintos.
 
 #### Acceptance Criteria
 
 1. WHILE la Summary_Table está visible, THE Program_Form SHALL exponer una acción de exportar el presupuesto a PDF.
 2. WHEN el usuario activa la acción de exportar el presupuesto a PDF, THE Calculation_Engine SHALL derivar un escenario por cada desplazamiento configurado, sumando ese desplazamiento a la cantidad de pasajeros del programa.
-3. IF el Catalog_Endpoint no entrega desplazamientos de escenario, THEN THE Calculation_Engine SHALL usar los desplazamientos −10, −5, 0 y +5.
+3. IF el Catalog_Endpoint no entrega desplazamientos de escenario, THEN THE Calculation_Engine SHALL usar los desplazamientos −10, −5, 0, +5 y +10.
 4. THE Calculation_Engine SHALL acotar la cantidad de pasajeros de cada escenario a un mínimo de 1.
 5. THE Calculation_Engine SHALL calcular los pasajeros liberados de cada escenario como el producto de la cantidad de pasajeros de ese escenario por el cociente entre los pasajeros liberados y los pasajeros totales del programa, redondeado al entero más cercano.
 6. THE Calculation_Engine SHALL acotar los pasajeros liberados de cada escenario a un máximo de la cantidad de pasajeros de ese escenario menos uno, de modo que todo escenario conserve al menos un pasajero pagante.
@@ -585,14 +585,14 @@ les corresponden. Una divergencia entre capas es un defecto.
 8. THE Calculation_Engine SHALL recalcular en cada escenario los montos base de los servicios pasajero-dependientes con la cantidad de pasajeros de ese escenario.
 9. THE Calculation_Engine SHALL calcular el precio por persona de cada escenario aplicando las mismas reglas de reparto del Requirement 8.
 10. THE Program_Form SHALL enviar al Budget_Pdf_Endpoint el nombre del programa, el destino, la ciudad de salida, los días totales, las noches de estadía, la lista de nombres de servicios y, por cada escenario, su cantidad de pasajeros, sus pasajeros liberados, sus pasajeros pagantes y su precio por persona.
-11. THE Program_Form SHALL enviar entre 1 y 4 escenarios al Budget_Pdf_Endpoint.
+11. THE Program_Form SHALL enviar entre 1 y 5 escenarios al Budget_Pdf_Endpoint.
 12. WHEN el Budget_Pdf_Endpoint responde con el documento, THE Program_Form SHALL descargar el archivo PDF en el dispositivo del usuario.
 13. IF el destino del programa no está seleccionado, THEN THE Program_Form SHALL mostrar un mensaje que solicita seleccionar un destino y SHALL omitir la llamada al Budget_Pdf_Endpoint.
 14. IF el Budget_Pdf_Endpoint responde con un error, THEN THE Program_Form SHALL mostrar un mensaje de error y SHALL habilitar nuevamente las acciones de exportación.
 
-> **Por qué los escenarios se derivan del programa.** Los cuatro tamaños fijos de
-> 20, 25, 30 y 35 pasajeros son útiles para una gira de 28 y completamente
-> inútiles para una de 60: el PDF mostraría cuatro precios que no tienen relación
+> **Por qué los escenarios se derivan del programa.** Los cinco tamaños fijos de
+> 20, 25, 30, 35 y 40 pasajeros son útiles para una gira de 30 y completamente
+> inútiles para una de 60: el PDF mostraría cinco precios que no tienen relación
 > con el grupo que se está cotizando. Derivarlos por desplazamiento mantiene los
 > escenarios alrededor del programa real, y dejar los desplazamientos en el
 > catálogo permite ajustar el abanico sin desplegar el frontend.
