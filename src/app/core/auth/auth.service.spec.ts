@@ -77,6 +77,40 @@ describe('AuthService', () => {
     expect(service.canAccess('PROGRAMS')).toBe(true);
   });
 
+  it('transfiere la sesión a una pestaña nueva del mismo origen antes de navegar', () => {
+    const session = authSession(jwtExpiringIn(3_600));
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+    const targetStorage = { setItem: vi.fn() };
+    const replace = vi.fn();
+    const target = {
+      sessionStorage: targetStorage,
+      opener: window,
+      location: { replace },
+      close: vi.fn(),
+    } as unknown as Window;
+    const open = vi.spyOn(window, 'open').mockReturnValue(target);
+    const service = TestBed.inject(AuthService);
+
+    expect(service.openAuthenticatedTab('/comunicaciones/conversaciones?telefono=56911111111')).toBe(true);
+    expect(open).toHaveBeenCalledWith('about:blank', '_blank');
+    expect(targetStorage.setItem).toHaveBeenCalledWith(STORAGE_KEY, JSON.stringify(session));
+    expect(target.opener).toBeNull();
+    expect(replace).toHaveBeenCalledWith(
+      `${window.location.origin}/comunicaciones/conversaciones?telefono=56911111111`,
+    );
+    open.mockRestore();
+  });
+
+  it('rechaza abrir una URL externa con la sesión autenticada', () => {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(authSession(jwtExpiringIn(3_600))));
+    const open = vi.spyOn(window, 'open');
+    const service = TestBed.inject(AuthService);
+
+    expect(service.openAuthenticatedTab('https://example.com/conversaciones')).toBe(false);
+    expect(open).not.toHaveBeenCalled();
+    open.mockRestore();
+  });
+
   it('descarta una sesión alterada o expirada', () => {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(authSession(jwtExpiringIn(-1))));
 

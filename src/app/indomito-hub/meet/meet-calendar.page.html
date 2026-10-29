@@ -33,7 +33,8 @@
                 @if (event.agent && event.phoneNumber) {
                   <a pButton text rounded iconOnly severity="success" class="shrink-0" aria-label="Abrir conversación de WhatsApp"
                     title="Abrir conversación de WhatsApp" [routerLink]="['/comunicaciones/conversaciones']"
-                    [queryParams]="{ telefono: event.phoneNumber }" target="_blank" rel="noopener noreferrer">
+                    [queryParams]="{ telefono: event.phoneNumber }" target="_blank" rel="noopener noreferrer"
+                    (click)="openInboxConversation($event, event.phoneNumber)">
                     <span class="icon-[tabler--brand-whatsapp] size-4" aria-hidden="true"></span>
                   </a>
                 }

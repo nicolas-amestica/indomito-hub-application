@@ -27,6 +27,7 @@ const agentMeeting: MeetEvent = {
 
 describe('MeetCalendarPage', () => {
   it('abre la conversación de una reunión del agente en una pestaña nueva', async () => {
+    const openAuthenticatedTab = vi.fn().mockReturnValue(true);
     TestBed.configureTestingModule({
       imports: [MeetCalendarPage],
       providers: [
@@ -37,6 +38,7 @@ describe('MeetCalendarPage', () => {
             permissions: signal([
               { module: { code: 'MEET_AGENDA' }, allowances: ['c', 'u', 'd'] },
             ]),
+            openAuthenticatedTab,
           },
         },
         {
@@ -66,6 +68,11 @@ describe('MeetCalendarPage', () => {
     expect(link?.target).toBe('_blank');
     expect(link?.rel).toContain('noopener');
     expect(link?.getAttribute('href')).toContain(
+      '/comunicaciones/conversaciones?telefono=56911111111',
+    );
+
+    link?.click();
+    expect(openAuthenticatedTab).toHaveBeenCalledWith(
       '/comunicaciones/conversaciones?telefono=56911111111',
     );
   });

@@ -68,6 +68,27 @@ export class AuthService {
   token(): string | null {
     return this.state()?.token ?? null;
   }
+  openAuthenticatedTab(url: string): boolean {
+    const view = this.document.defaultView;
+    const session = this.state();
+    if (!view || !session) return false;
+
+    const targetUrl = new URL(url, view.location.origin);
+    if (targetUrl.origin !== view.location.origin) return false;
+
+    const target = view.open('about:blank', '_blank');
+    if (!target) return false;
+
+    try {
+      target.sessionStorage.setItem(AuthService.storageKey, JSON.stringify(session));
+      target.opener = null;
+      target.location.replace(targetUrl.href);
+      return true;
+    } catch {
+      target.close();
+      return false;
+    }
+  }
   canAccess(code: string): boolean {
     return this.canPerform(code, 'r');
   }

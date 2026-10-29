@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { FormsModule, type NgForm } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { Button, ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
@@ -27,6 +27,7 @@ interface DayCell { date: string; number: number; current: boolean; events: Meet
 export class MeetCalendarPage {
   private readonly api = inject(MeetService);
   private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
   private readonly hostApi = inject(MeetingHostService);
   readonly canCreate = computed(() => this.auth.permissions().some(p => p.module.code === "MEET_AGENDA" && p.allowances.includes("c")));
   readonly canUpdate = computed(() => this.auth.permissions().some(p => p.module.code === "MEET_AGENDA" && p.allowances.includes("u")));
@@ -118,6 +119,15 @@ export class MeetCalendarPage {
     this.year.set(this.now.getFullYear());
     this.month.set(this.now.getMonth());
     this.refresh();
+  }
+
+  openInboxConversation(event: MouseEvent, phoneNumber: string): void {
+    event.preventDefault();
+    const url = this.router.serializeUrl(this.router.createUrlTree(
+      ['/comunicaciones/conversaciones'],
+      { queryParams: { telefono: phoneNumber } },
+    ));
+    this.auth.openAuthenticatedTab(url);
   }
 
   open(date?: string, event?: MeetEvent): void {
