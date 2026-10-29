@@ -244,10 +244,7 @@ export class ProgramFormPage {
       totalDays: program.schedule.totalDays,
       totalNights: program.schedule.totalNights,
       serviceNames: program.services.map((service) => service.name),
-      scenarios: deriveScenarios(
-        calculationInput.schedule,
-        this.catalogStore.scenarioOffsets(),
-      ).map((scenario) => ({
+      scenarios: deriveScenarios().map((scenario) => ({
         ...scenario,
         pricePerPassengerCLP: calculateScenario(calculationInput, scenario).totals
           .totalPerPassengerCLP,

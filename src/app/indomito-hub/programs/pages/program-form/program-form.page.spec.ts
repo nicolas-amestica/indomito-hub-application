@@ -390,6 +390,7 @@ describe('ProgramFormPage', () => {
     const fixture = TestBed.createComponent(ProgramFormPage);
     const store = fixture.debugElement.injector.get(ProgramFormStore);
     completeValidForm(store);
+    store.form.controls.schedule.patchValue({ totalPassengers: 20, freePassengers: 2 });
     await fixture.whenStable();
     const previewTrigger = buttonNamed(fixture.nativeElement as HTMLElement, 'Previsualizar');
     previewTrigger.click();
@@ -460,6 +461,10 @@ describe('ProgramFormPage', () => {
     });
     expect(request.scenarios.map(({ totalPassengers }) => totalPassengers)).toEqual([
       20, 25, 30, 35, 40,
+    ]);
+    expect(request.scenarios.map(({ freePassengers }) => freePassengers)).toEqual([2, 2, 3, 3, 3]);
+    expect(request.scenarios.map(({ payingPassengers }) => payingPassengers)).toEqual([
+      18, 23, 27, 32, 37,
     ]);
     expect(request.scenarios.every(({ pricePerPassengerCLP }) => pricePerPassengerCLP > 0)).toBe(
       true,

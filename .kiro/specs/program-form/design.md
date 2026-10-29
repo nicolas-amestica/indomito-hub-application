@@ -800,14 +800,18 @@ Un escenario es el mismo motor con otro `totalPassengers` y otro `freePassengers
 los `per_passenger*` se recalculan solos porque la fórmula ya depende del
 parámetro (Requirement 13.8).
 
-Lo que sí es lógica nueva es **de dónde salen esas cantidades**. El Requirement 13
-las deriva del propio programa en cinco pasos, y el orden entre ellos importa:
+Las cantidades son una regla comercial fija del Requirement 13:
 
 ```ts
 // constants/scenario-defaults.ts
 
-/** Requirement 13.3: respaldo cuando el catálogo no declara desplazamientos. */
-export const DEFAULT_SCENARIO_OFFSETS = [-10, -5, 0, 5, 10] as const;
+export const BUDGET_SCENARIOS = [
+  { totalPassengers: 20, freePassengers: 2, payingPassengers: 18 },
+  { totalPassengers: 25, freePassengers: 2, payingPassengers: 23 },
+  { totalPassengers: 30, freePassengers: 3, payingPassengers: 27 },
+  { totalPassengers: 35, freePassengers: 3, payingPassengers: 32 },
+  { totalPassengers: 40, freePassengers: 3, payingPassengers: 37 },
+] as const;
 
 /** Requirement 13.11: el endpoint acepta entre 1 y 5 escenarios. */
 export const MAX_SCENARIOS = 5;
@@ -815,86 +819,17 @@ export const MAX_SCENARIOS = 5;
 
 ```ts
 // calculation/scenarios.ts
-import { DEFAULT_SCENARIO_OFFSETS, MAX_SCENARIOS } from '../constants/scenario-defaults';
+import { BUDGET_SCENARIOS } from '../constants/scenario-defaults';
 import type { ScenarioShape } from '../interfaces/program.interface';
 
-/**
- * Deriva las cantidades de cada escenario a partir de las del programa.
- *
- * Orden de las operaciones, que no es intercambiable:
- *   1. desplazar   — pasajeros del programa + offset            (13.2)
- *   2. acotar      — mínimo 1 pasajero                          (13.4)
- *   3. proporción  — liberados según la razón del programa      (13.5)
- *   4. acotar      — máximo totalPassengers − 1 liberados       (13.6)
- *   5. deduplicar  — descartar pares (total, libres) repetidos  (13.7)
- */
-export function deriveScenarios(
-  schedule: ScheduleInput,
-  offsets: readonly number[] = DEFAULT_SCENARIO_OFFSETS,
-): ScenarioShape[] {
-  const freeRatio =
-    schedule.totalPassengers > 0
-      ? schedule.freePassengers / schedule.totalPassengers
-      : 0;
-
-  const seen = new Set<string>();
-  const scenarios: ScenarioShape[] = [];
-
-  for (const offset of offsets) {
-    const totalPassengers = Math.max(1, schedule.totalPassengers + offset);
-    const freePassengers = Math.min(
-      Math.max(0, Math.round(totalPassengers * freeRatio)),
-      totalPassengers - 1,
-    );
-
-    const key = `${totalPassengers}:${freePassengers}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-
-    scenarios.push({
-      totalPassengers,
-      freePassengers,
-      payingPassengers: totalPassengers - freePassengers,
-    });
-
-    if (scenarios.length === MAX_SCENARIOS) break;
-  }
-
-  return scenarios;
+export function deriveScenarios(): ScenarioShape[] {
+  return BUDGET_SCENARIOS.map((scenario) => ({ ...scenario }));
 }
 ```
 
-**Por qué el orden es ese, y qué pasa si se invierte.**
-
-| Paso | Si se hiciera antes de lo que corresponde |
-| --- | --- |
-| Acotar el total antes de la proporción | Es lo correcto: la proporción tiene que aplicarse sobre el total ya acotado, o un programa de 8 pasajeros con offset −10 calcularía liberados sobre −2 |
-| Deduplicar antes de acotar | Los offsets `−10` y `−5` sobre un programa de 3 pasajeros producen `−7` y `−2`, distintos entre sí, y ambos se acotan a 1. Deduplicar antes los dejaría pasar y el PDF mostraría dos columnas idénticas de 1 pasajero |
-| Acotar liberados antes de la proporción | No tiene sentido: no hay valor que acotar todavía |
-
-Ese segundo caso es el que justifica que el criterio 13.7 exista como criterio
-aparte: **el acotamiento es lo que crea los duplicados**, así que la deduplicación
-tiene que ocurrir después. Con los desplazamientos por defecto y un programa
-pequeño, la lista de cinco escenarios se reduce sola:
-
-| Programa | Offsets | Totales tras acotar | Escenarios finales |
-| --- | --- | --- | --- |
-| 30 pasajeros, 2 libres | −10, −5, 0, +5 | 20, 25, 30, 35 | 4 escenarios, sin duplicados |
-| 8 pasajeros, 1 libre | −10, −5, 0, +5 | 1, 3, 8, 13 | 4 escenarios |
-| 3 pasajeros, 0 libres | −10, −5, 0, +5 | 1, 1, 3, 8 | 3 escenarios: se descarta el segundo `1:0` |
-| 1 pasajero, 0 libres | −10, −5, 0, +5 | 1, 1, 1, 6 | 2 escenarios: `1:0` y `6:0` |
-
-El último caso es el que garantiza el mínimo del Requirement 13.11: el escenario de
-offset 0 siempre sobrevive —es el programa mismo—, así que `deriveScenarios` nunca
-devuelve una lista vacía y el frontend nunca envía 0 escenarios. El tope de 4 lo
-impone `MAX_SCENARIOS` sobre la cantidad de desplazamientos configurados, de modo
-que un catálogo cargado con seis offsets recorta en vez de hacer fallar la
-generación.
-
-`freeRatio` se calcula una sola vez sobre el programa y se reutiliza en todos los
-escenarios. Redondear la proporción en cada escenario en vez de arrastrar decimales
-es lo que hace que las cantidades sean enteros presentables: un escenario con 2,4
-liberados no es algo que se pueda poner en un presupuesto.
+La cantidad ingresada en el programa no participa en la selección de escenarios.
+Cada escenario reemplaza temporalmente pasajeros y liberados antes de invocar el
+mismo motor, por lo que todos los costos y el precio por persona se recalculan.
 
 ### Límites de campo compartidos
 

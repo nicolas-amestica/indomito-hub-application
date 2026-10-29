@@ -1,14 +1,14 @@
 import fc from 'fast-check';
 
-import { arbCalculationInput, arbScenarioOffsets } from './__arbitraries__';
+import { arbCalculationInput } from './__arbitraries__';
 import { calculateProgram } from './calculation-engine';
 import { calculateScenario, deriveScenarios } from './scenarios';
 
 describe('calculateScenario', () => {
   it('Feature: program-form, Property 14: Cada escenario reutiliza el motor con sus cantidades derivadas', () => {
     fc.assert(
-      fc.property(arbCalculationInput(), arbScenarioOffsets(), (input, offsets) => {
-        for (const scenario of deriveScenarios(input.schedule, offsets)) {
+      fc.property(arbCalculationInput(), (input) => {
+        for (const scenario of deriveScenarios()) {
           const expected = calculateProgram({
             ...input,
             schedule: {

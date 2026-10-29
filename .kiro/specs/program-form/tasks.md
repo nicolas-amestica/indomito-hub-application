@@ -199,16 +199,14 @@ recuperarse entre los pasajeros pagantes.
 
 - [x] 7. Escenarios del presupuesto (repo: **app**)
   - [x] 7.1 Implementar `deriveScenarios` y `calculateScenario`
-    - Orden no intercambiable: desplazar, acotar a mínimo 1, aplicar la proporción de liberados, acotar liberados a `totalPassengers − 1`, deduplicar
-    - `freeRatio` se calcula una vez sobre el programa y se reutiliza
-    - Recortar a `MAX_SCENARIOS` en vez de fallar cuando el catálogo trae más desplazamientos
+    - Usar siempre 20/2, 25/2, 30/3, 35/3 y 40/3, independientemente del programa
     - `calculateScenario` reconstruye la entrada y llama a `calculateProgram`, sin lógica duplicada
-    - _Requirements: 13.2, 13.3, 13.4, 13.5, 13.6, 13.7, 13.8, 13.11_
+    - _Requirements: 13.2, 13.3, 13.4, 13.5, 13.8, 13.11_
 
   - [x]* 7.2 Escribir el test de propiedad de los escenarios derivados
-    - `Feature: program-form, Property 15: Los escenarios derivados son válidos, acotados y distintos entre sí`
+    - `Feature: program-form, Property 15: Los escenarios fijos son válidos y distintos entre sí`
     - Verificar sobre `deriveScenarios` como función pura, sin componente
-    - _Requirements: 13.2, 13.3, 13.4, 13.5, 13.6, 13.7, 13.11_
+    - _Requirements: 13.2, 13.3, 13.4, 13.5, 13.11_
 
   - [x]* 7.3 Escribir el test de propiedad del precio por escenario
     - La formulación original de monotonía se descartó porque el redondeo proporcional de liberados puede agregar un liberado y aumentar el precio por pagante

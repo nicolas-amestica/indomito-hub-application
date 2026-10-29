@@ -85,8 +85,7 @@ contra el servidor local (`make dev`). El motivo está en el Requirement 19.
 - **Snapshot de tipo de cambio** (`exchange_snapshot`): fecha y valores de USD y BRL con los que se calcula el programa. Se obtiene al abrir el formulario y no se persiste, porque el programa no se persiste.
 - **Snapshot de respaldo** (`fallback_snapshot`): último snapshot válido que el backend obtuvo de la fuente externa y guardó. Se entrega, marcado como respaldo, cuando la fuente externa no responde.
 - **Favorito** (`favorite`): contenido del formulario guardado con un nombre. En esta spec es el único mecanismo de persistencia del programa.
-- **Escenario de presupuesto** (`budget_scenario`): recálculo completo del programa para una cantidad de pasajeros derivada de la del propio programa, usado en la exportación a PDF.
-- **Desplazamiento de escenario** (`scenario_offset`): entero configurable en el catálogo que se suma a la cantidad de pasajeros del programa para derivar un escenario del presupuesto.
+- **Escenario de presupuesto** (`budget_scenario`): recálculo completo del programa para una cantidad fija de pasajeros y liberados, usado en la exportación a PDF.
 - **Catálogo** (`catalog`): conjunto de opciones de plan, temporada o destino que el backend sirve desde DynamoDB, junto con los parámetros de margen y los desplazamientos de escenario. Reemplaza las constantes del frontend del legacy.
 - **`Program_Form`**: la página del formulario de programa en `ind-hub-app`.
 - **`Calculation_Engine`**: el motor de cálculo reactivo del frontend que deriva montos, subtotales y totales a partir del estado del formulario. Es el único motor de cálculo de la feature.
@@ -209,11 +208,11 @@ interface Program {
   totals: ProgramTotals;
 }
 
-/** Escenario del presupuesto. Se deriva de los pasajeros del propio programa. */
+/** Escenario fijo del presupuesto. */
 interface BudgetScenario {
-  totalPassengers: number; // pasajeros del programa + desplazamiento, acotado a mínimo 1
-  freePassengers: number; // derivado de la proporción de liberados del programa
-  payingPassengers: number; // derivado: totalPassengers − freePassengers, mínimo 1
+  totalPassengers: number;
+  freePassengers: number;
+  payingPassengers: number; // totalPassengers − freePassengers
   pricePerPassengerCLP: number; // calculado por el Calculation_Engine
 }
 
@@ -569,19 +568,19 @@ les corresponden. Una divergencia entre capas es un defecto.
 7. IF la generación del archivo falla, THEN THE Program_Form SHALL mostrar un mensaje de error y SHALL habilitar nuevamente las acciones de exportación.
 8. THE Excel_Exporter SHALL cargar su implementación de forma diferida, de modo que su peso no forme parte del paquete inicial de la aplicación.
 
-### Requirement 13: Exportación del presupuesto a PDF con escenarios derivados
+### Requirement 13: Exportación del presupuesto a PDF con escenarios fijos
 
 **User Story:** Como cotizador, quiero un PDF de presupuesto con el precio por persona para varios tamaños de grupo cercanos al de mi programa, para presentar alternativas al colegio sin armar cinco programas distintos.
 
 #### Acceptance Criteria
 
 1. WHILE la Summary_Table está visible, THE Program_Form SHALL exponer una acción de exportar el presupuesto a PDF.
-2. WHEN el usuario activa la acción de exportar el presupuesto a PDF, THE Calculation_Engine SHALL derivar un escenario por cada desplazamiento configurado, sumando ese desplazamiento a la cantidad de pasajeros del programa.
-3. IF el Catalog_Endpoint no entrega desplazamientos de escenario, THEN THE Calculation_Engine SHALL usar los desplazamientos −10, −5, 0, +5 y +10.
-4. THE Calculation_Engine SHALL acotar la cantidad de pasajeros de cada escenario a un mínimo de 1.
-5. THE Calculation_Engine SHALL calcular los pasajeros liberados de cada escenario como el producto de la cantidad de pasajeros de ese escenario por el cociente entre los pasajeros liberados y los pasajeros totales del programa, redondeado al entero más cercano.
-6. THE Calculation_Engine SHALL acotar los pasajeros liberados de cada escenario a un máximo de la cantidad de pasajeros de ese escenario menos uno, de modo que todo escenario conserve al menos un pasajero pagante.
-7. THE Calculation_Engine SHALL descartar todo escenario cuya cantidad de pasajeros y cantidad de pasajeros liberados coincidan con las de un escenario ya derivado.
+2. WHEN el usuario activa la acción de exportar el presupuesto a PDF, THE Calculation_Engine SHALL usar siempre escenarios de 20, 25, 30, 35 y 40 pasajeros, independientemente de la cantidad ingresada en el programa.
+3. THE Calculation_Engine SHALL usar 2 pasajeros liberados para los escenarios de 20 y 25 pasajeros.
+4. THE Calculation_Engine SHALL usar 3 pasajeros liberados para los escenarios de 30, 35 y 40 pasajeros.
+5. THE Calculation_Engine SHALL calcular los pasajeros pagantes como pasajeros totales menos pasajeros liberados.
+6. THE Calculation_Engine SHALL conservar los cinco escenarios aunque la cantidad ingresada en el programa coincida con uno de ellos.
+7. THE Calculation_Engine SHALL entregar los escenarios en orden ascendente y sin duplicados.
 8. THE Calculation_Engine SHALL recalcular en cada escenario los montos base de los servicios pasajero-dependientes con la cantidad de pasajeros de ese escenario.
 9. THE Calculation_Engine SHALL calcular el precio por persona de cada escenario aplicando las mismas reglas de reparto del Requirement 8.
 10. THE Program_Form SHALL enviar al Budget_Pdf_Endpoint el nombre del programa, el destino, la ciudad de salida, los días totales, las noches de estadía, la lista de nombres de servicios y, por cada escenario, su cantidad de pasajeros, sus pasajeros liberados, sus pasajeros pagantes y su precio por persona.
@@ -590,20 +589,9 @@ les corresponden. Una divergencia entre capas es un defecto.
 13. IF el destino del programa no está seleccionado, THEN THE Program_Form SHALL mostrar un mensaje que solicita seleccionar un destino y SHALL omitir la llamada al Budget_Pdf_Endpoint.
 14. IF el Budget_Pdf_Endpoint responde con un error, THEN THE Program_Form SHALL mostrar un mensaje de error y SHALL habilitar nuevamente las acciones de exportación.
 
-> **Por qué los escenarios se derivan del programa.** Los cinco tamaños fijos de
-> 20, 25, 30, 35 y 40 pasajeros son útiles para una gira de 30 y completamente
-> inútiles para una de 60: el PDF mostraría cinco precios que no tienen relación
-> con el grupo que se está cotizando. Derivarlos por desplazamiento mantiene los
-> escenarios alrededor del programa real, y dejar los desplazamientos en el
-> catálogo permite ajustar el abanico sin desplegar el frontend.
->
-> **Por qué los liberados se derivan de la proporción del propio programa.** La
-> cantidad de liberados es el resultado de una negociación: un cotizador que
-> acordó 2 liberados en 30 pasajeros acordó, en la práctica, alrededor de un
-> pasajero liberado cada quince. Aplicar esa proporción a cada escenario mantiene
-> la condición negociada, mientras que una tabla fija de liberados por tramo
-> impondría una condición que nadie acordó. El criterio 6 pone el límite obvio:
-> ningún escenario puede quedarse sin alguien que pague.
+> Los escenarios y sus liberados son una regla comercial fija del documento. La
+> cantidad ingresada en el programa se usa para la cotización principal, pero no
+> desplaza las cinco alternativas que se presentan en el PDF.
 
 ### Requirement 14: Servicio de tipos de cambio en el backend
 
