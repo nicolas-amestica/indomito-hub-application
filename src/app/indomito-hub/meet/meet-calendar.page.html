@@ -27,8 +27,17 @@
                [class.opacity-40]="!day.current">
             <button pButton class="mb-1 rounded px-1 text-sm hover:bg-surface-100" type="button" (click)="open(day.date)" [disabled]="!canCreate()">{{ day.number }}</button>
             @for (event of day.events; track event.id) {
-              <button pButton type="button" class="mb-1 block w-full truncate rounded bg-primary-100 px-1.5 py-1 text-left text-xs text-primary-800 dark:bg-primary-900 dark:text-primary-100"
-                [title]="event.title" (click)="open(day.date, event)" [disabled]="!canUpdate()">{{ event.startTime }} {{ event.title }}</button>
+              <div class="mb-1 flex min-w-0 items-center gap-1">
+                <button pButton type="button" class="min-w-0 flex-1 truncate rounded bg-primary-100 px-1.5 py-1 text-left text-xs text-primary-800 dark:bg-primary-900 dark:text-primary-100"
+                  [title]="event.title" (click)="open(day.date, event)" [disabled]="!canUpdate()">{{ event.startTime }} {{ event.title }}</button>
+                @if (event.agent && event.phoneNumber) {
+                  <a pButton text rounded iconOnly severity="success" class="shrink-0" aria-label="Abrir conversación de WhatsApp"
+                    title="Abrir conversación de WhatsApp" [routerLink]="['/comunicaciones/conversaciones']"
+                    [queryParams]="{ telefono: event.phoneNumber }" target="_blank" rel="noopener noreferrer">
+                    <span class="icon-[tabler--brand-whatsapp] size-4" aria-hidden="true"></span>
+                  </a>
+                }
+              </div>
             }
           </div>
         }

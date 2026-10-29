@@ -1,5 +1,6 @@
 import { computed, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import { AuthService } from '../../../../core/auth/auth.service';
 import type { ConversationDetailResponse, ConversationSummary } from '../../interfaces/conversation.interface';
@@ -114,7 +115,7 @@ describe('InboxShellPage responsive layout', () => {
     const store = createStoreMock();
     TestBed.configureTestingModule({
       imports: [InboxShellPage],
-      providers: [{ provide: AuthService, useValue: { canPerform: () => true } }],
+      providers: [provideRouter([]), { provide: AuthService, useValue: { canPerform: () => true } }],
     });
     TestBed.overrideComponent(InboxShellPage, {
       set: {
@@ -192,7 +193,7 @@ describe('InboxShellPage responsive layout', () => {
     const store = createStoreMock();
     TestBed.configureTestingModule({
       imports: [InboxShellPage],
-      providers: [{ provide: AuthService, useValue: { canPerform: () => true } }],
+      providers: [provideRouter([]), { provide: AuthService, useValue: { canPerform: () => true } }],
     });
     TestBed.overrideComponent(InboxShellPage, {
       set: {

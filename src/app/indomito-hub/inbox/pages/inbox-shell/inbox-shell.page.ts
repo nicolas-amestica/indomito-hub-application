@@ -2,6 +2,7 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { ActivatedRoute } from '@angular/router';
 import { ButtonDirective, type ButtonDirectiveOptions } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { Skeleton } from 'primeng/skeleton';
@@ -85,6 +86,7 @@ export class InboxShellPage implements OnInit {
   readonly inboxContent = viewChild<ElementRef<HTMLElement>>('inboxContent');
   readonly conversationSearch = viewChild<ElementRef<HTMLInputElement>>('conversationSearch');
   private readonly audioRecorder = inject(InboxAudioRecorderService);
+  private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private searchTimer: ReturnType<typeof setTimeout> | null = null;
   private recordingTimer: ReturnType<typeof setInterval> | null = null;
@@ -104,6 +106,12 @@ export class InboxShellPage implements OnInit {
   }
 
   ngOnInit(): void {
+    const initialPhone = this.route.snapshot.queryParamMap.get('telefono')?.trim() ?? '';
+    if (/^[0-9]{8,15}$/.test(initialPhone)) {
+      this.search.set(initialPhone);
+      this.store.setQuery(initialPhone);
+      void this.selectConversation(initialPhone);
+    }
     void this.store.load();
   }
 
