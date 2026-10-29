@@ -614,9 +614,9 @@ recuperarse entre los pasajeros pagantes.
     - _Requirements: 11.5, 11.16, 11.17_
 
   - [x]* 23.2 Implementar el componente `favorites-panel`
-    - Panel lateral anclado al borde derecho; el scope llega por input para que otra feature lo reutilice
-    - En pantalla pequeña se superpone con capa de fondo que lo cierra; en escritorio alterna entre expandido y riel de iconos
-    - Buscador por nombre que filtra en el cliente, estado vacío con instrucciones, y las acciones seleccionar, visualizar y eliminar
+    - Mega Menú modal ancho consistente con el header; el scope llega por input para que otra feature lo reutilice
+    - Una columna en pantalla pequeña y dos columnas compactas en escritorio
+    - Nombre completo sin truncamiento, días, noches, pasajeros y liberados; buscador y acciones seleccionar, visualizar y eliminar
     - Diálogo de solo lectura para visualizar, y confirmación antes de eliminar, apilados con retención de foco propia
     - Solicita los favoritos al abrirse
     - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 11.7, 11.8, 11.11, 11.12, 15.5, 15.6_

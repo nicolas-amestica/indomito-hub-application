@@ -12,7 +12,7 @@ describe('FavoritesPanelComponent', () => {
   it('muestra el estado vacío y permite cerrar desde la capa móvil', async () => {
     const fixture = createFixture([]);
     await fixture.whenStable();
-    const host = fixture.nativeElement as HTMLElement;
+    const host = document.body;
 
     expect(host.textContent).toContain('No hay cotizaciones para mostrar.');
     host.querySelector<HTMLButtonElement>('[aria-label="Cerrar panel de cotizaciones"]')?.click();
@@ -23,6 +23,7 @@ describe('FavoritesPanelComponent', () => {
 
   it('expone seleccionar, visualizar y confirmar antes de eliminar', async () => {
     const item = favorite();
+    const summary = { ...item, schedule: item.content.schedule };
     const fixture = createFixture([item]);
     const selected = vi.fn();
     const previewRequested = vi.fn();
@@ -31,18 +32,18 @@ describe('FavoritesPanelComponent', () => {
     fixture.componentInstance.favoritePreviewRequested.subscribe(previewRequested);
     fixture.componentInstance.favoriteDeleted.subscribe(deleted);
     await fixture.whenStable();
-    const host = fixture.nativeElement as HTMLElement;
+    const host = document.body;
 
-    buttonNamed(host, 'Seleccionar').click();
-    buttonNamed(host, 'Visualizar').click();
+    buttonWithLabel(host, 'Seleccionar Brasil pedagógico').click();
+    buttonWithLabel(host, 'Visualizar cotización').click();
     await fixture.whenStable();
-    expect(selected).toHaveBeenCalledWith(item);
-    expect(previewRequested).toHaveBeenCalledWith(item);
+    expect(selected).toHaveBeenCalledWith(summary);
+    expect(previewRequested).toHaveBeenCalledWith(summary);
     fixture.componentRef.setInput('previewFavorite', item);
     await fixture.whenStable();
     expect(host.textContent).toContain('30 totales');
 
-    buttonNamed(host, 'Eliminar').click();
+    buttonWithLabel(host, 'Eliminar cotización').click();
     await fixture.whenStable();
     expect(deleted).not.toHaveBeenCalled();
     const deleteButtons = [...host.querySelectorAll<HTMLButtonElement>('button')].filter(
@@ -50,7 +51,23 @@ describe('FavoritesPanelComponent', () => {
     );
     deleteButtons.at(-1)?.click();
     await fixture.whenStable();
-    expect(deleted).toHaveBeenCalledWith(item);
+    expect(deleted).toHaveBeenCalledWith(summary);
+  });
+
+  it('muestra completo un nombre largo y las cantidades en una tarjeta compacta', async () => {
+    const item = favorite();
+    item.name =
+      'PLAN BASE PUCON, BARILOCHE VALDIVIA (3X2) - ÑUBLE, BIOBIO, ARAUCANIA, LOS RIOS Y LOS LAGOS';
+    const fixture = createFixture([item]);
+    await fixture.whenStable();
+    const host = document.body;
+
+    expect(host.textContent).toContain(item.name);
+    expect(host.textContent).toContain('7 días');
+    expect(host.textContent).toContain('6 noches');
+    expect(host.textContent).toContain('30 pasajeros');
+    expect(host.textContent).toContain('2 liberados');
+    expect(host.querySelector('.truncate')).toBeNull();
   });
 
   it('solicita un nombre no vacío antes de guardar', async () => {
@@ -59,7 +76,7 @@ describe('FavoritesPanelComponent', () => {
     fixture.componentInstance.saveSubmitted.subscribe(submitted);
     fixture.componentRef.setInput('saveDialogVisible', true);
     await fixture.whenStable();
-    const host = fixture.nativeElement as HTMLElement;
+    const host = document.body;
 
     expect(buttonNamed(host, 'Guardar').disabled).toBe(true);
     const input = host.querySelector<HTMLInputElement>('#favorite-name')!;
@@ -75,7 +92,10 @@ describe('FavoritesPanelComponent', () => {
 function createFixture(favorites: Favorite[]) {
   const fixture = TestBed.createComponent(FavoritesPanelComponent);
   fixture.componentRef.setInput('scope', 'cotizacion');
-  fixture.componentRef.setInput('favorites', favorites);
+  fixture.componentRef.setInput(
+    'favorites',
+    favorites.map((item) => ({ ...item, schedule: item.content.schedule })),
+  );
   fixture.componentRef.setInput('visible', true);
   return fixture;
 }
@@ -118,4 +138,8 @@ function buttonNamed(host: HTMLElement, text: string): HTMLButtonElement {
   return [...host.querySelectorAll<HTMLButtonElement>('button')].find(
     (button) => button.textContent?.trim() === text,
   )!;
+}
+
+function buttonWithLabel(host: HTMLElement, label: string): HTMLButtonElement {
+  return host.querySelector<HTMLButtonElement>(`button[aria-label="${label}"]`)!;
 }

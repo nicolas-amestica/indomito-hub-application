@@ -96,7 +96,7 @@ describe('FavoritesStore', () => {
     store.save(' Argentina ', CONTENT).subscribe();
 
     expect(service.create).toHaveBeenCalledWith({ name: 'Argentina', content: CONTENT });
-    expect(store.favorites()).toEqual([created]);
+    expect(store.favorites()).toEqual([{ ...created, schedule: created.content.schedule }]);
     expect(store.selected()).toBe(created);
     expect(store.mutating()).toBe(false);
   });
@@ -109,7 +109,7 @@ describe('FavoritesStore', () => {
     store.load('cotizacion');
     store.select(selected);
 
-    store.delete(selected).subscribe();
+    store.delete({ ...selected, schedule: selected.content.schedule }).subscribe();
 
     expect(store.favorites().map(({ id }) => id)).toEqual(['other']);
     expect(store.selected()).toBeNull();

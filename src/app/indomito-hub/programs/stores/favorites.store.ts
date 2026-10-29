@@ -124,8 +124,9 @@ function filterFavorites(
 }
 
 function upsertFavorite(favorites: readonly FavoriteSummary[], saved: Favorite): FavoriteSummary[] {
+  const summary: FavoriteSummary = { ...saved, schedule: saved.content.schedule };
   const existingIndex = favorites.findIndex((favorite) => favorite.id === saved.id);
-  if (existingIndex < 0) return [saved, ...favorites];
+  if (existingIndex < 0) return [summary, ...favorites];
 
-  return favorites.map((favorite) => (favorite.id === saved.id ? saved : favorite));
+  return favorites.map((favorite) => (favorite.id === saved.id ? summary : favorite));
 }

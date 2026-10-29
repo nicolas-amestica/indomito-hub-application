@@ -251,7 +251,9 @@ describe('ProgramFormPage', () => {
     const favorite = sampleFavorite();
     exchangeResponse$ = of(freshSnapshot());
     catalogResponse$ = of(catalogWithOptions());
-    listFavorites.mockReturnValueOnce(of([favorite]));
+    listFavorites.mockReturnValueOnce(
+      of([{ ...favorite, schedule: favorite.content.schedule }]),
+    );
     getFavorite.mockReturnValueOnce(of(favorite));
     const fixture = TestBed.createComponent(ProgramFormPage);
     const store = fixture.debugElement.injector.get(ProgramFormStore);
@@ -262,7 +264,7 @@ describe('ProgramFormPage', () => {
     const panel = fixture.debugElement.query(By.directive(FavoritesPanelComponent))
       .componentInstance as FavoritesPanelComponent;
 
-    panel.favoriteSelected.emit(favorite);
+    panel.favoriteSelected.emit({ ...favorite, schedule: favorite.content.schedule });
     await fixture.whenStable();
 
     expect(store.form.controls.generals.controls.name.value).toBe('Brasil 2027');
@@ -280,7 +282,7 @@ describe('ProgramFormPage', () => {
 
     buttonNamed(host, 'Cotizaciones guardadas').click();
     await fixture.whenStable();
-    expect(host.querySelector('app-side-drawer aside')).not.toBeNull();
+    expect(panel.visible()).toBe(true);
   });
 
   it('muestra la tabla de resumen cuando aparece el primer ítem válido', async () => {

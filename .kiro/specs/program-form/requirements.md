@@ -18,7 +18,7 @@ El repositorio principal de esta spec es `ind-hub-app` porque el grueso del trab
 - Servicio de tipos de cambio USD/BRL a CLP consumido al abrir el formulario, con respaldo por indisponibilidad de la fuente externa.
 - Endpoint de catálogos de plan, temporada y destino servido desde DynamoDB, que además entrega los parámetros de margen de la empresa y los desplazamientos de escenario del presupuesto.
 - Tabla de resumen reactiva con el detalle de tripulación y servicios.
-- Panel lateral de favoritos con guardar, seleccionar, visualizar y eliminar. **Es el único mecanismo de persistencia de la feature.**
+- Mega Menú de favoritos con guardar, seleccionar, visualizar y eliminar. **Es el único mecanismo de persistencia de la feature.**
 - Exportación del detalle del programa a Excel.
 - Exportación del presupuesto a PDF con hasta cinco escenarios de pasajeros derivados del propio programa.
 - Separación del backend en tres microservicios Go: `api-program`, `api-catalog` y `api-favorite`.
@@ -91,7 +91,7 @@ contra el servidor local (`make dev`). El motivo está en el Requirement 19.
 - **`Calculation_Engine`**: el motor de cálculo reactivo del frontend que deriva montos, subtotales y totales a partir del estado del formulario. Es el único motor de cálculo de la feature.
 - **`Summary_Table`**: la tabla de resumen que muestra el detalle de tripulación y servicios con sus montos.
 - **`Preview_Dialog`**: el diálogo que muestra el detalle completo del programa para revisarlo antes de exportarlo a Excel, exportarlo a PDF o guardarlo como favorito.
-- **`Favorites_Panel`**: el panel lateral derecho de favoritos.
+- **`Favorites_Panel`**: el Mega Menú de cotizaciones guardadas.
 - **`Excel_Exporter`**: el componente del frontend que genera el archivo `.xlsx` del detalle del programa.
 - **`Program_Service`** (`api-program`): el microservicio Go que expone el `Budget_Pdf_Endpoint`.
 - **`Catalog_Service`** (`api-catalog`): el microservicio Go que expone el `Catalog_Endpoint` y el `Exchange_Rate_Endpoint`.
@@ -529,13 +529,14 @@ les corresponden. Una divergencia entre capas es un defecto.
 #### Acceptance Criteria
 
 1. THE Program_Form SHALL exponer una acción que abre y cierra el Favorites_Panel.
-2. THE Favorites_Panel SHALL presentarse como un panel lateral anclado al borde derecho de la ventana.
-3. WHERE el ancho de la ventana corresponde a un dispositivo de pantalla pequeña, THE Favorites_Panel SHALL presentarse superpuesto al contenido con una capa de fondo que lo cierra al ser activada.
-4. WHERE el ancho de la ventana corresponde a un dispositivo de escritorio, THE Favorites_Panel SHALL exponer una acción que alterna entre el panel expandido y un riel de iconos colapsado.
+2. THE Favorites_Panel SHALL presentarse como un Mega Menú modal ancho consistente con el menú principal del header.
+3. WHERE el ancho de la ventana corresponde a un dispositivo de pantalla pequeña, THE Favorites_Panel SHALL usar una columna y conservar una capa de fondo que lo cierra al ser activada.
+4. WHERE el ancho de la ventana corresponde a un dispositivo de escritorio, THE Favorites_Panel SHALL distribuir las cotizaciones en dos columnas compactas.
 5. WHEN el Favorites_Panel se abre, THE Favorites_Panel SHALL solicitar al Favorites_Endpoint los favoritos del usuario para el scope del programa.
 6. THE Favorites_Panel SHALL exponer un campo de búsqueda que filtra los favoritos por coincidencia de texto en su nombre.
 7. WHILE el usuario no tiene favoritos guardados para el scope del programa, THE Favorites_Panel SHALL mostrar un estado vacío que explica cómo guardar el primero.
 8. THE Favorites_Panel SHALL exponer por cada favorito las acciones seleccionar, visualizar y eliminar.
+8.1 THE Favorites_Panel SHALL mostrar el nombre completo sin truncarlo y, debajo, días, noches, pasajeros y liberados.
 9. WHEN el usuario activa la acción seleccionar de un favorito, THE Program_Form SHALL cargar el contenido de ese favorito en el formulario y THE Favorites_Panel SHALL cerrarse.
 10. WHEN el Program_Form carga el contenido de un favorito, THE Calculation_Engine SHALL recalcular todos los montos con el snapshot de tipo de cambio vigente y no con el guardado en el favorito.
 11. WHEN el usuario activa la acción visualizar de un favorito, THE Favorites_Panel SHALL mostrar el contenido de ese favorito en un diálogo de solo lectura.

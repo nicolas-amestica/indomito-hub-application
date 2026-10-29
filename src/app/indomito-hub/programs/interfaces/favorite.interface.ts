@@ -23,12 +23,21 @@ export interface FavoriteSummary {
   id: string;
   name: string;
   scope: FavoriteScope;
+  schedule: Pick<
+    ProgramSchedule,
+    'totalDays' | 'totalNights' | 'totalPassengers' | 'freePassengers'
+  >;
   createdAt: string;
   updatedAt: string;
 }
 
-/** Favorito con el precio y el snapshot de tipo de cambio aceptados. */
-export interface Favorite extends FavoriteSummary {
+/** Favorito completo obtenido bajo demanda. */
+export interface Favorite {
+  id: string;
+  name: string;
+  scope: FavoriteScope;
+  createdAt: string;
+  updatedAt: string;
   content: FavoriteContent;
 }
 

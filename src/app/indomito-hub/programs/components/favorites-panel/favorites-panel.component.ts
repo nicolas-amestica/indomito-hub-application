@@ -1,30 +1,29 @@
-import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input, model, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  ElementRef,
+  input,
+  model,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
+import { Drawer } from 'primeng/drawer';
 import { InputText } from 'primeng/inputtext';
 import { ProgressSpinner } from 'primeng/progressspinner';
 
 import type { Favorite, FavoriteScope, FavoriteSummary } from '../../interfaces/favorite.interface';
 import { exchangeRateOriginLabel } from '../../fn/fn-exchange-rate-source';
-import { MotionPressDirective } from '../../../../shared/ui/motion-press.directive';
-import { SideDrawerComponent } from '../../../../shared/ui/side-drawer.component';
 import { trimmedRequiredValidator } from '../../validators/trimmed-required.validator';
 
 /** Panel presentacional y reutilizable para explorar y operar favoritos de un scope. */
 @Component({
   selector: 'app-favorites-panel',
-  imports: [
-    ButtonDirective,
-    DatePipe,
-    Dialog,
-    InputText,
-    MotionPressDirective,
-    ProgressSpinner,
-    ReactiveFormsModule,
-    SideDrawerComponent,
-  ],
+  imports: [ButtonDirective, Dialog, Drawer, InputText, ProgressSpinner, ReactiveFormsModule],
   templateUrl: './favorites-panel.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -50,12 +49,24 @@ export class FavoritesPanelComponent {
   readonly saveSubmitted = output<string>();
 
   protected readonly deleteCandidate = signal<FavoriteSummary | null>(null);
+  private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
   readonly previewClosed = output<void>();
   protected readonly exchangeRateOriginLabel = exchangeRateOriginLabel;
   protected readonly favoriteName = new FormControl('', {
     nonNullable: true,
     validators: [Validators.required, trimmedRequiredValidator],
   });
+
+  constructor() {
+    effect(() => {
+      if (!this.visible()) return;
+      setTimeout(() => this.searchInput()?.nativeElement.focus(), 100);
+    });
+  }
+
+  protected close(): void {
+    this.visible.set(false);
+  }
 
   protected prepareSaveName(): void {
     this.favoriteName.setValue(this.selectedFavorite()?.name ?? '');
