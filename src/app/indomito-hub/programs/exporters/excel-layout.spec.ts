@@ -81,7 +81,7 @@ describe('buildExcelLayout', () => {
         expect(metadataValue(layout.rows, 'Subtotal USD')).toBe(calculation.totals.subtotalUSD);
         expect(metadataValue(layout.rows, 'Subtotal BRL')).toBe(calculation.totals.subtotalBRL);
         expect(metadataValue(layout.rows, 'Neto')).toBe(calculation.totals.netCLP);
-        expect(metadataValue(layout.rows, 'IVA incluido (19%)')).toBe(calculation.totals.vatCLP);
+        expect(metadataValue(layout.rows, 'IVA (19%)')).toBe(calculation.totals.vatCLP);
         expect(metadataValue(layout.rows, 'Retención tripulación (15.25%)')).toBe(
           calculation.totals.crewWithholdingCLP,
         );

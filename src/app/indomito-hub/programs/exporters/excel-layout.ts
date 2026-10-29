@@ -255,7 +255,6 @@ function summaryRows(program: Program): ExcelRow[] {
     ['Subtotal USD', totals.subtotalUSD, CURRENCY_FORMAT],
     ['Subtotal BRL', totals.subtotalBRL, CURRENCY_FORMAT],
     ['Neto', totals.netCLP, CLP_FORMAT],
-    [`IVA incluido (${totals.vatRate}%)`, totals.vatCLP, CLP_FORMAT],
     [
       `Retención tripulación (${totals.crewWithholdingRate}%)`,
       totals.crewWithholdingCLP,
@@ -265,6 +264,7 @@ function summaryRows(program: Program): ExcelRow[] {
     ['Neto con utilidad', totals.netWithUtilityCLP, CLP_FORMAT],
     ['Neto con utilidad por persona', totals.netWithUtilityPerPassengerCLP, CLP_FORMAT],
     ['Recargo', totals.rechargeCLP, CLP_FORMAT],
+    [`IVA (${totals.vatRate}%)`, totals.vatCLP, CLP_FORMAT],
     ['Total programa', totals.totalCLP, CLP_FORMAT],
     ['Total por persona', totals.totalPerPassengerCLP, CLP_FORMAT],
   ];

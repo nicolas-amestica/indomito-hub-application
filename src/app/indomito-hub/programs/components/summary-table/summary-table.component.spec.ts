@@ -16,7 +16,7 @@ const TOTALS: ProgramTotals = {
   subtotalUSD: 1_650,
   subtotalBRL: 200,
   netCLP: 2_010_600,
-  vatCLP: 263_445,
+  vatCLP: 481_338,
   crewWithholdingCLP: 48_038,
   vatRate: 19,
   crewWithholdingRate: 15.25,
@@ -24,8 +24,8 @@ const TOTALS: ProgramTotals = {
   netWithUtilityCLP: 2_412_720,
   netWithUtilityPerPassengerCLP: 86_169,
   rechargeCLP: 120_636,
-  totalCLP: 2_533_356,
-  totalPerPassengerCLP: 90_477,
+  totalCLP: 3_014_694,
+  totalPerPassengerCLP: 107_668,
 };
 
 const RATES: EffectiveRates = { CLP: 1, USD: 1_000, BRL: 228 };
@@ -66,7 +66,7 @@ describe('SummaryTableComponent', () => {
     return fixture;
   }
 
-  it('muestra las siete columnas, las etiquetas con texto y los once montos del pie', async () => {
+  it('muestra las siete columnas, las etiquetas con texto y los doce montos del pie', async () => {
     const fixture = createTable([summaryRow(0, 'crew'), summaryRow(1)]);
     await fixture.whenStable();
     const host = fixture.nativeElement as HTMLElement;
@@ -85,15 +85,16 @@ describe('SummaryTableComponent', () => {
     expect(host.querySelectorAll('[data-summary-row]')).toHaveLength(2);
     expect(host.textContent).toContain('Tripulación');
     expect(host.textContent).toContain('Por pasajero por noche');
-    expect(host.querySelectorAll('[aria-label="Totales de la cotización"] > div')).toHaveLength(11);
-    expect(host.textContent).toContain('2.533.356 CLP');
+    expect(host.querySelectorAll('[aria-label="Totales de la cotización"] > div')).toHaveLength(12);
+    expect(host.textContent).toContain('3.014.694 CLP');
     expect(host.textContent).toContain('Banco Central de Chile');
-    expect(host.textContent).toContain('IVA incluido');
+    expect(host.textContent).toContain('IVA cobrado');
     expect(host.textContent).toContain(
-      'Los montos de IVA y retención informados abajo ya están incluidos en los precios.',
+      'El IVA se aplica después de la utilidad y el recargo, y forma parte del total cobrado al pasajero.',
     );
-    expect(host.textContent).toContain('IVA incluido (19%)');
-    expect(host.textContent).toContain('263.445 CLP');
+    expect(host.textContent).toContain('IVA (19%)');
+    expect(host.textContent).toContain('481.338 CLP');
+    expect(host.textContent).toContain('120.636 CLP');
     expect(host.textContent).toContain('Retención tripulación (15,25%)');
     expect(host.textContent).toContain('48.038 CLP');
   });

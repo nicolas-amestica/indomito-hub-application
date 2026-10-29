@@ -147,8 +147,10 @@ export interface CalculationResult {
  * netCLP            = round(netRaw)                                   (7.5)
  * utilityCLP        = ceil(netRaw × utilityRate / 100)                 (8.1)
  * netWithUtilityCLP = netCLP + utilityCLP                              (8.2)
- * totalCLP          = round(netWithUtilityCLP × (1 + rechargeRate/100))(8.3)
- * rechargeCLP       = totalCLP − netWithUtilityCLP                     (8.4)
+ * subtotalBeforeVat = round(netWithUtilityCLP × (1 + rechargeRate/100))(8.3)
+ * rechargeCLP       = subtotalBeforeVat − netWithUtilityCLP             (8.4)
+ * totalCLP          = round(subtotalBeforeVat × (1 + vatRate/100))
+ * vatCLP            = totalCLP − subtotalBeforeVat
  * ```
  *
  * Tres decisiones que el diseño hereda del legacy a propósito, porque cambiarlas
@@ -158,10 +160,12 @@ export interface CalculationResult {
  *   base sin redondear con la redondeada es discutible, pero la diferencia es de
  *   un peso y replicarlo garantiza que un programa recotizado dé el mismo número.
  * - **El recargo es compuesto**: se aplica sobre neto más utilidad, no sobre el
- *   neto.
+ *   neto. El IVA se aplica después sobre el neto, la utilidad y el recargo, porque
+ *   forma parte del valor final que se cobra al pasajero.
  * - **`rechargeCLP` se obtiene por diferencia y no multiplicando el porcentaje.**
  *   Eso hace que `netCLP + utilityCLP + rechargeCLP` iguale exactamente a
- *   `totalCLP` por construcción, sin residuo de redondeo.
+ *   `subtotalBeforeVatCLP` por construcción, sin residuo de redondeo. El IVA
+ *   también se obtiene por diferencia para cerrar exactamente contra `totalCLP`.
  *
  * El neto se compone en el orden CLP, USD, BRL, y cada subtotal se acumula de
  * forma independiente del orden de los ítems. Ver `sumAscending`.
@@ -183,7 +187,6 @@ export function calculateProgram(
   // muestra en el pie (Requirement 7.2 a 7.4).
   const baseByCurrency: Record<CurrencyCode, number[]> = { CLP: [], USD: [], BRL: [] };
   const crewAmountsCLP: number[] = [];
-  const serviceAmountsCLP: number[] = [];
 
   for (const [index, crew] of crews.entries()) {
     const row = buildRow(crew, index, schedule, rates);
@@ -196,7 +199,6 @@ export function calculateProgram(
     const row = buildRow(service, index, schedule, rates);
     rows.push(row);
     baseByCurrency[row.currency].push(row.baseAmount);
-    serviceAmountsCLP.push(row.amountCLP);
   }
 
   const subtotalCLP = sumAscending(baseByCurrency.CLP);
@@ -205,16 +207,16 @@ export function calculateProgram(
 
   const netRaw = subtotalCLP * rates.CLP + subtotalUSD * rates.USD + subtotalBRL * rates.BRL;
   const netCLP = round(netRaw);
-  const vatFactor = taxes.vatRate / 100;
-  const vatCLP = round((sumAscending(serviceAmountsCLP) * vatFactor) / (1 + vatFactor));
   const crewWithholdingCLP = round(
     sumAscending(crewAmountsCLP) * (taxes.crewWithholdingRate / 100),
   );
 
   const utilityCLP = ceil((netRaw * pricing.utilityRate) / 100);
   const netWithUtilityCLP = netCLP + utilityCLP;
-  const totalCLP = round(netWithUtilityCLP * (1 + pricing.rechargeRate / 100));
-  const rechargeCLP = totalCLP - netWithUtilityCLP;
+  const subtotalBeforeVatCLP = round(netWithUtilityCLP * (1 + pricing.rechargeRate / 100));
+  const rechargeCLP = subtotalBeforeVatCLP - netWithUtilityCLP;
+  const totalCLP = round(subtotalBeforeVatCLP * (1 + taxes.vatRate / 100));
+  const vatCLP = totalCLP - subtotalBeforeVatCLP;
   const payingPassengers = derivePayingPassengers(
     schedule.totalPassengers,
     schedule.freePassengers,

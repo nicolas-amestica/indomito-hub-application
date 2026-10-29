@@ -9,8 +9,10 @@
  * netCLP            = round(netRaw)                                    (7.5)
  * utilityCLP        = ceil(netRaw × utilityRate / 100)                 (8.1)
  * netWithUtilityCLP = netCLP + utilityCLP                              (8.2)
- * totalCLP          = round(netWithUtilityCLP × (1 + rechargeRate/100))(8.3)
- * rechargeCLP       = totalCLP − netWithUtilityCLP                     (8.4)
+ * subtotalBeforeVat = round(netWithUtilityCLP × (1 + rechargeRate/100))(8.3)
+ * rechargeCLP       = subtotalBeforeVat − netWithUtilityCLP             (8.4)
+ * totalCLP          = round(subtotalBeforeVat × (1 + vatRate/100))
+ * vatCLP            = totalCLP − subtotalBeforeVat
  * ```
  *
  * Las dos rarezas de esa secuencia están heredadas del legacy a propósito: la
@@ -116,7 +118,7 @@ function bumpItemPrice(sample: PriceBumpSample): CalculationInput {
 }
 
 describe('calculateProgram', () => {
-  it('Feature: program-form, Property 8: Sin utilidad ni recargo, el total iguala el neto', () => {
+  it('Feature: program-form, Property 8: Sin utilidad ni recargo, el total agrega IVA al neto', () => {
     fc.assert(
       fc.property(
         // Las dos tasas se fuerzan en 0 sobre el `pricing` generado en vez de
@@ -136,12 +138,12 @@ describe('calculateProgram', () => {
           expect(totals.utilityCLP).toBe(ceil((netRaw * 0) / 100));
           expect(totals.utilityCLP).toBe(0);
 
-          // Sin utilidad, el neto con utilidad es el neto (Requirement 8.2), y
-          // sin recargo el total es el neto con utilidad (Requirement 8.3).
+          // Sin utilidad, el neto con utilidad es el neto y sin recargo la base
+          // afecta a IVA sigue siendo el neto.
           expect(totals.netWithUtilityCLP).toBe(totals.netCLP);
           expect(totals.rechargeCLP).toBe(0);
-          expect(totals.totalCLP).toBe(totals.netCLP);
-          expect(totals.totalCLP).toBe(round(netRaw));
+          expect(totals.totalCLP).toBe(round(totals.netCLP * 1.19));
+          expect(totals.vatCLP).toBe(totals.totalCLP - totals.netCLP);
         },
       ),
       { numRuns: NUM_RUNS },
@@ -159,15 +161,17 @@ describe('calculateProgram', () => {
         // utilidad, que ya es entero.
         expect(totals.utilityCLP).toBe(ceil((netRaw * utilityRate) / 100));
         expect(totals.netWithUtilityCLP).toBe(totals.netCLP + totals.utilityCLP);
-        expect(totals.totalCLP).toBe(round(totals.netWithUtilityCLP * (1 + rechargeRate / 100)));
+        const subtotalBeforeVat = round(totals.netWithUtilityCLP * (1 + rechargeRate / 100));
+        expect(totals.totalCLP).toBe(round(subtotalBeforeVat * 1.19));
 
         // El cierre exacto. Vale por construcción **porque el recargo se obtiene
         // por diferencia**: quien lo recalculara como
         // `round(netWithUtilityCLP × rechargeRate / 100)` obtendría un número
         // plausible que en general no cierra, y este es el test que lo detecta.
-        // Igualdad estricta, sin tolerancia: los tres montos son enteros y el
-        // total que se le cobra al cliente no admite un peso de residuo.
-        expect(totals.netCLP + totals.utilityCLP + totals.rechargeCLP).toBe(totals.totalCLP);
+        // Igualdad estricta, sin tolerancia: el subtotal antes de IVA y el total
+        // que se le cobra al cliente no admiten un peso de residuo.
+        expect(totals.netCLP + totals.utilityCLP + totals.rechargeCLP).toBe(subtotalBeforeVat);
+        expect(subtotalBeforeVat + totals.vatCLP).toBe(totals.totalCLP);
 
         // Ninguno de los dos márgenes puede restar: con las tasas en 0 valen 0, y
         // de ahí hacia arriba solo suman (Requirements 8.1 y 8.4).
@@ -194,9 +198,8 @@ describe('calculateProgram', () => {
         const before = calculateProgram(input);
         const after = calculateProgram(bumped);
 
-        // Monotonía **no estricta**, y no por prudencia. Con la utilidad y el
-        // recargo en 0 el total es el neto redondeado, así que un alza que el
-        // redondeo absorbe deja el total idéntico; y un ítem cuyo precio ya está
+        // Monotonía **no estricta**, y no por prudencia. Un alza que los
+        // redondeos del neto o del IVA absorben deja el total idéntico; y un ítem cuyo precio ya está
         // en el máximo de `FIELD_LIMITS.itemPrice` no admite alza alguna. Exigir
         // crecimiento estricto haría fallar el test por un comportamiento
         // correcto.

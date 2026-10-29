@@ -200,7 +200,7 @@ describe('calculateProgram — casos límite', () => {
     });
   });
 
-  it('desglosa el IVA de servicios y la retención bruta de tripulación sin alterar el total', () => {
+  it('aplica el IVA al neto con utilidad y recargo, y mantiene informativa la retención', () => {
     const result = calculateProgram({
       ...MINIMAL_PROGRAM,
       crews: [
@@ -221,9 +221,46 @@ describe('calculateProgram — casos límite', () => {
       ],
     });
 
-    expect(result.totals.vatCLP).toBe(19_000);
+    expect(result.totals.vatCLP).toBe(41_610);
     expect(result.totals.crewWithholdingCLP).toBe(15_250);
-    expect(result.totals.totalCLP).toBe(219_000);
+    expect(result.totals.totalCLP).toBe(260_610);
+  });
+
+  it('incluye el IVA en el total por persona del reporte de producción', () => {
+    const result = calculateProgram({
+      ...MINIMAL_PROGRAM,
+      schedule: {
+        ...MINIMAL_PROGRAM.schedule,
+        totalPassengers: 27,
+        freePassengers: 0,
+      },
+      pricing: {
+        ...MINIMAL_PROGRAM.pricing,
+        utilityRate: 25,
+        rechargeRate: 0,
+      },
+      crews: [
+        {
+          name: 'Tripulación',
+          documentId: '17137440-5',
+          dailyPrice: 60_000,
+          currency: 'CLP',
+        },
+      ],
+      services: [
+        { name: 'Costos operacionales', chargeType: 'fixed', unitPrice: 135_000, currency: 'CLP' },
+        { name: 'Mochilas', chargeType: 'fixed', unitPrice: 32_400, currency: 'CLP' },
+        { name: 'Bus', chargeType: 'fixed', unitPrice: 600_000, currency: 'CLP' },
+        { name: 'Almuerzo y tour', chargeType: 'fixed', unitPrice: 540_000, currency: 'CLP' },
+      ],
+    });
+
+    expect(result.totals.netCLP).toBe(1_367_400);
+    expect(result.totals.utilityCLP).toBe(341_850);
+    expect(result.totals.rechargeCLP).toBe(0);
+    expect(result.totals.vatCLP).toBe(324_758);
+    expect(result.totals.totalCLP).toBe(2_034_008);
+    expect(result.totals.totalPerPassengerCLP).toBe(75_334);
   });
 
   it('reparte un programa de un pasajero sin cambiar su total', () => {
@@ -239,8 +276,8 @@ describe('calculateProgram — casos límite', () => {
       ],
     });
 
-    expect(result.totals.totalCLP).toBe(10_000);
-    expect(result.totals.totalPerPassengerCLP).toBe(10_000);
+    expect(result.totals.totalCLP).toBe(11_900);
+    expect(result.totals.totalPerPassengerCLP).toBe(11_900);
   });
 
   it('con el máximo de liberados conserva un solo pagante como divisor', () => {
@@ -262,8 +299,8 @@ describe('calculateProgram — casos límite', () => {
     });
 
     expect(derivePayingPassengers(100, 99)).toBe(1);
-    expect(result.totals.totalCLP).toBe(1_000);
-    expect(result.totals.totalPerPassengerCLP).toBe(1_000);
+    expect(result.totals.totalCLP).toBe(1_190);
+    expect(result.totals.totalPerPassengerCLP).toBe(1_190);
   });
 
   it('reparte un cargo fijo completo entre los pasajeros pagantes', () => {
@@ -284,9 +321,9 @@ describe('calculateProgram — casos límite', () => {
       ],
     });
 
-    expect(result.totals.totalCLP).toBe(3_000_000);
-    expect(result.totals.totalPerPassengerCLP).toBe(107_143);
-    expect(result.totals.totalPerPassengerCLP * 28).toBeGreaterThanOrEqual(3_000_000);
+    expect(result.totals.totalCLP).toBe(3_570_000);
+    expect(result.totals.totalPerPassengerCLP).toBe(127_500);
+    expect(result.totals.totalPerPassengerCLP * 28).toBeGreaterThanOrEqual(3_570_000);
   });
 
   it('conserva los precios mínimos antes del redondeo final a CLP', () => {

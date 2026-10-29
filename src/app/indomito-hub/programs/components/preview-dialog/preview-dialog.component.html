@@ -276,14 +276,6 @@
           </div>
           <div class="rounded-lg border border-brand-active/30 bg-brand-soft px-3 py-2">
             <dt class="text-xs text-graphite">
-              IVA incluido ({{ program().totals.vatRate | number: '1.0-2' }}%)
-            </dt>
-            <dd class="font-semibold tabular-nums text-ink">
-              {{ program().totals.vatCLP | clpAmount }} CLP
-            </dd>
-          </div>
-          <div class="rounded-lg border border-brand-active/30 bg-brand-soft px-3 py-2">
-            <dt class="text-xs text-graphite">
               Retención tripulación ({{ program().totals.crewWithholdingRate | number: '1.0-2' }}%)
             </dt>
             <dd class="font-semibold tabular-nums text-ink">
@@ -312,6 +304,14 @@
             <dt class="text-xs text-muted">Recargo</dt>
             <dd class="font-semibold tabular-nums text-ink">
               {{ program().totals.rechargeCLP | clpAmount }} CLP
+            </dd>
+          </div>
+          <div class="rounded-lg border border-brand-active/30 bg-brand-soft px-3 py-2">
+            <dt class="text-xs text-graphite">
+              IVA ({{ program().totals.vatRate | number: '1.0-2' }}%)
+            </dt>
+            <dd class="font-semibold tabular-nums text-ink">
+              {{ program().totals.vatCLP | clpAmount }} CLP
             </dd>
           </div>
           <div class="rounded-lg bg-canvas px-3 py-2">

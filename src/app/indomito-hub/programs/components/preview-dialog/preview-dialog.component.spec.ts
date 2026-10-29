@@ -66,7 +66,7 @@ const PROGRAM: Program = {
     subtotalUSD: 9_900,
     subtotalBRL: 0,
     netCLP: 10_710_000,
-    vatCLP: 1_660_546,
+    vatCLP: 2_563_974,
     crewWithholdingCLP: 48_038,
     vatRate: 19,
     crewWithholdingRate: 15.25,
@@ -74,8 +74,8 @@ const PROGRAM: Program = {
     netWithUtilityCLP: 12_852_000,
     netWithUtilityPerPassengerCLP: 459_000,
     rechargeCLP: 642_600,
-    totalCLP: 13_494_600,
-    totalPerPassengerCLP: 482_000,
+    totalCLP: 16_058_574,
+    totalPerPassengerCLP: 573_521,
   },
 };
 
@@ -106,7 +106,7 @@ describe('PreviewDialogComponent', () => {
     expect(host.textContent).toContain('Gira de estudio');
     expect(host.textContent).toContain('Coordinador');
     expect(host.textContent).toContain('Hotel');
-    expect(host.textContent).toContain('13.494.600 CLP');
+    expect(host.textContent).toContain('16.058.574 CLP');
     expect(host.querySelectorAll('th[scope="col"]')).toHaveLength(10);
   });
 

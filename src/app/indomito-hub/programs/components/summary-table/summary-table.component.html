@@ -122,10 +122,11 @@
         <span
           class="inline-flex shrink-0 rounded-full bg-night px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-brand"
         >
-          IVA incluido
+          IVA cobrado
         </span>
         <span
-          >Los montos de IVA y retención informados abajo ya están incluidos en los precios.</span
+          >El IVA se aplica después de la utilidad y el recargo, y forma parte del total cobrado al
+          pasajero. La retención informada ya está incluida en tripulación.</span
         >
       </div>
 
@@ -328,12 +329,6 @@
         </div>
         <div class="rounded-lg border border-brand-active/30 bg-brand-soft px-3 py-2">
           <span class="block text-xs text-graphite"
-            >IVA incluido ({{ totals().vatRate | number: '1.0-2' }}%)</span
-          >
-          <strong class="tabular-nums text-ink">{{ totals().vatCLP | clpAmount }} CLP</strong>
-        </div>
-        <div class="rounded-lg border border-brand-active/30 bg-brand-soft px-3 py-2">
-          <span class="block text-xs text-graphite"
             >Retención tripulación ({{ totals().crewWithholdingRate | number: '1.0-2' }}%)</span
           >
           <strong class="tabular-nums text-ink"
@@ -355,6 +350,16 @@
           <strong class="tabular-nums text-ink"
             >{{ totals().netWithUtilityPerPassengerCLP | clpAmount }} CLP</strong
           >
+        </div>
+        <div class="rounded-lg bg-surface px-3 py-2 shadow-sm">
+          <span class="block text-xs text-muted">Recargo</span>
+          <strong class="tabular-nums text-ink">{{ totals().rechargeCLP | clpAmount }} CLP</strong>
+        </div>
+        <div class="rounded-lg border border-brand-active/30 bg-brand-soft px-3 py-2">
+          <span class="block text-xs text-graphite"
+            >IVA ({{ totals().vatRate | number: '1.0-2' }}%)</span
+          >
+          <strong class="tabular-nums text-ink">{{ totals().vatCLP | clpAmount }} CLP</strong>
         </div>
         <div class="rounded-lg bg-canvas px-3 py-2 shadow-sm">
           <span class="block text-xs font-medium text-graphite">Total de la cotización</span>

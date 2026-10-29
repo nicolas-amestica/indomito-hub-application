@@ -121,7 +121,7 @@ export interface ProgramTotals {
   subtotalBRL: number;
   /** Neto: todo convertido a CLP. */
   netCLP: number;
-  /** IVA incluido en el total de servicios, extraído con tasa 19%. */
+  /** IVA aplicado después de sumar neto, utilidad y recargo. */
   vatCLP: number;
   /** Retención de honorarios incluida en el total bruto de tripulación. */
   crewWithholdingCLP: number;
