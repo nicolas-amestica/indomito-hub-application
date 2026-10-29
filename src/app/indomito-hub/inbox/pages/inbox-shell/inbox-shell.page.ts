@@ -11,6 +11,7 @@ import { Dialog } from 'primeng/dialog';
 import { Tooltip } from 'primeng/tooltip';
 import { Message } from 'primeng/message';
 import { Select } from 'primeng/select';
+import { Tag } from 'primeng/tag';
 
 import { ConversationListItemComponent } from '../../components/conversation-list-item/conversation-list-item.component';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
@@ -24,7 +25,7 @@ import type { InboxMessage } from '../../interfaces/conversation.interface';
 
 @Component({
   selector: 'app-inbox-shell-page',
-  imports: [ButtonDirective, ConversationListItemComponent, DatePipe, DecimalPipe, Dialog, FileUpload, FormsModule, HasPermissionDirective, InputText, Message, ScrollingModule, Select, Skeleton, Textarea, Tooltip],
+  imports: [ButtonDirective, ConversationListItemComponent, DatePipe, DecimalPipe, Dialog, FileUpload, FormsModule, HasPermissionDirective, InputText, Message, ScrollingModule, Select, Skeleton, Tag, Textarea, Tooltip],
   providers: [InboxAudioRecorderService, InboxRealtimeService, InboxStore],
   templateUrl: './inbox-shell.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

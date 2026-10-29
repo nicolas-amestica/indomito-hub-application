@@ -20,6 +20,15 @@ const conversation: ConversationSummary = {
   createdAt: '2026-10-24T12:00:00Z',
   updatedAt: '2026-10-24T12:00:00Z',
   generation: 1,
+  referral: {
+    sourceUrl: 'https://fb.me/ad',
+    sourceId: '1200001',
+    sourceType: 'ad',
+    headline: 'Gira a Bariloche',
+    body: 'Cotiza hoy',
+    mediaType: 'image',
+    attributedAt: '2026-10-24T12:00:00Z',
+  },
 };
 
 describe('ConversationListItemComponent accessibility', () => {
@@ -35,6 +44,7 @@ describe('ConversationListItemComponent accessibility', () => {
     expect(button.type).toBe('button');
     expect(button.getAttribute('aria-pressed')).toBe('true');
     expect(button.textContent).toContain('Ana Pérez');
+    expect(button.textContent).toContain('Meta Ads');
     expect(unread).toBeTruthy();
     expect([...fixture.nativeElement.querySelectorAll('span')].some((element: Element) => element.className.includes('tabler--user'))).toBe(true);
 

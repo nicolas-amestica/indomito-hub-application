@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
+import { Tag } from 'primeng/tag';
+import { Tooltip } from 'primeng/tooltip';
 
 import { formatInboxTime } from '../../fn/format-inbox-time';
 import type { ConversationSummary } from '../../interfaces/conversation.interface';
@@ -7,7 +9,7 @@ import type { ConversationSummary } from '../../interfaces/conversation.interfac
 @Component({
   selector: 'app-conversation-list-item',
   templateUrl: './conversation-list-item.component.html',
-  imports: [ButtonModule],
+  imports: [ButtonModule, Tag, Tooltip],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block w-full min-w-0' },
 })

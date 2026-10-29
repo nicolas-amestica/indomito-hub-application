@@ -31,6 +31,17 @@ export interface ConversationSummary {
   readonly createdAt: string | null;
   readonly updatedAt: string | null;
   readonly generation: number;
+  readonly referral?: MetaReferral;
+}
+
+export interface MetaReferral {
+  readonly sourceUrl: string;
+  readonly sourceId: string;
+  readonly sourceType: string;
+  readonly headline: string;
+  readonly body: string;
+  readonly mediaType: string;
+  readonly attributedAt: string | null;
 }
 
 export interface MessageAttachment {
@@ -92,6 +103,7 @@ export interface InboxMessage {
   readonly replyTo: MessageReference | null;
   readonly reactions?: readonly MessageReaction[];
   readonly rich?: MessageRichContent;
+  readonly referral?: MetaReferral;
 }
 
 export interface MessageLocation { readonly latitude: number; readonly longitude: number; readonly name: string; readonly address: string; }

@@ -82,7 +82,19 @@
         <header class="flex shrink-0 items-center gap-3 border-b border-line/75 bg-surface-0 px-3 py-3 dark:border-line/55 dark:bg-[#202c33]">
           <button pButton type="button" text rounded iconOnly severity="secondary" class="md:hidden!" aria-label="Volver a conversaciones" (click)="returnToConversationList()"><span class="icon-[tabler--arrow-left] size-5" aria-hidden="true"></span></button>
           <div class="min-w-0 flex-1">
-            <h2 class="truncate text-sm font-semibold text-ink">{{ store.detail()?.conversation?.alias || store.selectedPhone() }}</h2>
+            <div class="flex min-w-0 items-center gap-2">
+              <h2 class="truncate text-sm font-semibold text-ink">{{ store.detail()?.conversation?.alias || store.selectedPhone() }}</h2>
+              @if (store.detail()?.conversation?.referral; as referral) {
+                <p-tag
+                  value="Meta Ads"
+                  severity="info"
+                  rounded
+                  class="shrink-0"
+                  [pTooltip]="referral.headline || 'Conversación originada desde publicidad de Meta'"
+                  tooltipPosition="bottom"
+                />
+              }
+            </div>
             <p class="truncate text-xs text-muted">
               {{ store.selectedPhone() }}
               @if (serviceWindowState() === 'open') {
