@@ -60,6 +60,7 @@ export class FavoritesPanelComponent {
   constructor() {
     effect(() => {
       if (!this.visible()) return;
+      if (!globalThis.matchMedia?.('(min-width: 640px) and (pointer: fine)').matches) return;
       setTimeout(() => this.searchInput()?.nativeElement.focus(), 100);
     });
   }

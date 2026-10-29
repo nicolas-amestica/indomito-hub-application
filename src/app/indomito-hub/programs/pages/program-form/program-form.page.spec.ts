@@ -223,15 +223,34 @@ describe('ProgramFormPage', () => {
     await fixture.whenStable();
     const host = fixture.nativeElement as HTMLElement;
 
-    buttonNamed(host, 'Cotizaciones guardadas').click();
+    buttonLabeled(host, 'Abrir cotizaciones guardadas').click();
     await fixture.whenStable();
-    buttonNamed(host, 'Cerrar cotizaciones').click();
+    buttonLabeled(host, 'Cerrar cotizaciones guardadas').click();
     await fixture.whenStable();
-    buttonNamed(host, 'Cotizaciones guardadas').click();
+    buttonLabeled(host, 'Abrir cotizaciones guardadas').click();
     await fixture.whenStable();
 
     expect(listFavorites).toHaveBeenCalledTimes(2);
     expect(listFavorites).toHaveBeenNthCalledWith(1, 'cotizacion');
+  });
+
+  it('mantiene cotizaciones guardadas como acción flotante accesible y responsive', async () => {
+    const fixture = TestBed.createComponent(ProgramFormPage);
+    await fixture.whenStable();
+    const button = buttonLabeled(
+      fixture.nativeElement as HTMLElement,
+      'Abrir cotizaciones guardadas',
+    );
+
+    expect(button.textContent?.trim()).toBe('');
+    expect(button.classList).toContain('fixed');
+    expect(button.classList).toContain('right-3');
+    expect(button.classList).toContain('top-20');
+    expect(button.classList).toContain('sm:right-6');
+    expect(button.classList).toContain('sm:top-24');
+    expect(button.classList).toContain('bg-brand!');
+    expect(button.classList).toContain('text-night!');
+    expect(button.querySelector('[aria-hidden="true"]')).not.toBeNull();
   });
 
   it('muestra el aviso y deshabilita favoritos cuando el ambiente no los expone', async () => {
@@ -243,7 +262,7 @@ describe('ProgramFormPage', () => {
     expect(host.textContent).toContain(
       'El guardado de cotizaciones no está disponible en este ambiente.',
     );
-    expect(buttonNamed(host, 'Cotizaciones guardadas').disabled).toBe(true);
+    expect(buttonLabeled(host, 'Abrir cotizaciones guardadas').disabled).toBe(true);
     expect(listFavorites).not.toHaveBeenCalled();
   });
 
@@ -251,15 +270,13 @@ describe('ProgramFormPage', () => {
     const favorite = sampleFavorite();
     exchangeResponse$ = of(freshSnapshot());
     catalogResponse$ = of(catalogWithOptions());
-    listFavorites.mockReturnValueOnce(
-      of([{ ...favorite, schedule: favorite.content.schedule }]),
-    );
+    listFavorites.mockReturnValueOnce(of([{ ...favorite, schedule: favorite.content.schedule }]));
     getFavorite.mockReturnValueOnce(of(favorite));
     const fixture = TestBed.createComponent(ProgramFormPage);
     const store = fixture.debugElement.injector.get(ProgramFormStore);
     await fixture.whenStable();
     const host = fixture.nativeElement as HTMLElement;
-    buttonNamed(host, 'Cotizaciones guardadas').click();
+    buttonLabeled(host, 'Abrir cotizaciones guardadas').click();
     await fixture.whenStable();
     const panel = fixture.debugElement.query(By.directive(FavoritesPanelComponent))
       .componentInstance as FavoritesPanelComponent;
@@ -275,12 +292,12 @@ describe('ProgramFormPage', () => {
     expect(store.nightsSource()).toBe('user');
     expect(store.program()?.pricing.exchange).toEqual(freshSnapshot());
     expect(store.rows()[1].effectiveRate).toBe(1_050);
-    expect(buttonNamed(host, 'Cotizaciones guardadas')).toBeTruthy();
+    expect(buttonLabeled(host, 'Abrir cotizaciones guardadas')).toBeTruthy();
     expect(notifySuccess).toHaveBeenCalledWith(
       'La cotización se cargó con los tipos de cambio vigentes.',
     );
 
-    buttonNamed(host, 'Cotizaciones guardadas').click();
+    buttonLabeled(host, 'Abrir cotizaciones guardadas').click();
     await fixture.whenStable();
     expect(panel.visible()).toBe(true);
   });
@@ -807,4 +824,8 @@ function buttonNamed(host: HTMLElement, text: string): HTMLButtonElement {
   return [...host.querySelectorAll<HTMLButtonElement>('button')].find(
     (button) => button.textContent?.trim() === text,
   )!;
+}
+
+function buttonLabeled(host: HTMLElement, label: string): HTMLButtonElement {
+  return host.querySelector<HTMLButtonElement>(`button[aria-label="${label}"]`)!;
 }

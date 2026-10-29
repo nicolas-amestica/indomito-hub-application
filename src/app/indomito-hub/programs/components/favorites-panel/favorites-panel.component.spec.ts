@@ -68,6 +68,13 @@ describe('FavoritesPanelComponent', () => {
     expect(host.textContent).toContain('30 pasajeros');
     expect(host.textContent).toContain('2 liberados');
     expect(host.querySelector('.truncate')).toBeNull();
+    const selectable = buttonWithLabel(host, `Seleccionar ${item.name}`);
+    expect(selectable.classList).toContain('cursor-pointer');
+    expect(selectable.classList).toContain('touch-manipulation');
+    expect(selectable.closest('li')?.classList).toContain('flex-col');
+    expect(selectable.closest('li')?.classList).toContain('md:flex-row');
+    expect(selectable.closest('li')?.classList).toContain('border-line/50');
+    expect(selectable.closest('li')?.classList).toContain('dark:border-line/35');
   });
 
   it('solicita un nombre no vacío antes de guardar', async () => {

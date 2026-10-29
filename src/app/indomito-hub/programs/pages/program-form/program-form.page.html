@@ -6,6 +6,26 @@
   Ir al formulario
 </a>
 
+<button
+  pButton
+  appMotionPress
+  pTooltip="Cotizaciones guardadas"
+  tooltipPosition="left"
+  type="button"
+  rounded
+  iconOnly
+  class="fixed right-3 top-20 z-30 size-12 cursor-pointer touch-manipulation border-brand-active/25! bg-brand! text-night! shadow-lg shadow-night/20 hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-active sm:right-6 sm:top-24"
+  [disabled]="!favoritesAvailable"
+  [attr.aria-label]="
+    favoritesOpen() ? 'Cerrar cotizaciones guardadas' : 'Abrir cotizaciones guardadas'
+  "
+  [attr.aria-expanded]="favoritesOpen()"
+  aria-controls="favorites-panel"
+  (click)="toggleFavorites()"
+>
+  <i class="icon-[tabler--bookmarks] size-5" aria-hidden="true"></i>
+</button>
+
 <div
   class="min-h-screen bg-[radial-gradient(circle_at_top_right,rgba(235,255,0,0.07),transparent_32rem)]"
 >
@@ -34,20 +54,6 @@
         >
           Crear contrato
         </a>
-        <button
-          pButton
-          appMotionPress
-          type="button"
-          severity="secondary"
-          outlined
-          class="border-white/20! text-white! hover:border-white/35! hover:bg-white/10!"
-          [disabled]="!favoritesAvailable"
-          [attr.aria-expanded]="favoritesOpen()"
-          aria-controls="favorites-panel"
-          (click)="toggleFavorites()"
-        >
-          {{ favoritesOpen() ? 'Cerrar cotizaciones' : 'Cotizaciones guardadas' }}
-        </button>
       </div>
     </header>
 

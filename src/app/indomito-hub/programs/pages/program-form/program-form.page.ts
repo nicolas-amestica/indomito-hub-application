@@ -15,6 +15,7 @@ import { RouterLink } from '@angular/router';
 import { ButtonDirective } from 'primeng/button';
 import { Panel } from 'primeng/panel';
 import { ProgressSpinner } from 'primeng/progressspinner';
+import { Tooltip } from 'primeng/tooltip';
 import { finalize } from 'rxjs';
 
 import { MotionPressDirective } from '../../../../shared/ui/motion-press.directive';
@@ -66,6 +67,7 @@ import { APP_MESSAGES } from '../../../../shared/constants/app-messages';
     ButtonDirective,
     Panel,
     ProgressSpinner,
+    Tooltip,
     GeneralDataPanelComponent,
     SchedulePanelComponent,
     PricingPanelComponent,
