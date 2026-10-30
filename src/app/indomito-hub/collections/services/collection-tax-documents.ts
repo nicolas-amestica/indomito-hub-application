@@ -5,6 +5,7 @@ import { environment } from '../../../../environments/environment';
 import type { ApiSuccessEnvelope } from '../../../core/http/api-response.interface';
 import type {
   ManualTaxIssuanceRequest,
+  CreateTaxDocumentRequest,
   TaxDocumentListStatus,
   TaxDocumentPage,
   TaxDocumentRequest,
@@ -28,6 +29,21 @@ export class CollectionTaxDocuments {
       .post<ApiSuccessEnvelope<TaxDocumentRequest>>(
         `${this.url}/${encodeURIComponent(requestId)}/emision-manual`,
         request,
+      )
+      .pipe(map(({ data }) => data));
+  }
+
+  create(request: CreateTaxDocumentRequest) {
+    return this.http
+      .post<ApiSuccessEnvelope<TaxDocumentRequest>>(`${this.url}/emisiones`, request)
+      .pipe(map(({ data }) => data));
+  }
+
+  issue(requestId: string) {
+    return this.http
+      .post<ApiSuccessEnvelope<TaxDocumentRequest>>(
+        `${this.url}/${encodeURIComponent(requestId)}/emision`,
+        {},
       )
       .pipe(map(({ data }) => data));
   }

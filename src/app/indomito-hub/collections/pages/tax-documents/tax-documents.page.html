@@ -1,202 +1,25 @@
 <main class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-8 sm:px-8" [attr.aria-busy]="busy()">
-  <header class="flex flex-wrap items-start justify-between gap-4">
-    <div>
-      <p class="text-sm text-muted">Cobranza · documentos tributarios</p>
-      <h1 class="mt-2 text-3xl font-semibold text-ink">Boletas de ventas electrónicas</h1>
-    </div>
-    <a pButton severity="secondary" outlined routerLink="/cobranza/tesoreria">Volver a tesorería</a>
-  </header>
-
-  <p-message severity="info"
-    >Cada pendiente nace de un pago Khipu confirmado. Emite la boleta manualmente en el SII y
-    registra aquí el folio y el PDF. Este módulo no emite ni certifica documentos ante el
-    SII.</p-message
-  >
-  @if (error()) {
-    <p-message severity="error">{{ error() }}</p-message>
-  }
-  @if (success()) {
-    <p-message severity="success">{{ success() }}</p-message>
-  }
-
-  <div class="flex flex-wrap items-center justify-between gap-3">
-    <p-selectbutton
-      [options]="statusOptions"
-      optionLabel="label"
-      optionValue="value"
-      [ngModel]="status()"
-      (ngModelChange)="changeStatus($event)"
-      ariaLabel="Estado de boletas"
-    />
-    <button
-      pButton
-      type="button"
-      severity="secondary"
-      outlined
-      [disabled]="busy()"
-      [loading]="busy()"
-      (click)="load(false)"
-    >
-      Actualizar
-    </button>
-  </div>
-
-  <div class="app-table-viewport">
-    <p-table
-      class="block w-full min-w-0 max-w-full overflow-x-auto"
-      [value]="items()"
-      [scrollable]="true"
-      [tableStyle]="{ 'min-width': '64rem' }"
-      styleClass="text-sm"
-    >
-      <ng-template #header
-        ><tr>
-          <th>Pago</th>
-          <th>Fecha</th>
-          <th>Monto</th>
-          <th>Gira</th>
-          <th>Cuenta</th>
-          <th>Estado tributario</th>
-          <th><span class="sr-only">Acción</span></th>
-        </tr></ng-template
-      >
-      <ng-template #body let-item>
-        <tr>
-          <td class="break-all">{{ item.receiptId }}</td>
-          <td>{{ item.effectiveDate | date: 'dd-MM-yyyy' : 'UTC' }}</td>
-          <td>{{ item.grossAmount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</td>
-          <td class="break-all">{{ item.tripId }}</td>
-          <td>
-            <a class="underline" [routerLink]="['/cobranza/cuentas', item.accountId]">Ver cuenta</a>
-          </td>
-          <td>
-            {{
-              item.status === 'PENDING_MANUAL_ISSUE'
-                ? 'Pendiente de emisión'
-                : 'Registrada, sin validación automática SII'
-            }}
-          </td>
-          <td>
-            @if (item.status === 'PENDING_MANUAL_ISSUE') {
-              <button
-                pButton
-                type="button"
-                [loading]="busy()"
-                [disabled]="busy()"
-                (click)="begin(item)"
-              >
-                Registrar boleta
-              </button>
-            } @else {
-              <button
-                pButton
-                type="button"
-                severity="secondary"
-                outlined
-                [disabled]="busy()"
-                [loading]="busy()"
-                (click)="download(item)"
-              >
-                Descargar PDF
-              </button>
-            }
-          </td>
-        </tr>
-      </ng-template>
-      <ng-template #emptymessage
-        ><tr>
-          <td colspan="7">No hay boletas en este estado.</td>
-        </tr></ng-template
-      >
-    </p-table>
-  </div>
-  @if (nextCursor()) {
-    <button
-      pButton
-      type="button"
-      severity="secondary"
-      outlined
-      class="self-start"
-      [disabled]="busy()"
-      [loading]="busy()"
-      (click)="load(true)"
-    >
-      Cargar más
-    </button>
-  }
-
-  @if (selected(); as item) {
-    <p-panel header="Registrar boleta emitida manualmente">
-      <form [formGroup]="form" (ngSubmit)="save()" class="grid gap-5 lg:grid-cols-2">
-        <p-message class="lg:col-span-2" severity="warn"
-          >Monto esperado: {{ item.grossAmount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}. El
-          sistema no permite cambiarlo; verifica que coincida con la boleta emitida.</p-message
-        >
-        <div class="flex flex-col gap-2">
-          <label for="tax-folio">Folio SII</label
-          ><input
-            pInputText
-            id="tax-folio"
-            formControlName="folio"
-            inputmode="numeric"
-            maxlength="18"
-          />
-        </div>
-        <div class="flex min-w-0 flex-col gap-2">
-          <label for="tax-date">Fecha de emisión</label
-          ><app-date-only-picker inputId="tax-date" formControlName="issueDate" />
-        </div>
-        <div class="flex flex-col gap-2 lg:col-span-2">
-          <label for="tax-reason">Nota de registro</label
-          ><textarea
-            pTextarea
-            id="tax-reason"
-            formControlName="reason"
-            rows="3"
-            maxlength="500"
-          ></textarea>
-        </div>
-        <div class="flex flex-col gap-2 lg:col-span-2">
-          <span>PDF de la boleta emitida</span>
-          <p-fileupload
-            #taxUpload
-            mode="basic"
-            name="taxDocument"
-            accept="application/pdf,.pdf"
-            chooseLabel="Seleccionar PDF"
-            chooseIcon="icon-[tabler--upload] size-4"
-            [auto]="true"
-            [customUpload]="true"
-            [maxFileSize]="5242880"
-            [disabled]="busy()"
-            (uploadHandler)="selectPDF($event, taxUpload)"
-          />
-          @if (selectedPDF(); as file) {
-            <small class="text-muted">Archivo seleccionado: {{ file.name }}</small>
-          }
-        </div>
-        <div class="flex items-start gap-3 lg:col-span-2">
-          <p-checkbox inputId="tax-reviewed" formControlName="reviewed" [binary]="true" /><label
-            for="tax-reviewed"
-            >Verifiqué folio, fecha, monto y que el PDF corresponde al pago indicado.</label
-          >
-        </div>
-        <div class="flex flex-wrap gap-3 lg:col-span-2">
-          <button pButton type="submit" [loading]="busy()" [disabled]="busy()">
-            Guardar boleta</button
-          ><button
-            pButton
-            type="button"
-            severity="secondary"
-            outlined
-            [disabled]="busy()"
-            [loading]="busy()"
-            (click)="cancel()"
-          >
-            Cancelar
-          </button>
-        </div>
-      </form>
-    </p-panel>
-  }
+  <header class="flex flex-wrap items-start justify-between gap-4"><div><p class="text-sm text-muted">Cobranza · facturación</p><h1 class="mt-2 text-3xl font-semibold text-ink">Emisión de boletas</h1></div><a pButton severity="secondary" outlined routerLink="/cobranza/tesoreria">Volver a tesorería</a></header>
+  <p-message severity="info">Emite boletas electrónicas tipo 39. En el set de certificación usa la referencia CASO-1, CASO-2, etc.; el XML agrega CodRef SET.</p-message>
+  @if (error()) { <p-message severity="error">{{ error() }}</p-message> } @if (success()) { <p-message severity="success">{{ success() }}</p-message> }
+  <p-panel header="Nueva boleta manual"><form [formGroup]="form" (ngSubmit)="create()" class="grid gap-5 lg:grid-cols-3">
+    <div class="flex flex-col gap-2"><label for="tax-date">Fecha de emisión</label><app-date-only-picker inputId="tax-date" formControlName="issueDate" /></div>
+    <div class="flex flex-col gap-2"><label for="tax-rut">RUT receptor (opcional)</label><input pInputText id="tax-rut" formControlName="customerRut" /></div>
+    <div class="flex flex-col gap-2"><label for="tax-reference">Referencia del set</label><input pInputText id="tax-reference" formControlName="reference" placeholder="CASO-1" /></div>
+    <div formArrayName="items" class="flex flex-col gap-4 lg:col-span-3">@for (item of form.controls.items.controls; track item; let index = $index) {<div [formGroupName]="index" class="grid gap-3 rounded-lg border border-surface p-4 md:grid-cols-12">
+      <div class="flex flex-col gap-2 md:col-span-4"><label [for]="'item-name-' + index">Ítem</label><input pInputText [id]="'item-name-' + index" formControlName="description" /></div>
+      <div class="flex flex-col gap-2 md:col-span-2"><label [for]="'item-qty-' + index">Cantidad</label><p-inputnumber [inputId]="'item-qty-' + index" formControlName="quantity" [min]="1" [maxFractionDigits]="0" /></div>
+      <div class="flex flex-col gap-2 md:col-span-2"><label [for]="'item-price-' + index">Precio con IVA</label><p-inputnumber [inputId]="'item-price-' + index" formControlName="unitPrice" mode="currency" currency="CLP" locale="es-CL" [min]="1" /></div>
+      <div class="flex flex-col gap-2 md:col-span-2"><label [for]="'item-unit-' + index">Unidad</label><input pInputText [id]="'item-unit-' + index" formControlName="unit" placeholder="Kg" /></div>
+      <div class="flex items-center gap-2 md:col-span-1"><p-checkbox [inputId]="'item-exempt-' + index" formControlName="exempt" [binary]="true" /><label [for]="'item-exempt-' + index">Exento</label></div>
+      <button pButton type="button" severity="danger" text class="md:col-span-1" [disabled]="form.controls.items.length === 1" (click)="removeItem(index)">Quitar</button>
+    </div>}</div>
+    <div class="flex flex-wrap items-center justify-between gap-3 lg:col-span-3"><button pButton type="button" severity="secondary" outlined (click)="addItem()">Agregar ítem</button><strong>Total: {{ total() | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</strong></div>
+    <button pButton type="submit" class="justify-self-start lg:col-span-3" [loading]="busy()" [disabled]="busy()">Emitir boleta</button>
+  </form></p-panel>
+  <p-panel header="Boletas de pagos y emisiones pendientes"><div class="app-table-viewport"><p-table [value]="items()" [scrollable]="true" [tableStyle]="{ 'min-width': '60rem' }">
+    <ng-template #header><tr><th>Origen</th><th>Fecha</th><th>Monto</th><th>Estado</th><th>Folio / Track ID</th><th><span class="sr-only">Acción</span></th></tr></ng-template>
+    <ng-template #body let-item><tr><td>{{ item.receiptId || item.reference || 'Emisión manual' }}</td><td>{{ item.effectiveDate | date: 'dd-MM-yyyy' : 'UTC' }}</td><td>{{ item.grossAmount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</td><td>{{ item.status }}</td><td>{{ item.siiIssuance?.folio || '—' }} / {{ item.siiIssuance?.trackId || '—' }}</td><td><button pButton type="button" [disabled]="busy() || item.status === 'SUBMITTED'" (click)="issue(item)">{{ item.status === 'SUBMITTED' ? 'Enviada' : 'Emitir boleta' }}</button></td></tr></ng-template>
+    <ng-template #emptymessage><tr><td colspan="6">No hay boletas pendientes.</td></tr></ng-template>
+  </p-table></div></p-panel>
 </main>

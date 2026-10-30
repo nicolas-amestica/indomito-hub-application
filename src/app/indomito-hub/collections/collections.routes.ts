@@ -9,13 +9,14 @@ export const COLLECTIONS_ROUTES: Routes = [
     loadComponent: () => import('./pages/renditions/renditions.page').then((m) => m.RenditionsPage),
   },
   {
-    path: 'documentos-tributarios',
-    title: 'Boletas pendientes de emisión',
-    data: { module: 'PAYMENT_OPERATIONS' },
+    path: 'factura-electronica',
+    title: 'Factura electrónica',
+    data: { module: 'FACTURA_ELECTRONICA' },
     canActivate: [moduleGuard],
     loadComponent: () =>
       import('./pages/tax-documents/tax-documents.page').then((m) => m.TaxDocumentsPage),
   },
+  { path: 'documentos-tributarios', pathMatch: 'full', redirectTo: 'factura-electronica' },
   {
     path: 'comprobantes/fallos',
     title: 'Entregas fallidas de comprobantes',

@@ -1,5 +1,13 @@
 export type TaxDocumentListStatus = 'PENDING' | 'RECORDED';
 
+export interface TaxDocumentItem {
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  exempt: boolean;
+  unit?: string;
+}
+
 export interface ManualTaxIssuance {
   folio: string;
   issueDate: string;
@@ -21,9 +29,21 @@ export interface TaxDocumentRequest {
   requestedAt: string;
   documentKind: 'BOLETA';
   documentSubtype: 'BOLETA_VENTA_ELECTRONICA';
-  issuanceMode: 'MANUAL_SII';
-  status: 'PENDING_MANUAL_ISSUE' | 'MANUAL_RECORDED';
+  issuanceMode: 'MANUAL_SII' | 'SII_DIRECT';
+  status: 'PENDING_MANUAL_ISSUE' | 'MANUAL_RECORDED' | 'READY' | 'ISSUING' | 'SUBMITTED';
   manualIssuance?: ManualTaxIssuance;
+  siiIssuance?: { folio: number; trackId?: string; submittedAt?: string };
+  items?: TaxDocumentItem[];
+  reference?: string;
+  customerRut?: string;
+}
+
+export interface CreateTaxDocumentRequest {
+  commandId: string;
+  issueDate: string;
+  customerRut: string;
+  reference: string;
+  items: TaxDocumentItem[];
 }
 
 export interface TaxDocumentPage {
