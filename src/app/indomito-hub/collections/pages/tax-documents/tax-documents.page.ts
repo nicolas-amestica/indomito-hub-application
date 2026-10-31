@@ -32,7 +32,7 @@ export class TaxDocumentsPage {
   protected addItem(): void { if (this.form.controls.items.length < 20) this.form.controls.items.push(this.newItem()); }
   protected removeItem(index: number): void { if (this.form.controls.items.length > 1) this.form.controls.items.removeAt(index); }
   protected total(): number { return this.form.controls.items.getRawValue().reduce((sum, item) => sum + item['quantity'] * item['unitPrice'], 0); }
-  protected load(): void { if (this.busy()) return; this.busy.set(true); this.api.list('PENDING').pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.busy.set(false))).subscribe({ next: page => this.items.set(page.items), error: () => this.error.set('No fue posible consultar las boletas.') }); }
+  protected load(): void { if (this.busy()) return; this.busy.set(true); this.api.listAll().pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.busy.set(false))).subscribe({ next: page => this.items.set(page.items), error: () => this.error.set('No fue posible consultar las boletas.') }); }
   protected create(): void {
     this.form.markAllAsTouched();
     if (this.form.invalid || this.total() <= 0 || this.busy()) { this.error.set('Completa al menos un ítem válido.'); return; }

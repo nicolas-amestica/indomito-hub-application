@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map } from 'rxjs';
+import { forkJoin, map } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import type { ApiSuccessEnvelope } from '../../../core/http/api-response.interface';
 import type {
@@ -22,6 +22,16 @@ export class CollectionTaxDocuments {
     return this.http
       .get<ApiSuccessEnvelope<TaxDocumentPage>>(`${this.url}/pendientes`, { params })
       .pipe(map(({ data }) => data));
+  }
+
+  listAll() {
+    return forkJoin([this.list('PENDING'), this.list('RECORDED')]).pipe(
+      map(([pending, recorded]) => ({
+        items: [...pending.items, ...recorded.items].sort((left, right) =>
+          right.requestedAt.localeCompare(left.requestedAt),
+        ),
+      })),
+    );
   }
 
   recordManual(requestId: string, request: ManualTaxIssuanceRequest) {
