@@ -1,25 +1,97 @@
-<main class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-8 sm:px-8" [attr.aria-busy]="busy()">
-  <header class="flex flex-wrap items-start justify-between gap-4"><div><p class="text-sm text-muted">Cobranza · facturación</p><h1 class="mt-2 text-3xl font-semibold text-ink">Emisión de boletas</h1></div><a pButton severity="secondary" outlined routerLink="/cobranza/tesoreria">Volver a tesorería</a></header>
-  <p-message severity="info">Emite boletas electrónicas tipo 39. En el set de certificación usa la referencia CASO-1, CASO-2, etc.; el XML agrega CodRef SET.</p-message>
-  @if (error()) { <p-message severity="error">{{ error() }}</p-message> } @if (success()) { <p-message severity="success">{{ success() }}</p-message> }
-  <p-panel header="Nueva boleta manual"><form [formGroup]="form" (ngSubmit)="create()" class="grid gap-5 lg:grid-cols-3">
-    <div class="flex flex-col gap-2"><label for="tax-date">Fecha de emisión</label><app-date-only-picker inputId="tax-date" formControlName="issueDate" /></div>
-    <div class="flex flex-col gap-2"><label for="tax-rut">RUT receptor (opcional)</label><input pInputText id="tax-rut" formControlName="customerRut" /></div>
-    <div class="flex flex-col gap-2"><label for="tax-reference">Referencia del set</label><input pInputText id="tax-reference" formControlName="reference" placeholder="CASO-1" /></div>
-    <div formArrayName="items" class="flex flex-col gap-4 lg:col-span-3">@for (item of form.controls.items.controls; track item; let index = $index) {<div [formGroupName]="index" class="grid gap-3 rounded-lg border border-surface p-4 md:grid-cols-12">
-      <div class="flex flex-col gap-2 md:col-span-4"><label [for]="'item-name-' + index">Ítem</label><input pInputText [id]="'item-name-' + index" formControlName="description" /></div>
-      <div class="flex flex-col gap-2 md:col-span-2"><label [for]="'item-qty-' + index">Cantidad</label><p-inputnumber [inputId]="'item-qty-' + index" formControlName="quantity" [min]="1" [maxFractionDigits]="0" /></div>
-      <div class="flex flex-col gap-2 md:col-span-2"><label [for]="'item-price-' + index">Precio con IVA</label><p-inputnumber [inputId]="'item-price-' + index" formControlName="unitPrice" mode="currency" currency="CLP" locale="es-CL" [min]="1" /></div>
-      <div class="flex flex-col gap-2 md:col-span-2"><label [for]="'item-unit-' + index">Unidad</label><input pInputText [id]="'item-unit-' + index" formControlName="unit" placeholder="Kg" /></div>
-      <div class="flex items-center gap-2 md:col-span-1"><p-checkbox [inputId]="'item-exempt-' + index" formControlName="exempt" [binary]="true" /><label [for]="'item-exempt-' + index">Exento</label></div>
-      <button pButton type="button" severity="danger" text class="md:col-span-1" [disabled]="form.controls.items.length === 1" (click)="removeItem(index)">Quitar</button>
-    </div>}</div>
-    <div class="flex flex-wrap items-center justify-between gap-3 lg:col-span-3"><button pButton type="button" severity="secondary" outlined (click)="addItem()">Agregar ítem</button><strong>Total: {{ total() | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</strong></div>
-    <button pButton type="submit" class="justify-self-start lg:col-span-3" [loading]="busy()" [disabled]="busy()">Emitir boleta</button>
-  </form></p-panel>
-  <p-panel header="Boletas de pagos y emisiones pendientes"><div class="app-table-viewport"><p-table [value]="items()" [scrollable]="true" [tableStyle]="{ 'min-width': '60rem' }">
-    <ng-template #header><tr><th>Origen</th><th>Fecha</th><th>Monto</th><th>Estado</th><th>Folio / Track ID</th><th><span class="sr-only">Acción</span></th></tr></ng-template>
-    <ng-template #body let-item><tr><td>{{ item.receiptId || item.reference || 'Emisión manual' }}</td><td>{{ item.effectiveDate | date: 'dd-MM-yyyy' : 'UTC' }}</td><td>{{ item.grossAmount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</td><td>{{ item.status }}</td><td>{{ item.siiIssuance?.folio || '—' }} / {{ item.siiIssuance?.trackId || '—' }}</td><td><button pButton type="button" [disabled]="busy() || item.status === 'SUBMITTED'" (click)="issue(item)">{{ item.status === 'SUBMITTED' ? 'Enviada' : 'Emitir boleta' }}</button></td></tr></ng-template>
-    <ng-template #emptymessage><tr><td colspan="6">No hay boletas pendientes.</td></tr></ng-template>
-  </p-table></div></p-panel>
+<main class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-8 sm:px-8" [attr.aria-busy]="busy() || configurationBusy()">
+  <header class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <p class="text-sm text-muted">Cobranza · facturación</p>
+      <h1 class="mt-2 text-3xl font-semibold text-ink">Factura electrónica</h1>
+    </div>
+    <a pButton severity="secondary" outlined routerLink="/cobranza/tesoreria">Volver a tesorería</a>
+  </header>
+
+  @if (error()) { <p-message severity="error" closable (onClose)="error.set('')">{{ error() }}</p-message> }
+  @if (success()) { <p-message severity="success" closable (onClose)="success.set('')">{{ success() }}</p-message> }
+
+  <p-tabs value="emission" scrollable>
+    <p-tablist>
+      <p-tab value="emission"><span class="icon-[tabler--receipt-2] mr-2 size-4" aria-hidden="true"></span>Emisión de boletas</p-tab>
+      <p-tab value="received"><span class="icon-[tabler--inbox] mr-2 size-4" aria-hidden="true"></span>Documentos recibidos</p-tab>
+      <p-tab value="configuration"><span class="icon-[tabler--settings] mr-2 size-4" aria-hidden="true"></span>Configuración</p-tab>
+    </p-tablist>
+
+    <p-tabpanels>
+      <p-tabpanel value="emission">
+        <div class="flex flex-col gap-6 pt-5">
+          <p-message severity="info">Emite boletas electrónicas tipo 39. En el set de certificación usa la referencia CASO-1, CASO-2, etc.; el XML agrega CodRef SET.</p-message>
+          <p-panel header="Nueva boleta manual">
+            <form [formGroup]="form" (ngSubmit)="create()" class="grid gap-5 lg:grid-cols-3">
+              <div class="flex flex-col gap-2"><label for="tax-date">Fecha de emisión</label><app-date-only-picker inputId="tax-date" formControlName="issueDate" /></div>
+              <div class="flex flex-col gap-2"><label for="tax-rut">RUT receptor (opcional)</label><input pInputText id="tax-rut" formControlName="customerRut" /></div>
+              <div class="flex flex-col gap-2"><label for="tax-reference">Referencia del set</label><input pInputText id="tax-reference" formControlName="reference" placeholder="CASO-1" /></div>
+              <div formArrayName="items" class="flex flex-col gap-4 lg:col-span-3">@for (item of form.controls.items.controls; track item; let index = $index) {<div [formGroupName]="index" class="grid gap-3 rounded-lg border border-line/75 p-4 dark:border-line/55 md:grid-cols-12">
+                <div class="flex flex-col gap-2 md:col-span-4"><label [for]="'item-name-' + index">Ítem</label><input pInputText [id]="'item-name-' + index" formControlName="description" /></div>
+                <div class="flex flex-col gap-2 md:col-span-2"><label [for]="'item-qty-' + index">Cantidad</label><p-inputnumber [inputId]="'item-qty-' + index" formControlName="quantity" [min]="1" [maxFractionDigits]="0" /></div>
+                <div class="flex flex-col gap-2 md:col-span-2"><label [for]="'item-price-' + index">Precio con IVA</label><p-inputnumber [inputId]="'item-price-' + index" formControlName="unitPrice" mode="currency" currency="CLP" locale="es-CL" [min]="1" /></div>
+                <div class="flex flex-col gap-2 md:col-span-2"><label [for]="'item-unit-' + index">Unidad</label><input pInputText [id]="'item-unit-' + index" formControlName="unit" placeholder="Kg" /></div>
+                <div class="flex items-center gap-2 md:col-span-1"><p-checkbox [inputId]="'item-exempt-' + index" formControlName="exempt" [binary]="true" /><label [for]="'item-exempt-' + index">Exento</label></div>
+                <button pButton type="button" severity="danger" text class="md:col-span-1" [disabled]="form.controls.items.length === 1" (click)="removeItem(index)">Quitar</button>
+              </div>}</div>
+              <div class="flex flex-wrap items-center justify-between gap-3 lg:col-span-3"><button pButton type="button" severity="secondary" outlined (click)="addItem()"><span class="icon-[tabler--plus] size-4" aria-hidden="true"></span>Agregar ítem</button><strong>Total: {{ total() | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</strong></div>
+              <button pButton type="submit" class="justify-self-start lg:col-span-3" [loading]="busy()" [disabled]="busy()"><span class="icon-[tabler--send] size-4" aria-hidden="true"></span>Emitir boleta</button>
+            </form>
+          </p-panel>
+          <p-panel header="Boletas de pagos y emisiones pendientes"><div class="app-table-viewport"><p-table [value]="items()" [scrollable]="true" [tableStyle]="{ 'min-width': '60rem' }">
+            <ng-template #header><tr><th>Origen</th><th>Fecha</th><th>Monto</th><th>Estado</th><th>Folio / Track ID</th><th><span class="sr-only">Acción</span></th></tr></ng-template>
+            <ng-template #body let-item><tr><td>{{ item.receiptId || item.reference || 'Emisión manual' }}</td><td>{{ item.effectiveDate | date: 'dd-MM-yyyy' : 'UTC' }}</td><td>{{ item.grossAmount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</td><td>{{ item.status }}</td><td>{{ item.siiIssuance?.folio || '—' }} / {{ item.siiIssuance?.trackId || '—' }}</td><td><button pButton type="button" [disabled]="busy() || item.status === 'SUBMITTED'" (click)="issue(item)">{{ item.status === 'SUBMITTED' ? 'Enviada' : 'Emitir boleta' }}</button></td></tr></ng-template>
+            <ng-template #emptymessage><tr><td colspan="6">No hay boletas pendientes.</td></tr></ng-template>
+          </p-table></div></p-panel>
+        </div>
+      </p-tabpanel>
+
+      <p-tabpanel value="received">
+        <p-panel header="Documentos tributarios recibidos" class="mt-5 block">
+          <div class="flex flex-col items-center gap-4 py-12 text-center">
+            <span class="icon-[tabler--tools] size-10 text-muted" aria-hidden="true"></span>
+            <div><h2 class="text-xl font-semibold text-ink">En construcción</h2><p class="mt-2 max-w-xl text-sm text-muted">La consulta de facturas, facturas exentas, boletas y otros DTE recibidos estará disponible en una próxima etapa.</p></div>
+          </div>
+        </p-panel>
+      </p-tabpanel>
+
+      <p-tabpanel value="configuration">
+        <div class="flex flex-col gap-6 pt-5">
+          <p-message severity="info">Los datos, CAF y certificado se leen desde la configuración SII activa de emisión. Cada cambio valida el material y actualiza esa configuración sin modificar las solicitudes ni folios ya emitidos.</p-message>
+          @if (configuration(); as current) {
+            <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Estado tributario">
+              <p-panel header="Ambiente"><p class="text-lg font-semibold text-ink">{{ current.environment === 'CERTIFICATION' ? 'Certificación' : 'Producción' }}</p><p class="mt-2 text-sm text-muted">DTE 39 · Boleta electrónica</p></p-panel>
+              <p-panel header="CAF"><p class="text-lg font-semibold text-ink">{{ current.caf.available | number }} disponibles</p><p class="mt-2 text-sm text-muted">{{ current.caf.used | number }} usados de {{ current.caf.from | number }}–{{ current.caf.to | number }}</p><p-tag class="mt-3 inline-block" [severity]="cafSeverity()" [value]="current.caf.severity === 'OK' ? 'Disponible' : current.caf.severity === 'LOW' ? 'Por agotarse' : current.caf.severity === 'EXHAUSTED' ? 'Agotado' : 'Sin CAF'" /></p-panel>
+              <p-panel header="Certificado digital" class="min-w-0"><p class="text-lg font-semibold text-ink">{{ current.certificate.daysUntilExpiry }} días</p><p class="mt-2 break-all text-sm text-muted">{{ current.certificate.subject || 'Sin certificado cargado' }}</p><p-tag class="mt-3 inline-block" [severity]="certificateSeverity()" [value]="current.certificate.severity === 'OK' ? 'Vigente' : current.certificate.severity === 'EXPIRING' ? 'Por vencer' : current.certificate.severity === 'EXPIRED' ? 'Vencido' : 'Sin certificado'" /></p-panel>
+              <p-panel header="Certificación"><p class="text-lg font-semibold text-ink">{{ current.certificationApproved ? 'Aprobada' : 'Pendiente' }}</p><p class="mt-2 text-sm text-muted">Estado informado para el ambiente de certificación.</p></p-panel>
+            </section>
+          }
+
+          <p-panel header="Datos del emisor">
+            <form [formGroup]="configurationForm" (ngSubmit)="saveConfiguration()" class="grid gap-5 lg:grid-cols-3">
+              <div class="flex flex-col gap-2"><label for="issuer-rut">RUT emisor</label><input pInputText id="issuer-rut" formControlName="senderRut" /></div>
+              <div class="flex flex-col gap-2 lg:col-span-2"><label for="issuer-name">Razón social</label><input pInputText id="issuer-name" formControlName="issuerName" [readonly]="true" /><small class="text-muted">La razón social se obtiene del CAF activo.</small></div>
+              <div class="flex flex-col gap-2"><label for="issuer-activity">Giro</label><input pInputText id="issuer-activity" formControlName="issuerActivity" /></div>
+              <div class="flex flex-col gap-2"><label for="issuer-address">Dirección</label><input pInputText id="issuer-address" formControlName="issuerAddress" /></div>
+              <div class="flex flex-col gap-2"><label for="issuer-commune">Comuna</label><input pInputText id="issuer-commune" formControlName="issuerCommune" /></div>
+              <div class="flex flex-col gap-2"><label for="resolution-date">Fecha de resolución</label><input pInputText id="resolution-date" type="date" formControlName="resolutionDate" /></div>
+              <div class="flex flex-col gap-2"><label for="resolution-number">Número de resolución</label><p-inputnumber inputId="resolution-number" formControlName="resolutionNumber" [min]="0" [maxFractionDigits]="0" /></div>
+              <div class="flex items-center gap-2"><p-checkbox inputId="issuer-enabled" formControlName="enabled" [binary]="true" /><label for="issuer-enabled">Configuración habilitada</label></div>
+              <div class="flex items-center gap-2"><p-checkbox inputId="certification-approved" formControlName="certificationApproved" [binary]="true" /><label for="certification-approved">Certificación aprobada</label></div>
+              <div class="lg:col-span-3"><button pButton type="submit" [loading]="configurationBusy()" [disabled]="configurationBusy()"><span class="icon-[tabler--device-floppy] size-4" aria-hidden="true"></span>Guardar datos del emisor</button></div>
+            </form>
+          </p-panel>
+
+          <div class="grid gap-6 xl:grid-cols-2">
+            <p-panel header="Folios CAF DTE 39">
+              <div class="flex flex-col gap-4"><p class="text-sm text-muted">Carga un CAF XML autorizado por el SII. Se valida el rango y sólo se almacena como secreto cifrado.</p><p-fileupload #cafUploader mode="basic" name="caf" accept=".xml,text/xml,application/xml" chooseLabel="Cargar CAF XML" chooseIcon="icon-[tabler--upload] size-4" [auto]="false" [disabled]="uploadingCaf()" (onSelect)="uploadCaf($event, cafUploader)" /><p class="text-xs text-muted">{{ selectedCafName() || (cafConfigured() ? 'CAF cargado.' : 'Aún no hay CAF cargado.') }}</p></div>
+            </p-panel>
+            <p-panel header="Certificado digital">
+              <div class="flex flex-col gap-4"><p class="text-sm text-muted">Carga el certificado de firma en formato .pfx. La contraseña no se conserva en el navegador.</p><div class="flex flex-col gap-2"><label for="pfx-password">Contraseña del certificado</label><input pInputText id="pfx-password" type="password" [formControl]="pfxPassword" autocomplete="new-password" /></div><p-fileupload #pfxUploader mode="basic" name="pfx" accept=".pfx,application/x-pkcs12" chooseLabel="Cargar certificado .pfx" chooseIcon="icon-[tabler--upload] size-4" [auto]="false" [disabled]="uploadingPfx()" (onSelect)="uploadPfx($event, pfxUploader)" /><p class="text-xs text-muted">{{ selectedPfxName() || (certificateConfigured() ? 'Certificado cargado.' : 'Aún no hay certificado cargado.') }}</p></div>
+            </p-panel>
+          </div>
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
 </main>

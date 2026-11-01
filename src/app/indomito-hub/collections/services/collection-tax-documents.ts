@@ -6,6 +6,8 @@ import type { ApiSuccessEnvelope } from '../../../core/http/api-response.interfa
 import type {
   ManualTaxIssuanceRequest,
   CreateTaxDocumentRequest,
+  TaxConfigurationInput,
+  TaxConfigurationSummary,
   TaxDocumentListStatus,
   TaxDocumentPage,
   TaxDocumentRequest,
@@ -32,6 +34,35 @@ export class CollectionTaxDocuments {
         ),
       })),
     );
+  }
+
+  getConfiguration() {
+    return this.http
+      .get<ApiSuccessEnvelope<TaxConfigurationSummary>>(`${this.url}/configuracion`)
+      .pipe(map(({ data }) => data));
+  }
+
+  updateConfiguration(request: TaxConfigurationInput) {
+    return this.http
+      .put<ApiSuccessEnvelope<TaxConfigurationSummary>>(`${this.url}/configuracion`, request)
+      .pipe(map(({ data }) => data));
+  }
+
+  uploadCaf(cafXmlBase64: string) {
+    return this.http
+      .post<ApiSuccessEnvelope<TaxConfigurationSummary>>(`${this.url}/configuracion/caf`, {
+        cafXmlBase64,
+      })
+      .pipe(map(({ data }) => data));
+  }
+
+  uploadPfx(pfxBase64: string, password: string) {
+    return this.http
+      .post<ApiSuccessEnvelope<TaxConfigurationSummary>>(`${this.url}/configuracion/pfx`, {
+        pfxBase64,
+        password,
+      })
+      .pipe(map(({ data }) => data));
   }
 
   recordManual(requestId: string, request: ManualTaxIssuanceRequest) {

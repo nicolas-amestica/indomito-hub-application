@@ -58,3 +58,33 @@ export interface ManualTaxIssuanceRequest {
   reason: string;
   pdfBase64: string;
 }
+
+export interface TaxConfigurationInput {
+  senderRut: string;
+  issuerName: string;
+  issuerActivity: string;
+  issuerAddress: string;
+  issuerCommune: string;
+  environment: 'CERTIFICATION' | 'PRODUCTION';
+  resolutionDate: string;
+  resolutionNumber: number;
+  enabled: boolean;
+  certificationApproved: boolean;
+}
+
+export interface TaxConfigurationSummary extends TaxConfigurationInput {
+  caf: {
+    from: number;
+    to: number;
+    used: number;
+    available: number;
+    severity: 'MISSING' | 'OK' | 'LOW' | 'EXHAUSTED';
+  };
+  certificate: {
+    subject: string;
+    validFrom: string;
+    validTo: string;
+    daysUntilExpiry: number;
+    severity: 'MISSING' | 'OK' | 'EXPIRING' | 'EXPIRED';
+  };
+}
