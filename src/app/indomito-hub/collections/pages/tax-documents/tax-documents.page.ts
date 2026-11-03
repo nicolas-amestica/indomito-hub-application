@@ -1,4 +1,5 @@
 import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -81,6 +82,7 @@ export class TaxDocumentsPage {
     issuerActivity: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(160)] }),
     issuerAddress: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(160)] }),
     issuerCommune: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(80)] }),
+    notificationEmail: new FormControl('', { nonNullable: true, validators: [Validators.email, Validators.maxLength(254)] }),
     resolutionDate: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     resolutionNumber: new FormControl(0, { nonNullable: true, validators: [Validators.required, Validators.min(0)] }),
     enabled: new FormControl(false, { nonNullable: true }),
@@ -227,8 +229,13 @@ export class TaxDocumentsPage {
       this.selectedCafName.set(file.name);
       this.applyConfiguration(configuration);
       this.success.set('CAF validado y guardado de forma segura. La emisión vigente conserva su configuración actual.');
-    } catch {
-      this.error.set('No fue posible cargar el CAF. Verifica que sea un CAF DTE tipo 39 válido.');
+    } catch (error: unknown) {
+      if (error instanceof HttpErrorResponse && error.status === 409 && this.configuration()) {
+        const caf = this.configuration()!.caf;
+        this.error.set(`El CAF ${caf.from}–${caf.to} todavía tiene ${caf.available} folio(s) disponible(s). Cárgalo nuevamente cuando el rango activo llegue a cero.`);
+      } else {
+        this.error.set('No fue posible cargar el CAF. Verifica que sea un CAF DTE tipo 39 válido.');
+      }
     } finally {
       this.uploadingCaf.set(false);
     }
@@ -275,6 +282,7 @@ export class TaxDocumentsPage {
       issuerActivity: configuration.issuerActivity,
       issuerAddress: configuration.issuerAddress,
       issuerCommune: configuration.issuerCommune,
+      notificationEmail: configuration.notificationEmail ?? '',
       resolutionDate: configuration.resolutionDate,
       resolutionNumber: configuration.resolutionNumber,
       enabled: configuration.enabled,

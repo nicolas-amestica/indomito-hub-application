@@ -66,6 +66,7 @@ export interface TaxConfigurationInput {
   issuerActivity: string;
   issuerAddress: string;
   issuerCommune: string;
+  notificationEmail: string;
   environment: 'CERTIFICATION' | 'PRODUCTION';
   resolutionDate: string;
   resolutionNumber: number;
