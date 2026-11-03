@@ -89,6 +89,15 @@ export class CollectionTaxDocuments {
       .pipe(map(({ data }) => data));
   }
 
+  reissue(requestId: string, commandId: string) {
+    return this.http
+      .post<ApiSuccessEnvelope<TaxDocumentRequest>>(
+        `${this.url}/${encodeURIComponent(requestId)}/reemision`,
+        { commandId },
+      )
+      .pipe(map(({ data }) => data));
+  }
+
   download(requestId: string) {
     return this.http
       .get<ApiSuccessEnvelope<{ url: string; expiresIn: number }>>(

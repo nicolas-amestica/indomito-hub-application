@@ -30,19 +30,20 @@ export interface TaxDocumentRequest {
   documentKind: 'BOLETA';
   documentSubtype: 'BOLETA_VENTA_ELECTRONICA';
   issuanceMode: 'MANUAL_SII' | 'SII_DIRECT';
-  status: 'PENDING_MANUAL_ISSUE' | 'MANUAL_RECORDED' | 'READY' | 'ISSUING' | 'SUBMITTED';
+  status: 'PENDING_MANUAL_ISSUE' | 'MANUAL_RECORDED' | 'READY' | 'ISSUING' | 'SUBMITTED' | 'ACCEPTED' | 'ACCEPTED_WITH_REPAIRS' | 'REJECTED';
   manualIssuance?: ManualTaxIssuance;
-  siiIssuance?: { folio: number; trackId?: string; submittedAt?: string };
+  siiIssuance?: { folio: number; trackId?: string; submittedAt?: string; processedAt?: string; status?: string; detail?: string; documentKey?: string };
   items?: TaxDocumentItem[];
   reference?: string;
   customerRut?: string;
+  reissuesRequest?: string;
+  reissuedBy?: string;
 }
 
 export interface CreateTaxDocumentRequest {
   commandId: string;
   issueDate: string;
   customerRut: string;
-  reference: string;
   items: TaxDocumentItem[];
 }
 
@@ -78,6 +79,9 @@ export interface TaxConfigurationSummary extends TaxConfigurationInput {
     to: number;
     used: number;
     available: number;
+    next: number | null;
+    usagePercentage: number;
+    authorizationDate: string;
     severity: 'MISSING' | 'OK' | 'LOW' | 'EXHAUSTED';
   };
   certificate: {

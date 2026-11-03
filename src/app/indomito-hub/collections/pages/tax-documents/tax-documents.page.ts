@@ -62,6 +62,7 @@ export class TaxDocumentsPage {
   protected readonly error = signal('');
   protected readonly success = signal('');
   protected readonly items = signal<TaxDocumentRequest[]>([]);
+  protected readonly rejectedCount = computed(() => this.items().filter(item => item.status === 'REJECTED' && !item.reissuedBy).length);
   protected readonly configuration = signal<TaxConfigurationSummary | null>(null);
   protected readonly selectedCafName = signal('');
   protected readonly selectedPfxName = signal('');
@@ -72,7 +73,6 @@ export class TaxDocumentsPage {
   protected readonly form = new FormGroup({
     issueDate: new FormControl(todayDateOnly(), { nonNullable: true, validators: [Validators.required] }),
     customerRut: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(12)] }),
-    reference: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(90)] }),
     items: new FormArray([this.newItem()]),
   });
   protected readonly configurationForm = new FormGroup({
@@ -138,7 +138,6 @@ export class TaxDocumentsPage {
       commandId: newUlid(),
       issueDate: raw.issueDate,
       customerRut: raw.customerRut.trim(),
-      reference: raw.reference.trim(),
       items: raw.items.map(item => ({ ...item, description: item['description'].trim(), unit: item['unit'].trim() })) as TaxDocumentItem[],
     }).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.busy.set(false))).subscribe({
       next: item => {
@@ -162,6 +161,28 @@ export class TaxDocumentsPage {
     });
   }
 
+  protected download(item: TaxDocumentRequest): void {
+    if (this.busy() || !['SUBMITTED', 'ACCEPTED', 'ACCEPTED_WITH_REPAIRS'].includes(item.status)) return;
+    this.busy.set(true);
+    this.api.download(item.requestId).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.busy.set(false))).subscribe({
+      next: ({ url }) => window.open(url, '_blank', 'noopener,noreferrer'),
+      error: () => this.error.set('La representación PDF todavía no está disponible.'),
+    });
+  }
+
+  protected reissue(item: TaxDocumentRequest): void {
+    if (this.busy() || item.status !== 'REJECTED' || item.reissuedBy) return;
+    this.busy.set(true);
+    this.error.set('');
+    this.api.reissue(item.requestId, newUlid()).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.busy.set(false))).subscribe({
+      next: replacement => {
+        this.items.update(items => [replacement, ...items.map(current => current.requestId === item.requestId ? { ...current, reissuedBy: replacement.requestId } : current)]);
+        this.success.set('Se creó una nueva emisión con otro folio. El folio rechazado no será reutilizado.');
+      },
+      error: () => this.error.set('No fue posible regenerar la boleta rechazada.'),
+    });
+  }
+
   protected loadConfiguration(): void {
     if (this.configurationBusy()) return;
     this.configurationBusy.set(true);
@@ -177,7 +198,10 @@ export class TaxDocumentsPage {
     this.configurationBusy.set(true);
     this.error.set('');
     const raw = this.configurationForm.getRawValue();
-    const request: TaxConfigurationInput = { ...raw, environment: 'CERTIFICATION' };
+    const request: TaxConfigurationInput = {
+      ...raw,
+      environment: this.configuration()?.environment ?? 'CERTIFICATION',
+    };
     this.api.updateConfiguration(request).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.configurationBusy.set(false))).subscribe({
       next: configuration => {
         this.applyConfiguration(configuration);
