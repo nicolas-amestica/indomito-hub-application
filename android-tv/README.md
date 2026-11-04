@@ -5,6 +5,7 @@ Aplicación nativa para teléfonos, tablets, Android TV y Google TV que abre `ht
 ## Funcionalidad
 
 - Launcher estándar para teléfonos y tablets, y launcher Leanback para televisores.
+- Ícono adaptativo de Giras Indómito compatible con máscaras circulares, squircle y cuadradas.
 - Orientación automática según el dispositivo; los televisores mantienen su orientación horizontal nativa.
 - Navegación mediante pantalla táctil, D-pad/control remoto y mouse, delegada al motor WebView.
 - Cookies, almacenamiento DOM y base de datos Web habilitados para conservar la sesión.
