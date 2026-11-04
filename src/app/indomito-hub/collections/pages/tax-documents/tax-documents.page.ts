@@ -2,15 +2,18 @@ import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ButtonDirective } from 'primeng/button';
 import { Checkbox } from 'primeng/checkbox';
+import { DatePicker } from 'primeng/datepicker';
+import { Dialog } from 'primeng/dialog';
 import { FileUpload, type FileSelectEvent } from 'primeng/fileupload';
 import { InputNumber } from 'primeng/inputnumber';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
 import { Panel } from 'primeng/panel';
+import { Select } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 import { Tag } from 'primeng/tag';
@@ -18,11 +21,14 @@ import { finalize } from 'rxjs';
 import { DateOnlyPickerComponent } from '../../../../shared/date-only/date-only-picker.component';
 import { todayDateOnly } from '../../../../shared/date-only/date-only';
 import { newUlid } from '../../../../shared/fn/new-ulid';
+import { TAX_DOCUMENT_STATUS_PRESENTATION } from '../../constants/tax-document-status.constant';
+import { filterTaxDocuments, taxDocumentOrigin, taxDocumentUpdatedAt, type TaxDocumentOrigin } from '../../fn/filter-tax-documents';
 import type {
   TaxConfigurationInput,
   TaxConfigurationSummary,
   TaxDocumentItem,
   TaxDocumentRequest,
+  TaxDocumentStatus,
 } from '../../interfaces/tax-document.interface';
 import { CollectionTaxDocuments } from '../../services/collection-tax-documents';
 
@@ -37,11 +43,15 @@ import { CollectionTaxDocuments } from '../../services/collection-tax-documents'
     ButtonDirective,
     Checkbox,
     DateOnlyPickerComponent,
+    DatePicker,
+    Dialog,
     FileUpload,
+    FormsModule,
     InputNumber,
     InputText,
     Message,
     Panel,
+    Select,
     Tab,
     TabList,
     TabPanel,
@@ -63,6 +73,25 @@ export class TaxDocumentsPage {
   protected readonly error = signal('');
   protected readonly success = signal('');
   protected readonly items = signal<TaxDocumentRequest[]>([]);
+  protected readonly taxDocumentStatusPresentation = TAX_DOCUMENT_STATUS_PRESENTATION;
+  protected readonly searchTerm = signal('');
+  protected readonly statusFilter = signal<TaxDocumentStatus | 'ALL'>('ALL');
+  protected readonly originFilter = signal<TaxDocumentOrigin>('ALL');
+  protected readonly fromDate = signal<Date | null>(null);
+  protected readonly toDate = signal<Date | null>(null);
+  protected readonly selectedDocument = signal<TaxDocumentRequest | null>(null);
+  protected readonly statusOptions = [
+    { label: 'Todos los estados', value: 'ALL' },
+    ...Object.entries(TAX_DOCUMENT_STATUS_PRESENTATION).map(([value, presentation]) => ({ value, label: presentation.label })),
+  ];
+  protected readonly originOptions = [
+    { label: 'Todos los orígenes', value: 'ALL' },
+    { label: 'Pago Khipu', value: 'KHIPU' },
+    { label: 'Emisión manual', value: 'MANUAL' },
+  ];
+  protected readonly filteredItems = computed(() => filterTaxDocuments(this.items(), {
+    search: this.searchTerm(), status: this.statusFilter(), origin: this.originFilter(), from: this.fromDate(), to: this.toDate(),
+  }));
   protected readonly rejectedCount = computed(() => this.items().filter(item => item.status === 'REJECTED' && !item.reissuedBy).length);
   protected readonly configuration = signal<TaxConfigurationSummary | null>(null);
   protected readonly selectedCafName = signal('');
@@ -124,6 +153,26 @@ export class TaxDocumentsPage {
       next: page => this.items.set(page.items),
       error: () => this.error.set('No fue posible consultar las boletas.'),
     });
+  }
+
+  protected setSearchTerm(event: Event): void {
+    this.searchTerm.set((event.target as HTMLInputElement).value);
+  }
+
+  protected clearFilters(): void {
+    this.searchTerm.set('');
+    this.statusFilter.set('ALL');
+    this.originFilter.set('ALL');
+    this.fromDate.set(null);
+    this.toDate.set(null);
+  }
+
+  protected originLabel(item: TaxDocumentRequest): string {
+    return taxDocumentOrigin(item) === 'KHIPU' ? 'Pago Khipu' : 'Emisión manual';
+  }
+
+  protected updatedAt(item: TaxDocumentRequest): string {
+    return taxDocumentUpdatedAt(item);
   }
 
   protected create(): void {
