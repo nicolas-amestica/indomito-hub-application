@@ -8,7 +8,7 @@ export type TaxDocumentStatusPresentation = Readonly<{
 export const TAX_DOCUMENT_STATUS_PRESENTATION: Readonly<
   Record<string, TaxDocumentStatusPresentation>
 > = {
-  PENDING_MANUAL_ISSUE: { label: 'Pendiente de emisión manual', severity: 'secondary' },
+  PENDING_MANUAL_ISSUE: { label: 'Pendiente de emisión manual', severity: 'info' },
   MANUAL_RECORDED: { label: 'Registrada manualmente', severity: 'success' },
   READY: { label: 'Lista para emitir', severity: 'info' },
   ISSUING: { label: 'Emitiendo', severity: 'warn' },

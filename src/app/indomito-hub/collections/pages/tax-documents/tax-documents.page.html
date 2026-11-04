@@ -1,4 +1,7 @@
-<main class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-8 sm:px-8" [attr.aria-busy]="busy() || configurationBusy()">
+<main
+  class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-8 sm:px-8"
+  [attr.aria-busy]="busy() || configurationBusy()"
+>
   <header class="flex flex-wrap items-start justify-between gap-4">
     <div>
       <p class="text-sm text-muted">Cobranza · facturación</p>
@@ -7,75 +10,655 @@
     <a pButton severity="secondary" outlined routerLink="/cobranza/tesoreria">Volver a tesorería</a>
   </header>
 
-  @if (error()) { <p-message severity="error" closable (onClose)="error.set('')">{{ error() }}</p-message> }
-  @if (success()) { <p-message severity="success" closable (onClose)="success.set('')">{{ success() }}</p-message> }
-  @if (rejectedCount() > 0) { <p-message severity="error">Hay {{ rejectedCount() }} boleta(s) rechazada(s) por el SII que requieren revisión y reemisión.</p-message> }
+  @if (error()) {
+    <p-message severity="error" closable (onClose)="error.set('')">{{ error() }}</p-message>
+  }
+  @if (success()) {
+    <p-message severity="success" closable (onClose)="success.set('')">{{ success() }}</p-message>
+  }
+  @if (rejectedCount() > 0) {
+    <p-message severity="error"
+      >Hay {{ rejectedCount() }} boleta(s) rechazada(s) por el SII que requieren revisión y
+      reemisión.</p-message
+    >
+  }
 
   <p-tabs value="emission" scrollable>
     <p-tablist>
-      <p-tab value="emission"><span class="icon-[tabler--receipt-2] mr-2 size-4" aria-hidden="true"></span>Emisión de boletas</p-tab>
-      <p-tab value="received"><span class="icon-[tabler--inbox] mr-2 size-4" aria-hidden="true"></span>Documentos recibidos</p-tab>
-      <p-tab value="configuration"><span class="icon-[tabler--settings] mr-2 size-4" aria-hidden="true"></span>Configuración</p-tab>
+      <p-tab value="emission"
+        ><span class="icon-[tabler--receipt-2] mr-2 size-4" aria-hidden="true"></span>Emisión de
+        boletas</p-tab
+      >
+      <p-tab value="received"
+        ><span class="icon-[tabler--inbox] mr-2 size-4" aria-hidden="true"></span>Documentos
+        recibidos</p-tab
+      >
+      <p-tab value="configuration"
+        ><span class="icon-[tabler--settings] mr-2 size-4" aria-hidden="true"></span
+        >Configuración</p-tab
+      >
     </p-tablist>
 
     <p-tabpanels>
       <p-tabpanel value="emission">
         <div class="flex flex-col gap-6 pt-5">
-          <p-message severity="info">Emite boletas electrónicas tipo 39. El folio se reserva automáticamente desde el CAF activo.</p-message>
+          <p-message severity="info"
+            >Emite boletas electrónicas tipo 39. El folio se reserva automáticamente desde el CAF
+            activo.</p-message
+          >
           <p-panel header="Nueva boleta manual">
-            <form [formGroup]="form" (ngSubmit)="create()" class="grid min-w-0 gap-5 sm:grid-cols-2 xl:grid-cols-12">
-              <div class="flex min-w-0 flex-col gap-2 xl:col-span-4"><label for="tax-date">Fecha de emisión</label><app-date-only-picker inputId="tax-date" formControlName="issueDate" /></div>
-              <div class="flex min-w-0 flex-col gap-2 xl:col-span-8"><label for="tax-rut">RUT receptor (opcional)</label><input pInputText id="tax-rut" name="tax-rut" class="w-full min-w-0" formControlName="customerRut" autocomplete="off" placeholder="Ej. 12.345.678-9" /></div>
-              <div formArrayName="items" class="flex min-w-0 flex-col gap-4 sm:col-span-2 xl:col-span-12">@for (item of form.controls.items.controls; track item; let index = $index) {<fieldset [formGroupName]="index" class="grid min-w-0 gap-4 rounded-xl border border-line/75 p-4 dark:border-line/55 sm:grid-cols-2 xl:grid-cols-12"><legend class="px-2 text-sm font-semibold text-ink">Ítem {{ index + 1 }}</legend>
-                <div class="flex min-w-0 flex-col gap-2 sm:col-span-2 xl:col-span-4"><label [for]="'item-name-' + index">Descripción</label><input pInputText [id]="'item-name-' + index" [name]="'item-name-' + index" class="w-full min-w-0" formControlName="description" autocomplete="off" placeholder="Ej. Cuota de viaje" /></div>
-                <div class="flex min-w-0 flex-col gap-2 xl:col-span-2"><label [for]="'item-qty-' + index">Cantidad</label><p-inputnumber [inputId]="'item-qty-' + index" formControlName="quantity" [min]="1" [maxFractionDigits]="0" [fluid]="true" /></div>
-                <div class="flex min-w-0 flex-col gap-2 xl:col-span-2"><label [for]="'item-price-' + index">Precio con IVA</label><p-inputnumber [inputId]="'item-price-' + index" formControlName="unitPrice" mode="currency" currency="CLP" locale="es-CL" [min]="1" [fluid]="true" /></div>
-                <div class="flex min-w-0 flex-col gap-2 xl:col-span-2"><label [for]="'item-unit-' + index">Unidad</label><input pInputText [id]="'item-unit-' + index" [name]="'item-unit-' + index" class="w-full min-w-0" formControlName="unit" autocomplete="off" placeholder="Ej. un." /></div>
-                <label class="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-2 xl:col-span-1 xl:self-end"><p-checkbox [inputId]="'item-exempt-' + index" formControlName="exempt" [binary]="true" /><span>Exento</span></label>
-                <button pButton type="button" severity="danger" text class="w-full sm:col-span-2 xl:col-span-1 xl:self-end" [disabled]="form.controls.items.length === 1" (click)="removeItem(index)"><span class="icon-[tabler--trash] size-4" aria-hidden="true"></span>Quitar</button>
-              </fieldset>}</div>
-              <div class="flex flex-col items-stretch gap-4 rounded-xl border border-line/75 p-4 dark:border-line/55 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between xl:col-span-12"><button pButton type="button" severity="secondary" outlined class="w-full sm:w-auto" (click)="addItem()"><span class="icon-[tabler--plus] size-4" aria-hidden="true"></span>Agregar ítem</button><strong class="text-right text-lg tabular-nums text-ink">Total: {{ total() | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</strong></div>
-              <button pButton type="submit" class="w-full sm:col-span-2 sm:w-auto sm:justify-self-start xl:col-span-12" [loading]="busy()" [disabled]="busy()"><span class="icon-[tabler--send] size-4" aria-hidden="true"></span>Emitir boleta</button>
+            <form
+              [formGroup]="form"
+              (ngSubmit)="create()"
+              class="grid min-w-0 gap-5 sm:grid-cols-2 xl:grid-cols-12"
+            >
+              <div class="flex min-w-0 flex-col gap-2 xl:col-span-4">
+                <label for="tax-date">Fecha de emisión</label
+                ><app-date-only-picker inputId="tax-date" formControlName="issueDate" />
+              </div>
+              <div class="flex min-w-0 flex-col gap-2 xl:col-span-8">
+                <label for="tax-rut">RUT receptor (opcional)</label
+                ><input
+                  pInputText
+                  id="tax-rut"
+                  name="tax-rut"
+                  class="w-full min-w-0"
+                  formControlName="customerRut"
+                  autocomplete="off"
+                  placeholder="Ej. 12.345.678-9"
+                />
+              </div>
+              <div
+                formArrayName="items"
+                class="flex min-w-0 flex-col gap-4 sm:col-span-2 xl:col-span-12"
+              >
+                @for (item of form.controls.items.controls; track item; let index = $index) {
+                  <fieldset
+                    [formGroupName]="index"
+                    class="grid min-w-0 gap-4 rounded-xl border border-line/75 p-4 dark:border-line/55 sm:grid-cols-2 xl:grid-cols-12"
+                  >
+                    <legend class="px-2 text-sm font-semibold text-ink">
+                      Ítem {{ index + 1 }}
+                    </legend>
+                    <div class="flex min-w-0 flex-col gap-2 sm:col-span-2 xl:col-span-4">
+                      <label [for]="'item-name-' + index">Descripción</label
+                      ><input
+                        pInputText
+                        [id]="'item-name-' + index"
+                        [name]="'item-name-' + index"
+                        class="w-full min-w-0"
+                        formControlName="description"
+                        autocomplete="off"
+                        placeholder="Ej. Cuota de viaje"
+                      />
+                    </div>
+                    <div class="flex min-w-0 flex-col gap-2 xl:col-span-2">
+                      <label [for]="'item-qty-' + index">Cantidad</label
+                      ><p-inputnumber
+                        [inputId]="'item-qty-' + index"
+                        formControlName="quantity"
+                        [min]="1"
+                        [maxFractionDigits]="0"
+                        [fluid]="true"
+                      />
+                    </div>
+                    <div class="flex min-w-0 flex-col gap-2 xl:col-span-2">
+                      <label [for]="'item-price-' + index">Precio con IVA</label
+                      ><p-inputnumber
+                        [inputId]="'item-price-' + index"
+                        formControlName="unitPrice"
+                        mode="currency"
+                        currency="CLP"
+                        locale="es-CL"
+                        [min]="1"
+                        [fluid]="true"
+                      />
+                    </div>
+                    <div class="flex min-w-0 flex-col gap-2 xl:col-span-2">
+                      <label [for]="'item-unit-' + index">Unidad</label
+                      ><p-select
+                        [inputId]="'item-unit-' + index"
+                        [options]="unitOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        formControlName="unit"
+                        placeholder="Seleccionar"
+                        appendTo="body"
+                        panelStyleClass="dark:border-line/55!"
+                        fluid
+                      />
+                    </div>
+                    <label
+                      class="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-2 xl:col-span-1 xl:self-end"
+                      ><p-checkbox
+                        [inputId]="'item-exempt-' + index"
+                        formControlName="exempt"
+                        [binary]="true"
+                      /><span>Exento</span></label
+                    >
+                    <button
+                      pButton
+                      type="button"
+                      severity="danger"
+                      text
+                      class="w-full sm:col-span-2 xl:col-span-1 xl:self-end"
+                      [disabled]="form.controls.items.length === 1"
+                      (click)="removeItem(index)"
+                    >
+                      <span class="icon-[tabler--trash] size-4" aria-hidden="true"></span>Quitar
+                    </button>
+                  </fieldset>
+                }
+              </div>
+              <div
+                class="grid gap-4 rounded-xl border border-line/75 p-4 dark:border-line/55 sm:col-span-2 sm:grid-cols-[auto_1fr] sm:items-center xl:col-span-12"
+              >
+                <button
+                  pButton
+                  type="button"
+                  severity="secondary"
+                  outlined
+                  class="w-full sm:w-auto"
+                  (click)="addItem()"
+                >
+                  <span class="icon-[tabler--plus] size-4" aria-hidden="true"></span>Agregar ítem
+                </button>
+                <dl
+                  class="grid grid-cols-2 gap-x-5 gap-y-2 text-right text-sm tabular-nums sm:ml-auto sm:grid-cols-4"
+                >
+                  <div>
+                    <dt class="text-muted">Neto</dt>
+                    <dd class="font-medium text-ink">
+                      {{ totals().net | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt class="text-muted">IVA</dt>
+                    <dd class="font-medium text-ink">
+                      {{ totals().vat | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt class="text-muted">Exento</dt>
+                    <dd class="font-medium text-ink">
+                      {{ totals().exempt | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt class="text-muted">Total</dt>
+                    <dd class="text-lg font-semibold text-ink">
+                      {{ totals().gross | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+              @if (formError()) {
+                <p-message severity="error" class="sm:col-span-2 xl:col-span-12">{{
+                  formError()
+                }}</p-message>
+              }
+              <button
+                pButton
+                type="submit"
+                class="w-full sm:col-span-2 sm:w-auto sm:justify-self-start xl:col-span-12"
+                [loading]="busy()"
+                [disabled]="busy()"
+              >
+                <span class="icon-[tabler--send] size-4" aria-hidden="true"></span>Emitir boleta
+              </button>
             </form>
           </p-panel>
           <p-panel>
             <ng-template #header>
-              <div class="flex w-full items-center justify-between gap-3">
-                <div><span>Boletas emitidas y pendientes</span><p class="mt-1 text-xs font-normal text-muted">{{ filteredItems().length }} de {{ items().length }} documentos</p></div>
-                <button pButton type="button" size="small" severity="secondary" outlined [loading]="busy()" [disabled]="busy()" (click)="load()">
-                  <span class="icon-[tabler--refresh] size-4" aria-hidden="true"></span>
-                  Actualizar
+              <span>Boletas emitidas y pendientes</span>
+            </ng-template>
+            <section
+              class="mb-5 grid gap-4 rounded-xl border border-line/75 p-4 dark:border-line/55 md:grid-cols-2 xl:grid-cols-5"
+              aria-label="Filtros de boletas"
+            >
+              <div class="flex flex-col gap-2 xl:col-span-2">
+                <label for="tax-document-search">Buscar</label
+                ><input
+                  pInputText
+                  id="tax-document-search"
+                  name="tax-document-search"
+                  type="search"
+                  autocomplete="off"
+                  spellcheck="false"
+                  placeholder="Folio, Track ID, RUT o comprobante…"
+                  [value]="searchTerm()"
+                  (input)="setSearchTerm($event)"
+                />
+              </div>
+              <div class="flex flex-col gap-2">
+                <label for="tax-status-filter">Estado</label
+                ><p-select
+                  inputId="tax-status-filter"
+                  name="tax-status-filter"
+                  [options]="statusOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  [ngModel]="statusFilter()"
+                  (ngModelChange)="statusFilter.set($event)"
+                  appendTo="body"
+                  panelStyleClass="dark:border-line/55!"
+                  fluid
+                />
+              </div>
+              <div class="flex flex-col gap-2">
+                <label for="tax-origin-filter">Origen</label
+                ><p-select
+                  inputId="tax-origin-filter"
+                  name="tax-origin-filter"
+                  [options]="originOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  [ngModel]="originFilter()"
+                  (ngModelChange)="originFilter.set($event)"
+                  appendTo="body"
+                  panelStyleClass="dark:border-line/55!"
+                  fluid
+                />
+              </div>
+              <div class="flex items-end">
+                <button
+                  pButton
+                  type="button"
+                  severity="secondary"
+                  text
+                  [disabled]="
+                    !searchTerm() &&
+                    statusFilter() === 'ALL' &&
+                    originFilter() === 'ALL' &&
+                    !fromDate() &&
+                    !toDate()
+                  "
+                  (click)="clearFilters()"
+                >
+                  Limpiar filtros
                 </button>
               </div>
-            </ng-template>
-            <section class="mb-5 grid gap-4 rounded-xl border border-line/75 p-4 dark:border-line/55 md:grid-cols-2 xl:grid-cols-5" aria-label="Filtros de boletas">
-              <div class="flex flex-col gap-2 xl:col-span-2"><label for="tax-document-search">Buscar</label><input pInputText id="tax-document-search" name="tax-document-search" type="search" autocomplete="off" spellcheck="false" placeholder="Folio, Track ID, RUT o comprobante…" [value]="searchTerm()" (input)="setSearchTerm($event)" /></div>
-              <div class="flex flex-col gap-2"><label for="tax-status-filter">Estado</label><p-select inputId="tax-status-filter" name="tax-status-filter" [options]="statusOptions" optionLabel="label" optionValue="value" [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)" appendTo="body" fluid /></div>
-              <div class="flex flex-col gap-2"><label for="tax-origin-filter">Origen</label><p-select inputId="tax-origin-filter" name="tax-origin-filter" [options]="originOptions" optionLabel="label" optionValue="value" [ngModel]="originFilter()" (ngModelChange)="originFilter.set($event)" appendTo="body" fluid /></div>
-              <div class="flex items-end"><button pButton type="button" severity="secondary" text [disabled]="!searchTerm() && statusFilter() === 'ALL' && originFilter() === 'ALL' && !fromDate() && !toDate()" (click)="clearFilters()">Limpiar filtros</button></div>
-              <div class="flex flex-col gap-2"><label for="tax-date-from">Desde</label><p-datepicker inputId="tax-date-from" name="tax-date-from" dateFormat="dd-mm-yy" placeholder="DD-MM-YYYY" [showIcon]="true" [ngModel]="fromDate()" (ngModelChange)="fromDate.set($event)" appendTo="body" fluid /></div>
-              <div class="flex flex-col gap-2"><label for="tax-date-to">Hasta</label><p-datepicker inputId="tax-date-to" name="tax-date-to" dateFormat="dd-mm-yy" placeholder="DD-MM-YYYY" [showIcon]="true" [minDate]="fromDate()" [ngModel]="toDate()" (ngModelChange)="toDate.set($event)" appendTo="body" fluid /></div>
+              <div class="flex flex-col gap-2">
+                <label for="tax-date-from">Desde</label
+                ><p-datepicker
+                  inputId="tax-date-from"
+                  name="tax-date-from"
+                  dateFormat="dd-mm-yy"
+                  placeholder="DD-MM-YYYY"
+                  [showIcon]="true"
+                  [ngModel]="fromDate()"
+                  (ngModelChange)="fromDate.set($event)"
+                  panelStyleClass="dark:border-line/55!"
+                  appendTo="body"
+                  fluid
+                />
+              </div>
+              <div class="flex flex-col gap-2">
+                <label for="tax-date-to">Hasta</label
+                ><p-datepicker
+                  inputId="tax-date-to"
+                  name="tax-date-to"
+                  dateFormat="dd-mm-yy"
+                  placeholder="DD-MM-YYYY"
+                  [showIcon]="true"
+                  [minDate]="fromDate()"
+                  [ngModel]="toDate()"
+                  (ngModelChange)="toDate.set($event)"
+                  panelStyleClass="dark:border-line/55!"
+                  appendTo="body"
+                  fluid
+                />
+              </div>
             </section>
 
-            <div class="hidden md:block"><div class="app-table-viewport"><p-table [value]="filteredItems()" [paginator]="filteredItems().length > 10" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [scrollable]="true" [tableStyle]="{ 'min-width': '74rem' }">
-              <ng-template #header><tr><th>Origen</th><th>Fecha</th><th>Monto</th><th>Estado</th><th>Folio</th><th>Track ID</th><th>Actualización</th><th><span class="sr-only">Acciones</span></th></tr></ng-template>
-              <ng-template #body let-item><tr><td><span class="font-medium">{{ originLabel(item) }}</span>@if (item.receiptId) {<span class="mt-1 block max-w-36 truncate text-xs text-muted" [title]="item.receiptId">{{ item.receiptId }}</span>}</td><td>{{ item.effectiveDate | date: 'dd-MM-yyyy' : 'UTC' }}</td><td class="tabular-nums">{{ item.grossAmount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</td><td><p-tag [severity]="taxDocumentStatusPresentation[item.status].severity" [value]="taxDocumentStatusPresentation[item.status].label" /></td><td class="tabular-nums">{{ item.siiIssuance?.folio || '—' }}</td><td><span class="font-mono text-sm" translate="no">{{ item.siiIssuance?.trackId || '—' }}</span></td><td>{{ updatedAt(item) | date: 'dd-MM-yyyy HH:mm' : 'UTC' }}</td><td><div class="flex flex-wrap justify-end gap-2">@if (item.status === 'READY') {<button pButton type="button" size="small" [disabled]="busy()" (click)="issue(item)">Emitir</button>}@if (item.status === 'ISSUING') {<span class="text-sm text-muted" aria-live="polite">Procesando…</span>}@if (item.status === 'SUBMITTED' || item.status === 'ACCEPTED' || item.status === 'ACCEPTED_WITH_REPAIRS') {<button pButton type="button" size="small" severity="secondary" outlined [disabled]="busy()" (click)="download(item)"><span class="icon-[tabler--file-type-pdf] size-4" aria-hidden="true"></span>PDF</button>}<button pButton type="button" size="small" severity="secondary" text (click)="selectedDocument.set(item)">Detalles</button>@if (item.status === 'REJECTED' && !item.reissuedBy) {<button pButton type="button" size="small" severity="danger" [disabled]="busy()" (click)="reissue(item)">Regenerar</button>}</div></td></tr></ng-template>
-              <ng-template #emptymessage><tr><td colspan="8">No hay boletas que coincidan con los filtros.</td></tr></ng-template>
-            </p-table></div></div>
+            <div
+              class="mb-5 flex flex-col gap-3 rounded-xl border border-line/75 bg-canvas/60 p-3 dark:border-line/55 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <p class="text-sm text-muted">
+                <span class="font-semibold text-ink">{{ filteredItems().length }}</span> de
+                {{ items().length }} documentos visibles
+              </p>
+              <button
+                pButton
+                type="button"
+                size="small"
+                severity="secondary"
+                outlined
+                class="w-full sm:w-auto"
+                [loading]="busy()"
+                [disabled]="busy()"
+                (click)="load()"
+              >
+                <span class="icon-[tabler--refresh] size-4" aria-hidden="true"></span>Actualizar
+                boletas
+              </button>
+            </div>
+
+            <div class="hidden md:block">
+              <div class="app-table-viewport">
+                <p-table
+                  [value]="filteredItems()"
+                  [paginator]="filteredItems().length > 10"
+                  [rows]="10"
+                  [rowsPerPageOptions]="[10, 25, 50]"
+                  [scrollable]="true"
+                  [tableStyle]="{ 'min-width': '64rem' }"
+                  tableStyleClass="[&_th]:border-line/50! [&_td]:border-line/50! dark:[&_th]:border-line/35! dark:[&_td]:border-line/35!"
+                >
+                  <ng-template #header
+                    ><tr>
+                      <th class="w-60 min-w-60">Origen</th>
+                      <th class="w-28 whitespace-nowrap">Fecha</th>
+                      <th>Monto</th>
+                      <th class="w-40 whitespace-nowrap">Estado</th>
+                      <th>Folio</th>
+                      <th class="w-32 whitespace-nowrap">Track ID</th>
+                      <th class="w-40 whitespace-nowrap">Actualización</th>
+                      <th class="w-px whitespace-nowrap text-right">Acciones</th>
+                    </tr></ng-template
+                  >
+                  <ng-template #body let-item
+                    ><tr>
+                      <td class="w-60 min-w-60">
+                        <span class="font-medium">{{ originLabel(item) }}</span>
+                        @if (item.receiptId) {
+                          <button
+                            pButton
+                            type="button"
+                            size="small"
+                            severity="secondary"
+                            text
+                            class="mt-1 flex justify-start! p-0! font-mono! text-xs!"
+                            [title]="'Copiar ' + item.receiptId"
+                            [attr.aria-label]="'Copiar código de operación ' + item.receiptId"
+                            (click)="copyReceiptId(item.receiptId)"
+                          >
+                            <span class="whitespace-nowrap">{{ item.receiptId }}</span
+                            ><span
+                              class="icon-[tabler--copy] size-3 shrink-0"
+                              aria-hidden="true"
+                            ></span>
+                          </button>
+                        }
+                      </td>
+                      <td class="w-28 whitespace-nowrap tabular-nums">
+                        {{ item.effectiveDate | date: 'dd-MM-yyyy' : 'UTC' }}
+                      </td>
+                      <td class="tabular-nums">
+                        {{ item.grossAmount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}
+                      </td>
+                      <td class="w-40 whitespace-nowrap">
+                        <p-tag
+                          [severity]="taxDocumentStatusPresentation[item.status].severity"
+                          [value]="taxDocumentStatusPresentation[item.status].label"
+                        />
+                      </td>
+                      <td class="tabular-nums">{{ item.siiIssuance?.folio || '—' }}</td>
+                      <td class="w-32 max-w-32">
+                        <span
+                          class="block truncate font-mono text-sm"
+                          [title]="item.siiIssuance?.trackId || ''"
+                          translate="no"
+                          >{{ item.siiIssuance?.trackId || '—' }}</span
+                        >
+                      </td>
+                      <td class="w-40 whitespace-nowrap tabular-nums">
+                        {{ updatedAt(item) | date: 'dd-MM-yyyy HH:mm' : 'UTC' }}
+                      </td>
+                      <td class="w-px whitespace-nowrap">
+                        <div class="flex flex-nowrap justify-end gap-2">
+                          @if (item.status === 'READY') {
+                            <button
+                              pButton
+                              type="button"
+                              size="small"
+                              [disabled]="busy()"
+                              (click)="issue(item)"
+                            >
+                              Emitir
+                            </button>
+                          }
+                          @if (item.status === 'ISSUING') {
+                            <span class="text-sm text-muted" aria-live="polite">Procesando…</span>
+                          }
+                          @if (
+                            item.status === 'SUBMITTED' ||
+                            item.status === 'ACCEPTED' ||
+                            item.status === 'ACCEPTED_WITH_REPAIRS'
+                          ) {
+                            <button
+                              pButton
+                              type="button"
+                              size="small"
+                              severity="secondary"
+                              outlined
+                              [disabled]="busy()"
+                              (click)="download(item)"
+                            >
+                              <span
+                                class="icon-[tabler--file-type-pdf] size-4"
+                                aria-hidden="true"
+                              ></span
+                              >PDF
+                            </button>
+                          }
+                          <button
+                            pButton
+                            type="button"
+                            size="small"
+                            severity="secondary"
+                            outlined
+                            (click)="selectedDocument.set(item)"
+                          >
+                            Detalles
+                          </button>
+                          @if (item.status === 'REJECTED' && !item.reissuedBy) {
+                            <button
+                              pButton
+                              type="button"
+                              size="small"
+                              severity="danger"
+                              [disabled]="busy()"
+                              (click)="reissue(item)"
+                            >
+                              Regenerar
+                            </button>
+                          }
+                        </div>
+                      </td>
+                    </tr></ng-template
+                  >
+                  <ng-template #emptymessage
+                    ><tr>
+                      <td colspan="8">No hay boletas que coincidan con los filtros.</td>
+                    </tr></ng-template
+                  >
+                </p-table>
+              </div>
+            </div>
 
             <div class="grid gap-4 md:hidden">
               @for (item of filteredItems(); track item.requestId) {
                 <article class="rounded-xl border border-line/75 p-4 dark:border-line/55">
-                  <div class="flex items-start justify-between gap-3"><div class="min-w-0"><p class="font-semibold text-ink">{{ originLabel(item) }}</p><p class="mt-1 text-sm text-muted">{{ item.effectiveDate | date: 'dd-MM-yyyy' : 'UTC' }} · {{ item.grossAmount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</p></div><p-tag [severity]="taxDocumentStatusPresentation[item.status].severity" [value]="taxDocumentStatusPresentation[item.status].label" /></div>
-                  <dl class="mt-4 grid grid-cols-2 gap-3 text-sm"><div><dt class="text-muted">Folio</dt><dd class="mt-1 font-medium tabular-nums">{{ item.siiIssuance?.folio || '—' }}</dd></div><div class="min-w-0"><dt class="text-muted">Track ID</dt><dd class="mt-1 truncate font-mono" translate="no">{{ item.siiIssuance?.trackId || '—' }}</dd></div><div class="col-span-2"><dt class="text-muted">Actualización</dt><dd class="mt-1">{{ updatedAt(item) | date: 'dd-MM-yyyy HH:mm' : 'UTC' }}</dd></div></dl>
-                  <div class="mt-4 flex flex-wrap gap-2">@if (item.status === 'READY') {<button pButton type="button" size="small" [disabled]="busy()" (click)="issue(item)">Emitir</button>}@if (item.status === 'ISSUING') {<span class="text-sm text-muted" aria-live="polite">Procesando…</span>}@if (item.status === 'SUBMITTED' || item.status === 'ACCEPTED' || item.status === 'ACCEPTED_WITH_REPAIRS') {<button pButton type="button" size="small" severity="secondary" outlined [disabled]="busy()" (click)="download(item)"></button>}<button pButton type="button" size="small" severity="secondary" text (click)="selectedDocument.set(item)">Detalles</button>@if (item.status === 'REJECTED' && !item.reissuedBy) {<button pButton type="button" size="small" severity="danger" [disabled]="busy()" (click)="reissue(item)">Regenerar</button>}</div>
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                      <p class="font-semibold text-ink">{{ originLabel(item) }}</p>
+                      @if (item.receiptId) {
+                        <button
+                          pButton
+                          type="button"
+                          size="small"
+                          severity="secondary"
+                          text
+                          class="mt-1 max-w-full! p-0! font-mono! text-xs!"
+                          [attr.aria-label]="'Copiar código de operación ' + item.receiptId"
+                          (click)="copyReceiptId(item.receiptId)"
+                        >
+                          <span class="truncate">{{ item.receiptId }}</span
+                          ><span
+                            class="icon-[tabler--copy] size-3 shrink-0"
+                            aria-hidden="true"
+                          ></span>
+                        </button>
+                      }
+                      <p class="mt-1 text-sm text-muted">
+                        {{ item.effectiveDate | date: 'dd-MM-yyyy' : 'UTC' }} ·
+                        {{ item.grossAmount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}
+                      </p>
+                    </div>
+                    <p-tag
+                      [severity]="taxDocumentStatusPresentation[item.status].severity"
+                      [value]="taxDocumentStatusPresentation[item.status].label"
+                    />
+                  </div>
+                  <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <dt class="text-muted">Folio</dt>
+                      <dd class="mt-1 font-medium tabular-nums">
+                        {{ item.siiIssuance?.folio || '—' }}
+                      </dd>
+                    </div>
+                    <div class="min-w-0">
+                      <dt class="text-muted">Track ID</dt>
+                      <dd class="mt-1 truncate font-mono" translate="no">
+                        {{ item.siiIssuance?.trackId || '—' }}
+                      </dd>
+                    </div>
+                    <div class="col-span-2">
+                      <dt class="text-muted">Actualización</dt>
+                      <dd class="mt-1">{{ updatedAt(item) | date: 'dd-MM-yyyy HH:mm' : 'UTC' }}</dd>
+                    </div>
+                  </dl>
+                  <div class="mt-4 flex flex-wrap gap-2">
+                    @if (item.status === 'READY') {
+                      <button
+                        pButton
+                        type="button"
+                        size="small"
+                        [disabled]="busy()"
+                        (click)="issue(item)"
+                      >
+                        Emitir
+                      </button>
+                    }
+                    @if (item.status === 'ISSUING') {
+                      <span class="text-sm text-muted" aria-live="polite">Procesando…</span>
+                    }
+                    @if (
+                      item.status === 'SUBMITTED' ||
+                      item.status === 'ACCEPTED' ||
+                      item.status === 'ACCEPTED_WITH_REPAIRS'
+                    ) {
+                      <button
+                        pButton
+                        type="button"
+                        size="small"
+                        severity="secondary"
+                        outlined
+                        [disabled]="busy()"
+                        (click)="download(item)"
+                      >
+                        <span class="icon-[tabler--file-type-pdf] size-4" aria-hidden="true"></span
+                        >PDF
+                      </button>
+                    }
+                    <button
+                      pButton
+                      type="button"
+                      size="small"
+                      severity="secondary"
+                      outlined
+                      (click)="selectedDocument.set(item)"
+                    >
+                      Detalles
+                    </button>
+                    @if (item.status === 'REJECTED' && !item.reissuedBy) {
+                      <button
+                        pButton
+                        type="button"
+                        size="small"
+                        severity="danger"
+                        [disabled]="busy()"
+                        (click)="reissue(item)"
+                      >
+                        Regenerar
+                      </button>
+                    }
+                  </div>
                 </article>
-              } @empty { <p class="py-8 text-center text-sm text-muted">No hay boletas que coincidan con los filtros.</p> }
+              } @empty {
+                <p class="py-8 text-center text-sm text-muted">
+                  No hay boletas que coincidan con los filtros.
+                </p>
+              }
             </div>
           </p-panel>
 
-          <p-dialog header="Detalle de boleta" [modal]="true" [visible]="!!selectedDocument()" (visibleChange)="!$event && selectedDocument.set(null)" [style]="{ width: 'min(42rem, calc(100vw - 2rem))' }">
-            @if (selectedDocument(); as item) {<dl class="grid gap-4 sm:grid-cols-2"><div><dt class="text-sm text-muted">Origen</dt><dd class="mt-1 font-medium">{{ originLabel(item) }}</dd></div><div><dt class="text-sm text-muted">Estado</dt><dd class="mt-1"><p-tag [severity]="taxDocumentStatusPresentation[item.status].severity" [value]="taxDocumentStatusPresentation[item.status].label" /></dd></div><div><dt class="text-sm text-muted">Folio</dt><dd class="mt-1 tabular-nums">{{ item.siiIssuance?.folio || '—' }}</dd></div><div><dt class="text-sm text-muted">Track ID</dt><dd class="mt-1 break-all font-mono" translate="no">{{ item.siiIssuance?.trackId || '—' }}</dd></div><div><dt class="text-sm text-muted">Monto</dt><dd class="mt-1 tabular-nums">{{ item.grossAmount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</dd></div><div><dt class="text-sm text-muted">Fecha de emisión</dt><dd class="mt-1">{{ item.effectiveDate | date: 'dd-MM-yyyy' : 'UTC' }}</dd></div>@if (item.customerRut) {<div><dt class="text-sm text-muted">RUT receptor</dt><dd class="mt-1" translate="no">{{ item.customerRut }}</dd></div>}@if (item.receiptId) {<div class="min-w-0"><dt class="text-sm text-muted">Comprobante</dt><dd class="mt-1 break-all font-mono text-sm" translate="no">{{ item.receiptId }}</dd></div>}@if (item.siiIssuance?.detail) {<div class="sm:col-span-2"><dt class="text-sm text-muted">Detalle del SII</dt><dd class="mt-1 break-words">{{ item.siiIssuance?.detail }}</dd></div>}</dl>}
+          <p-dialog
+            header="Detalle de boleta"
+            [modal]="true"
+            [visible]="!!selectedDocument()"
+            (visibleChange)="!$event && selectedDocument.set(null)"
+            styleClass="dark:border-line/55!"
+            [style]="{ width: 'min(42rem, calc(100vw - 2rem))' }"
+          >
+            @if (selectedDocument(); as item) {
+              <dl class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <dt class="text-sm text-muted">Origen</dt>
+                  <dd class="mt-1 font-medium">{{ originLabel(item) }}</dd>
+                </div>
+                <div>
+                  <dt class="text-sm text-muted">Estado</dt>
+                  <dd class="mt-1">
+                    <p-tag
+                      [severity]="taxDocumentStatusPresentation[item.status].severity"
+                      [value]="taxDocumentStatusPresentation[item.status].label"
+                    />
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-sm text-muted">Folio</dt>
+                  <dd class="mt-1 tabular-nums">{{ item.siiIssuance?.folio || '—' }}</dd>
+                </div>
+                <div>
+                  <dt class="text-sm text-muted">Track ID</dt>
+                  <dd class="mt-1 break-all font-mono" translate="no">
+                    {{ item.siiIssuance?.trackId || '—' }}
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-sm text-muted">Monto</dt>
+                  <dd class="mt-1 tabular-nums">
+                    {{ item.grossAmount | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-sm text-muted">Fecha de emisión</dt>
+                  <dd class="mt-1">{{ item.effectiveDate | date: 'dd-MM-yyyy' : 'UTC' }}</dd>
+                </div>
+                @if (item.customerRut) {
+                  <div>
+                    <dt class="text-sm text-muted">RUT receptor</dt>
+                    <dd class="mt-1" translate="no">{{ item.customerRut }}</dd>
+                  </div>
+                }
+                @if (item.receiptId) {
+                  <div class="min-w-0">
+                    <dt class="text-sm text-muted">Comprobante</dt>
+                    <dd class="mt-1 break-all font-mono text-sm" translate="no">
+                      {{ item.receiptId }}
+                    </dd>
+                  </div>
+                }
+                @if (item.siiIssuance?.detail) {
+                  <div class="sm:col-span-2">
+                    <dt class="text-sm text-muted">Detalle del SII</dt>
+                    <dd class="mt-1 break-words">{{ item.siiIssuance?.detail }}</dd>
+                  </div>
+                }
+              </dl>
+            }
           </p-dialog>
         </div>
       </p-tabpanel>
@@ -84,45 +667,376 @@
         <p-panel header="Documentos tributarios recibidos" class="mt-5 block">
           <div class="flex flex-col items-center gap-4 py-12 text-center">
             <span class="icon-[tabler--tools] size-10 text-muted" aria-hidden="true"></span>
-            <div><h2 class="text-xl font-semibold text-ink">En construcción</h2><p class="mt-2 max-w-xl text-sm text-muted">La consulta de facturas, facturas exentas, boletas y otros DTE recibidos estará disponible en una próxima etapa.</p></div>
+            <div>
+              <h2 class="text-xl font-semibold text-ink">En construcción</h2>
+              <p class="mt-2 max-w-xl text-sm text-muted">
+                La consulta de facturas, facturas exentas, boletas y otros DTE recibidos estará
+                disponible en una próxima etapa.
+              </p>
+            </div>
           </div>
         </p-panel>
       </p-tabpanel>
 
       <p-tabpanel value="configuration">
         <div class="flex flex-col gap-6 pt-5">
-          <p-message severity="info">Los datos, CAF y certificado se leen desde la configuración SII activa de emisión. Cada cambio valida el material y actualiza esa configuración sin modificar las solicitudes ni folios ya emitidos.</p-message>
+          <p-message severity="info"
+            >Los datos, CAF y certificado se leen desde la configuración SII activa de emisión. Cada
+            cambio valida el material y actualiza esa configuración sin modificar las solicitudes ni
+            folios ya emitidos.</p-message
+          >
           @if (configuration(); as current) {
-            <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Estado tributario">
-              <p-panel header="Ambiente"><p class="text-lg font-semibold text-ink">{{ current.environment === 'CERTIFICATION' ? 'Certificación' : 'Producción' }}</p><p class="mt-2 text-sm text-muted">DTE 39 · Boleta electrónica</p></p-panel>
-              <p-panel header="CAF activo"><p class="text-lg font-semibold text-ink">{{ current.caf.available | number }} folios disponibles</p><p class="mt-2 text-sm text-muted">Rango {{ current.caf.from | number }}–{{ current.caf.to | number }} · {{ current.caf.used | number }} utilizados</p><p class="mt-1 text-sm text-muted">Próximo folio: {{ current.caf.next === null ? 'Sin folios' : (current.caf.next | number) }}</p><p class="mt-1 text-sm text-muted">Autorizado: {{ current.caf.authorizationDate | date: 'dd-MM-yyyy' : 'UTC' }}</p><p-tag class="mt-3 inline-block" [severity]="cafSeverity()" [value]="current.caf.severity === 'OK' ? 'Disponible' : current.caf.severity === 'LOW' ? 'Por agotarse' : current.caf.severity === 'EXHAUSTED' ? 'Agotado' : 'Sin CAF'" /></p-panel>
-              <p-panel header="Certificado digital" class="min-w-0"><p class="text-lg font-semibold text-ink">{{ current.certificate.daysUntilExpiry }} días</p><p class="mt-2 break-all text-sm text-muted">{{ current.certificate.subject || 'Sin certificado cargado' }}</p><p-tag class="mt-3 inline-block" [severity]="certificateSeverity()" [value]="current.certificate.severity === 'OK' ? 'Vigente' : current.certificate.severity === 'EXPIRING' ? 'Por vencer' : current.certificate.severity === 'EXPIRED' ? 'Vencido' : 'Sin certificado'" /></p-panel>
-              <p-panel header="Certificación"><p class="text-lg font-semibold text-ink">{{ current.certificationApproved ? 'Aprobada' : 'Pendiente' }}</p><p class="mt-2 text-sm text-muted">Estado informado para el ambiente de certificación.</p></p-panel>
+            <section
+              class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+              aria-label="Estado tributario"
+            >
+              <p-panel header="Ambiente"
+                ><p class="text-lg font-semibold text-ink">
+                  {{ current.environment === 'CERTIFICATION' ? 'Certificación' : 'Producción' }}
+                </p>
+                <p class="mt-2 text-sm text-muted">DTE 39 · Boleta electrónica</p></p-panel
+              >
+              <p-panel header="CAF activo"
+                ><p class="text-lg font-semibold text-ink">
+                  {{ current.caf.available | number }} folios disponibles
+                </p>
+                <p class="mt-2 text-sm text-muted">
+                  Rango {{ current.caf.from | number }}–{{ current.caf.to | number }} ·
+                  {{ current.caf.used | number }} utilizados
+                </p>
+                <p class="mt-1 text-sm text-muted">
+                  Próximo folio:
+                  {{ current.caf.next === null ? 'Sin folios' : (current.caf.next | number) }}
+                </p>
+                <p class="mt-1 text-sm text-muted">
+                  Autorizado: {{ current.caf.authorizationDate | date: 'dd-MM-yyyy' : 'UTC' }}
+                </p>
+                <p-tag
+                  class="mt-3 inline-block"
+                  [severity]="cafSeverity()"
+                  [value]="
+                    current.caf.severity === 'OK'
+                      ? 'Disponible'
+                      : current.caf.severity === 'LOW'
+                        ? 'Por agotarse'
+                        : current.caf.severity === 'EXHAUSTED'
+                          ? 'Agotado'
+                          : 'Sin CAF'
+                  "
+              /></p-panel>
+              <p-panel header="Certificado digital" class="min-w-0"
+                ><p class="text-lg font-semibold text-ink">
+                  {{ current.certificate.daysUntilExpiry }} días
+                </p>
+                <p class="mt-2 break-all text-sm text-muted">
+                  {{ current.certificate.subject || 'Sin certificado cargado' }}
+                </p>
+                <p-tag
+                  class="mt-3 inline-block"
+                  [severity]="certificateSeverity()"
+                  [value]="
+                    current.certificate.severity === 'OK'
+                      ? 'Vigente'
+                      : current.certificate.severity === 'EXPIRING'
+                        ? 'Por vencer'
+                        : current.certificate.severity === 'EXPIRED'
+                          ? 'Vencido'
+                          : 'Sin certificado'
+                  "
+              /></p-panel>
+              <p-panel header="Certificación"
+                ><p class="text-lg font-semibold text-ink">
+                  {{ current.certificationApproved ? 'Aprobada' : 'Pendiente' }}
+                </p>
+                <p class="mt-2 text-sm text-muted">
+                  Estado informado para el ambiente de certificación.
+                </p></p-panel
+              >
             </section>
           }
 
           <p-panel header="Datos del emisor">
-            <form [formGroup]="configurationForm" (ngSubmit)="saveConfiguration()" class="grid gap-5 lg:grid-cols-3">
-              <div class="flex flex-col gap-2"><label for="issuer-rut">RUT emisor <span class="text-red-600" aria-hidden="true">*</span></label><input pInputText id="issuer-rut" formControlName="senderRut" [invalid]="configurationForm.controls.senderRut.touched && configurationForm.controls.senderRut.invalid" aria-required="true" />@if (configurationForm.controls.senderRut.touched && configurationForm.controls.senderRut.hasError('required')) {<small class="text-red-600">Este campo es requerido</small>}</div>
-              <div class="flex flex-col gap-2 lg:col-span-2"><label for="issuer-name">Razón social <span class="text-red-600" aria-hidden="true">*</span></label><input pInputText id="issuer-name" formControlName="issuerName" [readonly]="true" [invalid]="configurationForm.controls.issuerName.touched && configurationForm.controls.issuerName.invalid" aria-required="true" /><small class="text-muted">La razón social se obtiene del CAF activo.</small>@if (configurationForm.controls.issuerName.touched && configurationForm.controls.issuerName.hasError('required')) {<small class="text-red-600">Este campo es requerido</small>}</div>
-              <div class="flex flex-col gap-2"><label for="issuer-activity">Giro <span class="text-red-600" aria-hidden="true">*</span></label><input pInputText id="issuer-activity" formControlName="issuerActivity" [invalid]="configurationForm.controls.issuerActivity.touched && configurationForm.controls.issuerActivity.invalid" aria-required="true" />@if (configurationForm.controls.issuerActivity.touched && configurationForm.controls.issuerActivity.hasError('required')) {<small class="text-red-600">Este campo es requerido</small>}</div>
-              <div class="flex flex-col gap-2"><label for="issuer-address">Dirección <span class="text-red-600" aria-hidden="true">*</span></label><input pInputText id="issuer-address" formControlName="issuerAddress" [invalid]="configurationForm.controls.issuerAddress.touched && configurationForm.controls.issuerAddress.invalid" aria-required="true" />@if (configurationForm.controls.issuerAddress.touched && configurationForm.controls.issuerAddress.hasError('required')) {<small class="text-red-600">Este campo es requerido</small>}</div>
-              <div class="flex flex-col gap-2"><label for="issuer-commune">Comuna <span class="text-red-600" aria-hidden="true">*</span></label><input pInputText id="issuer-commune" formControlName="issuerCommune" [invalid]="configurationForm.controls.issuerCommune.touched && configurationForm.controls.issuerCommune.invalid" aria-required="true" />@if (configurationForm.controls.issuerCommune.touched && configurationForm.controls.issuerCommune.hasError('required')) {<small class="text-red-600">Este campo es requerido</small>}</div>
-              <div class="flex flex-col gap-2 lg:col-span-2"><label for="sii-notification-email">Correo de notificaciones registrado en el SII <span class="text-red-600" aria-hidden="true">*</span></label><input pInputText id="sii-notification-email" type="email" formControlName="notificationEmail" autocomplete="email" [invalid]="configurationForm.controls.notificationEmail.touched && configurationForm.controls.notificationEmail.invalid" aria-required="true" /><small class="text-muted">Este dato documenta la casilla usada por cada ambiente. Para cambiar el destinatario oficial también debes actualizarlo en el portal del SII.</small>@if (configurationForm.controls.notificationEmail.touched && configurationForm.controls.notificationEmail.hasError('required')) {<small class="text-red-600">Este campo es requerido</small>}</div>
-              <div class="flex flex-col gap-2"><label for="resolution-date">Fecha de resolución <span class="text-red-600" aria-hidden="true">*</span></label><p-datepicker inputId="resolution-date" formControlName="resolutionDate" dateFormat="dd-mm-yy" placeholder="DD-MM-YYYY" [showIcon]="true" [invalid]="configurationForm.controls.resolutionDate.touched && configurationForm.controls.resolutionDate.invalid" appendTo="body" fluid />@if (configurationForm.controls.resolutionDate.touched && configurationForm.controls.resolutionDate.hasError('required')) {<small class="text-red-600">Este campo es requerido</small>}</div>
-              <div class="flex flex-col gap-2"><label for="resolution-number">Número de resolución <span class="text-red-600" aria-hidden="true">*</span></label><p-inputnumber inputId="resolution-number" formControlName="resolutionNumber" [min]="0" [maxFractionDigits]="0" [invalid]="configurationForm.controls.resolutionNumber.touched && configurationForm.controls.resolutionNumber.invalid" fluid />@if (configurationForm.controls.resolutionNumber.touched && configurationForm.controls.resolutionNumber.hasError('required')) {<small class="text-red-600">Este campo es requerido</small>}</div>
-              <div class="flex items-center gap-2"><p-checkbox inputId="issuer-enabled" formControlName="enabled" [binary]="true" /><label for="issuer-enabled">Configuración habilitada</label></div>
-              <div class="flex items-center gap-2"><p-checkbox inputId="certification-approved" formControlName="certificationApproved" [binary]="true" /><label for="certification-approved">Certificación aprobada</label></div>
-              <div class="lg:col-span-3"><button pButton type="submit" [loading]="configurationBusy()" [disabled]="configurationBusy()"><span class="icon-[tabler--device-floppy] size-4" aria-hidden="true"></span>Guardar datos del emisor</button></div>
+            <form
+              [formGroup]="configurationForm"
+              (ngSubmit)="saveConfiguration()"
+              class="grid gap-5 lg:grid-cols-3"
+            >
+              <div class="flex flex-col gap-2">
+                <label for="issuer-rut"
+                  >RUT emisor <span class="text-red-600" aria-hidden="true">*</span></label
+                ><input
+                  pInputText
+                  id="issuer-rut"
+                  formControlName="senderRut"
+                  [invalid]="
+                    configurationForm.controls.senderRut.touched &&
+                    configurationForm.controls.senderRut.invalid
+                  "
+                  aria-required="true"
+                />
+                @if (
+                  configurationForm.controls.senderRut.touched &&
+                  configurationForm.controls.senderRut.hasError('required')
+                ) {
+                  <small class="text-red-600">Este campo es requerido</small>
+                }
+              </div>
+              <div class="flex flex-col gap-2 lg:col-span-2">
+                <label for="issuer-name"
+                  >Razón social <span class="text-red-600" aria-hidden="true">*</span></label
+                ><input
+                  pInputText
+                  id="issuer-name"
+                  formControlName="issuerName"
+                  [readonly]="true"
+                  [invalid]="
+                    configurationForm.controls.issuerName.touched &&
+                    configurationForm.controls.issuerName.invalid
+                  "
+                  aria-required="true"
+                /><small class="text-muted">La razón social se obtiene del CAF activo.</small>
+                @if (
+                  configurationForm.controls.issuerName.touched &&
+                  configurationForm.controls.issuerName.hasError('required')
+                ) {
+                  <small class="text-red-600">Este campo es requerido</small>
+                }
+              </div>
+              <div class="flex flex-col gap-2">
+                <label for="issuer-activity"
+                  >Giro <span class="text-red-600" aria-hidden="true">*</span></label
+                ><input
+                  pInputText
+                  id="issuer-activity"
+                  formControlName="issuerActivity"
+                  [invalid]="
+                    configurationForm.controls.issuerActivity.touched &&
+                    configurationForm.controls.issuerActivity.invalid
+                  "
+                  aria-required="true"
+                />
+                @if (
+                  configurationForm.controls.issuerActivity.touched &&
+                  configurationForm.controls.issuerActivity.hasError('required')
+                ) {
+                  <small class="text-red-600">Este campo es requerido</small>
+                }
+              </div>
+              <div class="flex flex-col gap-2">
+                <label for="issuer-address"
+                  >Dirección <span class="text-red-600" aria-hidden="true">*</span></label
+                ><input
+                  pInputText
+                  id="issuer-address"
+                  formControlName="issuerAddress"
+                  [invalid]="
+                    configurationForm.controls.issuerAddress.touched &&
+                    configurationForm.controls.issuerAddress.invalid
+                  "
+                  aria-required="true"
+                />
+                @if (
+                  configurationForm.controls.issuerAddress.touched &&
+                  configurationForm.controls.issuerAddress.hasError('required')
+                ) {
+                  <small class="text-red-600">Este campo es requerido</small>
+                }
+              </div>
+              <div class="flex flex-col gap-2">
+                <label for="issuer-commune"
+                  >Comuna <span class="text-red-600" aria-hidden="true">*</span></label
+                ><input
+                  pInputText
+                  id="issuer-commune"
+                  formControlName="issuerCommune"
+                  [invalid]="
+                    configurationForm.controls.issuerCommune.touched &&
+                    configurationForm.controls.issuerCommune.invalid
+                  "
+                  aria-required="true"
+                />
+                @if (
+                  configurationForm.controls.issuerCommune.touched &&
+                  configurationForm.controls.issuerCommune.hasError('required')
+                ) {
+                  <small class="text-red-600">Este campo es requerido</small>
+                }
+              </div>
+              <div class="flex flex-col gap-2 lg:col-span-2">
+                <label for="sii-notification-email"
+                  >Correo de notificaciones registrado en el SII
+                  <span class="text-red-600" aria-hidden="true">*</span></label
+                ><input
+                  pInputText
+                  id="sii-notification-email"
+                  type="email"
+                  formControlName="notificationEmail"
+                  autocomplete="email"
+                  [invalid]="
+                    configurationForm.controls.notificationEmail.touched &&
+                    configurationForm.controls.notificationEmail.invalid
+                  "
+                  aria-required="true"
+                /><small class="text-muted"
+                  >Este dato documenta la casilla usada por cada ambiente. Para cambiar el
+                  destinatario oficial también debes actualizarlo en el portal del SII.</small
+                >
+                @if (
+                  configurationForm.controls.notificationEmail.touched &&
+                  configurationForm.controls.notificationEmail.hasError('required')
+                ) {
+                  <small class="text-red-600">Este campo es requerido</small>
+                }
+              </div>
+              <div class="flex flex-col gap-2">
+                <label for="resolution-date"
+                  >Fecha de resolución <span class="text-red-600" aria-hidden="true">*</span></label
+                ><p-datepicker
+                  inputId="resolution-date"
+                  formControlName="resolutionDate"
+                  dateFormat="dd-mm-yy"
+                  placeholder="DD-MM-YYYY"
+                  [showIcon]="true"
+                  [invalid]="
+                    configurationForm.controls.resolutionDate.touched &&
+                    configurationForm.controls.resolutionDate.invalid
+                  "
+                  panelStyleClass="dark:border-line/55!"
+                  appendTo="body"
+                  fluid
+                />
+                @if (
+                  configurationForm.controls.resolutionDate.touched &&
+                  configurationForm.controls.resolutionDate.hasError('required')
+                ) {
+                  <small class="text-red-600">Este campo es requerido</small>
+                }
+              </div>
+              <div class="flex flex-col gap-2">
+                <label for="resolution-number"
+                  >Número de resolución
+                  <span class="text-red-600" aria-hidden="true">*</span></label
+                ><p-inputnumber
+                  inputId="resolution-number"
+                  formControlName="resolutionNumber"
+                  [min]="0"
+                  [maxFractionDigits]="0"
+                  [invalid]="
+                    configurationForm.controls.resolutionNumber.touched &&
+                    configurationForm.controls.resolutionNumber.invalid
+                  "
+                  fluid
+                />
+                @if (
+                  configurationForm.controls.resolutionNumber.touched &&
+                  configurationForm.controls.resolutionNumber.hasError('required')
+                ) {
+                  <small class="text-red-600">Este campo es requerido</small>
+                }
+              </div>
+              <div class="flex items-center gap-2">
+                <p-checkbox
+                  inputId="issuer-enabled"
+                  formControlName="enabled"
+                  [binary]="true"
+                /><label for="issuer-enabled">Configuración habilitada</label>
+              </div>
+              <div class="flex items-center gap-2">
+                <p-checkbox
+                  inputId="certification-approved"
+                  formControlName="certificationApproved"
+                  [binary]="true"
+                /><label for="certification-approved">Certificación aprobada</label>
+              </div>
+              <div class="lg:col-span-3">
+                <button
+                  pButton
+                  type="submit"
+                  [loading]="configurationBusy()"
+                  [disabled]="configurationBusy()"
+                >
+                  <span class="icon-[tabler--device-floppy] size-4" aria-hidden="true"></span
+                  >Guardar datos del emisor
+                </button>
+              </div>
             </form>
           </p-panel>
 
           <div class="grid gap-6 xl:grid-cols-2">
             <p-panel header="Folios CAF DTE 39">
-              <div class="flex flex-col gap-4"><p class="text-sm text-muted">Solicita los folios en el portal del SII, descarga el XML CAF y cárgalo aquí. El SII no lo instala automáticamente en este facturador. Validamos que sea DTE 39, que corresponda al emisor y que su rango no reutilice folios consumidos.</p><p-message severity="warn">Por seguridad, el CAF activo sólo puede reemplazarse cuando su rango esté agotado. Solicita el siguiente con anticipación y cárgalo al llegar a cero. El archivo contiene una llave privada de timbraje y se guarda cifrado como SecureString en Parameter Store.</p-message><p-fileupload #cafUploader mode="basic" name="caf" accept=".xml,text/xml,application/xml" chooseLabel="Cargar CAF XML" chooseIcon="icon-[tabler--upload] size-4" [auto]="false" [disabled]="uploadingCaf()" (onSelect)="uploadCaf($event, cafUploader)" /><p class="text-xs text-muted">{{ selectedCafName() || (cafConfigured() ? 'CAF activo cargado.' : 'Aún no hay CAF cargado.') }}</p></div>
+              <div class="flex flex-col gap-4">
+                <p class="text-sm text-muted">
+                  Solicita los folios en el portal del SII, descarga el XML CAF y cárgalo aquí. El
+                  SII no lo instala automáticamente en este facturador. Validamos que sea DTE 39,
+                  que corresponda al emisor y que su rango no reutilice folios consumidos.
+                </p>
+                <p-message severity="warn"
+                  >Por seguridad, el CAF activo sólo puede reemplazarse cuando su rango esté
+                  agotado. Solicita el siguiente con anticipación y cárgalo al llegar a cero. El
+                  archivo contiene una llave privada de timbraje y se guarda cifrado como
+                  SecureString en Parameter Store.</p-message
+                ><p-fileupload
+                  #cafUploader
+                  mode="basic"
+                  name="caf"
+                  accept=".xml,text/xml,application/xml"
+                  chooseLabel="Cargar CAF XML"
+                  chooseIcon="icon-[tabler--upload] size-4"
+                  [auto]="false"
+                  [disabled]="uploadingCaf()"
+                  (onSelect)="uploadCaf($event, cafUploader)"
+                />
+                <p class="text-xs text-muted">
+                  {{
+                    selectedCafName() ||
+                      (cafConfigured() ? 'CAF activo cargado.' : 'Aún no hay CAF cargado.')
+                  }}
+                </p>
+              </div>
             </p-panel>
             <p-panel header="Certificado digital">
-              <div class="flex flex-col gap-4"><p class="text-sm text-muted">Carga el certificado de firma en formato .pfx. La contraseña no se conserva en el navegador.</p><div class="flex flex-col gap-2"><label for="pfx-password">Contraseña del certificado <span class="text-red-600" aria-hidden="true">*</span></label><input pInputText id="pfx-password" type="password" [formControl]="pfxPassword" autocomplete="new-password" [invalid]="pfxPassword.touched && pfxPassword.invalid" aria-required="true" />@if (pfxPassword.touched && pfxPassword.hasError('required')) {<small class="text-red-600">Este campo es requerido</small>}</div><p-fileupload #pfxUploader mode="basic" name="pfx" accept=".pfx,application/x-pkcs12" chooseLabel="Cargar certificado .pfx" chooseIcon="icon-[tabler--upload] size-4" [auto]="false" [disabled]="uploadingPfx()" (onSelect)="uploadPfx($event, pfxUploader)" /><p class="text-xs text-muted">{{ selectedPfxName() || (certificateConfigured() ? 'Certificado cargado.' : 'Aún no hay certificado cargado.') }}</p></div>
+              <div class="flex flex-col gap-4">
+                <p class="text-sm text-muted">
+                  Carga el certificado de firma en formato .pfx. La contraseña no se conserva en el
+                  navegador.
+                </p>
+                <div class="flex flex-col gap-2">
+                  <label for="pfx-password"
+                    >Contraseña del certificado
+                    <span class="text-red-600" aria-hidden="true">*</span></label
+                  ><input
+                    pInputText
+                    id="pfx-password"
+                    type="password"
+                    [formControl]="pfxPassword"
+                    autocomplete="new-password"
+                    [invalid]="pfxPassword.touched && pfxPassword.invalid"
+                    aria-required="true"
+                  />
+                  @if (pfxPassword.touched && pfxPassword.hasError('required')) {
+                    <small class="text-red-600">Este campo es requerido</small>
+                  }
+                </div>
+                <p-fileupload
+                  #pfxUploader
+                  mode="basic"
+                  name="pfx"
+                  accept=".pfx,application/x-pkcs12"
+                  chooseLabel="Cargar certificado .pfx"
+                  chooseIcon="icon-[tabler--upload] size-4"
+                  [auto]="false"
+                  [disabled]="uploadingPfx()"
+                  (onSelect)="uploadPfx($event, pfxUploader)"
+                />
+                <p class="text-xs text-muted">
+                  {{
+                    selectedPfxName() ||
+                      (certificateConfigured()
+                        ? 'Certificado cargado.'
+                        : 'Aún no hay certificado cargado.')
+                  }}
+                </p>
+              </div>
             </p-panel>
           </div>
         </div>

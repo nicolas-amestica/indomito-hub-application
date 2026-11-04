@@ -1,8 +1,22 @@
 import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import {
+  FormArray,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ButtonDirective } from 'primeng/button';
 import { Checkbox } from 'primeng/checkbox';
@@ -19,10 +33,21 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 import { Tag } from 'primeng/tag';
 import { finalize } from 'rxjs';
 import { DateOnlyPickerComponent } from '../../../../shared/date-only/date-only-picker.component';
-import { dateOnlyToLocalDate, localDateToDateOnly, todayDateOnly } from '../../../../shared/date-only/date-only';
+import {
+  dateOnlyToLocalDate,
+  localDateToDateOnly,
+  todayDateOnly,
+} from '../../../../shared/date-only/date-only';
 import { newUlid } from '../../../../shared/fn/new-ulid';
 import { TAX_DOCUMENT_STATUS_PRESENTATION } from '../../constants/tax-document-status.constant';
-import { filterTaxDocuments, taxDocumentOrigin, taxDocumentUpdatedAt, type TaxDocumentOrigin } from '../../fn/filter-tax-documents';
+import { TAX_DOCUMENT_UNIT_OPTIONS } from '../../constants/tax-document-unit-options.constant';
+import { calculateTaxDocumentTotals } from '../../fn/calculate-tax-document-totals';
+import {
+  filterTaxDocuments,
+  taxDocumentOrigin,
+  taxDocumentUpdatedAt,
+  type TaxDocumentOrigin,
+} from '../../fn/filter-tax-documents';
 import type {
   TaxConfigurationInput,
   TaxConfigurationSummary,
@@ -80,19 +105,32 @@ export class TaxDocumentsPage {
   protected readonly fromDate = signal<Date | null>(null);
   protected readonly toDate = signal<Date | null>(null);
   protected readonly selectedDocument = signal<TaxDocumentRequest | null>(null);
+  protected readonly formError = signal('');
+  protected readonly unitOptions = TAX_DOCUMENT_UNIT_OPTIONS;
   protected readonly statusOptions = [
     { label: 'Todos los estados', value: 'ALL' },
-    ...Object.entries(TAX_DOCUMENT_STATUS_PRESENTATION).map(([value, presentation]) => ({ value, label: presentation.label })),
+    ...Object.entries(TAX_DOCUMENT_STATUS_PRESENTATION).map(([value, presentation]) => ({
+      value,
+      label: presentation.label,
+    })),
   ];
   protected readonly originOptions = [
     { label: 'Todos los orígenes', value: 'ALL' },
     { label: 'Pago Khipu', value: 'KHIPU' },
     { label: 'Emisión manual', value: 'MANUAL' },
   ];
-  protected readonly filteredItems = computed(() => filterTaxDocuments(this.items(), {
-    search: this.searchTerm(), status: this.statusFilter(), origin: this.originFilter(), from: this.fromDate(), to: this.toDate(),
-  }));
-  protected readonly rejectedCount = computed(() => this.items().filter(item => item.status === 'REJECTED' && !item.reissuedBy).length);
+  protected readonly filteredItems = computed(() =>
+    filterTaxDocuments(this.items(), {
+      search: this.searchTerm(),
+      status: this.statusFilter(),
+      origin: this.originFilter(),
+      from: this.fromDate(),
+      to: this.toDate(),
+    }),
+  );
+  protected readonly rejectedCount = computed(
+    () => this.items().filter((item) => item.status === 'REJECTED' && !item.reissuedBy).length,
+  );
   protected readonly configuration = signal<TaxConfigurationSummary | null>(null);
   protected readonly selectedCafName = signal('');
   protected readonly selectedPfxName = signal('');
@@ -101,23 +139,56 @@ export class TaxDocumentsPage {
     () => !!this.configuration()?.certificate.validTo,
   );
   protected readonly form = new FormGroup({
-    issueDate: new FormControl(todayDateOnly(), { nonNullable: true, validators: [Validators.required] }),
+    issueDate: new FormControl(todayDateOnly(), {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
     customerRut: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(12)] }),
     items: new FormArray([this.newItem()]),
   });
+  private readonly formValue = toSignal(this.form.valueChanges, {
+    initialValue: this.form.getRawValue(),
+  });
+  protected readonly totals = computed(() =>
+    calculateTaxDocumentTotals(this.formValue().items ?? []),
+  );
   protected readonly configurationForm = new FormGroup({
-    senderRut: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(12)] }),
-    issuerName: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(120)] }),
-    issuerActivity: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(160)] }),
-    issuerAddress: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(160)] }),
-    issuerCommune: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(80)] }),
-    notificationEmail: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.email, Validators.maxLength(254)] }),
+    senderRut: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(12)],
+    }),
+    issuerName: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(120)],
+    }),
+    issuerActivity: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(160)],
+    }),
+    issuerAddress: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(160)],
+    }),
+    issuerCommune: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(80)],
+    }),
+    notificationEmail: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.email, Validators.maxLength(254)],
+    }),
     resolutionDate: new FormControl<Date | null>(null, { validators: [Validators.required] }),
-    resolutionNumber: new FormControl(0, { nonNullable: true, validators: [Validators.required, Validators.min(0)] }),
+    resolutionNumber: new FormControl(0, {
+      nonNullable: true,
+      validators: [Validators.required, Validators.min(0)],
+    }),
     enabled: new FormControl(false, { nonNullable: true }),
     certificationApproved: new FormControl(false, { nonNullable: true }),
   });
-  protected readonly pfxPassword = new FormControl('', { nonNullable: true, validators: [Validators.required] });
+  protected readonly pfxPassword = new FormControl('', {
+    nonNullable: true,
+    validators: [Validators.required],
+  });
 
   constructor() {
     this.load();
@@ -126,11 +197,23 @@ export class TaxDocumentsPage {
 
   protected newItem(): FormGroup {
     return new FormGroup({
-      description: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(80)] }),
-      quantity: new FormControl(1, { nonNullable: true, validators: [Validators.required, Validators.min(1)] }),
-      unitPrice: new FormControl(0, { nonNullable: true, validators: [Validators.required, Validators.min(1)] }),
+      description: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.maxLength(80)],
+      }),
+      quantity: new FormControl(1, {
+        nonNullable: true,
+        validators: [Validators.required, Validators.min(1)],
+      }),
+      unitPrice: new FormControl(0, {
+        nonNullable: true,
+        validators: [Validators.required, Validators.min(1)],
+      }),
       exempt: new FormControl(false, { nonNullable: true }),
-      unit: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(4)] }),
+      unit: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.maxLength(4)],
+      }),
     });
   }
 
@@ -142,17 +225,19 @@ export class TaxDocumentsPage {
     if (this.form.controls.items.length > 1) this.form.controls.items.removeAt(index);
   }
 
-  protected total(): number {
-    return this.form.controls.items.getRawValue().reduce((sum, item) => sum + item['quantity'] * item['unitPrice'], 0);
-  }
-
   protected load(): void {
     if (this.busy()) return;
     this.busy.set(true);
-    this.api.listAll().pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.busy.set(false))).subscribe({
-      next: page => this.items.set(page.items),
-      error: () => this.error.set('No fue posible consultar las boletas.'),
-    });
+    this.api
+      .listAll()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.busy.set(false)),
+      )
+      .subscribe({
+        next: (page) => this.items.set(page.items),
+        error: () => this.error.set('No fue posible consultar las boletas.'),
+      });
   }
 
   protected setSearchTerm(event: Event): void {
@@ -175,72 +260,135 @@ export class TaxDocumentsPage {
     return taxDocumentUpdatedAt(item);
   }
 
+  protected async copyReceiptId(receiptId: string): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(receiptId);
+      this.success.set('Código de operación copiado al portapapeles.');
+      this.error.set('');
+    } catch {
+      this.error.set('No fue posible copiar el código automáticamente.');
+    }
+  }
+
   protected create(): void {
     this.form.markAllAsTouched();
-    if (this.form.invalid || this.total() <= 0 || this.busy()) {
-      this.error.set('Completa al menos un ítem válido.');
+    if (this.form.invalid || this.totals().gross <= 0 || this.busy()) {
+      this.formError.set(
+        'Revisa los campos de cada ítem. Descripción, cantidad, precio y unidad son obligatorios.',
+      );
       return;
     }
+    this.formError.set('');
     const raw = this.form.getRawValue();
     this.busy.set(true);
     this.error.set('');
     this.success.set('');
-    this.api.create({
-      commandId: newUlid(),
-      issueDate: raw.issueDate,
-      customerRut: raw.customerRut.trim(),
-      items: raw.items.map(item => ({ ...item, description: item['description'].trim(), unit: item['unit'].trim() })) as TaxDocumentItem[],
-    }).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.busy.set(false))).subscribe({
-      next: item => {
-        this.items.update(items => [item, ...items]);
-        this.success.set('Boleta encolada para emisión ante el SII.');
-      },
-      error: () => this.error.set('No fue posible crear la boleta. Revisa los datos antes de reintentar.'),
-    });
+    this.api
+      .create({
+        commandId: newUlid(),
+        issueDate: raw.issueDate,
+        customerRut: raw.customerRut.trim(),
+        items: raw.items.map((item) => ({
+          ...item,
+          description: item['description'].trim(),
+          unit: item['unit'].trim(),
+        })) as TaxDocumentItem[],
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.busy.set(false)),
+      )
+      .subscribe({
+        next: (item) => {
+          this.items.update((items) => [item, ...items]);
+          this.success.set('Boleta encolada para emisión ante el SII.');
+        },
+        error: () =>
+          this.error.set('No fue posible crear la boleta. Revisa los datos antes de reintentar.'),
+      });
   }
 
   protected issue(item: TaxDocumentRequest): void {
     if (this.busy() || item.status === 'SUBMITTED') return;
     this.busy.set(true);
     this.error.set('');
-    this.api.issue(item.requestId).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.busy.set(false))).subscribe({
-      next: updated => {
-        this.items.update(items => items.map(current => current.requestId === updated.requestId ? updated : current));
-        this.success.set(`Boleta folio ${updated.siiIssuance?.folio ?? ''} enviada al SII.`);
-      },
-      error: () => this.error.set('La emisión no pudo completarse. Revisa el estado antes de volver a intentar.'),
-    });
+    this.api
+      .issue(item.requestId)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.busy.set(false)),
+      )
+      .subscribe({
+        next: (updated) => {
+          this.items.update((items) =>
+            items.map((current) => (current.requestId === updated.requestId ? updated : current)),
+          );
+          this.success.set(`Boleta folio ${updated.siiIssuance?.folio ?? ''} enviada al SII.`);
+        },
+        error: () =>
+          this.error.set(
+            'La emisión no pudo completarse. Revisa el estado antes de volver a intentar.',
+          ),
+      });
   }
 
   protected download(item: TaxDocumentRequest): void {
-    if (this.busy() || !['SUBMITTED', 'ACCEPTED', 'ACCEPTED_WITH_REPAIRS'].includes(item.status)) return;
+    if (this.busy() || !['SUBMITTED', 'ACCEPTED', 'ACCEPTED_WITH_REPAIRS'].includes(item.status))
+      return;
     this.busy.set(true);
-    this.api.download(item.requestId).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.busy.set(false))).subscribe({
-      next: ({ url }) => window.open(url, '_blank', 'noopener,noreferrer'),
-      error: () => this.error.set('La representación PDF todavía no está disponible.'),
-    });
+    this.api
+      .download(item.requestId)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.busy.set(false)),
+      )
+      .subscribe({
+        next: ({ url }) => window.open(url, '_blank', 'noopener,noreferrer'),
+        error: () => this.error.set('La representación PDF todavía no está disponible.'),
+      });
   }
 
   protected reissue(item: TaxDocumentRequest): void {
     if (this.busy() || item.status !== 'REJECTED' || item.reissuedBy) return;
     this.busy.set(true);
     this.error.set('');
-    this.api.reissue(item.requestId, newUlid()).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.busy.set(false))).subscribe({
-      next: replacement => {
-        this.items.update(items => [replacement, ...items.map(current => current.requestId === item.requestId ? { ...current, reissuedBy: replacement.requestId } : current)]);
-        this.success.set('Se creó una nueva emisión con otro folio. El folio rechazado no será reutilizado.');
-      },
-      error: () => this.error.set('No fue posible regenerar la boleta rechazada.'),
-    });
+    this.api
+      .reissue(item.requestId, newUlid())
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.busy.set(false)),
+      )
+      .subscribe({
+        next: (replacement) => {
+          this.items.update((items) => [
+            replacement,
+            ...items.map((current) =>
+              current.requestId === item.requestId
+                ? { ...current, reissuedBy: replacement.requestId }
+                : current,
+            ),
+          ]);
+          this.success.set(
+            'Se creó una nueva emisión con otro folio. El folio rechazado no será reutilizado.',
+          );
+        },
+        error: () => this.error.set('No fue posible regenerar la boleta rechazada.'),
+      });
   }
 
   protected loadConfiguration(): void {
     if (this.configurationBusy()) return;
     this.configurationBusy.set(true);
-    this.api.getConfiguration().pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.configurationBusy.set(false))).subscribe({
-      next: configuration => this.applyConfiguration(configuration),
-      error: () => this.error.set('No fue posible cargar la configuración tributaria.'),
-    });
+    this.api
+      .getConfiguration()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.configurationBusy.set(false)),
+      )
+      .subscribe({
+        next: (configuration) => this.applyConfiguration(configuration),
+        error: () => this.error.set('No fue posible cargar la configuración tributaria.'),
+      });
   }
 
   protected saveConfiguration(): void {
@@ -254,19 +402,30 @@ export class TaxDocumentsPage {
       resolutionDate: localDateToDateOnly(raw.resolutionDate),
       environment: this.configuration()?.environment ?? 'CERTIFICATION',
     };
-    this.api.updateConfiguration(request).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.configurationBusy.set(false))).subscribe({
-      next: configuration => {
-        this.applyConfiguration(configuration);
-        this.success.set('Datos del emisor guardados. La emisión vigente no fue modificada.');
-      },
-      error: () => this.error.set('No fue posible guardar los datos del emisor.'),
-    });
+    this.api
+      .updateConfiguration(request)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.configurationBusy.set(false)),
+      )
+      .subscribe({
+        next: (configuration) => {
+          this.applyConfiguration(configuration);
+          this.success.set('Datos del emisor guardados. La emisión vigente no fue modificada.');
+        },
+        error: () => this.error.set('No fue posible guardar los datos del emisor.'),
+      });
   }
 
   protected async uploadCaf(event: FileSelectEvent, uploader: FileUpload): Promise<void> {
     const file = Array.from(event.files)[0];
     uploader.clear();
-    if (!file || this.uploadingCaf() || !file.name.toLowerCase().endsWith('.xml') || file.size > 512 * 1024) {
+    if (
+      !file ||
+      this.uploadingCaf() ||
+      !file.name.toLowerCase().endsWith('.xml') ||
+      file.size > 512 * 1024
+    ) {
       this.error.set('Selecciona un archivo CAF XML válido de hasta 512 KB.');
       return;
     }
@@ -274,15 +433,22 @@ export class TaxDocumentsPage {
     this.error.set('');
     try {
       const cafXmlBase64 = await this.fileAsBase64(file);
-      const configuration = await this.api.uploadCaf(cafXmlBase64).pipe(takeUntilDestroyed(this.destroyRef)).toPromise();
+      const configuration = await this.api
+        .uploadCaf(cafXmlBase64)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .toPromise();
       if (!configuration) throw new Error('Missing tax configuration response');
       this.selectedCafName.set(file.name);
       this.applyConfiguration(configuration);
-      this.success.set('CAF validado y guardado de forma segura. La emisión vigente conserva su configuración actual.');
+      this.success.set(
+        'CAF validado y guardado de forma segura. La emisión vigente conserva su configuración actual.',
+      );
     } catch (error: unknown) {
       if (error instanceof HttpErrorResponse && error.status === 409 && this.configuration()) {
         const caf = this.configuration()!.caf;
-        this.error.set(`El CAF ${caf.from}–${caf.to} todavía tiene ${caf.available} folio(s) disponible(s). Cárgalo nuevamente cuando el rango activo llegue a cero.`);
+        this.error.set(
+          `El CAF ${caf.from}–${caf.to} todavía tiene ${caf.available} folio(s) disponible(s). Cárgalo nuevamente cuando el rango activo llegue a cero.`,
+        );
       } else {
         this.error.set('No fue posible cargar el CAF. Verifica que sea un CAF DTE tipo 39 válido.');
       }
@@ -295,20 +461,33 @@ export class TaxDocumentsPage {
     const file = Array.from(event.files)[0];
     uploader.clear();
     this.pfxPassword.markAsTouched();
-    if (!file || this.uploadingPfx() || !file.name.toLowerCase().endsWith('.pfx') || file.size > 512 * 1024 || this.pfxPassword.invalid) {
-      this.error.set('Selecciona un certificado .pfx válido de hasta 512 KB e ingresa su contraseña.');
+    if (
+      !file ||
+      this.uploadingPfx() ||
+      !file.name.toLowerCase().endsWith('.pfx') ||
+      file.size > 512 * 1024 ||
+      this.pfxPassword.invalid
+    ) {
+      this.error.set(
+        'Selecciona un certificado .pfx válido de hasta 512 KB e ingresa su contraseña.',
+      );
       return;
     }
     this.uploadingPfx.set(true);
     this.error.set('');
     try {
       const pfxBase64 = await this.fileAsBase64(file);
-      const configuration = await this.api.uploadPfx(pfxBase64, this.pfxPassword.value).pipe(takeUntilDestroyed(this.destroyRef)).toPromise();
+      const configuration = await this.api
+        .uploadPfx(pfxBase64, this.pfxPassword.value)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .toPromise();
       if (!configuration) throw new Error('Missing tax configuration response');
       this.selectedPfxName.set(file.name);
       this.pfxPassword.reset();
       this.applyConfiguration(configuration);
-      this.success.set('Certificado validado y guardado de forma segura. La emisión vigente conserva su configuración actual.');
+      this.success.set(
+        'Certificado validado y guardado de forma segura. La emisión vigente conserva su configuración actual.',
+      );
     } catch {
       this.error.set('No fue posible cargar el certificado. Revisa el archivo y su contraseña.');
     } finally {
@@ -317,11 +496,19 @@ export class TaxDocumentsPage {
   }
 
   protected cafSeverity(): 'success' | 'warn' | 'danger' | 'secondary' {
-    return this.configuration()?.caf.severity === 'OK' ? 'success' : this.configuration()?.caf.severity === 'LOW' ? 'warn' : this.configuration()?.caf.severity === 'EXHAUSTED' ? 'danger' : 'secondary';
+    return this.configuration()?.caf.severity === 'OK'
+      ? 'success'
+      : this.configuration()?.caf.severity === 'EXHAUSTED'
+        ? 'danger'
+        : 'warn';
   }
 
   protected certificateSeverity(): 'success' | 'warn' | 'danger' | 'secondary' {
-    return this.configuration()?.certificate.severity === 'OK' ? 'success' : this.configuration()?.certificate.severity === 'EXPIRING' ? 'warn' : this.configuration()?.certificate.severity === 'EXPIRED' ? 'danger' : 'secondary';
+    return this.configuration()?.certificate.severity === 'OK'
+      ? 'success'
+      : this.configuration()?.certificate.severity === 'EXPIRED'
+        ? 'danger'
+        : 'warn';
   }
 
   private applyConfiguration(configuration: TaxConfigurationSummary): void {
