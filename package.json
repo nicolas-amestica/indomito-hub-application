@@ -11,6 +11,7 @@
     "test": "ng test",
     "test:inbox:browser": "ng test --include 'src/app/indomito-hub/inbox/**/*.spec.ts' --watch=false --browsers=chromiumHeadless",
     "check:buttons": "node tools/check-button-policy.mjs",
+    "build:android-tv": "bash android-tv/scripts/build-debug.sh",
     "build:dev": "ng build -c=dev",
     "build:prd": "ng build -c=production",
     "deploy:dev": "bash tools/deploy-spa.sh dev",

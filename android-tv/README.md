@@ -31,6 +31,12 @@ Después de cada actualización, ejecuta desde la carpeta `android-tv/`:
 ./scripts/build-debug.sh
 ```
 
+También puedes ejecutarlo desde la raíz del repositorio:
+
+```bash
+npm run build:android-tv
+```
+
 El script realiza el flujo completo:
 
 1. Detecta y valida JDK 17+ y Android SDK.
