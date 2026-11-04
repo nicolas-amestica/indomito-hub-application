@@ -88,7 +88,7 @@ fi
 
 "$APKSIGNER" verify --verbose "$SOURCE_APK"
 "$AAPT" dump badging "$SOURCE_APK" | grep -E \
-  "^(package:|sdkVersion:|targetSdkVersion:|leanback-launchable-activity:)"
+  "^(package:|sdkVersion:|targetSdkVersion:|launchable-activity:|leanback-launchable-activity:)"
 
 mkdir -p "$OUTPUT_DIR"
 cp "$SOURCE_APK" "$OUTPUT_APK"

@@ -1,11 +1,12 @@
-# Indómito Hub para Android TV
+# Indómito Hub para Android y Android TV
 
-Aplicación nativa para Android TV y Google TV que abre `https://nuevo.admin.girasindomito.cl` dentro de una `WebView` en pantalla completa.
+Aplicación nativa para teléfonos, tablets, Android TV y Google TV que abre `https://nuevo.admin.girasindomito.cl` dentro de una `WebView` en pantalla completa.
 
 ## Funcionalidad
 
-- Launcher Leanback para aparecer en la pantalla de aplicaciones del televisor.
-- Navegación mediante D-pad/control remoto y mouse, delegada al motor WebView.
+- Launcher estándar para teléfonos y tablets, y launcher Leanback para televisores.
+- Orientación automática según el dispositivo; los televisores mantienen su orientación horizontal nativa.
+- Navegación mediante pantalla táctil, D-pad/control remoto y mouse, delegada al motor WebView.
 - Cookies, almacenamiento DOM y base de datos Web habilitados para conservar la sesión.
 - Navegación HTTPS dentro de la aplicación; esquemas externos se delegan a una aplicación compatible.
 - Botón Back: vuelve al historial de WebView y cierra la aplicación cuando no existe una página anterior.
@@ -42,7 +43,7 @@ El script realiza el flujo completo:
 1. Detecta y valida JDK 17+ y Android SDK.
 2. Ejecuta compilación limpia, Lint y pruebas unitarias.
 3. Genera y verifica la firma del APK debug.
-4. Comprueba el package, SDK y launcher Leanback del manifiesto compilado.
+4. Comprueba el package, SDK y launchers estándar y Leanback del manifiesto compilado.
 5. Copia el resultado en una ruta estable y muestra su SHA-256.
 
 Resultado:
@@ -74,7 +75,7 @@ android-tv/app/build/outputs/apk/debug/app-debug.apk
 
 ## Instalar mediante ADB
 
-Activa las opciones de desarrollador y la depuración USB o por red en el televisor. Luego:
+Activa las opciones de desarrollador y la depuración USB o por red en el dispositivo. Luego:
 
 ```bash
 adb connect IP_DEL_TELEVISOR:5555
