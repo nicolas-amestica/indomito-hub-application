@@ -12,7 +12,8 @@ android-tv/.gradle/
 android-tv/local.properties
 android-tv/build/
 android-tv/app/build/
-android-tv/dist/
+android-tv/dist/*
+!android-tv/dist/.gitkeep
 npm-debug.log
 yarn-error.log
 
