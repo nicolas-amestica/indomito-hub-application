@@ -19,7 +19,7 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 import { Tag } from 'primeng/tag';
 import { finalize } from 'rxjs';
 import { DateOnlyPickerComponent } from '../../../../shared/date-only/date-only-picker.component';
-import { todayDateOnly } from '../../../../shared/date-only/date-only';
+import { dateOnlyToLocalDate, localDateToDateOnly, todayDateOnly } from '../../../../shared/date-only/date-only';
 import { newUlid } from '../../../../shared/fn/new-ulid';
 import { TAX_DOCUMENT_STATUS_PRESENTATION } from '../../constants/tax-document-status.constant';
 import { filterTaxDocuments, taxDocumentOrigin, taxDocumentUpdatedAt, type TaxDocumentOrigin } from '../../fn/filter-tax-documents';
@@ -111,8 +111,8 @@ export class TaxDocumentsPage {
     issuerActivity: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(160)] }),
     issuerAddress: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(160)] }),
     issuerCommune: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(80)] }),
-    notificationEmail: new FormControl('', { nonNullable: true, validators: [Validators.email, Validators.maxLength(254)] }),
-    resolutionDate: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    notificationEmail: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.email, Validators.maxLength(254)] }),
+    resolutionDate: new FormControl<Date | null>(null, { validators: [Validators.required] }),
     resolutionNumber: new FormControl(0, { nonNullable: true, validators: [Validators.required, Validators.min(0)] }),
     enabled: new FormControl(false, { nonNullable: true }),
     certificationApproved: new FormControl(false, { nonNullable: true }),
@@ -251,6 +251,7 @@ export class TaxDocumentsPage {
     const raw = this.configurationForm.getRawValue();
     const request: TaxConfigurationInput = {
       ...raw,
+      resolutionDate: localDateToDateOnly(raw.resolutionDate),
       environment: this.configuration()?.environment ?? 'CERTIFICATION',
     };
     this.api.updateConfiguration(request).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.configurationBusy.set(false))).subscribe({
@@ -332,7 +333,7 @@ export class TaxDocumentsPage {
       issuerAddress: configuration.issuerAddress,
       issuerCommune: configuration.issuerCommune,
       notificationEmail: configuration.notificationEmail ?? '',
-      resolutionDate: configuration.resolutionDate,
+      resolutionDate: dateOnlyToLocalDate(configuration.resolutionDate),
       resolutionNumber: configuration.resolutionNumber,
       enabled: configuration.enabled,
       certificationApproved: configuration.certificationApproved,
