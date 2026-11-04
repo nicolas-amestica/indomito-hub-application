@@ -8,6 +8,10 @@
 
 # Node
 /node_modules
+android-tv/.gradle/
+android-tv/local.properties
+android-tv/build/
+android-tv/app/build/
 npm-debug.log
 yarn-error.log
 

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Indómito Hub</string>
+    <string name="load_error">No se pudo cargar Indómito Hub.\n\nPresiona OK para reintentar.</string>
+</resources>
