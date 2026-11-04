@@ -56,7 +56,7 @@
                 <label for="tax-date">Fecha de emisión</label
                 ><app-date-only-picker inputId="tax-date" formControlName="issueDate" />
               </div>
-              <div class="flex min-w-0 flex-col gap-2 xl:col-span-8">
+              <div class="flex min-w-0 flex-col gap-2 xl:col-span-4">
                 <label for="tax-rut">RUT receptor (opcional)</label
                 ><input
                   pInputText
@@ -67,6 +67,28 @@
                   autocomplete="off"
                   placeholder="Ej. 12.345.678-9"
                 />
+              </div>
+              <div class="flex min-w-0 flex-col gap-2 sm:col-span-2 xl:col-span-4">
+                <label for="tax-delivery-email">Enviar email (opcional)</label
+                ><input
+                  pInputText
+                  id="tax-delivery-email"
+                  name="tax-delivery-email"
+                  type="email"
+                  class="w-full min-w-0"
+                  formControlName="deliveryEmail"
+                  autocomplete="email"
+                  placeholder="Ej. receptor@correo.cl"
+                  [attr.aria-invalid]="
+                    form.controls.deliveryEmail.invalid && form.controls.deliveryEmail.touched
+                  "
+                  aria-describedby="tax-delivery-email-error"
+                />
+                @if (form.controls.deliveryEmail.invalid && form.controls.deliveryEmail.touched) {
+                  <small id="tax-delivery-email-error" class="text-danger"
+                    >Ingresa un correo electrónico válido.</small
+                  >
+                }
               </div>
               <div
                 formArrayName="items"
@@ -115,7 +137,7 @@
                       />
                     </div>
                     <div class="flex min-w-0 flex-col gap-2 xl:col-span-2">
-                      <label [for]="'item-unit-' + index">Unidad</label
+                      <label [for]="'item-unit-' + index">Unidad (opcional)</label
                       ><p-select
                         [inputId]="'item-unit-' + index"
                         [options]="unitOptions"

@@ -46,6 +46,7 @@ export interface TaxDocumentRequest {
   items?: TaxDocumentItem[];
   reference?: string;
   customerRut?: string;
+  deliveryEmail?: string;
   reissuesRequest?: string;
   reissuedBy?: string;
 }
@@ -54,6 +55,7 @@ export interface CreateTaxDocumentRequest {
   commandId: string;
   issueDate: string;
   customerRut: string;
+  deliveryEmail?: string;
   items: TaxDocumentItem[];
 }
 

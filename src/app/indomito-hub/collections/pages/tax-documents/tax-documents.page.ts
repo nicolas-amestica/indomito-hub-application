@@ -144,6 +144,10 @@ export class TaxDocumentsPage {
       validators: [Validators.required],
     }),
     customerRut: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(12)] }),
+    deliveryEmail: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.email, Validators.maxLength(254)],
+    }),
     items: new FormArray([this.newItem()]),
   });
   private readonly formValue = toSignal(this.form.valueChanges, {
@@ -212,7 +216,7 @@ export class TaxDocumentsPage {
       exempt: new FormControl(false, { nonNullable: true }),
       unit: new FormControl('', {
         nonNullable: true,
-        validators: [Validators.required, Validators.maxLength(4)],
+        validators: [Validators.maxLength(4)],
       }),
     });
   }
@@ -274,12 +278,13 @@ export class TaxDocumentsPage {
     this.form.markAllAsTouched();
     if (this.form.invalid || this.totals().gross <= 0 || this.busy()) {
       this.formError.set(
-        'Revisa los campos de cada ítem. Descripción, cantidad, precio y unidad son obligatorios.',
+        'Revisa los campos de cada ítem. Descripción, cantidad y precio son obligatorios.',
       );
       return;
     }
     this.formError.set('');
     const raw = this.form.getRawValue();
+    const deliveryEmail = raw.deliveryEmail.trim();
     this.busy.set(true);
     this.error.set('');
     this.success.set('');
@@ -288,6 +293,7 @@ export class TaxDocumentsPage {
         commandId: newUlid(),
         issueDate: raw.issueDate,
         customerRut: raw.customerRut.trim(),
+        ...(deliveryEmail ? { deliveryEmail } : {}),
         items: raw.items.map((item) => ({
           ...item,
           description: item['description'].trim(),
