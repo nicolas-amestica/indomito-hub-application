@@ -121,6 +121,8 @@ echo ""
 echo -e "${YELLOW}▶ [1/5] Subiendo assets (cache 1 año)...${NC}"
 aws s3 sync "$DIST_PATH" "s3://$BUCKET" \
   --exclude "index.html" \
+  --exclude "manifest.webmanifest" \
+  --exclude "icons/*" \
   --exclude "styles.css" \
   --exclude "styles.css.map" \
   --exclude "3rdpartylicenses.txt" \
@@ -166,6 +168,23 @@ fi
 echo -e "${YELLOW}▶ [3/5] Subiendo archivos adicionales (si existen)...${NC}"
 EXTRA_COUNT=0
 
+if [[ -f "$DIST_PATH/manifest.webmanifest" ]]; then
+  aws s3 cp "$DIST_PATH/manifest.webmanifest" "s3://$BUCKET/manifest.webmanifest" \
+    --cache-control "no-cache, no-store, must-revalidate" \
+    --content-type "application/manifest+json" \
+    --region "$REGION" \
+    --no-cli-pager
+  EXTRA_COUNT=$((EXTRA_COUNT + 1))
+fi
+
+if [[ -d "$DIST_PATH/icons" ]]; then
+  aws s3 sync "$DIST_PATH/icons" "s3://$BUCKET/icons" \
+    --cache-control "no-cache, no-store, must-revalidate" \
+    --region "$REGION" \
+    --no-cli-pager
+  EXTRA_COUNT=$((EXTRA_COUNT + 1))
+fi
+
 if [[ -f "$DIST_PATH/3rdpartylicenses.txt" ]]; then
   aws s3 cp "$DIST_PATH/3rdpartylicenses.txt" "s3://$BUCKET/3rdpartylicenses.txt" \
     --cache-control "public, max-age=86400" \
@@ -186,7 +205,7 @@ echo ""
 echo -e "${YELLOW}▶ [4/5] Invalidando cache de CloudFront...${NC}"
 INVALIDATION_ID=$(aws cloudfront create-invalidation \
   --distribution-id "$DISTRIBUTION_ID" \
-  --paths "/index.html" "/styles.css" \
+  --paths "/index.html" "/styles.css" "/manifest.webmanifest" "/icons/*" \
   --query "Invalidation.Id" \
   --output text \
   --no-cli-pager)
