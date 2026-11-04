@@ -30,6 +30,8 @@
     color-scheme: light;
     scroll-behavior: smooth;
     background: var(--color-canvas);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
   body {
     @apply m-0 bg-canvas font-sans text-ink antialiased;
