@@ -23,6 +23,38 @@ Si el SDK no está en la ubicación predeterminada, define `ANDROID_HOME` o agre
 
 ## Compilar
 
+### Script recomendado
+
+Después de cada actualización, ejecuta desde la carpeta `android-tv/`:
+
+```bash
+./scripts/build-debug.sh
+```
+
+El script realiza el flujo completo:
+
+1. Detecta y valida JDK 17+ y Android SDK.
+2. Ejecuta compilación limpia, Lint y pruebas unitarias.
+3. Genera y verifica la firma del APK debug.
+4. Comprueba el package, SDK y launcher Leanback del manifiesto compilado.
+5. Copia el resultado en una ruta estable y muestra su SHA-256.
+
+Resultado:
+
+```text
+android-tv/dist/indomito-hub-tv-debug.apk
+```
+
+Para compilar, instalar sobre el dispositivo ADB conectado y abrir la aplicación:
+
+```bash
+./scripts/build-debug.sh --install
+```
+
+`--install` exige exactamente un dispositivo en estado `device`, evitando instalar accidentalmente en otro equipo.
+
+### Compilación Gradle manual
+
 ```bash
 cd android-tv
 ./gradlew assembleDebug
