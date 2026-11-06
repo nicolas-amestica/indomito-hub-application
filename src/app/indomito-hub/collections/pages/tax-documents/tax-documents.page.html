@@ -429,7 +429,7 @@
                         >
                       </td>
                       <td class="w-40 whitespace-nowrap tabular-nums">
-                        {{ updatedAt(item) | date: 'dd-MM-yyyy HH:mm' : 'UTC' }}
+                        {{ updatedAt(item) | date: 'dd-MM-yyyy HH:mm' }}
                       </td>
                       <td class="w-px whitespace-nowrap">
                         <div class="flex flex-nowrap justify-end gap-2">
@@ -552,7 +552,7 @@
                     </div>
                     <div class="col-span-2">
                       <dt class="text-muted">Actualización</dt>
-                      <dd class="mt-1">{{ updatedAt(item) | date: 'dd-MM-yyyy HH:mm' : 'UTC' }}</dd>
+                      <dd class="mt-1">{{ updatedAt(item) | date: 'dd-MM-yyyy HH:mm' }}</dd>
                     </div>
                   </dl>
                   <div class="mt-4 flex flex-wrap gap-2">
