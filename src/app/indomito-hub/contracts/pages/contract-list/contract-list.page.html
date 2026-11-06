@@ -105,24 +105,123 @@
         [rows]="10"
         [scrollable]="true"
         [tableStyle]="{ 'min-width': '64rem' }"
+        tableStyleClass="[&_th]:border-line/50! [&_td]:border-line/50! [&_th]:bg-canvas! [&_th]:text-ink! dark:[&_th]:border-line/35! dark:[&_td]:border-line/35! dark:[&_th]:bg-surface! [&_.p-datatable-column-filter-button]:text-muted! [&_.p-datatable-column-filter-button:hover]:bg-surface-200! [&_.p-datatable-column-filter-button:hover]:text-ink! dark:[&_.p-datatable-column-filter-button:hover]:bg-surface-800! [&_.p-datatable-column-filter-button:focus-visible]:outline-2! [&_.p-datatable-column-filter-button:focus-visible]:outline-offset-2! [&_.p-datatable-column-filter-button:focus-visible]:outline-brand-active!"
       >
         <ng-template #header
           ><tr>
-            <th class="border-line/75! dark:border-line/55!">Cotización</th>
-            <th class="border-line/75! dark:border-line/55!">Institución</th>
-            <th class="border-line/75! dark:border-line/55!">Destino</th>
-            <th class="border-line/75! dark:border-line/55!">Período</th>
-            <th class="border-line/75! dark:border-line/55!">Pasajeros</th>
-            <th class="border-line/75! dark:border-line/55!">Estado</th>
-            <th class="border-line/75! dark:border-line/55!">Documento firmado</th>
-            <th class="border-line/75! dark:border-line/55!">Actualización</th>
-            <th aria-label="Acciones" class="border-line/75! dark:border-line/55!">Acciones</th></tr
-        ></ng-template>
+            <th class="border-line/75! dark:border-line/55!">
+              <div class="flex items-center justify-between gap-2">
+                <span>Contrato</span>
+                <p-column-filter field="id" type="text" display="menu" />
+              </div>
+            </th>
+            <th class="border-line/75! dark:border-line/55!">
+              <div class="flex items-center justify-between gap-2">
+                <span>Cotización</span>
+                <p-column-filter field="planName" type="text" display="menu" />
+              </div>
+            </th>
+            <th class="border-line/75! dark:border-line/55!">
+              <div class="flex items-center justify-between gap-2">
+                <span>Institución</span>
+                <p-column-filter field="institutionName" type="text" display="menu" />
+              </div>
+            </th>
+            <th class="border-line/75! dark:border-line/55!">
+              <div class="flex items-center justify-between gap-2">
+                <span>Período</span>
+                <p-column-filter field="period" type="text" display="menu" />
+              </div>
+            </th>
+            <th class="border-line/75! dark:border-line/55!">
+              <div class="flex items-center justify-between gap-2">
+                <span>Pasajeros</span>
+                <p-column-filter field="passengerCount" type="numeric" display="menu" />
+              </div>
+            </th>
+            <th class="border-line/75! dark:border-line/55!">
+              <div class="flex items-center justify-between gap-2">
+                <span>Estado</span>
+                <p-column-filter
+                  field="status"
+                  matchMode="equals"
+                  display="menu"
+                  [showMatchModes]="false"
+                  [showOperator]="false"
+                  [showAddButton]="false"
+                >
+                  <ng-template #filter let-value let-filter="filterCallback">
+                    <p-select
+                      [ngModel]="value"
+                      [options]="statusOptions"
+                      optionLabel="label"
+                      optionValue="value"
+                      placeholder="Todos"
+                      [showClear]="true"
+                      (ngModelChange)="filter($event)"
+                    />
+                  </ng-template>
+                </p-column-filter>
+              </div>
+            </th>
+            <th class="border-line/75! dark:border-line/55!">
+              <div class="flex items-center justify-between gap-2">
+                <span>Documento firmado</span>
+                <p-column-filter
+                  field="signatureStatus"
+                  matchMode="equals"
+                  display="menu"
+                  [showMatchModes]="false"
+                  [showOperator]="false"
+                  [showAddButton]="false"
+                >
+                  <ng-template #filter let-value let-filter="filterCallback">
+                    <p-select
+                      [ngModel]="value"
+                      [options]="signatureOptions"
+                      optionLabel="label"
+                      optionValue="value"
+                      placeholder="Todos"
+                      [showClear]="true"
+                      (ngModelChange)="filter($event)"
+                    />
+                  </ng-template>
+                </p-column-filter>
+              </div>
+            </th>
+            <th class="border-line/75! dark:border-line/55!">
+              <div class="flex items-center justify-between gap-2">
+                <span>Actualización</span>
+                <p-column-filter field="updatedAt" type="text" display="menu" />
+              </div>
+            </th>
+            <th aria-label="Acciones" class="border-line/75! dark:border-line/55!">Acciones</th>
+          </tr></ng-template
+        >
         <ng-template #body let-contract
           ><tr>
-            <td class="font-semibold border-line/75! dark:border-line/55!">{{ contract.planName || 'Sin nombre' }}</td>
-            <td class="border-line/75! dark:border-line/55!">{{ contract.institutionName || 'Sin institución' }}</td>
-            <td class="border-line/75! dark:border-line/55!">{{ contract.destination || 'Sin destino' }}</td>
+            <td class="border-line/75! dark:border-line/55!">
+              <button
+                pButton
+                type="button"
+                severity="secondary"
+                text
+                size="small"
+                class="p-1! text-ink! hover:bg-canvas! dark:hover:bg-surface-800!"
+                [title]="'Copiar ' + contract.id"
+                [attr.aria-label]="'Copiar código de contrato ' + contract.id"
+                (click)="copyContractId(contract.id)"
+              >
+                <span class="font-mono" translate="no">{{ contract.id }}</span>
+                <span class="icon-[tabler--copy] size-3 shrink-0" aria-hidden="true"></span>
+              </button>
+            </td>
+            <td class="font-semibold border-line/75! dark:border-line/55!">
+              {{ contract.planName || 'Sin nombre' }}
+            </td>
+            <td class="border-line/75! dark:border-line/55!">
+              {{ contract.institutionName || 'Sin institución' }}
+            </td>
             <td class="border-line/75! dark:border-line/55!">{{ contract.period }}</td>
             <td class="border-line/75! dark:border-line/55!">{{ contract.passengerCount }}</td>
             <td class="border-line/75! dark:border-line/55!">
@@ -138,15 +237,21 @@
                   class="rounded-full px-3 py-1 text-xs font-semibold"
                   [class.bg-amber-100]="contract.signatureStatus !== 'SIGNED_UPLOADED'"
                   [class.text-amber-900]="contract.signatureStatus !== 'SIGNED_UPLOADED'"
+                  [class.dark:bg-amber-950]="contract.signatureStatus !== 'SIGNED_UPLOADED'"
+                  [class.dark:text-amber-100]="contract.signatureStatus !== 'SIGNED_UPLOADED'"
                   [class.bg-emerald-100]="contract.signatureStatus === 'SIGNED_UPLOADED'"
                   [class.text-emerald-900]="contract.signatureStatus === 'SIGNED_UPLOADED'"
+                  [class.dark:bg-emerald-950]="contract.signatureStatus === 'SIGNED_UPLOADED'"
+                  [class.dark:text-emerald-100]="contract.signatureStatus === 'SIGNED_UPLOADED'"
                   >{{ signatureLabel(contract.signatureStatus || 'PENDING_SIGNED_UPLOAD') }}</span
                 >
               } @else {
                 <span class="text-sm text-muted">No aplica</span>
               }
             </td>
-            <td class="border-line/75! dark:border-line/55!">{{ contract.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td class="border-line/75! dark:border-line/55!">
+              {{ contract.updatedAt | date: 'dd/MM/yyyy HH:mm' }}
+            </td>
             <td class="border-line/75! dark:border-line/55!">
               <div class="flex flex-wrap items-center justify-end gap-2">
                 @if (contract.status === 'APPROVED') {
@@ -185,7 +290,10 @@
         >
         <ng-template #emptymessage
           ><tr>
-            <td colspan="9" class="border-line/75! dark:border-line/55! py-12 text-center text-sm text-muted">
+            <td
+              colspan="9"
+              class="border-line/75! dark:border-line/55! py-12 text-center text-sm text-muted"
+            >
               No hay registros de contratos en el año seleccionado.
             </td>
           </tr></ng-template

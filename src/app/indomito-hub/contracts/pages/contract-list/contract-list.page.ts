@@ -5,7 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { Select } from 'primeng/select';
 import { ButtonDirective } from 'primeng/button';
-import { Table } from 'primeng/table';
+import { ColumnFilter, Table } from 'primeng/table';
 import { finalize } from 'rxjs';
 import type {
   ContractSignatureStatus,
@@ -14,10 +14,11 @@ import type {
 } from '../../interfaces/contract.interface';
 import { ContractsService } from '../../services/contracts.service';
 import { DocumentPreviewService } from '../../../../shared/documents/services/document-preview.service';
+import { NotificationService } from '../../../../core/notifications/notification.service';
 
 @Component({
   selector: 'app-contract-list-page',
-  imports: [ButtonDirective, DatePipe, FormsModule, RouterLink, Select, Table],
+  imports: [ButtonDirective, ColumnFilter, DatePipe, FormsModule, RouterLink, Select, Table],
   templateUrl: './contract-list.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -25,6 +26,7 @@ export class ContractListPage {
   private readonly api = inject(ContractsService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly documentPreview = inject(DocumentPreviewService);
+  private readonly notifications = inject(NotificationService);
   private readonly currentYear = new Date().getFullYear();
   protected readonly years = Array.from(
     { length: this.currentYear + 5 - 2025 + 1 },
@@ -33,6 +35,18 @@ export class ContractListPage {
   protected readonly selectedYear = signal(this.currentYear);
   protected readonly contracts = signal<ContractSummary[]>([]);
   protected readonly loading = signal(false);
+  protected readonly statusOptions: { label: string; value: ContractStatus }[] = [
+    { label: 'Borrador', value: 'DRAFT' },
+    { label: 'Pendiente de aprobación', value: 'PENDING_APPROVAL' },
+    { label: 'Aprobado', value: 'APPROVED' },
+    { label: 'Rechazado', value: 'REJECTED' },
+    { label: 'Cancelado', value: 'CANCELLED' },
+  ];
+  protected readonly signatureOptions: { label: string; value: ContractSignatureStatus }[] = [
+    { label: 'No aplica', value: 'NOT_REQUIRED' },
+    { label: 'Firma pendiente', value: 'PENDING_SIGNED_UPLOAD' },
+    { label: 'Firmado cargado', value: 'SIGNED_UPLOADED' },
+  ];
 
   constructor() {
     this.load(this.currentYear);
@@ -53,11 +67,11 @@ export class ContractListPage {
   }
   protected statusClass(status: ContractStatus): string {
     return {
-      DRAFT: 'bg-slate-100 text-slate-700',
-      PENDING_APPROVAL: 'bg-amber-100 text-amber-800',
-      APPROVED: 'bg-emerald-100 text-emerald-800',
-      REJECTED: 'bg-red-100 text-red-800',
-      CANCELLED: 'bg-zinc-200 text-zinc-700',
+      DRAFT: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-100',
+      PENDING_APPROVAL: 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-100',
+      APPROVED: 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-100',
+      REJECTED: 'bg-red-100 text-red-900 dark:bg-red-950 dark:text-red-100',
+      CANCELLED: 'bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100',
     }[status];
   }
   protected signatureLabel(status: ContractSignatureStatus): string {
@@ -66,6 +80,14 @@ export class ContractListPage {
       PENDING_SIGNED_UPLOAD: 'Firma pendiente',
       SIGNED_UPLOADED: 'Firmado cargado',
     }[status];
+  }
+  protected async copyContractId(contractId: string): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(contractId);
+      this.notifications.success('Código de contrato copiado al portapapeles.');
+    } catch {
+      this.notifications.error('No fue posible copiar el código de contrato automáticamente.');
+    }
   }
   protected viewPdf(contract: ContractSummary): void {
     this.loading.set(true);
