@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @plugin '@iconify/tailwind4';
+@source inline("icon-[tabler--refresh]");
 @custom-variant dark (&:where(.dark, .dark *));
 /* Los módulos llegan desde DynamoDB; estas clases no pueden descubrirse en templates.
  * Esta lista cubre los iconos disponibles en los módulos actuales del Hub. */

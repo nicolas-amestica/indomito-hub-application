@@ -1,0 +1,286 @@
+<p-panel header="Documentos tributarios recibidos" class="mt-5 block min-w-0">
+  <div class="flex min-w-0 flex-col gap-5" [attr.aria-busy]="busy() || loading() || syncing()">
+    <p class="text-sm text-muted">
+      El mes corresponde a la fecha de emisión. Las decisiones se envían al SII solo después de tu
+      confirmación.
+    </p>
+    @if (error()) {
+      <p-message severity="error" [dt]="designTokens.message" role="alert">{{ error() }}</p-message>
+    }
+    @if (notice()) {
+      <p-message
+        [severity]="noticeSeverity()"
+        size="small"
+        [dt]="designTokens.message"
+        [closable]="true"
+        (onClose)="notice.set('')"
+        role="status"
+        aria-live="polite"
+        >{{ notice() }}</p-message
+      >
+    }
+    @if (issues().length) {
+      <p-panel
+        [header]="'Correos por revisar (' + issues().length + ')'"
+        [toggleable]="true"
+        [collapsed]="true"
+        [toggleButtonProps]="{ severity: 'contrast', text: true, rounded: true }"
+      >
+        <p class="mb-3 text-sm text-muted">
+          Se muestran hasta 50 incidencias. Los originales descargados se conservan para revisión.
+        </p>
+        <div
+          class="max-h-48 overflow-y-auto"
+          tabindex="0"
+          role="region"
+          aria-label="Detalle de correos por revisar"
+        >
+          @for (issue of issues(); track issue.messageId) {
+            <p class="break-words py-2 text-sm text-ink">
+              Correo {{ issue.messageId }}: {{ issue.detail }}
+            </p>
+          }
+        </div>
+      </p-panel>
+    }
+    <form
+      [formGroup]="filters"
+      (ngSubmit)="$event.preventDefault()"
+      class="grid min-w-0 gap-4 rounded-xl border border-line/75 p-4 dark:border-line/55 sm:grid-cols-[minmax(0,16rem)_auto_1fr] sm:items-end"
+      aria-label="Filtros de documentos recibidos"
+    >
+      <div class="flex min-w-0 flex-col gap-2">
+        <label for="received-month" class="text-ink">Mes de emisión</label
+        ><p-datepicker
+          inputId="received-month"
+          view="month"
+          dateFormat="mm/yy"
+          [readonlyInput]="true"
+          [showIcon]="true"
+          appendTo="body"
+          formControlName="month"
+          [dt]="designTokens.calendar"
+          panelStyleClass="border-line/75! dark:border-line/55!"
+          fluid
+        />
+      </div>
+      <div class="flex items-center gap-3">
+        <button
+          pButton
+          type="button"
+          severity="contrast"
+          outlined
+          size="small"
+          class="min-h-11 min-w-11"
+          [loading]="syncing()"
+          [disabled]="syncing() || busy()"
+          aria-label="Sincronizar correo y procesar DTE"
+          pTooltip="Sincronizar correo ahora"
+          tooltipPosition="top"
+          (click)="synchronize()"
+        >
+          <span class="icon-[tabler--refresh] size-4" aria-hidden="true"></span>
+        </button>
+        <span class="text-sm text-muted sm:hidden">Sincronizar correo</span>
+      </div>
+      @if (lastSuccess()) {
+        <p class="text-sm text-muted">
+          Última lectura de correo: {{ lastSuccess() | date: 'dd/MM/yyyy HH:mm' }}
+          @if (manualSync(); as request) {
+            <span class="mt-1 block"
+              >Última solicitud manual: {{ syncStatuses[request.status] }} ·
+              {{ request.finishedAt || request.requestedAt | date: 'dd/MM/yyyy HH:mm' }}</span
+            >
+          }
+        </p>
+      } @else {
+        <p class="text-sm text-muted">Aún no hay una lectura de correo completada.</p>
+      }
+    </form>
+    <div class="min-w-0 overflow-x-auto">
+      <p-table
+        [dt]="designTokens.table"
+        [value]="items()"
+        [loading]="loading()"
+        [scrollable]="true"
+        [tableStyle]="{ 'min-width': '48rem' }"
+      >
+        <ng-template #header
+          ><tr>
+            <th>Emisor</th>
+            <th>DTE / folio</th>
+            <th>Emisión</th>
+            <th>Total</th>
+            <th>Consulta SII</th>
+            <th>Acciones</th>
+          </tr></ng-template
+        >
+        <ng-template #body let-item
+          ><tr>
+            <td>
+              <span class="block">{{ item.issuerName }}</span
+              ><span class="text-sm text-muted">{{ item.issuerRut }}</span>
+            </td>
+            <td>{{ item.kind }} / {{ item.folio }}</td>
+            <td>{{ item.issueDate }}</td>
+            <td>{{ item.total | currency: 'CLP' : 'symbol-narrow' : '1.0-0' }}</td>
+            <td>{{ item.registry?.description || 'Pendiente de consulta' }}</td>
+            <td>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  pButton
+                  type="button"
+                  severity="contrast"
+                  outlined
+                  [disabled]="busy() || (item.kind !== 33 && item.kind !== 34 && item.kind !== 43)"
+                  (click)="open(item)"
+                >
+                  Gestionar</button
+                ><button
+                  pButton
+                  type="button"
+                  severity="contrast"
+                  outlined
+                  [disabled]="busy()"
+                  (click)="download(item)"
+                >
+                  XML
+                </button>
+              </div>
+            </td>
+          </tr></ng-template
+        >
+        <ng-template #emptymessage
+          ><tr>
+            <td colspan="6">No hay documentos incorporados para este mes.</td>
+          </tr></ng-template
+        >
+      </p-table>
+    </div>
+    @if (nextCursor()) {
+      <button
+        pButton
+        type="button"
+        severity="contrast"
+        outlined
+        [disabled]="busy() || loading() || syncing()"
+        (click)="load(true)"
+      >
+        Cargar más
+      </button>
+    }
+    <p class="text-sm text-muted">
+      El registro de aceptación/reclamo admite tipos 33, 34 y 43. “Aceptado con reparos” es una
+      respuesta comercial entre contribuyentes y no un evento de este registro.
+    </p>
+  </div>
+</p-panel>
+<p-dialog
+  header="Gestionar DTE recibido"
+  [visible]="!!selected()"
+  (visibleChange)="!$event && selected.set(null)"
+  [modal]="true"
+  [style]="{ width: '42rem', maxWidth: 'calc(100vw - 2rem)' }"
+  [closable]="!busy()"
+  [closeOnEscape]="!busy()"
+  styleClass="border-line/75! dark:border-line/55!"
+>
+  @if (selected(); as document) {
+    <form [formGroup]="decision" (ngSubmit)="query(true)" class="flex min-w-0 flex-col gap-4">
+      @if (error()) {
+        <p-message severity="error" [dt]="designTokens.message" role="alert">{{
+          error()
+        }}</p-message>
+      }
+      <p class="break-words text-ink">
+        {{ document.issuerName }} · {{ document.issuerRut }} · DTE {{ document.kind }} · Folio
+        {{ document.folio }}
+      </p>
+      @if (result(); as current) {
+        <p-message severity="info" [dt]="designTokens.message"
+          >SII {{ current.code }}: {{ current.description }}</p-message
+        >
+        @for (event of current.events; track $index) {
+          <p class="break-words text-ink">
+            {{ event.at }} · {{ event.code }} · {{ event.description }} · {{ event.rut }}-{{
+              event.dv
+            }}
+          </p>
+        }
+      }
+      <button
+        pButton
+        type="button"
+        severity="contrast"
+        outlined
+        [disabled]="busy()"
+        (click)="query()"
+      >
+        Consultar eventos actuales
+      </button>
+      <p-message severity="warn" [dt]="designTokens.message"
+        >Aceptar contenido u otorgar recibo impide reclamar posteriormente. Los reclamos impiden
+        aceptar u otorgar recibo. El SII determina el plazo desde su recepción, no desde la llegada
+        del correo.</p-message
+      >
+      <div class="flex flex-col gap-2">
+        <label id="received-action-label" for="received-action" class="text-ink"
+          >Decisión <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></label
+        ><p-select
+          inputId="received-action"
+          ariaLabelledBy="received-action-label"
+          [options]="actions"
+          optionLabel="label"
+          optionValue="value"
+          formControlName="action"
+          placeholder="Seleccionar"
+          appendTo="body"
+          panelStyleClass="border-line/75! dark:border-line/55!"
+          fluid
+          [invalid]="decision.controls.action.touched && decision.controls.action.invalid"
+        />
+        @if (decision.controls.action.touched && decision.controls.action.invalid) {
+          <small class="text-red-600 dark:text-red-400">Este campo es requerido</small>
+        }
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="received-reason" class="text-ink"
+          >Motivo para auditoría
+          <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></label
+        ><input
+          pInputText
+          id="received-reason"
+          formControlName="reason"
+          maxlength="500"
+          class="w-full min-w-0"
+          [invalid]="decision.controls.reason.touched && decision.controls.reason.invalid"
+          aria-describedby="received-reason-hint"
+        /><small class="text-muted" id="received-reason-hint"
+          >Mínimo 5 caracteres. Se conserva en la auditoría interna.</small
+        >
+        @if (decision.controls.reason.touched && decision.controls.reason.invalid) {
+          <small class="text-red-600 dark:text-red-400">{{
+            decision.controls.reason.hasError('required')
+              ? 'Este campo es requerido'
+              : 'Ingresa entre 5 y 500 caracteres, sin espacios al inicio o al final.'
+          }}</small>
+        }
+      </div>
+      <label class="flex items-start gap-2 text-ink" for="received-confirm"
+        ><p-checkbox inputId="received-confirm" [binary]="true" formControlName="confirmed" /><span
+          >Confirmo que esta decisión corresponde al DTE seleccionado y autorizo su registro en el
+          SII.</span
+        ></label
+      >
+      <button
+        pButton
+        type="submit"
+        severity="danger"
+        [loading]="busy()"
+        [disabled]="busy() || decision.invalid"
+      >
+        Registrar decisión en el SII
+      </button>
+    </form>
+  }
+</p-dialog>

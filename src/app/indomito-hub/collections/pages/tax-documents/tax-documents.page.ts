@@ -56,10 +56,12 @@ import type {
   TaxDocumentStatus,
 } from '../../interfaces/tax-document.interface';
 import { CollectionTaxDocuments } from '../../services/collection-tax-documents';
+import { ReceivedTaxDocumentsComponent } from '../../components/received-tax-documents/received-tax-documents.component';
 
 @Component({
   selector: 'app-tax-documents',
   imports: [
+    ReceivedTaxDocumentsComponent,
     CurrencyPipe,
     DatePipe,
     DecimalPipe,
