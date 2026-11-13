@@ -78,6 +78,42 @@ describe('Documentos recibidos', () => {
     fixture.destroy();
   });
 
+  it.each([
+    { paymentForm: 1, code: 16, blocked: true },
+    { paymentForm: 3, code: 16, blocked: true },
+    { paymentForm: undefined, code: 27, blocked: true },
+    { paymentForm: 2, code: 16, blocked: false },
+    { paymentForm: undefined, code: 16, blocked: false },
+  ])(
+    'gestiona restricciones de pago $paymentForm y respuesta $code',
+    async ({ paymentForm, code, blocked }) => {
+      const current = { ...document, paymentForm };
+      api.events.mockReturnValue(
+        of({ document: current, result: { code, description: '', events: [] }, successful: false }),
+      );
+      const fixture = TestBed.createComponent(ReceivedTaxDocumentsComponent);
+      await fixture.whenStable();
+      const component = fixture.componentInstance as unknown as {
+        open(value: unknown): void;
+        query(register: boolean): void;
+        decision: FormGroup;
+        restriction(): string;
+      };
+      component.open(current);
+      fixture.detectChanges();
+      expect(!!component.restriction()).toBe(blocked);
+      expect(!!fixture.nativeElement.querySelector('#received-action')).toBe(!blocked);
+      component.decision.patchValue({
+        action: 'ERM',
+        reason: 'Servicio recibido',
+        confirmed: true,
+      });
+      component.query(true);
+      expect(api.events).toHaveBeenCalledTimes(blocked ? 1 : 2);
+      fixture.destroy();
+    },
+  );
+
   it('consulta al cambiar el mes y descarta respuestas del mes anterior', async () => {
     const old = new Subject<ReceivedTaxPage>();
     api.list.mockReturnValueOnce(old);

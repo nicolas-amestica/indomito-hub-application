@@ -218,69 +218,80 @@
       >
         Consultar eventos actuales
       </button>
-      <p-message severity="warn" [dt]="designTokens.message"
-        >Aceptar contenido u otorgar recibo impide reclamar posteriormente. Los reclamos impiden
-        aceptar u otorgar recibo. El SII determina el plazo desde su recepción, no desde la llegada
-        del correo.</p-message
-      >
-      <div class="flex flex-col gap-2">
-        <label id="received-action-label" for="received-action" class="text-ink"
-          >Decisión <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></label
-        ><p-select
-          inputId="received-action"
-          ariaLabelledBy="received-action-label"
-          [options]="actions"
-          optionLabel="label"
-          optionValue="value"
-          formControlName="action"
-          placeholder="Seleccionar"
-          appendTo="body"
-          panelStyleClass="border-line/75! dark:border-line/55!"
-          fluid
-          [invalid]="decision.controls.action.touched && decision.controls.action.invalid"
-        />
-        @if (decision.controls.action.touched && decision.controls.action.invalid) {
-          <small class="text-red-600 dark:text-red-400">Este campo es requerido</small>
-        }
-      </div>
-      <div class="flex flex-col gap-2">
-        <label for="received-reason" class="text-ink"
-          >Motivo para auditoría
-          <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></label
-        ><input
-          pInputText
-          id="received-reason"
-          formControlName="reason"
-          maxlength="500"
-          class="w-full min-w-0"
-          [invalid]="decision.controls.reason.touched && decision.controls.reason.invalid"
-          aria-describedby="received-reason-hint"
-        /><small class="text-muted" id="received-reason-hint"
-          >Mínimo 5 caracteres. Se conserva en la auditoría interna.</small
+      @if (restriction(); as reason) {
+        <p-message severity="info" [dt]="designTokens.message" role="status">{{
+          reason
+        }}</p-message>
+      } @else {
+        <p-message severity="warn" [dt]="designTokens.message"
+          >Aceptar contenido u otorgar recibo impide reclamar posteriormente. Los reclamos impiden
+          aceptar u otorgar recibo. El SII determina el plazo desde su recepción, no desde la
+          llegada del correo.</p-message
         >
-        @if (decision.controls.reason.touched && decision.controls.reason.invalid) {
-          <small class="text-red-600 dark:text-red-400">{{
-            decision.controls.reason.hasError('required')
-              ? 'Este campo es requerido'
-              : 'Ingresa entre 5 y 500 caracteres, sin espacios al inicio o al final.'
-          }}</small>
-        }
-      </div>
-      <label class="flex items-start gap-2 text-ink" for="received-confirm"
-        ><p-checkbox inputId="received-confirm" [binary]="true" formControlName="confirmed" /><span
-          >Confirmo que esta decisión corresponde al DTE seleccionado y autorizo su registro en el
-          SII.</span
-        ></label
-      >
-      <button
-        pButton
-        type="submit"
-        severity="danger"
-        [loading]="busy()"
-        [disabled]="busy() || decision.invalid"
-      >
-        Registrar decisión en el SII
-      </button>
+        <div class="flex flex-col gap-2">
+          <label id="received-action-label" for="received-action" class="text-ink"
+            >Decisión
+            <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></label
+          ><p-select
+            inputId="received-action"
+            ariaLabelledBy="received-action-label"
+            [options]="actions"
+            optionLabel="label"
+            optionValue="value"
+            formControlName="action"
+            placeholder="Seleccionar"
+            appendTo="body"
+            panelStyleClass="border-line/75! dark:border-line/55!"
+            fluid
+            [invalid]="decision.controls.action.touched && decision.controls.action.invalid"
+          />
+          @if (decision.controls.action.touched && decision.controls.action.invalid) {
+            <small class="text-red-600 dark:text-red-400">Este campo es requerido</small>
+          }
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="received-reason" class="text-ink"
+            >Motivo para auditoría
+            <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></label
+          ><input
+            pInputText
+            id="received-reason"
+            formControlName="reason"
+            maxlength="500"
+            class="w-full min-w-0"
+            [invalid]="decision.controls.reason.touched && decision.controls.reason.invalid"
+            aria-describedby="received-reason-hint"
+          /><small class="text-muted" id="received-reason-hint"
+            >Mínimo 5 caracteres. Se conserva en la auditoría interna.</small
+          >
+          @if (decision.controls.reason.touched && decision.controls.reason.invalid) {
+            <small class="text-red-600 dark:text-red-400">{{
+              decision.controls.reason.hasError('required')
+                ? 'Este campo es requerido'
+                : 'Ingresa entre 5 y 500 caracteres, sin espacios al inicio o al final.'
+            }}</small>
+          }
+        </div>
+        <label class="flex items-start gap-2 text-ink" for="received-confirm"
+          ><p-checkbox
+            inputId="received-confirm"
+            [binary]="true"
+            formControlName="confirmed"
+          /><span
+            >Confirmo que esta decisión corresponde al DTE seleccionado y autorizo su registro en el
+            SII.</span
+          ></label
+        >
+        <button
+          pButton
+          type="submit"
+          severity="danger"
+          [loading]="busy()"
+          [disabled]="busy() || decision.invalid"
+        >
+          Registrar decisión en el SII
+        </button>
+      }
     </form>
   }
 </p-dialog>

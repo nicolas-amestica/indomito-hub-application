@@ -18,6 +18,7 @@ export interface ReceivedTaxDocument {
   issuerName: string;
   receiverRut: string;
   kind: number;
+  paymentForm?: number;
   folio: number;
   issueDate: string;
   total: number;

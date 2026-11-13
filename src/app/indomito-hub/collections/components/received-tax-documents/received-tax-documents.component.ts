@@ -47,6 +47,7 @@ import type {
   ReceivedSyncRequest,
 } from '../../interfaces/received-tax-document.interface';
 import { ReceivedTaxDocuments } from '../../services/received-tax-documents';
+import { receivedTaxRestriction } from '../../fn/received-tax-restriction';
 
 @Component({
   selector: 'app-received-tax-documents',
@@ -107,6 +108,9 @@ export class ReceivedTaxDocumentsComponent {
   protected readonly error = signal('');
   protected readonly selected = signal<ReceivedTaxDocument | null>(null);
   protected readonly result = signal<ReceivedTaxResult | null>(null);
+  protected readonly restriction = computed(() =>
+    receivedTaxRestriction(this.selected(), this.result()),
+  );
   protected readonly actions = [...RECEIVED_TAX_ACTIONS];
 
   constructor() {
@@ -253,6 +257,7 @@ export class ReceivedTaxDocumentsComponent {
     const document = this.selected();
     if (!document || this.busy()) return;
     if (register) {
+      if (this.restriction()) return;
       this.decision.markAllAsTouched();
       if (this.decision.invalid || this.decision.controls.reason.value.trim().length < 5) return;
     }
