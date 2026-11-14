@@ -4,6 +4,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { firstValueFrom, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { safeLoginDestination } from './auth-navigation';
 import { ApiEnvelope, AuthAllowance, AuthPermission, AuthSession } from './auth.models';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -40,14 +41,14 @@ export class AuthService {
   constructor() {
     if (this.state()?.token) queueMicrotask(() => void this.refreshPermissions());
   }
-  async login(login: string, password: string): Promise<void> {
+  async login(login: string, password: string, returnUrl?: string): Promise<void> {
     const session = await firstValueFrom(
       this.http
         .post<ApiEnvelope<AuthSession>>(`${environment.apiUrl}/auth/login`, { login, password })
         .pipe(map((x) => x.data)),
     );
     this.setSession(session);
-    await this.router.navigateByUrl('/inicio');
+    await this.router.navigateByUrl(safeLoginDestination(returnUrl));
   }
   async requestPasswordReset(email: string): Promise<void> {
     await firstValueFrom(
@@ -100,12 +101,15 @@ export class AuthService {
     if (permission.module.level !== 'LV2') return true;
 
     const parentCode = permission.module.parentCode;
-    return !!parentCode && this.permissions().some(
-      (candidate) =>
-        candidate.module.code === parentCode &&
-        candidate.module.active &&
-        candidate.module.level === 'LV1' &&
-        candidate.allowances.includes('r'),
+    return (
+      !!parentCode &&
+      this.permissions().some(
+        (candidate) =>
+          candidate.module.code === parentCode &&
+          candidate.module.active &&
+          candidate.module.level === 'LV1' &&
+          candidate.allowances.includes('r'),
+      )
     );
   }
   async refreshPermissions(): Promise<void> {

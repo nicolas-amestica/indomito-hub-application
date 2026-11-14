@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ButtonDirective } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
@@ -13,6 +13,8 @@ import { AuthService } from '../../../../core/auth/auth.service';
 })
 export class LoginPage {
   private readonly auth = inject(AuthService);
+  private readonly returnUrl =
+    inject(ActivatedRoute).snapshot.queryParamMap.get('returnUrl') ?? undefined;
   readonly loading = signal(false);
   readonly error = signal('');
   readonly form = new FormGroup({
@@ -30,7 +32,11 @@ export class LoginPage {
     this.loading.set(true);
     this.error.set('');
     try {
-      await this.auth.login(this.form.controls.login.value, this.form.controls.password.value);
+      await this.auth.login(
+        this.form.controls.login.value,
+        this.form.controls.password.value,
+        this.returnUrl,
+      );
     } catch {
       this.error.set('No pudimos iniciar sesión. Revisa tu RUT o correo y clave.');
     } finally {

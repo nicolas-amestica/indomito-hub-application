@@ -2,6 +2,7 @@ import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 
+import { SILENT_HTTP_ERRORS } from './request-context';
 import { NotificationService } from '../notifications/notification.service';
 import { ApiErrorEnvelope } from './api-response.interface';
 import { APP_MESSAGES } from '../../shared/constants/app-messages';
@@ -36,6 +37,7 @@ const FALLBACK_MESSAGE = APP_MESSAGES.http.unexpected;
  * duplicar la traducción del mensaje.
  */
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
+  if (req.context.get(SILENT_HTTP_ERRORS)) return next(req);
   const notifications = inject(NotificationService);
 
   return next(req).pipe(

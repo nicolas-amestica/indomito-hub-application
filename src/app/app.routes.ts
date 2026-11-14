@@ -2,6 +2,13 @@ import { Routes } from '@angular/router';
 import { authGuard, moduleGuard } from './core/auth/auth.guard';
 export const routes: Routes = [
   {
+    path: 'derivaciones',
+    loadChildren: () =>
+      import('./indomito-hub/inbox-handoff/inbox-handoff.routes').then(
+        (m) => m.INBOX_HANDOFF_ROUTES,
+      ),
+  },
+  {
     path: 'login',
     loadChildren: () =>
       import('./indomito-hub/authentication/authentication.routes').then(
@@ -38,7 +45,14 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./indomito-hub/collections/collections.routes').then((m) => m.COLLECTIONS_ROUTES),
       },
-      { path: 'agenda/videollamadas', title: 'Agenda de Videollamadas', data: { module: 'MEET_AGENDA' }, canActivate: [moduleGuard], loadComponent: () => import('./indomito-hub/meet/meet-calendar.page').then(m => m.MeetCalendarPage) },
+      {
+        path: 'agenda/videollamadas',
+        title: 'Agenda de Videollamadas',
+        data: { module: 'MEET_AGENDA' },
+        canActivate: [moduleGuard],
+        loadComponent: () =>
+          import('./indomito-hub/meet/meet-calendar.page').then((m) => m.MeetCalendarPage),
+      },
       { path: '', pathMatch: 'full', redirectTo: 'inicio' },
       {
         path: 'cotizaciones',
@@ -56,8 +70,7 @@ export const routes: Routes = [
         path: 'comunicaciones/conversaciones',
         data: { module: 'INBOX' },
         canActivate: [moduleGuard],
-        loadChildren: () =>
-          import('./indomito-hub/inbox/inbox.routes').then((m) => m.INBOX_ROUTES),
+        loadChildren: () => import('./indomito-hub/inbox/inbox.routes').then((m) => m.INBOX_ROUTES),
       },
       {
         path: '',

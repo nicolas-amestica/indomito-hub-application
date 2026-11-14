@@ -10,7 +10,7 @@
       ],
       "outputPath": "ai/generated/app-ngx-hub/.claude/rules/global-rules.md",
       "targetPath": ".claude/rules/global-rules.md",
-      "checksum": "sha256:158b782d1f2df91b37493048ce013527ec65a5130f48f8ef0c9b35142613e2da"
+      "checksum": "sha256:919b01ecf30c8d1979bc325260cd9046d53a519d2db4a943089102787c14d913"
     },
     {
       "sourcePaths": [
@@ -18,7 +18,7 @@
       ],
       "outputPath": "ai/generated/app-ngx-hub/.claude/rules/repo-rules.md",
       "targetPath": ".claude/rules/repo-rules.md",
-      "checksum": "sha256:efb6384b13e2d2ba013eabe21ee0020cc8342f0f2bcdc23559bcbd406a46a58c"
+      "checksum": "sha256:e997dc479da12aac0cd0e1008924c693b02f5def5ad712668277c126cff7f769"
     },
     {
       "sourcePaths": [
@@ -88,7 +88,7 @@
       ],
       "outputPath": "ai/generated/app-ngx-hub/AGENTS.md",
       "targetPath": "AGENTS.md",
-      "checksum": "sha256:8db7a34f2a43fc32d5cb7e1b3ebef0cde07bfaf522e8d62ef5c629e3c669215e"
+      "checksum": "sha256:c01e23aac2218dbe7506161d60935eec4b0f0cfb685051901c971ef82c0e1c2b"
     },
     {
       "sourcePaths": [
@@ -100,7 +100,7 @@
       ],
       "outputPath": "ai/generated/app-ngx-hub/CLAUDE.md",
       "targetPath": ".claude/CLAUDE.md",
-      "checksum": "sha256:7d2ab658d33ab40e95346a9bcb85e2f60f0bbaea258983eeac2ceca8f750bab0"
+      "checksum": "sha256:15f621691bb7410afea6209346c61025d2232df74c5e14b6858370ee9314fbfe"
     },
     {
       "sourcePaths": [
@@ -112,7 +112,7 @@
       ],
       "outputPath": "ai/generated/app-ngx-hub/GEMINI.md",
       "targetPath": ".gemini/GEMINI.md",
-      "checksum": "sha256:dfcee2be53caab035e328dbad43b68b2404de33d8bf1abd7755ad8339af94b36"
+      "checksum": "sha256:4b7ea2d0dfe978b04ffd2d13b69e9fbc19c4839e4fe1e3827069a648edc73b43"
     },
     {
       "sourcePaths": [
@@ -216,6 +216,6 @@
   ],
   "managedBy": "indomito-context-compiler",
   "artifactFormatVersion": 1,
-  "sourceCommit": "310658bdfc2f77bc3532780e2a5f9b0ecc189a05",
+  "sourceCommit": "e93e8ea75a0646f8ef4e15bf9012c7846b790579",
   "sourceDirty": true
 }

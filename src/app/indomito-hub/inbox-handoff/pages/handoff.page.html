@@ -1,0 +1,154 @@
+<a
+  pButton
+  href="#handoff-content"
+  (click)="focusContent($event)"
+  class="fixed left-4 top-4 z-50 min-h-11 -translate-y-20 touch-manipulation focus:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-graphite"
+  >Ir al contenido</a
+>
+<main
+  id="handoff-content"
+  tabindex="-1"
+  class="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-graphite min-h-screen scroll-mt-4 bg-canvas px-4 py-6 sm:px-6 sm:py-10"
+>
+  <div class="mx-auto grid w-full max-w-3xl grid-cols-1 gap-6">
+    <div class="flex justify-end">
+      <button
+        pButton
+        type="button"
+        severity="secondary"
+        outlined
+        rounded
+        iconOnly
+        class="min-h-11 min-w-11 touch-manipulation"
+        [attr.aria-label]="theme.label()"
+        (click)="theme.toggle()"
+      >
+        <span [class]="theme.icon()" class="size-5" aria-hidden="true"></span>
+      </button>
+    </div>
+    <app-page-header
+      title="Conversación derivada"
+      context="Atención del equipo · WhatsApp"
+      description="Consulta temporal de solo lectura. Para responder o gestionar la conversación, ingresa con tu cuenta."
+    />
+    @if (error()) {
+      <p-message [dt]="messageTokens" severity="warn" role="status" aria-live="polite">{{
+        error()
+      }}</p-message>
+    }
+    @if (canOpen() && !page()) {
+      <p-panel class="min-w-0" [dt]="panelTokens">
+        <ng-template #header
+          ><h2 class="text-base font-semibold">Revisa el contexto de la derivación</h2></ng-template
+        >
+        <div class="grid gap-5">
+          <p class="text-sm leading-6 text-muted">
+            El enlace puede abrirse una sola vez durante 24 horas desde su emisión. Al continuar
+            tendrás 30 minutos para leer esta conversación.
+          </p>
+          <button
+            pButton
+            type="button"
+            [loading]="loading()"
+            [disabled]="loading()"
+            (click)="open()"
+            class="w-full min-h-11 touch-manipulation sm:w-auto sm:justify-self-start"
+          >
+            Ver conversación
+          </button>
+        </div>
+      </p-panel>
+    }
+    @if (page(); as conversation) {
+      <p-panel class="min-w-0" [dt]="panelTokens" aria-label="Datos de derivación">
+        <ng-template #header
+          ><h2 class="min-w-0 break-words text-base font-semibold [overflow-wrap:anywhere]">
+            {{ conversation.alias || conversation.phone }}
+          </h2></ng-template
+        >
+        <div class="grid gap-4">
+          <dl class="grid gap-4 text-sm sm:grid-cols-2">
+            <div>
+              <dt class="text-muted">Teléfono</dt>
+              <dd class="mt-1 break-words">+{{ conversation.phone }}</dd>
+            </div>
+            <div>
+              <dt class="text-muted">Fecha de derivación (hora local)</dt>
+              <dd class="mt-1">{{ conversation.derivedAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+            </div>
+            <div class="sm:col-span-2">
+              <dt class="text-muted">Motivo</dt>
+              <dd class="mt-1 break-words">
+                {{ conversation.reason || 'Requiere atención del equipo' }}
+              </dd>
+            </div>
+          </dl>
+          <p class="text-xs text-muted">
+            Acceso disponible hasta {{ conversation.expiresAt | date: 'HH:mm' }} (hora de tu
+            dispositivo).
+          </p>
+        </div>
+      </p-panel>
+      <section
+        class="grid min-w-0 gap-4"
+        aria-label="Historial de conversación"
+        [attr.aria-busy]="loading()"
+      >
+        <h2
+          #conversationHeading
+          tabindex="-1"
+          class="scroll-mt-4 text-base font-semibold text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-graphite"
+        >
+          Historial de conversación
+        </h2>
+        @if (conversation.nextBefore) {
+          <button
+            class="min-h-11 touch-manipulation"
+            pButton
+            type="button"
+            severity="secondary"
+            outlined
+            [loading]="loading()"
+            [disabled]="loading()"
+            (click)="loadOlder()"
+          >
+            Cargar mensajes anteriores
+          </button>
+        }
+        @for (message of conversation.messages; track message.id) {
+          <article
+            class="min-w-0 rounded-xl border border-line/75 bg-surface p-4 text-ink dark:border-line/55 sm:p-5"
+          >
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
+              <h3 class="font-semibold text-ink">{{ message.author }}</h3>
+              <time [attr.datetime]="message.createdAt">{{
+                message.createdAt | date: 'dd/MM/yyyy HH:mm'
+              }}</time>
+            </div>
+            <p
+              class="mt-3 whitespace-pre-wrap break-words text-sm leading-6 [overflow-wrap:anywhere]"
+            >
+              {{ message.text }}
+            </p>
+          </article>
+        } @empty {
+          <p-message [dt]="messageTokens" severity="info">No hay mensajes disponibles.</p-message>
+        }
+      </section>
+    }
+    <p class="sr-only" role="status" aria-live="polite">
+      {{ loading() ? 'Cargando conversación…' : page() ? 'Conversación cargada' : '' }}
+    </p>
+    <footer class="flex flex-col gap-3 sm:flex-row">
+      <a
+        pButton
+        routerLink="/comunicaciones/conversaciones"
+        [queryParams]="conversationQuery"
+        severity="secondary"
+        outlined
+        class="min-h-11 touch-manipulation"
+        >Ingresar a Hub para continuar</a
+      >
+    </footer>
+  </div>
+</main>

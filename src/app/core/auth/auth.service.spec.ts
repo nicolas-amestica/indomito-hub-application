@@ -38,7 +38,7 @@ describe('AuthService', () => {
     expect(router.navigateByUrl).toHaveBeenCalledWith('/inicio');
   });
 
-  it('navega siempre al dashboard después de autenticar', async () => {
+  it('navega al dashboard por defecto después de autenticar', async () => {
     const service = TestBed.inject(AuthService);
     const http = TestBed.inject(HttpTestingController);
     const session = authSession(jwtExpiringIn(3_600));
@@ -67,6 +67,18 @@ describe('AuthService', () => {
     expect(router.navigateByUrl).toHaveBeenCalledWith('/inicio');
   });
 
+  it('abre la conversación de destino después de autenticar', async () => {
+    const service = TestBed.inject(AuthService);
+    const http = TestBed.inject(HttpTestingController);
+    const destination = '/comunicaciones/conversaciones?telefono=56911112222';
+    const login = service.login('17137440-5', 'secret', destination);
+    http
+      .expectOne(`${environment.apiUrl}/auth/login`)
+      .flush({ data: authSession(jwtExpiringIn(3_600)) });
+    await login;
+    expect(router.navigateByUrl).toHaveBeenCalledWith(destination);
+  });
+
   it('restaura una sesión almacenada cuyo JWT sigue vigente', () => {
     const session = authSession(jwtExpiringIn(3_600));
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session));
@@ -91,7 +103,9 @@ describe('AuthService', () => {
     const open = vi.spyOn(window, 'open').mockReturnValue(target);
     const service = TestBed.inject(AuthService);
 
-    expect(service.openAuthenticatedTab('/comunicaciones/conversaciones?telefono=56911111111')).toBe(true);
+    expect(
+      service.openAuthenticatedTab('/comunicaciones/conversaciones?telefono=56911111111'),
+    ).toBe(true);
     expect(open).toHaveBeenCalledWith('about:blank', '_blank');
     expect(targetStorage.setItem).toHaveBeenCalledWith(STORAGE_KEY, JSON.stringify(session));
     expect(target.opener).toBeNull();
