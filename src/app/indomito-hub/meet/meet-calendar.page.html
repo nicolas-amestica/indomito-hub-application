@@ -1,93 +1,145 @@
-<section class="space-y-5 p-4 md:p-6">
-  <header class="flex flex-wrap items-center justify-between gap-3">
-    <div><h1 class="text-2xl font-semibold">Agenda de Videollamadas</h1>
-      <p class="text-sm text-surface-500">Reuniones de Google Calendar y Google Meet</p></div>
-    @if (canCreate()) { <p-button label="Nueva reunión" icon="icon-[tabler--plus] size-4" (onClick)="open()" /> }
+<section class="mx-auto min-w-0 max-w-screen-2xl space-y-6 p-4 pb-10 md:p-6">
+  <header>
+    <h1 class="text-2xl font-semibold">Agenda de Videollamadas</h1>
+    <p class="text-sm text-surface-500">Reuniones de Google Calendar y Google Meet</p>
   </header>
   @if (error()) { <p-message severity="error">{{ error() }}</p-message> }
-  <div class="rounded-xl border border-line/75 bg-surface-0 p-4 dark:border-line/55 dark:bg-surface-900">
-    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-2">
-        <p-button ariaLabel="Mes anterior" icon="icon-[tabler--chevron-left] size-5" [text]="true" severity="secondary" (onClick)="navigate(-1)" />
-        <h2 class="min-w-40 text-center font-semibold capitalize">{{ monthLabel() }}</h2>
-        <p-button ariaLabel="Mes siguiente" icon="icon-[tabler--chevron-right] size-5" [text]="true" severity="secondary" (onClick)="navigate(1)" />
-        <p-button label="Hoy" [outlined]="true" severity="secondary" (onClick)="today()" />
+  <p-panel [pt]="{ contentContainer: { class: 'min-w-0' }, contentWrapper: { class: 'min-w-0' }, content: { class: 'min-w-0' } }">
+    <ng-template #header>
+      <div class="flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <div class="flex flex-wrap items-center gap-1">
+          <p-button ariaLabel="Mes anterior" icon="icon-[tabler--chevron-left] size-4" rounded text severity="secondary" size="small" (onClick)="navigate(-1)" />
+          <h2 class="min-w-40 text-center text-base font-semibold capitalize text-gray-800 dark:text-slate-100" aria-live="polite">{{ monthLabel() }}</h2>
+          <p-button ariaLabel="Mes siguiente" icon="icon-[tabler--chevron-right] size-4" rounded text severity="secondary" size="small" (onClick)="navigate(1)" />
+          @if (!isCurrentMonth()) { <p-button label="Hoy" icon="icon-[tabler--history] size-4" outlined severity="secondary" size="small" (onClick)="today()" /> }
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          @if (events().length > 0) { <p-tag [dt]="{ secondary: { background: 'var(--color-canvas)', color: 'var(--color-ink)' } }" [value]="events().length + (events().length === 1 ? ' reunión' : ' reuniones')" severity="secondary" icon="icon-[tabler--video] size-4" /> }
+          <p-button label="Refrescar" icon="icon-[tabler--refresh] size-4" outlined severity="secondary" size="small" [loading]="loading()" (onClick)="refresh()" />
+          @if (canCreate()) { <p-button label="Nueva reunión" icon="icon-[tabler--plus] size-4" size="small" (onClick)="open()" /> }
+        </div>
       </div>
-      <p-button type="button" label="Refrescar" icon="icon-[tabler--refresh] size-4" [outlined]="true" severity="secondary" [loading]="loading()" (onClick)="refresh()" />
-    </div>
-    @if (loading()) {
-      <div class="grid grid-cols-7 gap-2">@for (i of placeholders; track i) { <p-skeleton height="7rem" /> }</div>
-    } @else {
-      <div class="grid grid-cols-7 border-b border-line/75 text-center text-xs font-medium dark:border-line/55">
-        @for (name of weekdays; track name) { <div class="py-2">{{ name }}</div> }
+    </ng-template>
+    <div class="overflow-hidden rounded-md border border-line/75 bg-white dark:border-line/55 dark:bg-slate-900" [attr.aria-busy]="loading()">
+      <div class="hidden grid-cols-7 border-b border-line/75 dark:border-line/55 md:grid">
+        @for (name of weekdays; track name) { <div class="py-3 text-center text-xs text-gray-500 dark:text-slate-400">{{ name }}</div> }
       </div>
-      <div class="grid grid-cols-7">
-        @for (day of days(); track day.date) {
-          <div class="min-h-24 border-b border-r border-line/75 p-1.5 dark:border-line/55 md:min-h-32"
-               [class.opacity-40]="!day.current">
-            <button pButton class="mb-1 rounded px-1 text-sm hover:bg-surface-100" type="button" (click)="open(day.date)" [disabled]="!canCreate()">{{ day.number }}</button>
-            @for (event of day.events; track event.id) {
-              <div class="mb-1 flex min-w-0 items-center gap-1">
-                <button pButton type="button" class="min-w-0 flex-1 truncate rounded bg-primary-100 px-1.5 py-1 text-left text-xs text-primary-800 dark:bg-primary-900 dark:text-primary-100"
-                  [title]="event.title" (click)="open(day.date, event)" [disabled]="!canUpdate()">{{ event.startTime }} {{ event.title }}</button>
-                @if (event.agent && event.phoneNumber) {
-                  <a pButton text rounded iconOnly severity="success" class="shrink-0" aria-label="Abrir conversación de WhatsApp"
-                    title="Abrir conversación de WhatsApp" [routerLink]="['/comunicaciones/conversaciones']"
-                    [queryParams]="{ telefono: event.phoneNumber }" target="_blank" rel="noopener noreferrer"
-                    (click)="openInboxConversation($event, event.phoneNumber)">
-                    <span class="icon-[tabler--brand-whatsapp] size-4" aria-hidden="true"></span>
-                  </a>
-                }
+      @if (loading()) {
+        <div class="hidden grid-cols-7 md:grid">
+          @for (i of placeholders; track i) {
+            <div class="flex min-h-28 flex-col gap-2 border-r border-b border-line/75 p-2 dark:border-line/55">
+              <p-skeleton shape="circle" size="1.75rem" /><p-skeleton width="80%" height="1.25rem" /><p-skeleton width="60%" height="1.25rem" />
+            </div>
+          }
+        </div>
+        <div class="space-y-4 p-4 md:hidden">
+          @for (i of placeholders.slice(0, 7); track i) { <div class="flex gap-4"><p-skeleton shape="circle" size="2.25rem" /><div class="flex-1 space-y-2"><p-skeleton width="70%" height="1rem" /><p-skeleton width="45%" height="1rem" /></div></div> }
+        </div>
+      } @else {
+        <div class="hidden grid-cols-7 md:grid">
+          @for (day of days(); track day.date) {
+            <div class="group min-h-28 min-w-0 border-r border-b border-line/75 p-2 dark:border-line/55" [class.bg-gray-50/60]="!day.current" [class.dark:bg-slate-800/50]="!day.current" [class.opacity-50]="day.past">
+              <div class="mb-1.5 flex items-start justify-between">
+                <span class="inline-flex size-7 items-center justify-center rounded-full text-sm" [class.bg-blue-600]="day.today" [class.text-white]="day.today" [class.font-semibold]="day.today" [class.text-gray-700]="!day.today && day.current" [class.dark:text-slate-300]="!day.today && day.current" [class.text-gray-400]="!day.current">{{ day.number }}</span>
+                @if (canCreate() && day.current) { <p-button ariaLabel="Agregar reunión" icon="icon-[tabler--plus] size-3" text rounded severity="info" size="small" (onClick)="open(day.date)" /> }
+              </div>
+              <div class="flex flex-col gap-0.5">
+                @for (event of (expandedDays().has(day.date) ? day.events : day.events.slice(0, 3)); track event.id) { <ng-container *ngTemplateOutlet="eventCard; context: { $implicit: event }" /> }
+                @if (day.events.length > 3) { <p-button text severity="secondary" size="small" [label]="expandedDays().has(day.date) ? 'Ver menos' : '+' + (day.events.length - 3) + ' más'" (onClick)="toggleDay(day.date)" /> }
+              </div>
+            </div>
+          }
+        </div>
+        <div class="divide-y divide-line/75 dark:divide-line/55 md:hidden">
+          @for (day of days(); track day.date) {
+            @if (day.current) {
+              <div class="flex items-center gap-3 px-3 py-3" [class.opacity-50]="day.past" [class.bg-blue-50/30]="day.today" [class.dark:bg-blue-900/20]="day.today">
+                <div class="flex w-10 shrink-0 flex-col items-center gap-0.5">
+                  <span class="inline-flex size-9 items-center justify-center rounded-full text-base font-medium" [class.bg-blue-600]="day.today" [class.text-white]="day.today" [class.text-gray-700]="!day.today" [class.dark:text-slate-300]="!day.today">{{ day.number }}</span>
+                  <span class="text-xs text-gray-400 dark:text-slate-500">{{ day.weekday }}</span>
+                </div>
+                <div class="flex min-w-0 flex-1 flex-col gap-1">
+                  @for (event of day.events; track event.id) { <ng-container *ngTemplateOutlet="eventCard; context: { $implicit: event }" /> } @empty { <span class="text-xs italic text-gray-400 dark:text-slate-500">Sin reuniones</span> }
+                </div>
+                @if (canCreate()) { <p-button ariaLabel="Agregar reunión" icon="icon-[tabler--plus] size-4" text rounded severity="info" size="small" (onClick)="open(day.date)" /> }
               </div>
             }
-          </div>
-        }
+          }
+        </div>
+      }
+    </div>
+    <footer class="flex flex-wrap items-center gap-x-6 gap-y-3 px-1 pt-3">
+      <div class="flex items-center gap-2"><span class="size-3 rounded-full bg-blue-500"></span><span class="text-xs font-medium text-surface-500 dark:text-surface-400">Reunión programada</span></div>
+      <div class="flex items-center gap-2"><span class="flex size-6 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">{{ todayNumber }}</span><span class="text-xs font-medium text-surface-500 dark:text-surface-400">Hoy</span></div>
+      <span class="min-w-0 text-xs text-surface-500 sm:ml-auto dark:text-surface-400">{{ events().length === 0 ? 'Sin reuniones este mes' : events().length + (events().length === 1 ? ' reunión en ' : ' reuniones en ') + monthLabel() }}</span>
+    </footer>
+  </p-panel>
+</section>
+
+<ng-template #eventCard let-event>
+  <div class="group flex min-w-0 flex-col gap-0.5 overflow-hidden rounded-lg border-l-[3px] bg-white/80 px-2 pt-1.5 pb-1 transition-shadow hover:shadow-md dark:bg-slate-800/80" [style.border-left-color]="event.hostColor || '#6366f1'">
+    <div class="flex min-w-0 items-center gap-1.5">
+      <button type="button" class="flex min-w-0 flex-1 items-center gap-1.5 rounded text-left focus-visible:outline-2 focus-visible:outline-blue-500 disabled:cursor-default" [title]="event.title + ' · ' + event.startTime" (click)="open(event.date, event)" [disabled]="!canUpdate()">
+        <span class="shrink-0 text-[10px] font-bold tabular-nums" [style.color]="event.hostColor || '#6366f1'">{{ event.startTime }}</span>
+        <span class="min-w-0 truncate text-xs leading-tight font-semibold text-slate-700 dark:text-slate-300">{{ event.title }}</span>
+      </button>
+      @if (event.agent && event.phoneNumber) {
+        <a pButton text rounded iconOnly severity="success" size="small" class="shrink-0" aria-label="Abrir conversación de WhatsApp" [routerLink]="['/comunicaciones/conversaciones']" [queryParams]="{ telefono: event.phoneNumber }" target="_blank" rel="noopener noreferrer" (click)="openInboxConversation($event, event.phoneNumber)"><span class="icon-[tabler--brand-whatsapp] size-3" aria-hidden="true"></span></a>
+      }
+      @if (event.googleMeetLink) { <a pButton text rounded iconOnly severity="info" size="small" class="shrink-0" aria-label="Abrir Google Meet" [href]="event.googleMeetLink" target="_blank" rel="noopener noreferrer"><span class="icon-[tabler--video] size-3" aria-hidden="true"></span></a> }
+    </div>
+    @if (event.hostName) {
+      <div class="flex min-w-0 items-center gap-1">
+        <span class="flex size-3.5 shrink-0 items-center justify-center rounded-full text-[7px] font-bold text-white" [style.background-color]="event.hostColor || '#6366f1'">{{ event.hostName.slice(0, 1).toUpperCase() }}</span>
+        <span class="truncate text-[10px] leading-tight font-medium" [style.color]="event.hostColor || '#6366f1'">{{ event.hostName }}</span>
       </div>
     }
   </div>
-</section>
+</ng-template>
 <p-dialog [visible]="dialogVisible()" (visibleChange)="dialogVisible.set($event)" [modal]="true"
-  [header]="selected() ? 'Editar reunión' : 'Nueva reunión'" [style]="{width:'min(95vw, 34rem)'}">
-  <form #meetingForm="ngForm" class="grid gap-4 pt-2" novalidate (ngSubmit)="save(meetingForm)">
+  [header]="selected() ? 'Editar reunión' : 'Nueva reunión'" [style]="{width:'min(calc(100vw - 2rem), 32rem)'}">
+  <form #meetingForm="ngForm" class="grid gap-5 pt-2" novalidate (ngSubmit)="save(meetingForm)">
     @if (error()) { <p-message severity="error">{{ error() }}</p-message> }
-    <label class="grid gap-1 text-sm">
-      <span>Título <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></span>
-      <input #titleControl="ngModel" pInputText name="title" [(ngModel)]="form.title" required pattern=".*\S.*"
+    <label class="grid min-w-0 gap-1.5">
+      <span class="text-sm font-semibold text-surface-700 dark:text-slate-300">Nombre del evento <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></span>
+      <input #titleControl="ngModel" pInputText name="title" [(ngModel)]="form.title" placeholder="Ej: Reunión de coordinación" required pattern=".*\S.*"
         aria-required="true" [attr.aria-invalid]="titleControl.invalid && (titleControl.touched || meetingForm.submitted)"
         [attr.aria-describedby]="titleControl.invalid && (titleControl.touched || meetingForm.submitted) ? 'meeting-title-error' : null" />
       @if (titleControl.invalid && (titleControl.touched || meetingForm.submitted)) {
         <small id="meeting-title-error" class="text-red-600 dark:text-red-400" aria-live="polite">Ingresa un título.</small>
       }
     </label>
-    <label class="grid gap-1 text-sm">
-      <span>Fecha <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></span>
-      <input #dateControl="ngModel" pInputText type="date" name="date" [(ngModel)]="form.date" required
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+    <label class="grid min-w-0 gap-1.5">
+      <span class="text-sm font-semibold text-surface-700 dark:text-slate-300">Fecha <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></span>
+      <p-datepicker #dateControl="ngModel" name="date" [(ngModel)]="form.date" dataType="string" dateFormat="yy-mm-dd" [showIcon]="true" [fluid]="true" appendTo="body" required
         aria-required="true" [attr.aria-invalid]="dateControl.invalid && (dateControl.touched || meetingForm.submitted)"
         [attr.aria-describedby]="dateControl.invalid && (dateControl.touched || meetingForm.submitted) ? 'meeting-date-error' : null" />
       @if (dateControl.invalid && (dateControl.touched || meetingForm.submitted)) {
         <small id="meeting-date-error" class="text-red-600 dark:text-red-400" aria-live="polite">Selecciona una fecha.</small>
       }
     </label>
-    <label class="grid gap-1 text-sm">
-      <span>Hora de inicio <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></span>
-      <input #startTimeControl="ngModel" pInputText type="time" name="startTime" [(ngModel)]="form.startTime" required
+    <label class="grid min-w-0 gap-1.5">
+      <span class="text-sm font-semibold text-surface-700 dark:text-slate-300">Hora de inicio <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></span>
+      <p-datepicker #startTimeControl="ngModel" name="startTime" [(ngModel)]="form.startTime" dataType="string" [timeOnly]="true" [showIcon]="true" [fluid]="true" [stepMinute]="5" appendTo="body" required
         aria-required="true" [attr.aria-invalid]="startTimeControl.invalid && (startTimeControl.touched || meetingForm.submitted)"
         [attr.aria-describedby]="startTimeControl.invalid && (startTimeControl.touched || meetingForm.submitted) ? 'meeting-start-time-error' : null" />
       @if (startTimeControl.invalid && (startTimeControl.touched || meetingForm.submitted)) {
         <small id="meeting-start-time-error" class="text-red-600 dark:text-red-400" aria-live="polite">Selecciona una hora de inicio.</small>
       }
     </label>
-    <label class="grid gap-1 text-sm">
-      <span>Hora de término <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></span>
-      <input #endTimeControl="ngModel" pInputText type="time" name="endTime" [(ngModel)]="form.endTime" required
+    <label class="grid min-w-0 gap-1.5">
+      <span class="text-sm font-semibold text-surface-700 dark:text-slate-300">Hora de término <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></span>
+      <p-datepicker #endTimeControl="ngModel" name="endTime" [(ngModel)]="form.endTime" dataType="string" [timeOnly]="true" [showIcon]="true" [fluid]="true" [stepMinute]="5" appendTo="body" required
         aria-required="true" [attr.aria-invalid]="endTimeControl.invalid && (endTimeControl.touched || meetingForm.submitted)"
         [attr.aria-describedby]="endTimeControl.invalid && (endTimeControl.touched || meetingForm.submitted) ? 'meeting-end-time-error' : null" />
       @if (endTimeControl.invalid && (endTimeControl.touched || meetingForm.submitted)) {
         <small id="meeting-end-time-error" class="text-red-600 dark:text-red-400" aria-live="polite">Selecciona una hora de término.</small>
       }
     </label>
-    <label class="grid gap-1 text-sm">
-      <span>Anfitrión <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></span>
+    </div>
+    <label class="grid min-w-0 gap-1.5">
+      <span class="text-sm font-semibold text-surface-700 dark:text-slate-300">Anfitrión <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span></span>
       <p-select #hostControl="ngModel" name="hostSk" [(ngModel)]="form.hostSk"
         [options]="availableHosts()" optionLabel="name" optionValue="sk" placeholder="Selecciona un anfitrión"
         [loading]="hostsLoading()" [disabled]="hostsLoading()" [fluid]="true" appendTo="body" required
@@ -110,18 +162,18 @@
         <small class="text-muted">No hay anfitriones activos. Configúralos en Configuración de la aplicación.</small>
       }
     </label>
-    <label class="grid gap-1 text-sm">Teléfono de contacto (opcional) <input pInputText type="tel" name="phoneNumber" [(ngModel)]="form.phoneNumber" /></label>
-    <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="agent" [(ngModel)]="form.agent" /> Reunión con agente</label>
-    <label class="grid gap-1 text-sm">Descripción <textarea class="rounded border border-line/75 p-2 dark:border-line/55" name="description" [(ngModel)]="form.description" rows="3"></textarea></label>
-    <label class="grid gap-1 text-sm">Invitados (correos separados por coma) <textarea class="rounded border border-line/75 p-2 dark:border-line/55" name="guests" [ngModel]="guestsText()" (ngModelChange)="guestsText.set($event)" rows="2"></textarea></label>
+    <label class="grid min-w-0 gap-1.5">Teléfono de contacto (opcional) <input pInputText type="tel" name="phoneNumber" [(ngModel)]="form.phoneNumber" /></label>
+    <label class="flex items-center gap-2 text-sm"><p-checkbox name="agent" [(ngModel)]="form.agent" [binary]="true" /> Reunión con agente</label>
+    <label class="grid min-w-0 gap-1.5"><span class="text-sm font-semibold text-surface-700 dark:text-slate-300">Descripción</span> <textarea pTextarea class="w-full resize-none" name="description" [(ngModel)]="form.description" rows="3"></textarea></label>
+    <label class="grid min-w-0 gap-1.5"><span class="text-sm font-semibold text-surface-700 dark:text-slate-300">Invitados (correos separados por coma)</span> <textarea pTextarea class="w-full resize-none" name="guests" [ngModel]="guestsText()" (ngModelChange)="guestsText.set($event)" rows="2"></textarea></label>
     @if (selected()?.googleMeetLink) {
       <a class="text-primary underline" [href]="selected()?.googleMeetLink" target="_blank" rel="noopener noreferrer">Abrir Google Meet</a>
     }
     <div class="flex justify-between gap-2">
       @if (selected() && canDelete()) { <p-button type="button" label="Eliminar" severity="danger" [outlined]="true" [loading]="saving()" (onClick)="remove()" /> }
       <div class="ml-auto flex gap-2">
-        <p-button type="button" label="Cancelar" severity="secondary" [text]="true" (onClick)="dialogVisible.set(false)" />
-        <p-button type="submit" label="Guardar" icon="icon-[tabler--check] size-4" [loading]="saving()" [disabled]="saving()" />
+        <p-button type="button" label="Cancelar" severity="secondary" [outlined]="true" (onClick)="dialogVisible.set(false)" />
+        <p-button type="submit" [label]="selected() ? 'Guardar cambios' : 'Crear reunión'" icon="icon-[tabler--check] size-4" [loading]="saving()" [disabled]="saving()" />
       </div>
     </div>
   </form>

@@ -1,4 +1,10 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { Panel } from 'primeng/panel';
+import { Tag } from 'primeng/tag';
+import { Textarea } from 'primeng/textarea';
+import { DatePicker } from 'primeng/datepicker';
+import { Checkbox } from 'primeng/checkbox';
 import { FormsModule, type NgForm } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
@@ -9,18 +15,19 @@ import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
 import { Skeleton } from 'primeng/skeleton';
 import { Select } from 'primeng/select';
+import type { CalendarDay } from './interfaces/calendar-day.interface';
 import { MeetService, type MeetEvent, type MeetRequest } from './meet.service';
 import { messageForHttpError } from '../../core/http/error.interceptor';
 import { AuthService } from '../../core/auth/auth.service';
 import type { MeetingHost } from '../../core/configuration/meeting-host.interface';
 import { MeetingHostService } from '../../core/configuration/meeting-host.service';
 
-interface DayCell { date: string; number: number; current: boolean; events: MeetEvent[] }
+
 
 @Component({
   selector: 'app-meet-calendar',
   standalone: true,
-  imports: [FormsModule, RouterLink, Button, ButtonDirective, Dialog, InputText, Message, Select, Skeleton],
+  imports: [NgTemplateOutlet, DatePicker, Panel, Tag, Textarea, Checkbox, FormsModule, RouterLink, Button, ButtonDirective, Dialog, InputText, Message, Select, Skeleton],
   templateUrl: './meet-calendar.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -50,7 +57,11 @@ export class MeetCalendarPage {
   readonly error = signal('');
   readonly dialogVisible = signal(false);
   readonly selected = signal<MeetEvent | null>(null);
-  readonly weekdays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+  readonly weekdays = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+  readonly todayNumber = this.now.getDate();
+  readonly todayKey = [this.now.getFullYear(), String(this.now.getMonth() + 1).padStart(2, '0'), String(this.now.getDate()).padStart(2, '0')].join('-');
+  readonly isCurrentMonth = computed(() => this.year() === this.now.getFullYear() && this.month() === this.now.getMonth());
+  readonly expandedDays = signal<ReadonlySet<string>>(new Set());
   readonly placeholders = Array.from({ length: 35 }, (_, i) => i);
   readonly form: MeetRequest = this.emptyForm();
   readonly guestsText = signal('');
@@ -58,7 +69,7 @@ export class MeetCalendarPage {
     new Intl.DateTimeFormat('es-CL', { month: 'long', year: 'numeric' })
       .format(new Date(this.year(), this.month(), 1)),
   );
-  readonly days = computed<DayCell[]>(() => {
+  readonly days = computed<CalendarDay[]>(() => {
     const y = this.year(), m = this.month();
     const first = new Date(y, m, 1);
     const offset = (first.getDay() + 6) % 7;
@@ -67,9 +78,17 @@ export class MeetCalendarPage {
     return Array.from({ length }, (_, index) => {
       const date = new Date(y, m, index - offset + 1);
       const key = [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
-      return { date: key, number: date.getDate(), current: date.getMonth() === m, events: events.filter(e => e.date === key) };
+      return { date: key, number: date.getDate(), current: date.getMonth() === m, today: key === this.todayKey, past: key < this.todayKey, weekday: this.weekdays[(date.getDay() + 6) % 7].slice(0, 3), events: events.filter(e => e.date === key).sort((a, b) => a.startTime.localeCompare(b.startTime)) };
     });
   });
+
+  toggleDay(date: string): void {
+    this.expandedDays.update(current => {
+      const next = new Set(current);
+      if (next.has(date)) next.delete(date); else next.add(date);
+      return next;
+    });
+  }
 
   constructor() {
     this.refresh();
