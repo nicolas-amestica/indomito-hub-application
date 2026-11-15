@@ -23,6 +23,7 @@ const ERROR_MESSAGES: Readonly<Record<string, string>> = {
   VALIDATION_ERROR: APP_MESSAGES.http.validationError,
   REQUIRED_FIELD_MISSING: APP_MESSAGES.http.requiredFieldMissing,
   RESOURCE_NOT_FOUND: APP_MESSAGES.http.resourceNotFound,
+  MEETING_AGENT_TITLE_LOCKED: APP_MESSAGES.http.meetingAgentTitleLocked,
   CALENDAR_OAUTH_NOT_CONFIGURED: APP_MESSAGES.http.calendarOAuthNotConfigured,
 };
 

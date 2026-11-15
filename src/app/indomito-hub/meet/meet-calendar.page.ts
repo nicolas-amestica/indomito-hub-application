@@ -4,17 +4,21 @@ import { Panel } from 'primeng/panel';
 import { Tag } from 'primeng/tag';
 import { Textarea } from 'primeng/textarea';
 import { DatePicker } from 'primeng/datepicker';
-import { Checkbox } from 'primeng/checkbox';
 import { FormsModule, type NgForm } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
-import { Button, ButtonDirective } from 'primeng/button';
+import { ButtonDirective } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
 import { Skeleton } from 'primeng/skeleton';
 import { Select } from 'primeng/select';
+import { MEETING_BUTTON_TOKENS, MEETING_MESSAGE_TOKENS } from './constants/meeting-theme.constants';
+import { MEETING_COORDINATOR_EMAIL } from './constants/meeting.constants';
+import { coordinatorMeetUrl } from './fn/coordinator-meet-url';
 import type { CalendarDay } from './interfaces/calendar-day.interface';
 import { MeetService, type MeetEvent, type MeetRequest } from './meet.service';
 import { messageForHttpError } from '../../core/http/error.interceptor';
@@ -23,16 +27,17 @@ import type { MeetingHost } from '../../core/configuration/meeting-host.interfac
 import { MeetingHostService } from '../../core/configuration/meeting-host.service';
 
 
-
 @Component({
   selector: 'app-meet-calendar',
   standalone: true,
-  imports: [NgTemplateOutlet, DatePicker, Panel, Tag, Textarea, Checkbox, FormsModule, RouterLink, Button, ButtonDirective, Dialog, InputText, Message, Select, Skeleton],
+  imports: [NgTemplateOutlet, DatePicker, Panel, Tag, Textarea, FormsModule, RouterLink, ButtonDirective, Dialog, ConfirmDialog, InputText, Message, Select, Skeleton],
+  providers: [ConfirmationService],
   templateUrl: './meet-calendar.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MeetCalendarPage {
   private readonly api = inject(MeetService);
+  private readonly confirmations = inject(ConfirmationService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly hostApi = inject(MeetingHostService);
@@ -57,6 +62,12 @@ export class MeetCalendarPage {
   readonly error = signal('');
   readonly dialogVisible = signal(false);
   readonly selected = signal<MeetEvent | null>(null);
+  readonly titleLocked = computed(() => this.selected()?.agent === true);
+  readonly hostWarningVisible = signal(false);
+  readonly buttonTokens = MEETING_BUTTON_TOKENS;
+  readonly messageTokens = MEETING_MESSAGE_TOKENS;
+  readonly coordinatorEmail = MEETING_COORDINATOR_EMAIL;
+  readonly coordinatorMeetUrl = coordinatorMeetUrl;
   readonly weekdays = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
   readonly todayNumber = this.now.getDate();
   readonly todayKey = [this.now.getFullYear(), String(this.now.getMonth() + 1).padStart(2, '0'), String(this.now.getDate()).padStart(2, '0')].join('-');
@@ -121,7 +132,7 @@ export class MeetCalendarPage {
     ).subscribe({
       next: hosts => {
         this.hosts.set(hosts);
-        if (this.dialogVisible() && !this.selected() && !this.form.hostSk) this.applyDefaultHost();
+        if (this.dialogVisible() && (!this.selected() || this.selected()?.agent) && !this.form.hostSk) this.applyDefaultHost();
       },
       error: () => this.hostsError.set('No fue posible consultar los anfitriones configurados.'),
     });
@@ -152,6 +163,7 @@ export class MeetCalendarPage {
   open(date?: string, event?: MeetEvent): void {
     if (event ? !this.canUpdate() : !this.canCreate()) return;
     this.error.set("");
+    this.hostWarningVisible.set(false);
     this.selected.set(event ?? null);
     Object.assign(this.form, this.emptyForm(), event ? {
       title: event.title, date: event.date, startTime: event.startTime, endTime: event.endTime,
@@ -161,7 +173,7 @@ export class MeetCalendarPage {
     } : {
       date: date ?? '',
     });
-    if (!event) this.applyDefaultHost();
+    if (!event || (event.agent && !event.hostSk)) this.applyDefaultHost();
     this.guestsText.set(this.form.guests.join(', '));
     this.dialogVisible.set(true);
   }
@@ -189,19 +201,44 @@ export class MeetCalendarPage {
     this.form.guests = [...new Set(this.guestsText().split(/[;,\n]/).map(x => x.trim()).filter(Boolean))];
     this.saving.set(true);
     this.error.set('');
-    const request = { ...this.form };
     const current = this.selected();
+    const request = {
+      ...this.form,
+      title: current?.agent ? current.title : this.form.title,
+      agent: current?.agent ?? false,
+    };
     const operation = current ? this.api.update(current.id, request) : this.api.create(request);
     operation.pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.saving.set(false)))
       .subscribe({
         next: () => { this.dialogVisible.set(false); this.refresh(); },
-        error: () => this.error.set('No fue posible guardar la reunión en Google Calendar.'),
+        error: error => this.error.set(messageForHttpError(error, 'No fue posible guardar la reunión en Google Calendar.')),
       });
+  }
+
+  confirmJoinMeet(): void {
+    const link = this.selected()?.googleMeetLink;
+    const url = link ? coordinatorMeetUrl(link) : null;
+    if (url) window.open(url, '_blank', 'noopener,noreferrer');
+    this.hostWarningVisible.set(false);
   }
 
   remove(): void {
     const current = this.selected();
-    if (!current || !this.canDelete() || this.saving() || !window.confirm('¿Eliminar esta reunión de Google Calendar?')) return;
+    if (!current || !this.canDelete() || this.saving()) return;
+    this.confirmations.confirm({
+      header: 'Eliminar reunión',
+      message: '¿Eliminar esta reunión de Google Calendar?',
+      icon: 'icon-[tabler--alert-triangle] size-6',
+      acceptLabel: 'Eliminar',
+      rejectLabel: 'Cancelar',
+      acceptButtonProps: { severity: 'danger' },
+      rejectButtonProps: { severity: 'secondary', outlined: true },
+      accept: () => this.deleteMeeting(current),
+    });
+  }
+
+  private deleteMeeting(current: MeetEvent): void {
+    if (!this.canDelete() || this.saving()) return;
     this.saving.set(true);
     this.api.remove(current.id).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.saving.set(false)))
       .subscribe({

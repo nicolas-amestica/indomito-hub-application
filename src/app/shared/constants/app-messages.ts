@@ -6,6 +6,7 @@ export const APP_MESSAGES = {
     warn: 'Advertencia',
   },
   http: {
+    meetingAgentTitleLocked: 'El nombre de una reunión creada por el agente IA no se puede modificar.',
     calendarOAuthNotConfigured: 'La conexión con Google Calendar no está configurada. Comunícate con el administrador para habilitarla.',
     upstreamServiceError:
       'No se pudieron obtener los tipos de cambio. Intenta nuevamente en unos minutos.',
