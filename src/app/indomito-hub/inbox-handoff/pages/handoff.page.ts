@@ -4,7 +4,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
-  effect,
+  afterRenderEffect,
   inject,
   signal,
   viewChild,
@@ -35,6 +35,7 @@ export class HandoffPageComponent {
   readonly messageTokens = HANDOFF_MESSAGE_TOKENS;
   private readonly conversationHeading =
     viewChild<ElementRef<HTMLHeadingElement>>('conversationHeading');
+  private readonly conversationHistory = viewChild<ElementRef<HTMLElement>>('conversationHistory');
   private readonly api = inject(HandoffApiService);
   private readonly route = inject(ActivatedRoute);
   private readonly document = inject(DOCUMENT);
@@ -51,7 +52,14 @@ export class HandoffPageComponent {
   );
 
   constructor() {
-    effect(() => this.conversationHeading()?.nativeElement.focus());
+    afterRenderEffect({
+      write: () => {
+        const history = this.conversationHistory()?.nativeElement;
+        if (!history) return;
+        this.conversationHeading()?.nativeElement.focus({ preventScroll: true });
+        history.scrollIntoView({ block: 'end', behavior: 'instant' });
+      },
+    });
     const view = this.document.defaultView;
     // Se retira el secreto del historial sin efectuar una navegación ni canjearlo.
     if (view?.location.hash)
