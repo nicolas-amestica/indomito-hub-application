@@ -41,6 +41,11 @@ export const routes: Routes = [
           import('./indomito-hub/dashboard/dashboard.routes').then((m) => m.DASHBOARD_ROUTES),
       },
       {
+        path: 'analitica',
+        loadChildren: () =>
+          import('./indomito-hub/analytics/analytics.routes').then((m) => m.ANALYTICS_ROUTES),
+      },
+      {
         path: 'cobranza',
         loadChildren: () =>
           import('./indomito-hub/collections/collections.routes').then((m) => m.COLLECTIONS_ROUTES),

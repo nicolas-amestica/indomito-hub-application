@@ -1,0 +1,603 @@
+<div class="space-y-6 min-w-0">
+  <p-message [dt]="messageTokens" severity="info"
+    >Una partida es un costo del viaje, por ejemplo el hotel. Los liberados viajan sin pagar, pero
+    pueden generar costos. Los importes de costos se ingresan en base neta; la retención ya está
+    incluida en el honorario bruto.</p-message
+  >
+  <p-panel header="Personas, precio y objetivo">
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="flex flex-col gap-2">
+        <label for="budget-name">Nombre del presupuesto o escenario</label
+        ><input
+          pInputText
+          id="budget-name"
+          [ngModel]="budget().name"
+          (ngModelChange)="patch({ name: $event })"
+          [disabled]="disabled()"
+          [maxlength]="150"
+        />
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="total-persons">Total de viajeros</label
+        ><p-inputnumber
+          inputId="total-persons"
+          [ngModel]="budget().totalPassengers"
+          (ngModelChange)="patch({ totalPassengers: $event ?? 0 })"
+          [min]="1"
+          [max]="1000"
+          [disabled]="disabled()"
+        /><small class="text-muted">Incluye a quienes pagan y a los liberados.</small>
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="free-persons">Liberados</label
+        ><p-inputnumber
+          inputId="free-persons"
+          [ngModel]="budget().freePassengers"
+          (ngModelChange)="patch({ freePassengers: $event ?? 0 })"
+          [min]="0"
+          [max]="999"
+          [disabled]="disabled()"
+        />
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="days">Días del viaje</label
+        ><p-inputnumber
+          inputId="days"
+          [ngModel]="budget().days"
+          (ngModelChange)="patch({ days: $event ?? 0 })"
+          [min]="1"
+          [max]="365"
+          [disabled]="disabled()"
+        />
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="nights">Noches de hotel de referencia</label
+        ><p-inputnumber
+          inputId="nights"
+          [ngModel]="budget().nights"
+          (ngModelChange)="patch({ nights: $event ?? 0 })"
+          [min]="0"
+          [max]="365"
+          [disabled]="disabled()"
+        /><small class="text-muted">Cada servicio puede tener otra duración.</small>
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="payer-price">Precio bruto por pagante (CLP)</label
+        ><p-inputnumber
+          inputId="payer-price"
+          [ngModel]="budget().pricePerPayer"
+          (ngModelChange)="patch({ pricePerPayer: $event ?? 0 })"
+          [min]="0"
+          [max]="10000000000"
+          [disabled]="disabled()"
+        /><small class="text-muted">Se mantiene fijo al variar el grupo.</small>
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="discount">Descuento comercial (%)</label
+        ><p-inputnumber
+          inputId="discount"
+          [ngModel]="budget().discount"
+          (ngModelChange)="patch({ discount: $event ?? 0 })"
+          [min]="0"
+          [max]="100"
+          [maxFractionDigits]="2"
+          [disabled]="disabled()"
+        />
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="contingency">Reserva para imprevistos (%)</label
+        ><p-inputnumber
+          inputId="contingency"
+          [ngModel]="budget().contingency"
+          (ngModelChange)="patch({ contingency: $event ?? 0 })"
+          [min]="0"
+          [max]="100"
+          [maxFractionDigits]="2"
+          [disabled]="disabled()"
+        /><small class="text-muted">Se agrega una vez sobre los costos incluidos.</small>
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="target-mode">Objetivo que quieres alcanzar</label
+        ><p-select
+          inputId="target-mode"
+          [options]="[
+            { label: 'Resultado en pesos', value: 'amount' },
+            { label: 'Margen sobre venta neta (%)', value: 'margin' },
+          ]"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="budget().targetMode"
+          (ngModelChange)="patch({ targetMode: $event })"
+          appendTo="body"
+          [disabled]="disabled()"
+        />
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="target">Valor del objetivo</label
+        ><p-inputnumber
+          inputId="target"
+          [ngModel]="budget().target"
+          (ngModelChange)="patch({ target: $event ?? 0 })"
+          [min]="0"
+          [max]="budget().targetMode === 'margin' ? 99.99 : 1000000000000"
+          [maxFractionDigits]="2"
+          [disabled]="disabled()"
+        />
+      </div>
+    </div>
+  </p-panel>
+  <p-panel header="Costos del viaje">
+    <div class="space-y-5">
+      <div class="flex flex-wrap justify-between gap-3">
+        <p class="text-sm text-muted">
+          Solo las partidas incluidas entran en el cálculo. Cada una conserva sus días, noches y
+          moneda.
+        </p>
+        <p-button
+          label="Agregar costo"
+          icon="icon-[tabler--plus] size-4"
+          (onClick)="add()"
+          [disabled]="disabled() || budget().lines.length >= 120"
+        />
+      </div>
+      @for (item of budget().lines; track item.id; let index = $index) {
+        <p-panel [header]="'Costo ' + (index + 1) + ' · ' + item.description" [toggleable]="true">
+          <div class="space-y-5">
+            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              <div class="flex flex-col gap-2 sm:col-span-2">
+                <label [for]="item.id + '-name'">Descripción</label
+                ><input
+                  pInputText
+                  [id]="item.id + '-name'"
+                  [ngModel]="item.description"
+                  (ngModelChange)="line(item.id, { description: $event })"
+                  [disabled]="disabled()"
+                />
+              </div>
+              <div class="flex flex-col gap-2">
+                <label [for]="item.id + '-provider'">Proveedor cotizado (opcional)</label
+                ><input
+                  pInputText
+                  [id]="item.id + '-provider'"
+                  [ngModel]="item.providerName ?? ''"
+                  (ngModelChange)="line(item.id, { providerName: $event })"
+                  [maxlength]="150"
+                  [disabled]="disabled()"
+                />
+              </div>
+              <div class="flex flex-col gap-2">
+                <label [for]="item.id + '-category'">Categoría</label
+                ><p-select
+                  [inputId]="item.id + '-category'"
+                  [options]="budget().categories"
+                  optionLabel="name"
+                  optionValue="id"
+                  [ngModel]="item.categoryId"
+                  (ngModelChange)="line(item.id, { categoryId: $event })"
+                  appendTo="body"
+                  [disabled]="disabled()"
+                />
+              </div>
+              <div class="flex flex-col gap-2">
+                <label [for]="item.id + '-charge'">¿Cómo cobra el proveedor?</label
+                ><p-select
+                  [inputId]="item.id + '-charge'"
+                  [options]="charges"
+                  optionLabel="label"
+                  optionValue="value"
+                  [ngModel]="item.chargeType"
+                  (ngModelChange)="line(item.id, { chargeType: $event })"
+                  appendTo="body"
+                  [disabled]="disabled()"
+                />
+              </div>
+              <div class="flex flex-col gap-2">
+                <label [for]="item.id + '-basis'">¿A quiénes o cuántas unidades aplica?</label
+                ><p-select
+                  [inputId]="item.id + '-basis'"
+                  [options]="bases"
+                  optionLabel="label"
+                  optionValue="value"
+                  [ngModel]="item.basis"
+                  (ngModelChange)="line(item.id, { basis: $event })"
+                  appendTo="body"
+                  [disabled]="disabled()"
+                />
+              </div>
+              <div class="flex flex-col gap-2">
+                <label [for]="item.id + '-quantity'"
+                  >Participantes o unidades (base explícita)</label
+                ><p-inputnumber
+                  [inputId]="item.id + '-quantity'"
+                  [ngModel]="item.quantity"
+                  (ngModelChange)="line(item.id, { quantity: $event ?? 0 })"
+                  [min]="0"
+                  [max]="10000"
+                  [disabled]="disabled()"
+                />
+              </div>
+              <div class="flex flex-col gap-2">
+                <label [for]="item.id + '-price'">Precio unitario neto</label
+                ><p-inputnumber
+                  [inputId]="item.id + '-price'"
+                  [ngModel]="item.unitPrice"
+                  (ngModelChange)="line(item.id, { unitPrice: $event ?? 0 })"
+                  [min]="0"
+                  [max]="10000000000"
+                  [maxFractionDigits]="2"
+                  [disabled]="disabled()"
+                />
+              </div>
+              <div class="flex flex-col gap-2">
+                <label [for]="item.id + '-currency'">Moneda original</label
+                ><p-select
+                  [inputId]="item.id + '-currency'"
+                  [options]="currencies"
+                  [ngModel]="item.currency"
+                  (ngModelChange)="currency(item.id, $event)"
+                  appendTo="body"
+                  [disabled]="disabled()"
+                />
+              </div>
+              <div class="flex flex-col gap-2">
+                <label [for]="item.id + '-state'">Estado del costo</label
+                ><p-select
+                  [inputId]="item.id + '-state'"
+                  [options]="states"
+                  optionLabel="label"
+                  optionValue="value"
+                  [ngModel]="item.state"
+                  (ngModelChange)="line(item.id, { state: $event })"
+                  appendTo="body"
+                  [disabled]="disabled()"
+                />
+              </div>
+              <div class="flex flex-col gap-2">
+                <label [for]="item.id + '-days'">Días efectivos de este servicio</label
+                ><p-inputnumber
+                  [inputId]="item.id + '-days'"
+                  [ngModel]="item.days"
+                  (ngModelChange)="line(item.id, { days: $event ?? 0 })"
+                  [min]="0"
+                  [max]="365"
+                  [disabled]="disabled()"
+                />
+              </div>
+              <div class="flex flex-col gap-2">
+                <label [for]="item.id + '-nights'">Noches efectivas de alojamiento</label
+                ><p-inputnumber
+                  [inputId]="item.id + '-nights'"
+                  [ngModel]="item.nights"
+                  (ngModelChange)="line(item.id, { nights: $event ?? 0 })"
+                  [min]="0"
+                  [max]="365"
+                  [disabled]="disabled()"
+                />
+              </div>
+              <div class="flex items-center gap-3">
+                <p-checkbox
+                  [inputId]="item.id + '-included'"
+                  [binary]="true"
+                  [ngModel]="item.included"
+                  (ngModelChange)="line(item.id, { included: $event })"
+                  [disabled]="disabled()"
+                /><label [for]="item.id + '-included'">Incluir en el presupuesto</label>
+              </div>
+              @if (item.currency !== 'CLP') {
+                <div class="flex flex-col gap-2">
+                  <label [for]="item.id + '-rate'">CLP por unidad de moneda</label
+                  ><p-inputnumber
+                    [inputId]="item.id + '-rate'"
+                    [ngModel]="item.rate"
+                    (ngModelChange)="line(item.id, { rate: $event ?? 0 })"
+                    [min]="0"
+                    [max]="1000000"
+                    [maxFractionDigits]="6"
+                    [disabled]="disabled()"
+                  />
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label [for]="item.id + '-buffer'">Resguardo adicional (CLP)</label
+                  ><p-inputnumber
+                    [inputId]="item.id + '-buffer'"
+                    [ngModel]="item.buffer"
+                    (ngModelChange)="line(item.id, { buffer: $event ?? 0 })"
+                    [min]="0"
+                    [max]="1000000"
+                    [maxFractionDigits]="4"
+                    [disabled]="disabled()"
+                  />
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label [for]="item.id + '-origin'">Fuente de la tasa</label
+                  ><input
+                    pInputText
+                    [id]="item.id + '-origin'"
+                    [ngModel]="item.rateSource"
+                    (ngModelChange)="line(item.id, { rateSource: $event })"
+                    [disabled]="disabled()"
+                  />
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label [for]="item.id + '-date'">Fecha de la tasa (AAAA-MM-DD)</label
+                  ><app-date-only-picker
+                    [inputId]="item.id + '-date'"
+                    [ngModel]="item.rateDate"
+                    (ngModelChange)="line(item.id, { rateDate: $event })"
+                    [disabled]="disabled()"
+                  />
+                </div>
+              }
+            </div>
+            <details>
+              <summary class="cursor-pointer py-2 underline">
+                Opciones: mínimos, capacidad, escalones y relación con proveedor
+              </summary>
+              <div class="grid gap-5 sm:grid-cols-2 mt-4">
+                <div class="flex flex-col gap-2">
+                  <label [for]="item.id + '-min'">Mínimo contratado</label
+                  ><p-inputnumber
+                    [inputId]="item.id + '-min'"
+                    [ngModel]="item.minimum"
+                    (ngModelChange)="line(item.id, { minimum: $event ?? 0 })"
+                    [min]="0"
+                    [max]="10000"
+                    [disabled]="disabled()"
+                  />
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label [for]="item.id + '-capacity'"
+                    >Capacidad máxima (0 = sin límite declarado)</label
+                  ><p-inputnumber
+                    [inputId]="item.id + '-capacity'"
+                    [ngModel]="item.capacity"
+                    (ngModelChange)="line(item.id, { capacity: $event ?? 0 })"
+                    [min]="0"
+                    [max]="10000"
+                    [disabled]="disabled()"
+                  />
+                </div>
+              </div>
+              <p class="text-sm text-muted my-3">
+                Un escalón cambia el precio unitario cuando el grupo alcanza cierta cantidad de
+                viajeros. Ingresa los umbrales en orden ascendente.
+              </p>
+              @for (tierItem of item.tiers; track $index; let tierIndex = $index) {
+                <div class="grid gap-3 sm:grid-cols-2 mb-3">
+                  <div class="flex flex-col gap-2">
+                    <label [for]="item.id + '-tier-' + tierIndex">Desde cuántos viajeros</label
+                    ><p-inputnumber
+                      [inputId]="item.id + '-tier-' + tierIndex"
+                      [ngModel]="tierItem.from"
+                      (ngModelChange)="tier(item, tierIndex, { from: $event ?? 0 })"
+                      [min]="0"
+                      [max]="1000"
+                      [disabled]="disabled()"
+                    />
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label [for]="item.id + '-tier-price-' + tierIndex">Nuevo precio unitario</label
+                    ><p-inputnumber
+                      [inputId]="item.id + '-tier-price-' + tierIndex"
+                      [ngModel]="tierItem.unitPrice"
+                      (ngModelChange)="tier(item, tierIndex, { unitPrice: $event ?? 0 })"
+                      [min]="0"
+                      [maxFractionDigits]="2"
+                      [disabled]="disabled()"
+                    />
+                  </div>
+                </div>
+              }
+              <div class="flex flex-wrap gap-2">
+                <p-button
+                  label="Agregar escalón"
+                  severity="secondary"
+                  [outlined]="true"
+                  (onClick)="addTier(item)"
+                  [disabled]="disabled()"
+                /><p-button
+                  label="Quitar escalones"
+                  severity="secondary"
+                  [outlined]="true"
+                  (onClick)="line(item.id, { tiers: [] })"
+                  [disabled]="disabled() || !item.tiers.length"
+                />
+              </div>
+              <p class="text-sm text-muted my-3">
+                Asocia un importe del compromiso a esta partida para identificar costos que ya están
+                presupuestados. Esto no registra un pago.
+              </p>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <div class="flex flex-col gap-2">
+                  <label [for]="item.id + '-supplier'">Compromiso de proveedor</label
+                  ><p-select
+                    #supplierSelect
+                    [inputId]="item.id + '-supplier'"
+                    [options]="suppliers()"
+                    optionLabel="name"
+                    optionValue="id"
+                    appendTo="body"
+                    [disabled]="disabled()"
+                  />
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label [for]="item.id + '-allocation'">Importe asociado (CLP)</label
+                  ><p-inputnumber
+                    #allocation
+                    [inputId]="item.id + '-allocation'"
+                    [min]="0"
+                    [max]="1000000000000"
+                    [disabled]="disabled()"
+                  />
+                </div>
+              </div>
+              <p-button
+                label="Asociar importe"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="link(item, supplierSelect.value, allocation.value() ?? 0)"
+                [disabled]="disabled() || !supplierSelect.value"
+              />
+              @for (relation of item.allocations; track relation.supplierId) {
+                <p class="text-xs text-muted break-all mt-2">
+                  Compromiso {{ relation.supplierId }}: {{ relation.amount }} CLP
+                </p>
+              }
+              <p-button
+                label="Quitar asociaciones"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="line(item.id, { allocations: [] })"
+                [disabled]="disabled() || !item.allocations.length"
+              />
+              <div class="flex flex-col gap-2 mt-4">
+                <label [for]="item.id + '-note'"
+                  >Observación o referencia de respaldo (opcional)</label
+                ><textarea
+                  pTextarea
+                  [id]="item.id + '-note'"
+                  [ngModel]="item.note"
+                  (ngModelChange)="line(item.id, { note: $event })"
+                  [disabled]="disabled()"
+                  rows="2"
+                ></textarea>
+              </div>
+            </details>
+            <p-button
+              label="Quitar este costo"
+              severity="danger"
+              [text]="true"
+              (onClick)="remove(item.id)"
+              [disabled]="disabled()"
+            />
+          </div>
+        </p-panel>
+      } @empty {
+        <p-message [dt]="messageTokens" severity="warn"
+          >Aún no ingresaste costos. No se mostrará un resultado de ganancia hasta que exista un
+          presupuesto.</p-message
+        >
+      }
+    </div>
+  </p-panel>
+  <p-panel header="Categorías e impuestos del presupuesto" [toggleable]="true" [collapsed]="true">
+    <div class="grid gap-5 sm:grid-cols-2">
+      @for (categoryItem of budget().categories; track categoryItem.id) {
+        <div class="flex flex-col gap-2">
+          <label [for]="categoryItem.id">Nombre de categoría</label
+          ><input
+            pInputText
+            [id]="categoryItem.id"
+            [ngModel]="categoryItem.name"
+            (ngModelChange)="renameCategory(categoryItem.id, $event)"
+            [disabled]="disabled()"
+          />
+        </div>
+      }
+      <div class="flex flex-col gap-2">
+        <label for="new-category">Nueva categoría</label
+        ><input pInputText #newCategory id="new-category" [disabled]="disabled()" /><p-button
+          label="Agregar categoría"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="category(newCategory.value); newCategory.value = ''"
+          [disabled]="disabled() || budget().categories.length >= 40"
+        />
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="vat">IVA de la venta (%)</label
+        ><p-inputnumber
+          inputId="vat"
+          [ngModel]="budget().taxes.vatRate"
+          (ngModelChange)="tax({ vatRate: $event ?? 0 })"
+          [min]="0"
+          [max]="100"
+          [maxFractionDigits]="2"
+          [disabled]="disabled()"
+        />
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="tax-source">Procedencia de impuestos</label
+        ><input
+          pInputText
+          id="tax-source"
+          [ngModel]="budget().taxes.source"
+          (ngModelChange)="tax({ source: $event })"
+          [disabled]="disabled()"
+        /><small class="text-muted"
+          >Se conserva en este presupuesto; no cambia las reglas tributarias generales.</small
+        >
+      </div>
+    </div>
+  </p-panel>
+  <p-panel
+    header="Cobros y pagos previstos para anticipar faltantes"
+    [toggleable]="true"
+    [collapsed]="true"
+  >
+    <div class="space-y-4">
+      <p class="text-sm text-muted">
+        Ingresa solo movimientos futuros desde la caja actual. Cobro positivo; pago negativo. Son
+        supuestos, no movimientos reales ni cuotas ya cobradas.
+      </p>
+      @for (flowItem of budget().flows; track $index; let flowIndex = $index) {
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="flex flex-col gap-2">
+            <label [for]="'flow-date-' + flowIndex">Fecha (AAAA-MM-DD)</label
+            ><app-date-only-picker
+              [inputId]="'flow-date-' + flowIndex"
+              [ngModel]="flowItem.date"
+              (ngModelChange)="flow(flowIndex, { date: $event })"
+              [disabled]="disabled()"
+            />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label [for]="'flow-desc-' + flowIndex">Concepto</label
+            ><input
+              pInputText
+              [id]="'flow-desc-' + flowIndex"
+              [ngModel]="flowItem.description"
+              (ngModelChange)="flow(flowIndex, { description: $event })"
+              [disabled]="disabled()"
+            />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label [for]="'flow-value-' + flowIndex">Importe CLP (+ cobro / − pago)</label
+            ><p-inputnumber
+              [inputId]="'flow-value-' + flowIndex"
+              [ngModel]="flowItem.amount"
+              (ngModelChange)="flow(flowIndex, { amount: $event ?? 0 })"
+              [disabled]="disabled()"
+            />
+          </div>
+          <p-button
+            label="Quitar movimiento"
+            severity="danger"
+            [text]="true"
+            (onClick)="removeFlow(flowIndex)"
+            [disabled]="disabled()"
+          />
+        </div>
+      }
+      <p-button
+        label="Agregar movimiento previsto"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="addFlow()"
+        [disabled]="disabled() || budget().flows.length >= 240"
+      />
+      <div class="flex gap-3 items-start">
+        <p-checkbox
+          inputId="forecast-complete"
+          [binary]="true"
+          [ngModel]="budget().forecastComplete"
+          (ngModelChange)="patch({ forecastComplete: $event })"
+          [disabled]="disabled()"
+        /><label for="forecast-complete"
+          >He revisado que están todos los cobros y pagos futuros del viaje. Si falta alguno, la
+          proyección se considera parcial.</label
+        >
+      </div>
+    </div>
+  </p-panel>
+</div>

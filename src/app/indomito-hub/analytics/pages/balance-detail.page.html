@@ -1,0 +1,765 @@
+<div class="mx-auto max-w-[1440px] min-w-0 space-y-6 px-4 py-5 sm:px-6 lg:px-8">
+  <app-page-header
+    title="Detalle balance"
+    context="Analítica · Decisiones para tus viajes"
+    description="Entiende cuánto cuesta cada viaje, qué falta cobrar y cómo cambia el resultado antes de tomar una decisión."
+  >
+    <p-button
+      [dt]="exportTokens"
+      headerActions
+      label="Exportar Excel"
+      icon="icon-[tabler--download] size-4"
+      severity="secondary"
+      [loading]="exporting()"
+      [disabled]="!tableRows().length || store.loading()"
+      (onClick)="export()"
+    />
+  </app-page-header>
+  <a
+    href="#balance-content"
+    class="sr-only focus:not-sr-only focus:block focus:rounded-lg focus:bg-surface focus:p-3"
+    >Saltar a los resultados del balance</a
+  >
+  <p-confirmdialog [style]="{ width: 'min(92vw,32rem)' }" />
+  <p-panel header="1. Elige qué quieres revisar">
+    <div class="space-y-4">
+      <p class="text-sm text-muted">
+        El período documental agrupa los contratos. El año de salida indica cuándo viajan. El rango
+        de movimientos filtra la caja, mientras que las deudas muestran la posición actual.
+      </p>
+      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="flex flex-col gap-2">
+          <label for="document-year">Período documental</label
+          ><p-inputnumber
+            inputId="document-year"
+            [ngModel]="year()"
+            (ngModelChange)="year.set($event ?? 0)"
+            [min]="2000"
+            [max]="2099"
+            [useGrouping]="false"
+          />
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="movement-from">Movimientos desde</label
+          ><app-date-only-picker
+            inputId="movement-from"
+            [ngModel]="from()"
+            (ngModelChange)="from.set($event)"
+          />
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="movement-to">Movimientos hasta</label
+          ><app-date-only-picker
+            inputId="movement-to"
+            [ngModel]="to()"
+            (ngModelChange)="to.set($event)"
+          />
+        </div>
+        <div class="flex items-end">
+          <p-button
+            label="Consultar viajes"
+            icon="icon-[tabler--refresh] size-4"
+            (onClick)="reload()"
+            [loading]="store.loading()"
+            [disabled]="store.saving()"
+          />
+        </div>
+      </div>
+      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="flex flex-col gap-2">
+          <label for="balance-search">Buscar institución, curso o viaje</label
+          ><input
+            pInputText
+            id="balance-search"
+            [ngModel]="search()"
+            (ngModelChange)="search.set($event)"
+            placeholder="Por ejemplo, colegio o curso"
+          />
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="destination-filter">Destino</label
+          ><p-select
+            inputId="destination-filter"
+            [options]="destinations()"
+            [ngModel]="destination()"
+            (ngModelChange)="destination.set($event)"
+            placeholder="Todos los destinos"
+            [showClear]="true"
+            appendTo="body"
+          />
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="departure-year">Año de salida (opcional)</label
+          ><p-inputnumber
+            inputId="departure-year"
+            [ngModel]="departureYear()"
+            (ngModelChange)="departureYear.set($event)"
+            [useGrouping]="false"
+            [min]="2000"
+            [max]="2100"
+          />
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="trip-filter">Uno o varios viajes</label
+          ><p-multiselect
+            inputId="trip-filter"
+            [options]="tripOptions()"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="selectedTrips()"
+            (ngModelChange)="selectedTrips.set($event)"
+            placeholder="Todos los viajes"
+            [filter]="true"
+            [showClear]="true"
+            appendTo="body"
+          />
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2 text-xs text-muted">
+        <p-tag [dt]="tagTokens" value="Contratos aprobados" severity="secondary" /><span
+          >{{ filtered().length }} viajes en la selección</span
+        >
+        @if (store.updatedAt()) {
+          <span>Actualizado: {{ store.updatedAt() | date: 'dd-MM-yyyy HH:mm' }}</span>
+        }
+        <span>Importes expresados en CLP salvo indicación.</span>
+      </div>
+    </div>
+  </p-panel>
+  <div aria-live="polite" class="space-y-3">
+    @if (localError()) {
+      <p-message [dt]="messageTokens" severity="error">{{ localError() }}</p-message>
+    }
+    @if (store.error()) {
+      <p-message [dt]="messageTokens" severity="error">{{ store.error() }}</p-message>
+    }
+    @if (store.notice()) {
+      <p-message [dt]="messageTokens" severity="success">{{ store.notice() }}</p-message>
+    }
+    @if (store.loading() || store.detailLoading()) {
+      <div class="flex items-center gap-3 p-4">
+        <p-progressspinner
+          [style]="{ width: '28px', height: '28px' }"
+          ariaLabel="Consultando datos"
+        />
+        <p>
+          Estamos reuniendo la información. No cierres la página si tienes una operación en curso.
+        </p>
+      </div>
+    }
+  </div>
+  <section
+    id="balance-content"
+    class="min-w-0 space-y-6 scroll-mt-6"
+    aria-label="Resultados del balance"
+  >
+    @if (!store.loading() && !store.rows().length && !store.error()) {
+      <p-message [dt]="messageTokens" severity="info"
+        >No encontramos contratos aprobados en este período documental. Prueba con otro
+        período.</p-message
+      >
+    }
+    <p-panel header="2. Compara los viajes y abre uno para trabajar">
+      <p class="mb-4 text-sm text-muted">
+        La tabla usa las estimaciones guardadas. Puedes desplazarla horizontalmente para revisar
+        todos los importes. «Sin datos» significa que falta información.
+      </p>
+      <p-table
+        [value]="tableRows()"
+        [scrollable]="true"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        size="small"
+        sortMode="multiple"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="{first}–{last} de {totalRecords} viajes"
+      >
+        <ng-template #header
+          ><tr>
+            <th scope="col">Acción</th>
+            @for (column of columns; track column.field) {
+              <th scope="col" [pSortableColumn]="column.field">
+                <span>{{ column.label }}</span
+                ><p-sort-icon [field]="column.field" />
+                @if (column.unit) {
+                  <small class="block font-normal">{{ column.unit }}</small>
+                }
+              </th>
+            }
+          </tr></ng-template
+        >
+        <ng-template #body let-row
+          ><tr>
+            <td>
+              <p-button
+                label="Abrir viaje"
+                size="small"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="select(row.id)"
+                [disabled]="store.saving()"
+              />
+            </td>
+            @for (column of columns; track column.field) {
+              <td class="whitespace-nowrap">
+                @if (row[column.field] === null) {
+                  <span class="text-muted">Sin datos</span>
+                } @else if (column.unit.startsWith('CLP') || column.unit === '%') {
+                  <span
+                    [class.text-red-700]="row[column.field] < 0"
+                    [class.dark:text-red-300]="row[column.field] < 0"
+                    >{{ row[column.field] | number: '1.0-2' : 'es-CL' }}</span
+                  >
+                } @else {
+                  {{ row[column.field] }}
+                }
+              </td>
+            }
+          </tr></ng-template
+        >
+        <ng-template #emptymessage
+          ><tr>
+            <td [attr.colspan]="columns.length + 1">No hay viajes con estos filtros.</td>
+          </tr></ng-template
+        >
+      </p-table>
+    </p-panel>
+    @if (selected(); as row) {
+      <p-panel [header]="'Viaje · ' + row.trip.institutionName + ' · ' + row.trip.destination">
+        <div class="space-y-4">
+          <div class="flex flex-wrap gap-2">
+            <p-tag
+              [dt]="tagTokens"
+              [value]="
+                historical()
+                  ? 'Versión histórica · solo lectura'
+                  : store.dirty()
+                    ? 'Cambios sin guardar'
+                    : 'Versión ' + row.state.version
+              "
+              [severity]="historical() ? 'secondary' : store.dirty() ? 'warn' : 'info'"
+            /><p-tag
+              [dt]="tagTokens"
+              [value]="row.state.baseline ? 'Con línea base aprobada' : 'Línea base sin aprobar'"
+              [severity]="row.state.baseline ? 'success' : 'warn'"
+            />
+          </div>
+          <p class="text-sm text-muted">
+            Contrato {{ row.trip.id }} · {{ row.trip.content.payments.totalPassengers }} pagantes y
+            {{ row.trip.content.payments.freePassengers }} liberados. La simulación puede usar otras
+            cantidades sin cambiar el contrato.
+          </p>
+          <p class="text-sm">
+            <strong>Venta contractual vigente: {{ format(contractualSale()) }} CLP brutos.</strong>
+            Resultado con esa venta y costos guardados: {{ format(operatingBalance()?.result) }} CLP
+            netos. La venta operativa considera cuentas vigentes, cobros aplicados y devoluciones
+            aprobadas por bajas; no equivale a ingreso contable.
+          </p>
+          @if (!row.trip.quantityConsistent) {
+            <p-message [dt]="messageTokens" severity="warn"
+              >La cantidad del contrato no coincide con su nómina ({{
+                row.trip.rosterCount
+              }}
+              personas). Revisa esta diferencia antes de importar.</p-message
+            >
+          }
+          @if (row.issue) {
+            <p-message [dt]="messageTokens" severity="warn"
+              >{{ row.issue }}. Puedes trabajar en el presupuesto, pero la comparación operativa
+              está incompleta.</p-message
+            >
+          }
+          <div class="flex flex-wrap gap-2">
+            <p-button
+              label="Crear presupuesto manual"
+              icon="icon-[tabler--plus] size-4"
+              severity="secondary"
+              [outlined]="true"
+              (onClick)="create(false)"
+              [disabled]="!canEdit() || store.saving()"
+            />
+            <p-button
+              label="Importar cotización del contrato"
+              icon="icon-[tabler--file-import] size-4"
+              severity="secondary"
+              [outlined]="true"
+              (onClick)="create(true)"
+              [disabled]="!canEdit() || store.saving() || !row.trip.quantityConsistent"
+            />
+            @if (auth.canAccess('CONTRACT_CREATE')) {
+              <a
+                pButton
+                severity="secondary"
+                [outlined]="true"
+                [routerLink]="['/contratos', row.trip.id, 'editar']"
+                >Ver contrato</a
+              >
+            }
+            @if (auth.canAccess('PAYMENT_OPERATIONS')) {
+              <a
+                pButton
+                severity="secondary"
+                [outlined]="true"
+                [routerLink]="['/cobranza/giras', row.trip.id, 'tesoreria']"
+                >Ver tesorería</a
+              >
+              <a
+                pButton
+                severity="secondary"
+                [outlined]="true"
+                [routerLink]="['/cobranza/giras', row.trip.id, 'proveedores']"
+                >Ver proveedores</a
+              >
+              <a
+                pButton
+                severity="secondary"
+                [outlined]="true"
+                [routerLink]="['/cobranza/giras', row.trip.id, 'devoluciones']"
+                >Ver devoluciones</a
+              >
+              <a
+                pButton
+                severity="secondary"
+                [outlined]="true"
+                [routerLink]="['/cobranza/giras', row.trip.id, 'alertas']"
+                >Ver cobranza</a
+              >
+            }
+          </div>
+          <details>
+            <summary class="cursor-pointer py-2 underline">
+              Revisiones guardadas y trazabilidad
+            </summary>
+            <p class="text-xs text-muted py-2">
+              Cada versión conserva quién hizo el cambio y por qué. Abrir una revisión no modifica
+              el presupuesto actual.
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <p-button
+                label="Volver a versión vigente"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="select(row.trip.id)"
+                [disabled]="store.saving()"
+              />
+              @for (revision of store.revisions(); track revision.version) {
+                <div class="space-y-1">
+                  <p class="text-xs text-muted">
+                    {{ revision.audit.actor }} ·
+                    {{ revision.audit.at | date: 'dd-MM-yyyy HH:mm' }} · {{ revision.audit.reason }}
+                  </p>
+                  <p-button
+                    [label]="'v' + revision.version + ' · ' + actions[revision.audit.action]"
+                    severity="secondary"
+                    [outlined]="true"
+                    (onClick)="select(row.trip.id, revision.version)"
+                    [disabled]="store.saving()"
+                  />
+                </div>
+              }
+            </div>
+            <p class="text-xs text-muted mt-3">
+              Último cambio: {{ row.state.audit?.actor }} ·
+              {{ row.state.audit?.at | date: 'dd-MM-yyyy HH:mm' }} · {{ row.state.audit?.reason }}
+            </p>
+          </details>
+        </div>
+      </p-panel>
+    }
+    <div class="flex flex-col gap-2 sm:max-w-sm">
+      <label for="balance-section">3. ¿Qué quieres entender?</label
+      ><p-select
+        inputId="balance-section"
+        [options]="sections"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="section()"
+        (ngModelChange)="section.set($event)"
+        appendTo="body"
+      />
+    </div>
+    @if (store.calculation(); as calc) {
+      @for (error of calc.errors; track error) {
+        <p-message [dt]="messageTokens" severity="error">{{ error }}</p-message>
+      }
+      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="rounded-xl border border-line/75 dark:border-line/55 bg-surface p-5">
+          <p class="text-sm text-muted">¿Cuánto cuesta el viaje?</p>
+          <p class="mt-2 text-2xl font-semibold">
+            {{
+              calc.cost === null
+                ? 'Sin presupuesto válido'
+                : (calc.cost | number: '1.0-0' : 'es-CL') + ' CLP'
+            }}
+          </p>
+          <p class="text-xs text-muted mt-2">Costos netos más reserva para imprevistos.</p>
+        </div>
+        <div class="rounded-xl border border-line/75 dark:border-line/55 bg-surface p-5">
+          <p class="text-sm text-muted">¿Cuánto financia cada pagante?</p>
+          <p class="mt-2 text-2xl font-semibold">
+            {{
+              calc.costPerPayer === null
+                ? 'Sin datos'
+                : (calc.costPerPayer | number: '1.0-0' : 'es-CL') + ' CLP'
+            }}
+          </p>
+          <p class="text-xs text-muted mt-2">
+            Costo repartido entre {{ calc.paying }} pagantes. Por viajero:
+            {{
+              calc.costPerTraveler === null
+                ? 'Sin datos'
+                : (calc.costPerTraveler | number: '1.0-0' : 'es-CL') + ' CLP'
+            }}.
+          </p>
+        </div>
+        <div class="rounded-xl border border-line/75 dark:border-line/55 bg-surface p-5">
+          <p class="text-sm text-muted">¿Qué resultado esperamos?</p>
+          <p
+            class="mt-2 text-2xl font-semibold"
+            [class.text-red-700]="calc.result !== null && calc.result < 0"
+            [class.dark:text-red-300]="calc.result !== null && calc.result < 0"
+            [class.text-emerald-700]="calc.result !== null && calc.result >= 0"
+            [class.dark:text-emerald-300]="calc.result !== null && calc.result >= 0"
+          >
+            {{
+              calc.result === null
+                ? 'Sin datos'
+                : (calc.result | number: '1.0-0' : 'es-CL') + ' CLP'
+            }}
+          </p>
+          <p class="text-xs text-muted mt-2">
+            {{
+              calc.result === null
+                ? 'Falta completar los costos.'
+                : calc.result < 0
+                  ? 'Pérdida operativa estimada.'
+                  : 'Resultado operativo favorable estimado.'
+            }}
+            No es utilidad neta.
+          </p>
+        </div>
+        <div class="rounded-xl border border-line/75 dark:border-line/55 bg-surface p-5">
+          <p class="text-sm text-muted">¿Qué precio alcanza el objetivo?</p>
+          <p class="mt-2 text-2xl font-semibold">
+            {{
+              calc.requiredPrice === null
+                ? 'Sin solución válida'
+                : (calc.requiredPrice | number: '1.0-0' : 'es-CL') + ' CLP'
+            }}
+          </p>
+          <p class="text-xs text-muted mt-2">
+            Precio bruto por pagante. Tu precio elegido permanece fijo.
+          </p>
+        </div>
+      </div>
+      @if (section() === 'summary') {
+        <p-panel header="Lee el resultado sin confundir los porcentajes">
+          <div class="grid gap-5 sm:grid-cols-2">
+            <div>
+              <p class="font-semibold">
+                Margen sobre venta neta:
+                {{
+                  calc.margin === null
+                    ? 'Sin datos'
+                    : (calc.margin | number: '1.0-2' : 'es-CL') + ' %'
+                }}
+              </p>
+              <p class="text-sm text-muted">
+                De cada 100 pesos vendidos sin IVA, cuánto queda después de los costos incluidos.
+              </p>
+            </div>
+            <div>
+              <p class="font-semibold">
+                Recargo sobre costo:
+                {{
+                  calc.markup === null
+                    ? 'Sin datos'
+                    : (calc.markup | number: '1.0-2' : 'es-CL') + ' %'
+                }}
+              </p>
+              <p class="text-sm text-muted">
+                Cuánto representa el resultado respecto de lo que cuesta hacer el viaje. No es el
+                mismo porcentaje que el margen.
+              </p>
+            </div>
+          </div>
+          <p class="mt-4 text-sm text-muted">
+            Venta simulada bruta: {{ calc.grossSale | number: '1.0-0' : 'es-CL' }} CLP · Venta neta:
+            {{ calc.netSale | number: '1.0-0' : 'es-CL' }} CLP. La venta del contrato se muestra en
+            la tabla y no cambia al simular.
+          </p>
+          @if (unbudgeted(); as missing) {
+            <p-message [dt]="messageTokens" severity="warn"
+              >Hay {{ missing | number: '1.0-0' : 'es-CL' }} CLP de compromisos sin asociar a
+              partidas. Revisa su cobertura: el resultado del presupuesto puede omitir esos costos.
+              No los sumamos automáticamente porque sus bases tributarias pueden ser
+              diferentes.</p-message
+            >
+          }
+        </p-panel>
+      }
+    }
+    @if (section() === 'budget' || section() === 'simulation') {
+      @if (store.draft(); as budget) {
+        @if (section() === 'simulation') {
+          <p-message [dt]="messageTokens" severity="info"
+            >Estás evaluando una alternativa. Cambiar personas, precio o costos no modifica el
+            contrato, los cobros ni los pagos. Guarda el escenario para volver a compararlo
+            después.</p-message
+          >
+          <div class="flex flex-wrap gap-2">
+            @for (scenario of store.scenarios(); track scenario.id) {
+              <p-button
+                [label]="scenario.budget.name"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="useScenario(scenario.id)"
+                [disabled]="store.saving()"
+              />
+            }
+          </div>
+
+          <p-panel header="Compara la línea base, la estimación y tus alternativas">
+            <p-table [value]="comparison()" [scrollable]="true" size="small"
+              ><ng-template #header
+                ><tr>
+                  <th scope="col">Versión / alternativa</th>
+                  <th scope="col">Costo neto CLP</th>
+                  <th scope="col">Resultado neto CLP</th>
+                  <th scope="col">Precio necesario CLP</th>
+                </tr></ng-template
+              ><ng-template #body let-item
+                ><tr>
+                  <th scope="row">{{ item.name }}</th>
+                  <td>{{ format(item.calculation?.cost) }}</td>
+                  <td>{{ format(item.calculation?.result) }}</td>
+                  <td>{{ format(item.calculation?.requiredPrice) }}</td>
+                </tr></ng-template
+              ></p-table
+            >
+          </p-panel>
+          <p-panel header="Pasajeros y precio: encuentra una combinación viable">
+            <p class="mb-3 text-sm text-muted">
+              Cada celda muestra el resultado estimado en CLP netos. Verde significa resultado
+              favorable; rojo, pérdida. Las columnas varían el precio fijo elegido. No se cambia el
+              contrato.
+            </p>
+            <p-table [value]="heatmap()" [scrollable]="true" size="small"
+              ><ng-template #header
+                ><tr>
+                  <th scope="col">Pagantes</th>
+                  @for (delta of [-20, -10, 0, 10, 20]; track delta) {
+                    <th scope="col">Precio {{ delta > 0 ? '+' : '' }}{{ delta }} %</th>
+                  }
+                </tr></ng-template
+              ><ng-template #body let-row
+                ><tr>
+                  <th scope="row">{{ row.count }}</th>
+                  @for (cell of row.cells; track $index) {
+                    <td
+                      [class.bg-emerald-50]="cell.result !== null && cell.result >= 0"
+                      [class.text-emerald-900]="cell.result !== null && cell.result >= 0"
+                      [class.dark:bg-emerald-950]="cell.result !== null && cell.result >= 0"
+                      [class.dark:text-emerald-200]="cell.result !== null && cell.result >= 0"
+                      [class.bg-red-50]="cell.result !== null && cell.result < 0"
+                      [class.text-red-900]="cell.result !== null && cell.result < 0"
+                      [class.dark:bg-red-950]="cell.result !== null && cell.result < 0"
+                      [class.dark:text-red-200]="cell.result !== null && cell.result < 0"
+                    >
+                      <span class="block text-xs"
+                        >{{ cell.price | number: '1.0-0' : 'es-CL' }} CLP por pagante</span
+                      ><strong>{{
+                        cell.result === null
+                          ? 'No viable / sin datos'
+                          : (cell.result | number: '1.0-0' : 'es-CL')
+                      }}</strong>
+                    </td>
+                  }
+                </tr></ng-template
+              ></p-table
+            >
+          </p-panel>
+        }
+        <app-budget-editor
+          [budget]="budget"
+          [today]="today"
+          [suppliers]="selected()?.finance?.suppliers ?? []"
+          [disabled]="!canEdit() || store.saving()"
+          (budgetChange)="edit($event)"
+        />
+        <p class="text-xs text-muted break-words">
+          Procedencia: {{ sources[budget.source.kind] }} · {{ budget.source.id }} · versión
+          {{ budget.source.version }} · {{ budget.source.date }}. Impuestos:
+          {{ budget.taxes.source }}. IVA {{ budget.taxes.vatRate }} %; retención de tripulación
+          {{ budget.taxes.crewWithholdingRate }} % incluida en honorarios brutos, sin sumarla
+          nuevamente.
+        </p>
+        <div class="rounded-2xl bg-night text-white p-5 space-y-4">
+          <div class="flex flex-col gap-2">
+            <label for="change-reason">Explica el motivo antes de guardar o aprobar</label
+            ><input
+              pInputText
+              id="change-reason"
+              [ngModel]="reason()"
+              (ngModelChange)="reason.set($event)"
+              placeholder="Por ejemplo: ajuste de alojamiento confirmado por el proveedor"
+              [maxlength]="500"
+              [disabled]="!canEdit() || store.saving()"
+            />
+          </div>
+          <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <p-button
+              label="Guardar borrador / estimación"
+              icon="icon-[tabler--device-floppy] size-4"
+              (onClick)="save('SAVE')"
+              [loading]="store.saving()"
+              [disabled]="
+                !canEdit() ||
+                !store.dirty() ||
+                reason().trim().length < 5 ||
+                !!store.calculation()?.errors?.length
+              "
+            />
+            <p-button
+              label="Guardar como escenario"
+              severity="secondary"
+              [outlined]="true"
+              (onClick)="save('SCENARIO')"
+              [disabled]="
+                !canEdit() ||
+                store.saving() ||
+                reason().trim().length < 5 ||
+                store.calculation()?.cost === null
+              "
+            />
+            <p-button
+              label="Aprobar presupuesto guardado"
+              severity="secondary"
+              [outlined]="true"
+              (onClick)="save('APPROVE')"
+              [disabled]="
+                !canEdit() ||
+                store.saving() ||
+                store.dirty() ||
+                !selected()?.state?.current ||
+                store.calculation()?.cost === null ||
+                reason().trim().length < 5
+              "
+            />
+            <p-button
+              label="Adoptar escenario guardado"
+              severity="secondary"
+              [outlined]="true"
+              (onClick)="save('PROMOTE')"
+              [disabled]="
+                !canEdit() ||
+                store.saving() ||
+                store.dirty() ||
+                !scenarioId() ||
+                reason().trim().length < 5
+              "
+            />
+          </div>
+          <p class="text-xs text-white/75">
+            Guardar no aprueba. Aprobar fija la línea base. Adoptar un escenario solo actualiza la
+            estimación y conserva la línea base anterior.
+          </p>
+        </div>
+      } @else {
+        <p-message [dt]="messageTokens" severity="info"
+          >Abre un viaje y crea o importa su presupuesto para trabajar con costos y
+          simulaciones.</p-message
+        >
+      }
+    }
+    @if (section() === 'cash') {
+      <p-panel header="¿Cuánto dinero podría hacer falta?">
+        <div class="grid gap-5 sm:grid-cols-2">
+          <div>
+            <p class="font-semibold">
+              Faltante actual:
+              {{
+                currentDeficit() === null
+                  ? 'Sin datos para hoy'
+                  : (currentDeficit() | number: '1.0-0' : 'es-CL') + ' CLP'
+              }}
+            </p>
+            <p class="text-sm text-muted">
+              Compromisos pendientes y devoluciones pagables menos caja registrada al día de hoy.
+              Sin fechas de proveedor representa exposición total, no deuda vencida.
+            </p>
+          </div>
+          <div>
+            <p class="font-semibold">
+              Mayor faltante previsto:
+              {{
+                projection()?.deficit === null || !projection()
+                  ? 'Faltan movimientos futuros fechados'
+                  : (projection()?.deficit | number: '1.0-0' : 'es-CL') + ' CLP'
+              }}
+            </p>
+            <p class="text-sm text-muted">
+              {{
+                projection()?.complete
+                  ? 'Cobertura futura declarada completa por el responsable.'
+                  : 'Proyección parcial: faltan fechas o confirmar la cobertura.'
+              }}
+              Se calcula desde el saldo registrado de hoy, sin contar acuerdos de recuperación como
+              dinero recibido.
+            </p>
+          </div>
+        </div>
+        @if (supplierSummary(); as suppliers) {
+          <p class="mt-4 text-sm">
+            Pendiente proveedores: {{ suppliers.pending | number: '1.0-0' : 'es-CL' }} CLP ·
+            Recuperaciones aún no recibidas:
+            {{ suppliers.recovery | number: '1.0-0' : 'es-CL' }} CLP.
+          </p>
+        }
+      </p-panel>
+    }
+    <div class="grid items-start gap-6 xl:grid-cols-2">
+      @for (chart of visibleCharts(); track chart.id) {
+        @defer (on viewport) {
+          <app-balance-chart [chart]="chart" />
+        } @placeholder {
+          <div class="rounded-xl border border-line/75 dark:border-line/55 bg-surface p-5">
+            <p>{{ chart.title }}</p>
+            <p class="text-xs text-muted">Se carga al entrar en pantalla.</p>
+          </div>
+        }
+      }
+    </div>
+    <details class="rounded-xl border border-line/75 dark:border-line/55 p-5 bg-surface">
+      <summary class="cursor-pointer font-semibold">Ayuda rápida: qué significa cada dato</summary>
+      <dl class="mt-4 grid gap-4 sm:grid-cols-2">
+        <div>
+          <dt class="font-semibold">Línea base</dt>
+          <dd class="text-sm text-muted">
+            Presupuesto aprobado con el que compararás los cambios posteriores.
+          </dd>
+        </div>
+        <div>
+          <dt class="font-semibold">Compromiso</dt>
+          <dd class="text-sm text-muted">
+            Importe acordado con un proveedor. Pagarlo no crea otro costo.
+          </dd>
+        </div>
+        <div>
+          <dt class="font-semibold">Escenario</dt>
+          <dd class="text-sm text-muted">
+            Una alternativa para probar decisiones sin cambiar operaciones reales.
+          </dd>
+        </div>
+        <div>
+          <dt class="font-semibold">Caja y resultado</dt>
+          <dd class="text-sm text-muted">
+            Caja es dinero registrado que entra o sale. Resultado compara venta y costos. Pueden ser
+            diferentes.
+          </dd>
+        </div>
+      </dl>
+    </details>
+  </section>
+</div>
