@@ -1,7 +1,7 @@
 {
   "id": "/",
   "name": "Indómito Hub",
-  "short_name": "Indómito",
+  "short_name": "Indómito Hub",
   "description": "Panel de administración de Giras Indómito",
   "start_url": "/",
   "scope": "/",
