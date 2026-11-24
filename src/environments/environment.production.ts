@@ -3,7 +3,7 @@
  */
 export const environment = {
   production: true,
-  version: 'v0.17.0',
+  version: 'v0.18.0',
   apiUrl: 'https://api.girasindomito.cl',
   paymentPortalUrl: 'https://pagos.girasindomito.cl',
   stage: 'prd',
