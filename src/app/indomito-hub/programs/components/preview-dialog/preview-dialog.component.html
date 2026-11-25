@@ -1,7 +1,7 @@
 <p-dialog
   header="Previsualización de la cotización"
   role="dialog"
-  styleClass="w-[min(72rem,calc(100vw-2rem))]"
+  styleClass="w-[min(72rem,calc(100vw-2rem))] border-line/75! dark:border-line/55!"
   contentStyleClass="p-0"
   [visible]="visible()"
   [modal]="true"
@@ -347,22 +347,24 @@
   </div>
 
   <ng-template #footer>
-    <div class="flex w-full flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
+    <div class="mt-3 flex w-full flex-col-reverse gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
       <button
         pButton
         type="button"
         severity="secondary"
         outlined
+        class="border-line/75! bg-surface! text-ink! enabled:hover:bg-canvas! dark:border-line/55!"
         [disabled]="busy()"
         [loading]="busy()"
         (click)="visible.set(false)"
       >
         Cerrar
       </button>
-      <div class="flex flex-col gap-2 sm:flex-row">
+      <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <button
           pButton
           type="button"
+          class="border-line/75! bg-canvas! text-ink! enabled:hover:bg-surface! dark:border-line/55!"
           severity="secondary"
           [disabled]="busy()"
           [loading]="busy()"
@@ -373,6 +375,7 @@
         <button
           pButton
           type="button"
+          class="border-line/75! bg-canvas! text-ink! enabled:hover:bg-surface! dark:border-line/55!"
           severity="secondary"
           [disabled]="busy()"
           [loading]="busy()"
@@ -383,6 +386,7 @@
         <button
           pButton
           type="button"
+          class="border-brand! bg-brand! text-night! enabled:hover:brightness-95"
           [disabled]="busy() || !favoriteAvailable()"
           [loading]="busy()"
           [title]="

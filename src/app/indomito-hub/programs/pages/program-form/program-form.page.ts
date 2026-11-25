@@ -1,3 +1,4 @@
+import { importProgramExcel } from '../../exporters/excel-importer';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -202,6 +203,25 @@ export class ProgramFormPage {
         next: () => this.notifications.success(APP_MESSAGES.programs.favoriteDeleted),
         error: (error: unknown) => this.notifyUnexpectedFavoriteError(error),
       });
+  }
+
+  protected async importExcel(input: HTMLInputElement): Promise<void> {
+    const file = input.files?.[0];
+    input.value = '';
+    const catalogs = this.catalogStore.catalogs();
+    if (!file || !catalogs || this.previewBusy()) return;
+    this.previewBusy.set(true);
+    try {
+      const content = await importProgramExcel(file, catalogs);
+      this.programFormStore.patchFromExcel(content);
+      this.notifications.success('Datos del Excel cargados en el formulario.');
+    } catch {
+      this.notifications.error(
+        'Revisa que el archivo sea un Excel exportado desde esta página y que su plan, temporada y destino estén disponibles.',
+      );
+    } finally {
+      this.previewBusy.set(false);
+    }
   }
 
   /** Exporta todas las filas calculadas, independientemente del filtro visible en el resumen. */

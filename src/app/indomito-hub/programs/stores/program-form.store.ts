@@ -1,3 +1,4 @@
+import type { ImportedProgram } from '../exporters/excel-importer';
 import { computed, DestroyRef, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -181,24 +182,7 @@ export class ProgramFormStore {
       const { exchange: _, ...pricing } = content.pricing;
       controls.pricing.setValue(pricing, { emitEvent: false });
 
-      const crews = content.crews ?? [];
-      controls.crews.clear({ emitEvent: false });
-      for (const crew of crews) {
-        controls.crews.push(createCrewRow(crew), { emitEvent: false });
-      }
-      if (controls.crews.length === 0) {
-        controls.crews.push(createCrewRow(), { emitEvent: false });
-      }
-
-      const services = content.services ?? [];
-      controls.services.clear({ emitEvent: false });
-      for (const service of services) {
-        controls.services.push(createServiceRow(service), { emitEvent: false });
-      }
-      if (controls.services.length === 0) {
-        controls.services.push(createServiceRow(), { emitEvent: false });
-      }
-
+      this.replaceImportedRows(content);
       this.nightsSourceState.set('user');
       this.form.markAsPristine();
     } finally {
@@ -207,6 +191,39 @@ export class ProgramFormStore {
 
     this.refreshAllSections();
     this.dynamicRowsRevisionState.update((revision) => revision + 1);
+  }
+
+  patchFromExcel(content: ImportedProgram): void {
+    this.form.controls.generals.patchValue(content.generals);
+    this.form.controls.schedule.patchValue(content.schedule);
+    if (content.schedule.totalNights != null)
+      this.setNightsFromFavorite(content.schedule.totalNights);
+    this.form.controls.pricing.patchValue(content.pricing);
+    this.replaceImportedRows(content);
+    this.form.markAsDirty();
+    this.refreshAllSections();
+    this.dynamicRowsRevisionState.update((revision) => revision + 1);
+  }
+
+  private replaceImportedRows(content: Pick<ImportedProgram, 'crews' | 'services'>): void {
+    const controls = this.form.controls;
+    const crews = content.crews ?? [];
+    const services = content.services ?? [];
+    controls.crews.clear({ emitEvent: false });
+    for (const crew of crews) {
+      controls.crews.push(createCrewRow(crew), { emitEvent: false });
+    }
+    if (controls.crews.length === 0) {
+      controls.crews.push(createCrewRow(), { emitEvent: false });
+    }
+
+    controls.services.clear({ emitEvent: false });
+    for (const service of services) {
+      controls.services.push(createServiceRow(service), { emitEvent: false });
+    }
+    if (controls.services.length === 0) {
+      controls.services.push(createServiceRow(), { emitEvent: false });
+    }
   }
 
   private subscribeToSections(): void {

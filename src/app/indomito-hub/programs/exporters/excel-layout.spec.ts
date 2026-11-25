@@ -1,4 +1,5 @@
 import fc from 'fast-check';
+import { readProgramSheet } from './excel-importer';
 
 import { arbCalculationInput } from '../calculation/__arbitraries__';
 import { calculateProgram } from '../calculation/calculation-engine';
@@ -32,6 +33,29 @@ describe('buildExcelLayout', () => {
     const buffer = await workbook.toBuffer();
 
     expect(buffer.subarray(0, 2).toString()).toBe('PK');
+    const { default: excel } = await import('exceljs');
+    const reader = new excel.Workbook();
+    await reader.xlsx.load(Uint8Array.from(buffer).buffer);
+    const { plan, season, destination } = program.generals;
+    const restored = readProgramSheet(reader.getWorksheet('Programa')!, {
+      plans: [{ ...plan, order: 0 }],
+      seasons: [{ ...season, order: 0 }],
+      destinations: [{ ...destination, order: 0, budgetTemplateId: 'test' }],
+    });
+    expect(restored.generals).toMatchObject(program.generals);
+    expect(restored.schedule).toEqual({
+      totalDays: input.schedule.totalDays,
+      totalNights: input.schedule.totalNights,
+      totalPassengers: input.schedule.totalPassengers,
+      freePassengers: input.schedule.freePassengers,
+    });
+    expect(restored.pricing.utilityRate).toBe(input.pricing.utilityRate);
+    expect(restored.crews.map((row) => row.documentId)).toEqual(
+      program.crews.map((row) => row.documentId),
+    );
+    expect(restored.services.map((row) => row.chargeType)).toEqual(
+      program.services.map((row) => row.chargeType),
+    );
   });
 
   it('Feature: program-form, Property 31: El Excel exporta el programa completo', () => {

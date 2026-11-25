@@ -44,6 +44,19 @@
       </div>
 
       <div class="flex shrink-0 flex-wrap gap-3">
+        <input #excelFile type="file" accept=".xlsx" hidden (change)="importExcel(excelFile)" />
+        <button
+          pButton
+          appMotionPress
+          type="button"
+          severity="secondary"
+          outlined
+          class="border-white/20! text-white! hover:border-white/35! hover:bg-white/10!"
+          [disabled]="actionBusy() || !catalogStore.catalogs()"
+          (click)="excelFile.click()"
+        >
+          Importar Excel
+        </button>
         <a
           pButton
           appMotionPress
